@@ -81,6 +81,14 @@ them as admin via *gear icon → Users → select user → Activate* before use.
 Demo depots with inventory: Main Warehouse, Boston Warehouse,
 Chicago Warehouse (plus Central Warehouse (NYC)).
 
+## Characterization tests
+
+Once the stack is up and demo data is loaded, the Playwright golden-path
+suite in [`characterization/`](../../characterization/README.md) can be run
+with `cd characterization && npm ci && npx playwright install chromium && npm test`.
+`docker/wait-for-app.sh` blocks until the app healthcheck passes (useful in
+scripts/CI).
+
 ## Configuration overrides
 
 Optionally create `docker/.env` (see `docker/.env.example`) to override

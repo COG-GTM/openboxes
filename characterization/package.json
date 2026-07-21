@@ -1,0 +1,16 @@
+{
+  "name": "openboxes-characterization",
+  "version": "1.0.0",
+  "private": true,
+  "description": "Playwright characterization (golden-path) tests for the legacy OpenBoxes app. These are the parity oracle for the modernization program.",
+  "scripts": {
+    "test": "playwright test",
+    "test:headed": "playwright test --headed",
+    "report": "playwright show-report"
+  },
+  "devDependencies": {
+    "@playwright/test": "^1.61.1",
+    "@types/node": "^26.1.1",
+    "typescript": "^7.0.2"
+  }
+}

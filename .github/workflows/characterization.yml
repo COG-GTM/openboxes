@@ -1,0 +1,68 @@
+name: Characterization Tests
+
+# Golden-path Playwright characterization suite (parity oracle for the
+# modernization program). Boots the released app image via docker compose,
+# seeds demo data, and exercises the live app end-to-end.
+on:
+  pull_request:
+  push:
+    branches: [ 'master', 'develop' ]
+
+concurrency:
+  group: characterization-${{ github.ref }}
+  cancel-in-progress: true
+
+jobs:
+  characterization:
+    runs-on: ubuntu-latest
+    timeout-minutes: 45
+
+    steps:
+      - name: Checkout Code
+        uses: actions/checkout@v4
+
+      - name: Boot OpenBoxes stack
+        working-directory: docker
+        run: docker compose up -d
+
+      - name: Wait for app (Liquibase migrations run on first boot)
+        working-directory: docker
+        run: ./wait-for-app.sh http://localhost:8080/openboxes 1200
+
+      - name: Load demo data
+        working-directory: docker
+        run: ./load-demo-data.sh
+
+      - name: Set up Node
+        uses: actions/setup-node@v4
+        with:
+          node-version: 22
+          cache: npm
+          cache-dependency-path: characterization/package-lock.json
+
+      - name: Install dependencies
+        working-directory: characterization
+        run: npm ci
+
+      - name: Install Playwright browsers
+        working-directory: characterization
+        run: npx playwright install --with-deps chromium
+
+      - name: Run characterization suite
+        working-directory: characterization
+        run: npm test
+
+      - name: Upload Playwright report and screenshots
+        if: always()
+        uses: actions/upload-artifact@v4
+        with:
+          name: characterization-report
+          path: |
+            characterization/playwright-report/
+            characterization/test-results/
+            characterization/screenshots/output/
+          retention-days: 14
+
+      - name: Dump app logs on failure
+        if: failure()
+        run: docker logs openboxes-app --tail 300
