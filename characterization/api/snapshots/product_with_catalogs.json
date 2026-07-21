@@ -1,0 +1,50 @@
+{
+  "body": {
+    "data": {
+      "catalogs": [
+        {
+          "id": "<masked>",
+          "name": "Ann Arbor Office Products"
+        },
+        {
+          "id": "<masked>",
+          "name": "Boston Office Products"
+        },
+        {
+          "id": "<masked>",
+          "name": "Cedar Rapids Office Products"
+        },
+        {
+          "id": "<masked>",
+          "name": "Chicago Office Products"
+        },
+        {
+          "id": "<masked>",
+          "name": "Des Moines Office Products"
+        },
+        {
+          "id": "<masked>",
+          "name": "Newark Office Products"
+        },
+        {
+          "id": "<masked>",
+          "name": "Portland Office Products"
+        },
+        {
+          "id": "<masked>",
+          "name": "Providence Office Products"
+        }
+      ],
+      "id": "<masked>",
+      "name": "Adapter, USB-C male to HDMI + VGA female",
+      "productCode": "AX738"
+    }
+  },
+  "contentType": "application/json",
+  "request": {
+    "method": "GET",
+    "params": {},
+    "path": "/api/products/<id>/withCatalogs"
+  },
+  "status": 200
+}

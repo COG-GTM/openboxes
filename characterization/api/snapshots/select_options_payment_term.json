@@ -1,0 +1,48 @@
+{
+  "body": {
+    "data": [
+      {
+        "id": "<masked>",
+        "label": "Cash On Delivery",
+        "value": "COD"
+      },
+      {
+        "id": "<masked>",
+        "label": "Net 30",
+        "value": "NET30"
+      },
+      {
+        "id": "<masked>",
+        "label": "Payment In Advance",
+        "value": "PIA"
+      },
+      {
+        "id": "<masked>",
+        "label": "Prepayment 100",
+        "value": "PP100"
+      },
+      {
+        "id": "<masked>",
+        "label": "Prepayment 25/Net 30",
+        "value": "PP25"
+      },
+      {
+        "id": "<masked>",
+        "label": "Prepayment 50/Net 30",
+        "value": "PP50"
+      },
+      {
+        "id": "<masked>",
+        "label": "Upon shipment",
+        "value": "US"
+      }
+    ]
+  },
+  "contentType": "application/json",
+  "request": {
+    "method": "GET",
+    "params": {},
+    "path": "/api/paymentTermOptions"
+  },
+  "status": 200
+}

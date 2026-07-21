@@ -1,0 +1,28 @@
+{
+  "body": {
+    "data": {
+      "code": "EA",
+      "createdBy": {
+        "id": "<masked>"
+      },
+      "dateCreated": "<masked>",
+      "description": null,
+      "id": "<masked>",
+      "lastUpdated": "<masked>",
+      "name": "Each",
+      "uomClass": {
+        "id": "<masked>"
+      },
+      "updatedBy": {
+        "id": "<masked>"
+      }
+    }
+  },
+  "contentType": "application/json",
+  "request": {
+    "method": "GET",
+    "params": {},
+    "path": "/api/unitOfMeasures/EA"
+  },
+  "status": 200
+}

@@ -1,0 +1,38 @@
+{
+  "body": {
+    "data": [
+      {
+        "id": "<masked>",
+        "label": "Fair",
+        "value": "FAIR"
+      },
+      {
+        "id": "<masked>",
+        "label": "Good",
+        "value": "GOOD"
+      },
+      {
+        "id": "<masked>",
+        "label": "Not rated",
+        "value": "NOT_RATED"
+      },
+      {
+        "id": "<masked>",
+        "label": "Outstanding",
+        "value": "OUTSTANDING"
+      },
+      {
+        "id": "<masked>",
+        "label": "Poor",
+        "value": "POOR"
+      }
+    ]
+  },
+  "contentType": "application/json",
+  "request": {
+    "method": "GET",
+    "params": {},
+    "path": "/api/ratingTypeCodeOptions"
+  },
+  "status": 200
+}

@@ -1,0 +1,29 @@
+{
+  "body": {
+    "data": [
+      {
+        "id": "<masked>",
+        "label": "Mail Room (4)"
+      },
+      {
+        "id": "<masked>",
+        "label": "New Employee Package (4)"
+      },
+      {
+        "id": "<masked>",
+        "label": "Primary Care (8)"
+      },
+      {
+        "id": "<masked>",
+        "label": "Tertiary Care (15)"
+      }
+    ]
+  },
+  "contentType": "application/json",
+  "request": {
+    "method": "GET",
+    "params": {},
+    "path": "/api/tagOptions"
+  },
+  "status": 200
+}

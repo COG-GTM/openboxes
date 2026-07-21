@@ -1,0 +1,15 @@
+{
+  "body": {
+    "data": []
+  },
+  "contentType": "application/json",
+  "request": {
+    "method": "GET",
+    "params": {
+      "origin.id": "1",
+      "product.id": "<id>"
+    },
+    "path": "/api/stockMovements/pendingRequisitionDetails"
+  },
+  "status": 200
+}

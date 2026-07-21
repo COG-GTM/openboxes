@@ -1,0 +1,141 @@
+{
+  "body": {
+    "data": [
+      {
+        "email": "",
+        "firstName": "Dr",
+        "id": "<masked>",
+        "lastName": "Brown",
+        "name": "Dr Brown",
+        "username": null
+      },
+      {
+        "email": "",
+        "firstName": "Dr",
+        "id": "<masked>",
+        "lastName": "Smith",
+        "name": "Dr Smith",
+        "username": null
+      },
+      {
+        "email": "",
+        "firstName": "Jane",
+        "id": "<masked>",
+        "lastName": "Doe",
+        "name": "Jane Doe",
+        "username": null
+      },
+      {
+        "email": "",
+        "firstName": "John",
+        "id": "<masked>",
+        "lastName": "Smith",
+        "name": "John Smith",
+        "username": null
+      },
+      {
+        "email": "",
+        "firstName": "Mr",
+        "id": "<masked>",
+        "lastName": "Accountant",
+        "name": "Mr Accountant",
+        "roles": [
+          "ROLE_ADMIN",
+          "ROLE_FINANCE",
+          "ROLE_INVOICE"
+        ],
+        "username": "accountant"
+      },
+      {
+        "email": "",
+        "firstName": "Mr",
+        "id": "<masked>",
+        "lastName": "Browser",
+        "name": "Mr Browser",
+        "roles": [
+          "ROLE_BROWSER",
+          "ROLE_FINANCE"
+        ],
+        "username": "browser"
+      },
+      {
+        "email": "",
+        "firstName": "Mr",
+        "id": "<masked>",
+        "lastName": "CEO",
+        "name": "Mr CEO",
+        "username": null
+      },
+      {
+        "email": "",
+        "firstName": "Mr",
+        "id": "<masked>",
+        "lastName": "Office Manager",
+        "name": "Mr Office Manager",
+        "username": null
+      },
+      {
+        "email": "",
+        "firstName": "Ms",
+        "id": "<masked>",
+        "lastName": "IT Lead",
+        "name": "Ms IT Lead",
+        "username": null
+      },
+      {
+        "email": "",
+        "firstName": "Ms",
+        "id": "<masked>",
+        "lastName": "Lab Lead",
+        "name": "Ms Lab Lead",
+        "username": null
+      },
+      {
+        "email": "",
+        "firstName": "Ms",
+        "id": "<masked>",
+        "lastName": "Purchaser",
+        "name": "Ms Purchaser",
+        "roles": [
+          "ROLE_ADMIN",
+          "ROLE_FINANCE"
+        ],
+        "username": "purchaser"
+      },
+      {
+        "email": "",
+        "firstName": "Ms",
+        "id": "<masked>",
+        "lastName": "Superuser",
+        "name": "Ms Superuser",
+        "roles": [
+          "ROLE_FINANCE",
+          "ROLE_INVOICE",
+          "ROLE_SUPERUSER"
+        ],
+        "username": "superuser"
+      },
+      {
+        "email": "admin@admin.com",
+        "firstName": "Miss",
+        "id": "<masked>",
+        "lastName": "Administrator",
+        "name": "Miss Administrator",
+        "roles": [
+          "ROLE_FINANCE",
+          "ROLE_PRODUCT_NOTIFICATION",
+          "ROLE_SHIPMENT_NOTIFICATION",
+          "ROLE_SUPERUSER"
+        ],
+        "username": "admin"
+      }
+    ]
+  },
+  "contentType": "application/json",
+  "request": {
+    "method": "GET",
+    "params": {},
+    "path": "/api/persons"
+  },
+  "status": 200
+}

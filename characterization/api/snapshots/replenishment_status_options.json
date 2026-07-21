@@ -1,0 +1,28 @@
+{
+  "body": {
+    "data": [
+      {
+        "id": "<masked>",
+        "label": "Below maximum",
+        "value": "BELOW_MAXIMUM"
+      },
+      {
+        "id": "<masked>",
+        "label": "Below minimum",
+        "value": "BELOW_MINIMUM"
+      },
+      {
+        "id": "<masked>",
+        "label": "Below reorder",
+        "value": "BELOW_REORDER"
+      }
+    ]
+  },
+  "contentType": "application/json",
+  "request": {
+    "method": "GET",
+    "params": {},
+    "path": "/api/replenishments/statusOptions"
+  },
+  "status": 200
+}

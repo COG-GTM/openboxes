@@ -1,0 +1,15 @@
+{
+  "body": {
+    "data": [],
+    "totalCount": 0
+  },
+  "contentType": "application/json",
+  "request": {
+    "method": "GET",
+    "params": {
+      "location": "1"
+    },
+    "path": "/api/stockTransfers"
+  },
+  "status": 200
+}

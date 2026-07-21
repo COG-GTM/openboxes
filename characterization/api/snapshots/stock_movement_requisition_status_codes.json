@@ -1,0 +1,53 @@
+{
+  "body": {
+    "data": [
+      {
+        "id": "<masked>",
+        "label": "Canceled",
+        "value": "CANCELED"
+      },
+      {
+        "id": "<masked>",
+        "label": "Checking",
+        "value": "CHECKING"
+      },
+      {
+        "id": "<masked>",
+        "label": "Created",
+        "value": "CREATED"
+      },
+      {
+        "id": "<masked>",
+        "label": "Editing",
+        "value": "EDITING"
+      },
+      {
+        "id": "<masked>",
+        "label": "Issued",
+        "value": "ISSUED"
+      },
+      {
+        "id": "<masked>",
+        "label": "Picked",
+        "value": "PICKED"
+      },
+      {
+        "id": "<masked>",
+        "label": "Picking",
+        "value": "PICKING"
+      },
+      {
+        "id": "<masked>",
+        "label": "Verifying",
+        "value": "VERIFYING"
+      }
+    ]
+  },
+  "contentType": "application/json",
+  "request": {
+    "method": "GET",
+    "params": {},
+    "path": "/api/stockMovements/requisitionsStatusCodes"
+  },
+  "status": 200
+}

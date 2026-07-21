@@ -1,0 +1,225 @@
+{
+  "body": {
+    "data": [
+      {
+        "active": true,
+        "category": "IT Equipment",
+        "color": null,
+        "dateCreated": "<masked>",
+        "description": "",
+        "displayNames": {
+          "default": null
+        },
+        "handlingIcons": [],
+        "id": "<masked>",
+        "lastUpdated": "<masked>",
+        "lotAndExpiryControl": false,
+        "name": "Adapter, USB-C Male to HDMI Female",
+        "pricePerUnit": 59.99,
+        "productCode": "GK233",
+        "unitOfMeasure": "Each",
+        "updatedBy": "Miss Administrator"
+      },
+      {
+        "active": true,
+        "category": "IT Equipment",
+        "color": null,
+        "dateCreated": "<masked>",
+        "description": "",
+        "displayNames": {
+          "default": null
+        },
+        "handlingIcons": [],
+        "id": "<masked>",
+        "lastUpdated": "<masked>",
+        "lotAndExpiryControl": false,
+        "name": "Adapter, USB-C male to HDMI + VGA female",
+        "pricePerUnit": 25.99,
+        "productCode": "AX738",
+        "unitOfMeasure": "Each",
+        "updatedBy": "Miss Administrator"
+      },
+      {
+        "active": true,
+        "category": "IT Equipment",
+        "color": null,
+        "dateCreated": "<masked>",
+        "description": "",
+        "displayNames": {
+          "default": null
+        },
+        "handlingIcons": [
+          {
+            "color": "#ffa500",
+            "icon": "fa-exclamation-triangle",
+            "label": "Hazardous material"
+          }
+        ],
+        "id": "<masked>",
+        "lastUpdated": "<masked>",
+        "lotAndExpiryControl": false,
+        "name": "Battery, for canon LP-E6N",
+        "pricePerUnit": 61.0,
+        "productCode": "QA069",
+        "unitOfMeasure": "Each",
+        "updatedBy": "Miss Administrator"
+      },
+      {
+        "active": true,
+        "category": "Lab",
+        "color": null,
+        "dateCreated": "<masked>",
+        "description": "",
+        "displayNames": {
+          "default": null
+        },
+        "handlingIcons": [],
+        "id": "<masked>",
+        "lastUpdated": "<masked>",
+        "lotAndExpiryControl": false,
+        "name": "Beaker, Graduated, Borosilicate glass, 100mL",
+        "pricePerUnit": 1.5,
+        "productCode": "HP196",
+        "unitOfMeasure": "Each",
+        "updatedBy": "Miss Administrator"
+      },
+      {
+        "active": true,
+        "category": "Lab",
+        "color": null,
+        "dateCreated": "<masked>",
+        "description": "",
+        "displayNames": {
+          "default": null
+        },
+        "handlingIcons": [],
+        "id": "<masked>",
+        "lastUpdated": "<masked>",
+        "lotAndExpiryControl": false,
+        "name": "Beaker, Graduated, Borosilicate glass, 250mL",
+        "pricePerUnit": 2.35,
+        "productCode": "MY523",
+        "unitOfMeasure": "Each",
+        "updatedBy": "Miss Administrator"
+      },
+      {
+        "active": true,
+        "category": "Lab",
+        "color": null,
+        "dateCreated": "<masked>",
+        "description": "",
+        "displayNames": {
+          "default": null
+        },
+        "handlingIcons": [],
+        "id": "<masked>",
+        "lastUpdated": "<masked>",
+        "lotAndExpiryControl": false,
+        "name": "Beaker, Graduated, Borosilicate glass, 400mL",
+        "pricePerUnit": 4.05,
+        "productCode": "BX996",
+        "unitOfMeasure": "Each",
+        "updatedBy": "Miss Administrator"
+      },
+      {
+        "active": true,
+        "category": "Office Supplies",
+        "color": null,
+        "dateCreated": "<masked>",
+        "description": "",
+        "displayNames": {
+          "default": null
+        },
+        "handlingIcons": [],
+        "id": "<masked>",
+        "lastUpdated": "<masked>",
+        "lotAndExpiryControl": false,
+        "name": "Binder clips, 19mm",
+        "pricePerUnit": 1.0,
+        "productCode": "XJ252",
+        "unitOfMeasure": "Each",
+        "updatedBy": "Miss Administrator"
+      },
+      {
+        "active": true,
+        "category": "Office Supplies",
+        "color": null,
+        "dateCreated": "<masked>",
+        "description": "",
+        "displayNames": {
+          "default": null
+        },
+        "handlingIcons": [],
+        "id": "<masked>",
+        "lastUpdated": "<masked>",
+        "lotAndExpiryControl": false,
+        "name": "Binder clips, 25mm",
+        "pricePerUnit": 1.0,
+        "productCode": "RS138",
+        "unitOfMeasure": "Each",
+        "updatedBy": "Miss Administrator"
+      },
+      {
+        "active": true,
+        "category": "Office Supplies",
+        "color": null,
+        "dateCreated": "<masked>",
+        "description": "",
+        "displayNames": {
+          "default": null
+        },
+        "handlingIcons": [
+          {
+            "color": "#ffa500",
+            "icon": "fa-exclamation-triangle",
+            "label": "Hazardous material"
+          }
+        ],
+        "id": "<masked>",
+        "lastUpdated": "<masked>",
+        "lotAndExpiryControl": false,
+        "name": "Batteries, Non Rechargeable, AA",
+        "pricePerUnit": 1.5,
+        "productCode": "XJ173",
+        "unitOfMeasure": "Each",
+        "updatedBy": "Miss Administrator"
+      },
+      {
+        "active": true,
+        "category": "Office Supplies",
+        "color": null,
+        "dateCreated": "<masked>",
+        "description": "",
+        "displayNames": {
+          "default": null
+        },
+        "handlingIcons": [
+          {
+            "color": "#ffa500",
+            "icon": "fa-exclamation-triangle",
+            "label": "Hazardous material"
+          }
+        ],
+        "id": "<masked>",
+        "lastUpdated": "<masked>",
+        "lotAndExpiryControl": false,
+        "name": "Batteries, Non Rechargeable, AAA",
+        "pricePerUnit": 1.5,
+        "productCode": "RU651",
+        "unitOfMeasure": "Each",
+        "updatedBy": "Miss Administrator"
+      }
+    ],
+    "totalCount": 57
+  },
+  "contentType": "application/json",
+  "request": {
+    "method": "GET",
+    "params": {
+      "max": "10",
+      "offset": "0"
+    },
+    "path": "/api/products"
+  },
+  "status": 200
+}

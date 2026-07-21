@@ -1,0 +1,19 @@
+{
+  "body": {
+    "data": {
+      "whoProducts": {
+        "description": "<div>This selection will import the WHO Essential Medicines List (Sept 2021 version) into your instance as products.  Public health facilities that use the WHO list as the basis of their product catalogue will find that this is a good starting point to building out their products in OpenBoxes.</div><div class='my-3'>In order to import this product list, you must have selected the corresponding WHO category tree in the previous step. This product list will not work with any other category tree. Go to <a target='_blank' rel='noopener noreferrer' href='https://list.essentialmeds.org/'>list.essentialmeds.org</a> to view the full WHO list that will be imported.</div>",
+        "enabled": true,
+        "fileUrl": "https://raw.githubusercontent.com/openboxes/openboxes/develop/grails-app/conf/templates/configuration/WHO_products.csv",
+        "title": "WHO product list"
+      }
+    }
+  },
+  "contentType": "application/json",
+  "request": {
+    "method": "GET",
+    "params": {},
+    "path": "/api/productsConfiguration/productOptions"
+  },
+  "status": 200
+}

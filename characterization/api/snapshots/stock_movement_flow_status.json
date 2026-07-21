@@ -1,0 +1,12 @@
+{
+  "body": {
+    "data": "CREATED"
+  },
+  "contentType": "application/json",
+  "request": {
+    "method": "GET",
+    "params": {},
+    "path": "/api/stockMovements/<id>/status"
+  },
+  "status": 200
+}

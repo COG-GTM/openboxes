@@ -1,0 +1,40 @@
+{
+  "body": {
+    "data": [
+      {
+        "createdBy": "Miss Administrator",
+        "dateCreated": "<masked>",
+        "destination": "Boston Warehouse",
+        "id": "<masked>",
+        "isPublished": true,
+        "lastUpdated": "<masked>",
+        "name": "Boston Monthly Replenishment",
+        "origin": "Central Warehouse (NYC)",
+        "requestedBy": "Miss Administrator",
+        "requisitionItemCount": 52,
+        "updatedBy": "Miss Administrator"
+      },
+      {
+        "createdBy": "Miss Administrator",
+        "dateCreated": "<masked>",
+        "destination": "Chicago Warehouse",
+        "id": "<masked>",
+        "isPublished": true,
+        "lastUpdated": "<masked>",
+        "name": "Chicago Monthly Replenishment",
+        "origin": "Central Warehouse (NYC)",
+        "requestedBy": "Miss Administrator",
+        "requisitionItemCount": 37,
+        "updatedBy": "Miss Administrator"
+      }
+    ],
+    "totalCount": 2
+  },
+  "contentType": "application/json",
+  "request": {
+    "method": "GET",
+    "params": {},
+    "path": "/api/stocklists"
+  },
+  "status": 200
+}

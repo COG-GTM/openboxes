@@ -1,0 +1,10 @@
+{
+  "contentType": "",
+  "request": {
+    "method": "DELETE",
+    "params": {},
+    "path": "/api/stocklists/<id>"
+  },
+  "status": 204,
+  "text": ""
+}

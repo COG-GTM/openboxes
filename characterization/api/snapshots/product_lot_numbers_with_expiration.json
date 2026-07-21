@@ -1,0 +1,14 @@
+{
+  "body": {
+    "data": {}
+  },
+  "contentType": "application/json",
+  "request": {
+    "method": "GET",
+    "params": {
+      "productId": "<id>"
+    },
+    "path": "/api/products/inventoryItems/lotNumbersWithExpirationDate"
+  },
+  "status": 200
+}

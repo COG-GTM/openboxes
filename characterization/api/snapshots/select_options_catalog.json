@@ -1,0 +1,45 @@
+{
+  "body": {
+    "data": [
+      {
+        "id": "<masked>",
+        "label": "Ann Arbor Office Products (24)"
+      },
+      {
+        "id": "<masked>",
+        "label": "Boston Office Products (49)"
+      },
+      {
+        "id": "<masked>",
+        "label": "Cedar Rapids Office Products (32)"
+      },
+      {
+        "id": "<masked>",
+        "label": "Chicago Office Products (49)"
+      },
+      {
+        "id": "<masked>",
+        "label": "Des Moines Office Products (24)"
+      },
+      {
+        "id": "<masked>",
+        "label": "Newark Office Products (24)"
+      },
+      {
+        "id": "<masked>",
+        "label": "Portland Office Products (32)"
+      },
+      {
+        "id": "<masked>",
+        "label": "Providence Office Products (26)"
+      }
+    ]
+  },
+  "contentType": "application/json",
+  "request": {
+    "method": "GET",
+    "params": {},
+    "path": "/api/catalogOptions"
+  },
+  "status": 200
+}

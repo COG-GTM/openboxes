@@ -1,0 +1,80 @@
+{
+  "body": {
+    "data": [
+      {
+        "id": "<masked>",
+        "name": "Consumed",
+        "sortOrder": "<masked>"
+      },
+      {
+        "id": "<masked>",
+        "name": "Correction",
+        "sortOrder": "<masked>"
+      },
+      {
+        "id": "<masked>",
+        "name": "Damaged product",
+        "sortOrder": "<masked>"
+      },
+      {
+        "id": "<masked>",
+        "name": "Data entry error",
+        "sortOrder": "<masked>"
+      },
+      {
+        "id": "<masked>",
+        "name": "Expired product",
+        "sortOrder": "<masked>"
+      },
+      {
+        "id": "<masked>",
+        "name": "Found",
+        "sortOrder": "<masked>"
+      },
+      {
+        "id": "<masked>",
+        "name": "Missing",
+        "sortOrder": "<masked>"
+      },
+      {
+        "id": "<masked>",
+        "name": "Other",
+        "sortOrder": "<masked>"
+      },
+      {
+        "id": "<masked>",
+        "name": "Recounted",
+        "sortOrder": "<masked>"
+      },
+      {
+        "id": "<masked>",
+        "name": "Rejected",
+        "sortOrder": "<masked>"
+      },
+      {
+        "id": "<masked>",
+        "name": "Returned",
+        "sortOrder": "<masked>"
+      },
+      {
+        "id": "<masked>",
+        "name": "Scrapped",
+        "sortOrder": "<masked>"
+      },
+      {
+        "id": "<masked>",
+        "name": "Stolen",
+        "sortOrder": "<masked>"
+      }
+    ]
+  },
+  "contentType": "application/json",
+  "request": {
+    "method": "GET",
+    "params": {
+      "activityCode": "ADJUST_INVENTORY"
+    },
+    "path": "/api/reasonCodes"
+  },
+  "status": 200
+}

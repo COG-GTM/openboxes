@@ -1,0 +1,45 @@
+{
+  "body": {
+    "data": [
+      {
+        "id": "<masked>",
+        "label": "Bottle",
+        "value": "BTL"
+      },
+      {
+        "id": "<masked>",
+        "label": "Box",
+        "value": "BX"
+      },
+      {
+        "id": "<masked>",
+        "label": "Case",
+        "value": "CS"
+      },
+      {
+        "id": "<masked>",
+        "label": "Each",
+        "value": "EA"
+      },
+      {
+        "id": "<masked>",
+        "label": "Pack",
+        "value": "PK"
+      },
+      {
+        "id": "<masked>",
+        "label": "Roll",
+        "value": "RL"
+      }
+    ]
+  },
+  "contentType": "application/json",
+  "request": {
+    "method": "GET",
+    "params": {
+      "type": "QUANTITY"
+    },
+    "path": "/api/unitOfMeasures/options"
+  },
+  "status": 200
+}

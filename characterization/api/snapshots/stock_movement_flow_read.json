@@ -1,0 +1,224 @@
+{
+  "body": {
+    "data": {
+      "approvers": [],
+      "associations": {
+        "documents": [
+          {
+            "contentType": "application/pdf",
+            "documentType": "PICKLIST",
+            "hidden": true,
+            "name": "Download Picklist",
+            "stepNumber": 4,
+            "uri": "http://localhost:8080/openboxes/picklist/renderPdf/<id>"
+          },
+          {
+            "contentType": "application/vnd.ms-excel",
+            "documentType": "CERTIFICATE_OF_DONATION",
+            "name": "Certificate of Donation",
+            "stepNumber": 5,
+            "uri": "http://localhost:8080/openboxes/doc4j/downloadCertificateOfDonation/<id>"
+          },
+          {
+            "contentType": "application/vnd.ms-excel",
+            "documentType": "PACKING_LIST",
+            "hidden": false,
+            "name": "Export Packing List (.xls)",
+            "stepNumber": 5,
+            "uri": "http://localhost:8080/openboxes/shipment/exportPackingList/<id>"
+          },
+          {
+            "contentType": "application/vnd.ms-excel",
+            "documentType": "PACKING_LIST",
+            "name": "Packing List",
+            "stepNumber": 5,
+            "uri": "http://localhost:8080/openboxes/doc4j/downloadPackingList/<id>"
+          },
+          {
+            "contentType": "text/csv",
+            "documentType": "EXPORT",
+            "hidden": false,
+            "name": "Export Stock Movement Items",
+            "stepNumber": 2,
+            "uri": "http://localhost:8080/openboxes/stockMovement/exportCsv/<id>"
+          },
+          {
+            "contentType": "text/html",
+            "documentType": "DELIVERY_NOTE",
+            "downloadOptions": [
+              {
+                "name": "Delivery Note (alphabetical by product)",
+                "uri": "http://localhost:8080/openboxes/deliveryNote/print/<id>?sortOrder=PRODUCT"
+              },
+              {
+                "name": "Delivery Note (shipment order)",
+                "uri": "http://localhost:8080/openboxes/deliveryNote/print/<id>"
+              }
+            ],
+            "name": "Delivery Note",
+            "stepNumber": 5,
+            "uri": "http://localhost:8080/openboxes/deliveryNote/print/<id>"
+          },
+          {
+            "contentType": "text/html",
+            "documentType": "DELIVERY_NOTE",
+            "hidden": true,
+            "name": "Delivery Note",
+            "stepNumber": 5,
+            "uri": "http://localhost:8080/openboxes/deliveryNote/printOutboundReturn/<id>"
+          },
+          {
+            "contentType": "text/html",
+            "documentType": "GOODS_RECEIPT_NOTE",
+            "hidden": true,
+            "name": "Goods Receipt Note",
+            "stepNumber": null,
+            "uri": "http://localhost:8080/openboxes/goodsReceiptNote/print/<id>"
+          },
+          {
+            "contentType": "text/html",
+            "documentType": "PICKLIST",
+            "name": "Print Picklist (sorted by bins)",
+            "stepNumber": null,
+            "uri": "http://localhost:8080/openboxes/picklist/print/<id>?sorted=true"
+          },
+          {
+            "contentType": "text/html",
+            "documentType": "PICKLIST",
+            "name": "Print Picklist",
+            "stepNumber": 4,
+            "uri": "http://localhost:8080/openboxes/picklist/print/<id>"
+          }
+        ],
+        "requisition": {
+          "id": "<masked>",
+          "requestNumber": "<masked>",
+          "status": "CREATED"
+        },
+        "shipment": {
+          "id": "<masked>",
+          "shipmentNumber": "<masked>",
+          "status": "PENDING"
+        },
+        "shipments": [
+          {
+            "id": "<masked>",
+            "shipmentNumber": "<masked>",
+            "status": "PENDING"
+          }
+        ]
+      },
+      "comments": null,
+      "currentEvent": null,
+      "currentStatus": "PENDING",
+      "dateCreated": "<masked>",
+      "dateDeliveryRequested": null,
+      "dateRequested": "<masked>",
+      "dateShipped": "<masked>",
+      "description": "Characterization test movement",
+      "destination": {
+        "id": "<masked>",
+        "locationGroup": {
+          "id": "<masked>",
+          "name": "NorthEast"
+        },
+        "locationNumber": "BOSO",
+        "locationType": {
+          "description": "Dispensary",
+          "id": "<masked>",
+          "locationTypeCode": "DISPENSARY",
+          "name": "Dispensary"
+        },
+        "name": "Boston Office",
+        "organizationCode": "<masked>",
+        "organizationName": "My Organization",
+        "supportedActivities": []
+      },
+      "displayStatus": {
+        "label": "Created",
+        "name": "CREATED",
+        "variant": "success"
+      },
+      "driverName": null,
+      "expectedDeliveryDate": null,
+      "hasManageInventory": true,
+      "id": "<masked>",
+      "identifier": "<masked>",
+      "isElectronicType": false,
+      "isFromOrder": false,
+      "isPartiallyReceived": false,
+      "isPending": true,
+      "isReceived": false,
+      "isReturn": false,
+      "isShipped": false,
+      "lastUpdated": "<masked>",
+      "lineItemCount": 0,
+      "lineItems": [],
+      "name": "MainWarehouse-BOSO-01Jul2026-Characterizationtestmovement",
+      "order": {
+        "id": null,
+        "name": null,
+        "orderNumber": null
+      },
+      "origin": {
+        "id": "<masked>",
+        "isDepot": true,
+        "locationGroup": null,
+        "locationNumber": null,
+        "locationType": {
+          "description": "Depot",
+          "id": "<masked>",
+          "locationTypeCode": "DEPOT",
+          "name": "Depot"
+        },
+        "name": "Main Warehouse",
+        "organizationCode": "<masked>",
+        "organizationName": "Main Organization",
+        "supportedActivities": []
+      },
+      "picklist": {
+        "id": null
+      },
+      "received": false,
+      "replenishmentType": null,
+      "requestType": null,
+      "requestedBy": {
+        "email": "admin@admin.com",
+        "firstName": "Miss",
+        "id": "<masked>",
+        "lastName": "Administrator",
+        "name": "Miss Administrator",
+        "roles": [
+          "ROLE_FINANCE",
+          "ROLE_PRODUCT_NOTIFICATION",
+          "ROLE_SHIPMENT_NOTIFICATION",
+          "ROLE_SUPERUSER"
+        ],
+        "username": "admin"
+      },
+      "shipmentStatus": "PENDING",
+      "shipmentType": {
+        "description": null,
+        "displayName": "Default",
+        "id": "<masked>",
+        "name": "Default"
+      },
+      "shipped": false,
+      "sourceType": null,
+      "statusCode": "CREATED",
+      "stocklist": {
+        "id": null,
+        "name": null
+      },
+      "trackingNumber": null
+    },
+    "totalCount": 0
+  },
+  "contentType": "application/json",
+  "request": {
+    "method": "GET",
+    "params": {},
+    "path": "/api/stockMovements/<id>"
+  },
+  "status": 200
+}

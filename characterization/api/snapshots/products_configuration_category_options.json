@@ -1,0 +1,40 @@
+{
+  "body": {
+    "data": {
+      "defaultCategories": {
+        "categoryNameColumnIndex": 0,
+        "description": "<div>A simple and flexible category tree with 25 categories organized into Equipment, Medicine, Supplies, Perishables, and Other. A good place to start for users  who aren’t sure exactly what they want. Can be edited after import. See a sample of the category tree below.</div><div class='category-list'>  <ul>    <li>Supplies      <ul>        <li>Office Supplies</li>        <li>Medical Supplies          <ul>            <li>Dental</li>            <li>Lab</li>            <li>Surgical</li>          </ul>        </li>      </ul>    </li>    <li>Equipment</li>  </ul></div>",
+        "enabled": true,
+        "fileUrl": "https://raw.githubusercontent.com/openboxes/openboxes/develop/grails-app/conf/templates/configuration/default_OB_categories.csv",
+        "parentCategoryNameColumnIndex": 1,
+        "rootCategoryName": "ROOT",
+        "title": "OpenBoxes Default Category List"
+      },
+      "unspscCategories": {
+        "categoryNameColumnIndex": 0,
+        "description": "<div>A tree of 201 categories based on the <a target='_blank' rel='noopener noreferrer' href='https://www.unspsc.org'>United Nations Standard Products and Services Code</a>. This list takes some of the most commonly used sections and classes from the UNSPSC list, using the sections as parent categories for the classes. This is a good option for organizations who already use UNSPSC classifications or who want a very detailed tree. See a sample section of the tree below.</div><div class='category-list'>  <ul>    <li>Paper Materials and Products      <ul>        <li>Paper materials</li>        <li>Paper Products</li>        <li>Industrial use papers</li>      </ul>    </li>    <li>Office Equipment and Accessories and Supplies      <ul>        <li>Office machines and their supplies and accessories</li>      </ul>    </li>  </ul></div>",
+        "enabled": true,
+        "fileUrl": "https://raw.githubusercontent.com/openboxes/openboxes/develop/grails-app/conf/templates/configuration/UNSPSC_categories.csv",
+        "parentCategoryNameColumnIndex": 1,
+        "rootCategoryName": "ROOT",
+        "title": "UNSPSC Category List"
+      },
+      "whoCategories": {
+        "categoryNameColumnIndex": 0,
+        "description": "<div>A system of medical categorization used by the <a target='_blank' rel='noopener noreferrer' href='https://www.who.int/groups/expert-committee-on-selection-and-use-of-essential-medicines/essential-medicines-lists'>WHO in their Essential Medicines List</a>. This categorization system is focused entirely on medication, and is best suited to healthcare organizations. Public health facilities that use the WHO list as the basis of their product catalogue will find that this is a good starting point to which medical items and other categories can be added. Users that want to import the WHO Essential Medicines List as their product list must select this category tree. See a sample of the tree below.</div><div class='category-list'>  <ul>    <li>Antileprosy Medicines</li>    <li>Antimalarial Medicines      <ul>        <li>For Chemoprevention</li>        <li>For Curative Treatment</li>        <li>For Treatment of Acute Attack</li>      </ul>    </li>    <li>Antimigraine Medicines</li>  </ul></div>",
+        "enabled": true,
+        "fileUrl": "https://raw.githubusercontent.com/openboxes/openboxes/develop/grails-app/conf/templates/configuration/WHO_categories.csv",
+        "parentCategoryNameColumnIndex": 1,
+        "rootCategoryName": "ROOT",
+        "title": "WHO Category List"
+      }
+    }
+  },
+  "contentType": "application/json",
+  "request": {
+    "method": "GET",
+    "params": {},
+    "path": "/api/productsConfiguration/categoryOptions"
+  },
+  "status": 200
+}

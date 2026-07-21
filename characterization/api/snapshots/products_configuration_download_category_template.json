@@ -1,0 +1,10 @@
+{
+  "contentType": "text/csv",
+  "request": {
+    "method": "GET",
+    "params": {},
+    "path": "/api/productsConfiguration/downloadCategoryTemplate"
+  },
+  "status": 200,
+  "text": "Category Name,Parent Category Name\n"
+}

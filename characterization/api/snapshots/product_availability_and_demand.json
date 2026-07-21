@@ -1,0 +1,16 @@
+{
+  "body": {
+    "monthlyDemand": 0,
+    "quantityAvailable": 30,
+    "quantityOnHand": 30
+  },
+  "contentType": "application/json",
+  "request": {
+    "method": "GET",
+    "params": {
+      "locationId": "1"
+    },
+    "path": "/api/products/<id>/productAvailabilityAndDemand"
+  },
+  "status": 200
+}

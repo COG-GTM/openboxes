@@ -1,0 +1,10 @@
+{
+  "contentType": "text/csv",
+  "request": {
+    "method": "GET",
+    "params": {},
+    "path": "/api/productsConfiguration/downloadCategories"
+  },
+  "status": 200,
+  "text": "﻿Category name,Parent Category Name\n\nARVS,\nAnesteshia,\nCancer,\nChronic Care,\nDental,\nEquipment,ROOT\nFood,\nFurniture and Equipment,\nHospital and Clinic Supplies,\nIT Equipment,\nLab,\nMedical Equipment,\nMedical Supplies,\nMedicines,ROOT\nOffice Supplies,\nOther,\nOther,\nOther,ROOT\nPain,\nPerishables,ROOT\nROOT,\nSupplies,ROOT\nSurgical Equipment,\nSurgical,\nTB,\nX-Ray,"
+}

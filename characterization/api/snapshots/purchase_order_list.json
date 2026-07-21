@@ -1,0 +1,14 @@
+{
+  "body": {
+    "data": [],
+    "totalCount": 0,
+    "totalPrice": 0.0
+  },
+  "contentType": "application/json",
+  "request": {
+    "method": "GET",
+    "params": {},
+    "path": "/api/purchaseOrders"
+  },
+  "status": 200
+}

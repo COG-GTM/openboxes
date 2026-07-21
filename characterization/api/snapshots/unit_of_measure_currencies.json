@@ -1,0 +1,47 @@
+{
+  "body": {
+    "data": [
+      {
+        "code": "EUR",
+        "createdBy": {
+          "id": "<masked>"
+        },
+        "dateCreated": "<masked>",
+        "description": "EUR (€)",
+        "id": "<masked>",
+        "lastUpdated": "<masked>",
+        "name": "Euro",
+        "uomClass": {
+          "id": "<masked>"
+        },
+        "updatedBy": {
+          "id": "<masked>"
+        }
+      },
+      {
+        "code": "USD",
+        "createdBy": {
+          "id": "<masked>"
+        },
+        "dateCreated": "<masked>",
+        "description": "USD (US$)",
+        "id": "<masked>",
+        "lastUpdated": "<masked>",
+        "name": "US Dollar",
+        "uomClass": {
+          "id": "<masked>"
+        },
+        "updatedBy": {
+          "id": "<masked>"
+        }
+      }
+    ]
+  },
+  "contentType": "application/json",
+  "request": {
+    "method": "GET",
+    "params": {},
+    "path": "/api/unitOfMeasure/currencies"
+  },
+  "status": 200
+}

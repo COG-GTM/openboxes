@@ -1,0 +1,68 @@
+{
+  "body": {
+    "data": [
+      {
+        "id": "<masked>",
+        "name": "Approved change",
+        "sortOrder": "<masked>"
+      },
+      {
+        "id": "<masked>",
+        "name": "Backorder",
+        "sortOrder": "<masked>"
+      },
+      {
+        "id": "<masked>",
+        "name": "Could not locate",
+        "sortOrder": "<masked>"
+      },
+      {
+        "id": "<masked>",
+        "name": "Duplicate Request",
+        "sortOrder": "<masked>"
+      },
+      {
+        "id": "<masked>",
+        "name": "Earlier expiration date",
+        "sortOrder": "<masked>"
+      },
+      {
+        "id": "<masked>",
+        "name": "Low stock",
+        "sortOrder": "<masked>"
+      },
+      {
+        "id": "<masked>",
+        "name": "Not needed based on consumption",
+        "sortOrder": "<masked>"
+      },
+      {
+        "id": "<masked>",
+        "name": "Package size contains different quantity",
+        "sortOrder": "<masked>"
+      },
+      {
+        "id": "<masked>",
+        "name": "Request error",
+        "sortOrder": "<masked>"
+      },
+      {
+        "id": "<masked>",
+        "name": "Stock-out",
+        "sortOrder": "<masked>"
+      },
+      {
+        "id": "<masked>",
+        "name": "Supplied by government",
+        "sortOrder": "<masked>"
+      }
+    ]
+  },
+  "contentType": "application/json",
+  "request": {
+    "method": "GET",
+    "params": {},
+    "path": "/api/reasonCodes"
+  },
+  "status": 200
+}

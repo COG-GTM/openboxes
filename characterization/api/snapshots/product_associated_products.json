@@ -1,0 +1,73 @@
+{
+  "body": {
+    "data": {
+      "availableItems": [
+        {
+          "binLocation": null,
+          "binLocation.id": null,
+          "binLocation.name": null,
+          "expirationDate": null,
+          "inventoryItem.id": "<id>",
+          "lotNumber": null,
+          "pickedRequisitionNumbers": "",
+          "product": {
+            "active": true,
+            "category": "IT Equipment",
+            "color": null,
+            "dateCreated": "<masked>",
+            "description": "",
+            "displayNames": {
+              "default": null
+            },
+            "handlingIcons": [],
+            "id": "<masked>",
+            "lastUpdated": "<masked>",
+            "lotAndExpiryControl": false,
+            "name": "Adapter, USB-C male to HDMI + VGA female",
+            "pricePerUnit": 25.99,
+            "productCode": "AX738",
+            "unitOfMeasure": "Each",
+            "updatedBy": "Miss Administrator"
+          },
+          "product.name": "Adapter, USB-C male to HDMI + VGA female",
+          "productCode": "AX738",
+          "quantityAvailable": 30,
+          "quantityOnHand": null,
+          "status": "AVAILABLE",
+          "zone": null
+        }
+      ],
+      "hasAssociations": false,
+      "hasEarlierExpiringItems": false,
+      "product": {
+        "active": true,
+        "category": "IT Equipment",
+        "color": null,
+        "dateCreated": "<masked>",
+        "description": "",
+        "displayNames": {
+          "default": null
+        },
+        "handlingIcons": [],
+        "id": "<masked>",
+        "lastUpdated": "<masked>",
+        "lotAndExpiryControl": false,
+        "name": "Adapter, USB-C male to HDMI + VGA female",
+        "pricePerUnit": 25.99,
+        "productCode": "AX738",
+        "unitOfMeasure": "Each",
+        "updatedBy": "Miss Administrator"
+      },
+      "productAssociations": []
+    }
+  },
+  "contentType": "application/json",
+  "request": {
+    "method": "GET",
+    "params": {
+      "type": "SUBSTITUTE"
+    },
+    "path": "/api/products/<id>/associatedProducts"
+  },
+  "status": 200
+}

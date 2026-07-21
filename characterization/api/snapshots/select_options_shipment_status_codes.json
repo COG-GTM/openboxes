@@ -1,0 +1,43 @@
+{
+  "body": {
+    "data": [
+      {
+        "id": "<masked>",
+        "label": "Created",
+        "value": "CREATED",
+        "variant": "primary"
+      },
+      {
+        "id": "<masked>",
+        "label": "Pending",
+        "value": "PENDING",
+        "variant": "warning"
+      },
+      {
+        "id": "<masked>",
+        "label": "Received",
+        "value": "RECEIVED",
+        "variant": "success"
+      },
+      {
+        "id": "<masked>",
+        "label": "Receiving",
+        "value": "PARTIALLY_RECEIVED",
+        "variant": "primary"
+      },
+      {
+        "id": "<masked>",
+        "label": "Shipped",
+        "value": "SHIPPED",
+        "variant": "success"
+      }
+    ]
+  },
+  "contentType": "application/json",
+  "request": {
+    "method": "GET",
+    "params": {},
+    "path": "/api/stockMovements/shipmentStatusCodes"
+  },
+  "status": 200
+}

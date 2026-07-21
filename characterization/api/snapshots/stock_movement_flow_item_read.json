@@ -1,0 +1,63 @@
+{
+  "body": {
+    "data": {
+      "boxName": "",
+      "comments": null,
+      "expirationDate": null,
+      "id": "<masked>",
+      "inventoryItem": null,
+      "lotNumber": "",
+      "manuallyAdded": "<masked>",
+      "orderId": null,
+      "orderItemId": null,
+      "orderNumber": null,
+      "packSize": 1,
+      "packsRequested": 5,
+      "palletName": "",
+      "product": {
+        "active": true,
+        "category": "IT Equipment",
+        "color": null,
+        "dateCreated": "<masked>",
+        "description": "",
+        "displayNames": {
+          "default": null
+        },
+        "handlingIcons": [],
+        "id": "<masked>",
+        "lastUpdated": "<masked>",
+        "lotAndExpiryControl": false,
+        "name": "Adapter, USB-C male to HDMI + VGA female",
+        "pricePerUnit": 25.99,
+        "productCode": "AX738",
+        "unitOfMeasure": "Each",
+        "updatedBy": "Miss Administrator"
+      },
+      "productCode": "AX738",
+      "productSupplier": null,
+      "quantityAllowed": null,
+      "quantityAvailable": null,
+      "quantityCanceled": null,
+      "quantityCounted": null,
+      "quantityOnHand": null,
+      "quantityPicked": 0,
+      "quantityRequested": 5,
+      "quantityRequired": 5,
+      "quantityRevised": null,
+      "reasonCode": null,
+      "recipient": null,
+      "sortOrder": "<masked>",
+      "statusCode": "APPROVED",
+      "substitutionItems": [],
+      "unitOfMeasure": null,
+      "version": 0
+    }
+  },
+  "contentType": "application/json",
+  "request": {
+    "method": "GET",
+    "params": {},
+    "path": "/api/stockMovementItems/<id>"
+  },
+  "status": 200
+}

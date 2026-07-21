@@ -1,0 +1,20 @@
+{
+  "body": {
+    "data": {
+      "location": {
+        "id": "<masked>"
+      },
+      "product": {
+        "id": "<masked>"
+      },
+      "quantityOnHand": 30
+    }
+  },
+  "contentType": "application/json",
+  "request": {
+    "method": "GET",
+    "params": {},
+    "path": "/api/products/<id>/productSummary"
+  },
+  "status": 200
+}

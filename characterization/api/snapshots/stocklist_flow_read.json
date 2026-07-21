@@ -1,0 +1,21 @@
+{
+  "body": {
+    "data": {
+      "destination.id": "<id>",
+      "destination.name": "Boston Office",
+      "name": "Characterization Test Stocklist",
+      "origin.id": "1",
+      "origin.name": "Main Warehouse",
+      "requestedBy.id": "1",
+      "requestedBy.name": "Miss Administrator",
+      "requisition.id": "<id>"
+    }
+  },
+  "contentType": "application/json",
+  "request": {
+    "method": "GET",
+    "params": {},
+    "path": "/api/stocklists/<id>"
+  },
+  "status": 200
+}

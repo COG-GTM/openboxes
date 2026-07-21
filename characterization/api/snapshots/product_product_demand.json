@@ -1,0 +1,13 @@
+{
+  "body": {
+    "monthlyDemand": 0,
+    "quantityOnHand": 0
+  },
+  "contentType": "application/json",
+  "request": {
+    "method": "GET",
+    "params": {},
+    "path": "/api/products/<id>/productDemand"
+  },
+  "status": 200
+}

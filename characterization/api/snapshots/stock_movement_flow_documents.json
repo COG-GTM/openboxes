@@ -1,0 +1,98 @@
+{
+  "body": {
+    "data": [
+      {
+        "contentType": "application/pdf",
+        "documentType": "PICKLIST",
+        "hidden": true,
+        "name": "Download Picklist",
+        "stepNumber": 4,
+        "uri": "http://localhost:8080/openboxes/picklist/renderPdf/<id>"
+      },
+      {
+        "contentType": "application/vnd.ms-excel",
+        "documentType": "CERTIFICATE_OF_DONATION",
+        "name": "Certificate of Donation",
+        "stepNumber": 5,
+        "uri": "http://localhost:8080/openboxes/doc4j/downloadCertificateOfDonation/<id>"
+      },
+      {
+        "contentType": "application/vnd.ms-excel",
+        "documentType": "PACKING_LIST",
+        "hidden": false,
+        "name": "Export Packing List (.xls)",
+        "stepNumber": 5,
+        "uri": "http://localhost:8080/openboxes/shipment/exportPackingList/<id>"
+      },
+      {
+        "contentType": "application/vnd.ms-excel",
+        "documentType": "PACKING_LIST",
+        "name": "Packing List",
+        "stepNumber": 5,
+        "uri": "http://localhost:8080/openboxes/doc4j/downloadPackingList/<id>"
+      },
+      {
+        "contentType": "text/csv",
+        "documentType": "EXPORT",
+        "hidden": false,
+        "name": "Export Stock Movement Items",
+        "stepNumber": 2,
+        "uri": "http://localhost:8080/openboxes/stockMovement/exportCsv/<id>"
+      },
+      {
+        "contentType": "text/html",
+        "documentType": "DELIVERY_NOTE",
+        "downloadOptions": [
+          {
+            "name": "Delivery Note (alphabetical by product)",
+            "uri": "http://localhost:8080/openboxes/deliveryNote/print/<id>?sortOrder=PRODUCT"
+          },
+          {
+            "name": "Delivery Note (shipment order)",
+            "uri": "http://localhost:8080/openboxes/deliveryNote/print/<id>"
+          }
+        ],
+        "name": "Delivery Note",
+        "stepNumber": 5,
+        "uri": "http://localhost:8080/openboxes/deliveryNote/print/<id>"
+      },
+      {
+        "contentType": "text/html",
+        "documentType": "DELIVERY_NOTE",
+        "hidden": true,
+        "name": "Delivery Note",
+        "stepNumber": 5,
+        "uri": "http://localhost:8080/openboxes/deliveryNote/printOutboundReturn/<id>"
+      },
+      {
+        "contentType": "text/html",
+        "documentType": "GOODS_RECEIPT_NOTE",
+        "hidden": true,
+        "name": "Goods Receipt Note",
+        "stepNumber": null,
+        "uri": "http://localhost:8080/openboxes/goodsReceiptNote/print/<id>"
+      },
+      {
+        "contentType": "text/html",
+        "documentType": "PICKLIST",
+        "name": "Print Picklist (sorted by bins)",
+        "stepNumber": null,
+        "uri": "http://localhost:8080/openboxes/picklist/print/<id>?sorted=true"
+      },
+      {
+        "contentType": "text/html",
+        "documentType": "PICKLIST",
+        "name": "Print Picklist",
+        "stepNumber": 4,
+        "uri": "http://localhost:8080/openboxes/picklist/print/<id>"
+      }
+    ]
+  },
+  "contentType": "application/json",
+  "request": {
+    "method": "GET",
+    "params": {},
+    "path": "/api/stockMovements/<id>/documents"
+  },
+  "status": 200
+}

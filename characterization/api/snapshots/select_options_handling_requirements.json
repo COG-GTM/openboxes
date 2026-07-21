@@ -1,0 +1,33 @@
+{
+  "body": {
+    "data": [
+      {
+        "id": "<masked>",
+        "label": "Cold chain",
+        "value": "COLD_CHAIN"
+      },
+      {
+        "id": "<masked>",
+        "label": "Controlled substance",
+        "value": "CONTROLLED_SUBSTANCE"
+      },
+      {
+        "id": "<masked>",
+        "label": "Hazardous material",
+        "value": "HAZARDOUS_MATERIAL"
+      },
+      {
+        "id": "<masked>",
+        "label": "Reconditioned",
+        "value": "RECONDITIONED"
+      }
+    ]
+  },
+  "contentType": "application/json",
+  "request": {
+    "method": "GET",
+    "params": {},
+    "path": "/api/handlingRequirementsOptions"
+  },
+  "status": 200
+}

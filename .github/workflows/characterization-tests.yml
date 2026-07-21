@@ -1,0 +1,49 @@
+name: Characterization Tests
+
+# Boots the baseline Docker environment (see docs/migration/RUNNING_LOCALLY.md),
+# seeds the demo dataset, and runs the API snapshot suite under
+# characterization/api. These snapshots are the API parity oracle for the
+# backend migration: any behavior diff fails the job.
+
+on:
+  workflow_call:
+
+jobs:
+  api-snapshot-tests:
+    runs-on: ubuntu-latest
+    timeout-minutes: 45
+    steps:
+      - uses: actions/checkout@v4
+
+      - uses: actions/setup-python@v5
+        with:
+          python-version: '3.12'
+
+      - name: Boot OpenBoxes stack
+        working-directory: docker
+        run: docker compose up -d
+
+      - name: Wait for app to be healthy
+        run: |
+          echo "Waiting for OpenBoxes to finish database migrations and start..."
+          for i in $(seq 1 120); do
+            if curl -sf http://localhost:8080/openboxes/health | grep -q UP; then
+              echo "App is up."
+              exit 0
+            fi
+            sleep 10
+          done
+          echo "App did not become healthy in time." >&2
+          docker logs openboxes-app | tail -100
+          exit 1
+
+      - name: Load demo data
+        working-directory: docker
+        run: ./load-demo-data.sh
+
+      - name: Run API snapshot suite
+        run: ./characterization/api/run.sh
+
+      - name: Dump app logs on failure
+        if: failure()
+        run: docker logs openboxes-app | tail -300

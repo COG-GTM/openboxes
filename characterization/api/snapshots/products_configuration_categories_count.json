@@ -1,0 +1,12 @@
+{
+  "body": {
+    "data": 26
+  },
+  "contentType": "application/json",
+  "request": {
+    "method": "GET",
+    "params": {},
+    "path": "/api/productsConfiguration/categoriesCount"
+  },
+  "status": 200
+}

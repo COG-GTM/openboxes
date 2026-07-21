@@ -1,0 +1,47 @@
+{
+  "body": {
+    "data": [
+      {
+        "id": "<masked>",
+        "location.id": "<id>",
+        "location.name": "Central Warehouse (NYC)",
+        "locationGroup.id": "<id>",
+        "locationGroup.name": "NorthEast",
+        "manager.email": "admin@admin.com",
+        "manager.id": "1",
+        "manager.name": "Miss Administrator",
+        "maxQuantity": 5,
+        "monthlyDemand": 5,
+        "name": "Boston Monthly Replenishment",
+        "replenishmentPeriod": 30,
+        "stocklistId": "<id>",
+        "uom": "Each"
+      },
+      {
+        "id": "<masked>",
+        "location.id": "<id>",
+        "location.name": "Central Warehouse (NYC)",
+        "locationGroup.id": "<id>",
+        "locationGroup.name": "NorthEast",
+        "manager.email": "admin@admin.com",
+        "manager.id": "1",
+        "manager.name": "Miss Administrator",
+        "maxQuantity": 5,
+        "monthlyDemand": 5,
+        "name": "Chicago Monthly Replenishment",
+        "replenishmentPeriod": 30,
+        "stocklistId": "<id>",
+        "uom": "Each"
+      }
+    ]
+  },
+  "contentType": "application/json",
+  "request": {
+    "method": "GET",
+    "params": {
+      "product.id": "<id>"
+    },
+    "path": "/api/stocklistItems"
+  },
+  "status": 200
+}

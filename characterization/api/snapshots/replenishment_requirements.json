@@ -1,0 +1,14 @@
+{
+  "body": {
+    "data": []
+  },
+  "contentType": "application/json",
+  "request": {
+    "method": "GET",
+    "params": {
+      "location.id": "1"
+    },
+    "path": "/api/requirements"
+  },
+  "status": 200
+}

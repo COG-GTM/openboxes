@@ -1,0 +1,29 @@
+{
+  "body": {
+    "data": [
+      {
+        "email": "admin@admin.com",
+        "firstName": "Miss",
+        "id": "<masked>",
+        "lastName": "Administrator",
+        "name": "Miss Administrator",
+        "roles": [
+          "ROLE_FINANCE",
+          "ROLE_PRODUCT_NOTIFICATION",
+          "ROLE_SHIPMENT_NOTIFICATION",
+          "ROLE_SUPERUSER"
+        ],
+        "username": "admin"
+      }
+    ]
+  },
+  "contentType": "application/json",
+  "request": {
+    "method": "GET",
+    "params": {
+      "name": "Administrator"
+    },
+    "path": "/api/persons"
+  },
+  "status": 200
+}

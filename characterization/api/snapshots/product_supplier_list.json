@@ -1,0 +1,786 @@
+{
+  "body": {
+    "data": [
+      {
+        "active": true,
+        "attributes": [],
+        "brandName": null,
+        "code": "CM871-MID",
+        "contractPrice": null,
+        "createdBy": {
+          "id": "<masked>",
+          "name": "Miss Administrator"
+        },
+        "dateCreated": "<masked>",
+        "defaultProductPackage": {
+          "description": "Box of 76",
+          "id": "<masked>",
+          "name": "BX/76",
+          "productPrice": {
+            "id": "<masked>",
+            "price": 22.04
+          },
+          "quantity": 76,
+          "uom": {
+            "code": "BX",
+            "id": "<masked>",
+            "name": "Box"
+          }
+        },
+        "description": null,
+        "id": "<masked>",
+        "lastUpdated": "<masked>",
+        "manufacturer": null,
+        "manufacturerCode": null,
+        "minOrderQuantity": null,
+        "name": "Lamivudine 150mg tablet",
+        "packagePrice": 22.04,
+        "packageSize": "BX/76",
+        "product": {
+          "id": "<masked>",
+          "name": "Lamivudine 150mg tablet",
+          "productCode": "CM871"
+        },
+        "productCode": null,
+        "productSupplierPreferences": [
+          {
+            "comments": null,
+            "destinationParty": null,
+            "id": "<masked>",
+            "preferenceType": {
+              "createdBy": null,
+              "dateCreated": "<masked>",
+              "id": "<masked>",
+              "lastUpdated": "<masked>",
+              "name": "Approved",
+              "updatedBy": null,
+              "validationCode": {
+                "enumType": "org.pih.warehouse.core.ValidationCode",
+                "name": "DEFAULT"
+              }
+            },
+            "validityEndDate": null,
+            "validityStartDate": null
+          }
+        ],
+        "ratingTypeCode": null,
+        "supplier": {
+          "code": "MID",
+          "displayName": "MID - Medical Items Depot",
+          "id": "<masked>",
+          "name": "Medical Items Depot"
+        },
+        "supplierCode": "8784513",
+        "tieredPricing": false,
+        "unitPrice": 0.29,
+        "updatedBy": {
+          "id": "<masked>",
+          "name": "Miss Administrator"
+        }
+      },
+      {
+        "active": true,
+        "attributes": [],
+        "brandName": null,
+        "code": "CR388-MID",
+        "contractPrice": null,
+        "createdBy": {
+          "id": "<masked>",
+          "name": "Miss Administrator"
+        },
+        "dateCreated": "<masked>",
+        "defaultProductPackage": {
+          "description": "Box of 76",
+          "id": "<masked>",
+          "name": "BX/76",
+          "productPrice": {
+            "id": "<masked>",
+            "price": 22.04
+          },
+          "quantity": 76,
+          "uom": {
+            "code": "BX",
+            "id": "<masked>",
+            "name": "Box"
+          }
+        },
+        "description": null,
+        "id": "<masked>",
+        "lastUpdated": "<masked>",
+        "manufacturer": null,
+        "manufacturerCode": null,
+        "minOrderQuantity": null,
+        "name": "Lamivudine 150mg + nevirapine 200mg + zidovudine 300mg tablet",
+        "packagePrice": 22.04,
+        "packageSize": "BX/76",
+        "product": {
+          "id": "<masked>",
+          "name": "Lamivudine 150mg + nevirapine 200mg + zidovudine 300mg tablet",
+          "productCode": "CR388"
+        },
+        "productCode": null,
+        "productSupplierPreferences": [
+          {
+            "comments": null,
+            "destinationParty": null,
+            "id": "<masked>",
+            "preferenceType": {
+              "createdBy": null,
+              "dateCreated": "<masked>",
+              "id": "<masked>",
+              "lastUpdated": "<masked>",
+              "name": "Approved",
+              "updatedBy": null,
+              "validationCode": {
+                "enumType": "org.pih.warehouse.core.ValidationCode",
+                "name": "DEFAULT"
+              }
+            },
+            "validityEndDate": null,
+            "validityStartDate": null
+          }
+        ],
+        "ratingTypeCode": null,
+        "supplier": {
+          "code": "MID",
+          "displayName": "MID - Medical Items Depot",
+          "id": "<masked>",
+          "name": "Medical Items Depot"
+        },
+        "supplierCode": "DG-4657",
+        "tieredPricing": false,
+        "unitPrice": 0.29,
+        "updatedBy": {
+          "id": "<masked>",
+          "name": "Miss Administrator"
+        }
+      },
+      {
+        "active": true,
+        "attributes": [],
+        "brandName": null,
+        "code": "EK670-MID",
+        "contractPrice": null,
+        "createdBy": {
+          "id": "<masked>",
+          "name": "Miss Administrator"
+        },
+        "dateCreated": "<masked>",
+        "defaultProductPackage": {
+          "description": "Each of 1",
+          "id": "<masked>",
+          "name": "EA/1",
+          "productPrice": {
+            "id": "<masked>",
+            "price": 15.0
+          },
+          "quantity": 1,
+          "uom": {
+            "code": "EA",
+            "id": "<masked>",
+            "name": "Each"
+          }
+        },
+        "description": null,
+        "id": "<masked>",
+        "lastUpdated": "<masked>",
+        "manufacturer": null,
+        "manufacturerCode": null,
+        "minOrderQuantity": null,
+        "name": "Vincristine injection, 1mL",
+        "packagePrice": 15.0,
+        "packageSize": "EA/1",
+        "product": {
+          "id": "<masked>",
+          "name": "Vincristine injection, 1mL",
+          "productCode": "EK670"
+        },
+        "productCode": null,
+        "productSupplierPreferences": [
+          {
+            "comments": null,
+            "destinationParty": null,
+            "id": "<masked>",
+            "preferenceType": {
+              "createdBy": null,
+              "dateCreated": "<masked>",
+              "id": "<masked>",
+              "lastUpdated": "<masked>",
+              "name": "Approved",
+              "updatedBy": null,
+              "validationCode": {
+                "enumType": "org.pih.warehouse.core.ValidationCode",
+                "name": "DEFAULT"
+              }
+            },
+            "validityEndDate": null,
+            "validityStartDate": null
+          }
+        ],
+        "ratingTypeCode": null,
+        "supplier": {
+          "code": "MID",
+          "displayName": "MID - Medical Items Depot",
+          "id": "<masked>",
+          "name": "Medical Items Depot"
+        },
+        "supplierCode": "THE-35-324",
+        "tieredPricing": false,
+        "unitPrice": 15.0,
+        "updatedBy": {
+          "id": "<masked>",
+          "name": "Miss Administrator"
+        }
+      },
+      {
+        "active": true,
+        "attributes": [],
+        "brandName": null,
+        "code": "GM080-MID",
+        "contractPrice": null,
+        "createdBy": {
+          "id": "<masked>",
+          "name": "Miss Administrator"
+        },
+        "dateCreated": "<masked>",
+        "defaultProductPackage": {
+          "description": "Each of 1",
+          "id": "<masked>",
+          "name": "EA/1",
+          "productPrice": {
+            "id": "<masked>",
+            "price": 11.2
+          },
+          "quantity": 1,
+          "uom": {
+            "code": "EA",
+            "id": "<masked>",
+            "name": "Each"
+          }
+        },
+        "description": null,
+        "id": "<masked>",
+        "lastUpdated": "<masked>",
+        "manufacturer": null,
+        "manufacturerCode": null,
+        "minOrderQuantity": null,
+        "name": "Bleomycin injection, 15mg",
+        "packagePrice": 11.2,
+        "packageSize": "EA/1",
+        "product": {
+          "id": "<masked>",
+          "name": "Bleomycin injection, 15mg",
+          "productCode": "GM080"
+        },
+        "productCode": null,
+        "productSupplierPreferences": [
+          {
+            "comments": null,
+            "destinationParty": null,
+            "id": "<masked>",
+            "preferenceType": {
+              "createdBy": null,
+              "dateCreated": "<masked>",
+              "id": "<masked>",
+              "lastUpdated": "<masked>",
+              "name": "Approved",
+              "updatedBy": null,
+              "validationCode": {
+                "enumType": "org.pih.warehouse.core.ValidationCode",
+                "name": "DEFAULT"
+              }
+            },
+            "validityEndDate": null,
+            "validityStartDate": null
+          }
+        ],
+        "ratingTypeCode": null,
+        "supplier": {
+          "code": "MID",
+          "displayName": "MID - Medical Items Depot",
+          "id": "<masked>",
+          "name": "Medical Items Depot"
+        },
+        "supplierCode": "576588",
+        "tieredPricing": false,
+        "unitPrice": 11.2,
+        "updatedBy": {
+          "id": "<masked>",
+          "name": "Miss Administrator"
+        }
+      },
+      {
+        "active": true,
+        "attributes": [],
+        "brandName": null,
+        "code": "MC017-MID",
+        "contractPrice": null,
+        "createdBy": {
+          "id": "<masked>",
+          "name": "Miss Administrator"
+        },
+        "dateCreated": "<masked>",
+        "defaultProductPackage": {
+          "description": "Box of 76",
+          "id": "<masked>",
+          "name": "BX/76",
+          "productPrice": {
+            "id": "<masked>",
+            "price": 22.04
+          },
+          "quantity": 76,
+          "uom": {
+            "code": "BX",
+            "id": "<masked>",
+            "name": "Box"
+          }
+        },
+        "description": null,
+        "id": "<masked>",
+        "lastUpdated": "<masked>",
+        "manufacturer": null,
+        "manufacturerCode": null,
+        "minOrderQuantity": null,
+        "name": "Lamivudine 30mg + nevirapine 50mg + zidovudine 60mg tablet",
+        "packagePrice": 22.04,
+        "packageSize": "BX/76",
+        "product": {
+          "id": "<masked>",
+          "name": "Lamivudine 30mg + nevirapine 50mg + zidovudine 60mg tablet",
+          "productCode": "MC017"
+        },
+        "productCode": null,
+        "productSupplierPreferences": [
+          {
+            "comments": null,
+            "destinationParty": null,
+            "id": "<masked>",
+            "preferenceType": {
+              "createdBy": null,
+              "dateCreated": "<masked>",
+              "id": "<masked>",
+              "lastUpdated": "<masked>",
+              "name": "Approved",
+              "updatedBy": null,
+              "validationCode": {
+                "enumType": "org.pih.warehouse.core.ValidationCode",
+                "name": "DEFAULT"
+              }
+            },
+            "validityEndDate": null,
+            "validityStartDate": null
+          }
+        ],
+        "ratingTypeCode": null,
+        "supplier": {
+          "code": "MID",
+          "displayName": "MID - Medical Items Depot",
+          "id": "<masked>",
+          "name": "Medical Items Depot"
+        },
+        "supplierCode": "436-THC",
+        "tieredPricing": false,
+        "unitPrice": 0.29,
+        "updatedBy": {
+          "id": "<masked>",
+          "name": "Miss Administrator"
+        }
+      },
+      {
+        "active": true,
+        "attributes": [],
+        "brandName": null,
+        "code": "QX039-MID",
+        "contractPrice": null,
+        "createdBy": {
+          "id": "<masked>",
+          "name": "Miss Administrator"
+        },
+        "dateCreated": "<masked>",
+        "defaultProductPackage": {
+          "description": "Bottle of 100",
+          "id": "<masked>",
+          "name": "BTL/100",
+          "productPrice": {
+            "id": "<masked>",
+            "price": 25.0
+          },
+          "quantity": 100,
+          "uom": {
+            "code": "BTL",
+            "id": "<masked>",
+            "name": "Bottle"
+          }
+        },
+        "description": null,
+        "id": "<masked>",
+        "lastUpdated": "<masked>",
+        "manufacturer": null,
+        "manufacturerCode": null,
+        "minOrderQuantity": null,
+        "name": "Morphine 10mg immediate release tablet",
+        "packagePrice": 25.0,
+        "packageSize": "BTL/100",
+        "product": {
+          "id": "<masked>",
+          "name": "Morphine 10mg immediate release tablet",
+          "productCode": "QX039"
+        },
+        "productCode": null,
+        "productSupplierPreferences": [
+          {
+            "comments": null,
+            "destinationParty": null,
+            "id": "<masked>",
+            "preferenceType": {
+              "createdBy": null,
+              "dateCreated": "<masked>",
+              "id": "<masked>",
+              "lastUpdated": "<masked>",
+              "name": "Approved",
+              "updatedBy": null,
+              "validationCode": {
+                "enumType": "org.pih.warehouse.core.ValidationCode",
+                "name": "DEFAULT"
+              }
+            },
+            "validityEndDate": null,
+            "validityStartDate": null
+          }
+        ],
+        "ratingTypeCode": null,
+        "supplier": {
+          "code": "MID",
+          "displayName": "MID - Medical Items Depot",
+          "id": "<masked>",
+          "name": "Medical Items Depot"
+        },
+        "supplierCode": "54565865",
+        "tieredPricing": false,
+        "unitPrice": 0.25,
+        "updatedBy": {
+          "id": "<masked>",
+          "name": "Miss Administrator"
+        }
+      },
+      {
+        "active": true,
+        "attributes": [],
+        "brandName": null,
+        "code": "QX419-MID",
+        "contractPrice": null,
+        "createdBy": {
+          "id": "<masked>",
+          "name": "Miss Administrator"
+        },
+        "dateCreated": "<masked>",
+        "defaultProductPackage": {
+          "description": "Box of 980",
+          "id": "<masked>",
+          "name": "BX/980",
+          "productPrice": {
+            "id": "<masked>",
+            "price": 372.4
+          },
+          "quantity": 980,
+          "uom": {
+            "code": "BX",
+            "id": "<masked>",
+            "name": "Box"
+          }
+        },
+        "description": null,
+        "id": "<masked>",
+        "lastUpdated": "<masked>",
+        "manufacturer": null,
+        "manufacturerCode": null,
+        "minOrderQuantity": null,
+        "name": "Isoniazid 300mg + rifapentine 300mg tablet",
+        "packagePrice": 372.4,
+        "packageSize": "BX/980",
+        "product": {
+          "id": "<masked>",
+          "name": "Isoniazid 300mg + rifapentine 300mg tablet",
+          "productCode": "QX419"
+        },
+        "productCode": null,
+        "productSupplierPreferences": [
+          {
+            "comments": null,
+            "destinationParty": null,
+            "id": "<masked>",
+            "preferenceType": {
+              "createdBy": null,
+              "dateCreated": "<masked>",
+              "id": "<masked>",
+              "lastUpdated": "<masked>",
+              "name": "Approved",
+              "updatedBy": null,
+              "validationCode": {
+                "enumType": "org.pih.warehouse.core.ValidationCode",
+                "name": "DEFAULT"
+              }
+            },
+            "validityEndDate": null,
+            "validityStartDate": null
+          }
+        ],
+        "ratingTypeCode": null,
+        "supplier": {
+          "code": "MID",
+          "displayName": "MID - Medical Items Depot",
+          "id": "<masked>",
+          "name": "Medical Items Depot"
+        },
+        "supplierCode": "34-656-24",
+        "tieredPricing": false,
+        "unitPrice": 0.38,
+        "updatedBy": {
+          "id": "<masked>",
+          "name": "Miss Administrator"
+        }
+      },
+      {
+        "active": true,
+        "attributes": [],
+        "brandName": null,
+        "code": "TS894-MID",
+        "contractPrice": null,
+        "createdBy": {
+          "id": "<masked>",
+          "name": "Miss Administrator"
+        },
+        "dateCreated": "<masked>",
+        "defaultProductPackage": {
+          "description": "Box of 100",
+          "id": "<masked>",
+          "name": "BX/100",
+          "productPrice": {
+            "id": "<masked>",
+            "price": 95.0
+          },
+          "quantity": 100,
+          "uom": {
+            "code": "BX",
+            "id": "<masked>",
+            "name": "Box"
+          }
+        },
+        "description": null,
+        "id": "<masked>",
+        "lastUpdated": "<masked>",
+        "manufacturer": null,
+        "manufacturerCode": null,
+        "minOrderQuantity": null,
+        "name": "Morphine injection, 10mg/mL in 1mL ampoule",
+        "packagePrice": 95.0,
+        "packageSize": "BX/100",
+        "product": {
+          "id": "<masked>",
+          "name": "Morphine injection, 10mg/mL in 1mL ampoule",
+          "productCode": "TS894"
+        },
+        "productCode": null,
+        "productSupplierPreferences": [
+          {
+            "comments": null,
+            "destinationParty": null,
+            "id": "<masked>",
+            "preferenceType": {
+              "createdBy": null,
+              "dateCreated": "<masked>",
+              "id": "<masked>",
+              "lastUpdated": "<masked>",
+              "name": "Approved",
+              "updatedBy": null,
+              "validationCode": {
+                "enumType": "org.pih.warehouse.core.ValidationCode",
+                "name": "DEFAULT"
+              }
+            },
+            "validityEndDate": null,
+            "validityStartDate": null
+          }
+        ],
+        "ratingTypeCode": null,
+        "supplier": {
+          "code": "MID",
+          "displayName": "MID - Medical Items Depot",
+          "id": "<masked>",
+          "name": "Medical Items Depot"
+        },
+        "supplierCode": "AD-4376",
+        "tieredPricing": false,
+        "unitPrice": 0.95,
+        "updatedBy": {
+          "id": "<masked>",
+          "name": "Miss Administrator"
+        }
+      },
+      {
+        "active": true,
+        "attributes": [],
+        "brandName": null,
+        "code": "TZ835-MID",
+        "contractPrice": null,
+        "createdBy": {
+          "id": "<masked>",
+          "name": "Miss Administrator"
+        },
+        "dateCreated": "<masked>",
+        "defaultProductPackage": {
+          "description": "Box of 76",
+          "id": "<masked>",
+          "name": "BX/76",
+          "productPrice": {
+            "id": "<masked>",
+            "price": 22.04
+          },
+          "quantity": 76,
+          "uom": {
+            "code": "BX",
+            "id": "<masked>",
+            "name": "Box"
+          }
+        },
+        "description": null,
+        "id": "<masked>",
+        "lastUpdated": "<masked>",
+        "manufacturer": null,
+        "manufacturerCode": null,
+        "minOrderQuantity": null,
+        "name": "Lamivudine 150mg + zidovudine 300mg tablet",
+        "packagePrice": 22.04,
+        "packageSize": "BX/76",
+        "product": {
+          "id": "<masked>",
+          "name": "Lamivudine 150mg + zidovudine 300mg tablet",
+          "productCode": "TZ835"
+        },
+        "productCode": null,
+        "productSupplierPreferences": [
+          {
+            "comments": null,
+            "destinationParty": null,
+            "id": "<masked>",
+            "preferenceType": {
+              "createdBy": null,
+              "dateCreated": "<masked>",
+              "id": "<masked>",
+              "lastUpdated": "<masked>",
+              "name": "Approved",
+              "updatedBy": null,
+              "validationCode": {
+                "enumType": "org.pih.warehouse.core.ValidationCode",
+                "name": "DEFAULT"
+              }
+            },
+            "validityEndDate": null,
+            "validityStartDate": null
+          }
+        ],
+        "ratingTypeCode": null,
+        "supplier": {
+          "code": "MID",
+          "displayName": "MID - Medical Items Depot",
+          "id": "<masked>",
+          "name": "Medical Items Depot"
+        },
+        "supplierCode": "7575w",
+        "tieredPricing": false,
+        "unitPrice": 0.29,
+        "updatedBy": {
+          "id": "<masked>",
+          "name": "Miss Administrator"
+        }
+      },
+      {
+        "active": true,
+        "attributes": [],
+        "brandName": null,
+        "code": "XM026-MID",
+        "contractPrice": null,
+        "createdBy": {
+          "id": "<masked>",
+          "name": "Miss Administrator"
+        },
+        "dateCreated": "<masked>",
+        "defaultProductPackage": {
+          "description": "Box of 980",
+          "id": "<masked>",
+          "name": "BX/980",
+          "productPrice": {
+            "id": "<masked>",
+            "price": 372.4
+          },
+          "quantity": 980,
+          "uom": {
+            "code": "BX",
+            "id": "<masked>",
+            "name": "Box"
+          }
+        },
+        "description": null,
+        "id": "<masked>",
+        "lastUpdated": "<masked>",
+        "manufacturer": null,
+        "manufacturerCode": null,
+        "minOrderQuantity": null,
+        "name": "Isoniazid 300mg tablet",
+        "packagePrice": 372.4,
+        "packageSize": "BX/980",
+        "product": {
+          "id": "<masked>",
+          "name": "Isoniazid 300mg tablet",
+          "productCode": "XM026"
+        },
+        "productCode": null,
+        "productSupplierPreferences": [
+          {
+            "comments": null,
+            "destinationParty": null,
+            "id": "<masked>",
+            "preferenceType": {
+              "createdBy": null,
+              "dateCreated": "<masked>",
+              "id": "<masked>",
+              "lastUpdated": "<masked>",
+              "name": "Approved",
+              "updatedBy": null,
+              "validationCode": {
+                "enumType": "org.pih.warehouse.core.ValidationCode",
+                "name": "DEFAULT"
+              }
+            },
+            "validityEndDate": null,
+            "validityStartDate": null
+          }
+        ],
+        "ratingTypeCode": null,
+        "supplier": {
+          "code": "MID",
+          "displayName": "MID - Medical Items Depot",
+          "id": "<masked>",
+          "name": "Medical Items Depot"
+        },
+        "supplierCode": "6464-THR",
+        "tieredPricing": false,
+        "unitPrice": 0.38,
+        "updatedBy": {
+          "id": "<masked>",
+          "name": "Miss Administrator"
+        }
+      }
+    ],
+    "totalCount": 38
+  },
+  "contentType": "application/json",
+  "request": {
+    "method": "GET",
+    "params": {
+      "max": "10"
+    },
+    "path": "/api/productSuppliers"
+  },
+  "status": 200
+}

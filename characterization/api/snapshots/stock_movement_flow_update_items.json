@@ -1,0 +1,195 @@
+{
+  "body": {
+    "data": {
+      "approvers": [],
+      "associations": {
+        "documents": null,
+        "requisition": {
+          "id": "<masked>",
+          "requestNumber": "<masked>",
+          "status": "CREATED"
+        },
+        "shipment": {
+          "id": "<masked>",
+          "shipmentNumber": "<masked>",
+          "status": "PENDING"
+        },
+        "shipments": [
+          {
+            "id": "<masked>",
+            "shipmentNumber": "<masked>",
+            "status": "PENDING"
+          }
+        ]
+      },
+      "comments": null,
+      "currentEvent": null,
+      "currentStatus": "PENDING",
+      "dateCreated": "<masked>",
+      "dateDeliveryRequested": null,
+      "dateRequested": "<masked>",
+      "dateShipped": "<masked>",
+      "description": "Characterization test movement",
+      "destination": {
+        "id": "<masked>",
+        "locationGroup": {
+          "id": "<masked>",
+          "name": "NorthEast"
+        },
+        "locationNumber": "BOSO",
+        "locationType": {
+          "description": "Dispensary",
+          "id": "<masked>",
+          "locationTypeCode": "DISPENSARY",
+          "name": "Dispensary"
+        },
+        "name": "Boston Office",
+        "organizationCode": "<masked>",
+        "organizationName": "My Organization",
+        "supportedActivities": []
+      },
+      "displayStatus": {
+        "label": "Created",
+        "name": "CREATED",
+        "variant": "success"
+      },
+      "driverName": null,
+      "expectedDeliveryDate": null,
+      "hasManageInventory": true,
+      "id": "<masked>",
+      "identifier": "<masked>",
+      "isElectronicType": false,
+      "isFromOrder": false,
+      "isPartiallyReceived": false,
+      "isPending": true,
+      "isReceived": false,
+      "isReturn": false,
+      "isShipped": false,
+      "lastUpdated": "<masked>",
+      "lineItemCount": 1,
+      "lineItems": [
+        {
+          "boxName": "",
+          "comments": null,
+          "expirationDate": null,
+          "id": "<masked>",
+          "inventoryItem": {
+            "expirationDate": null,
+            "id": "<masked>",
+            "lotNumber": null,
+            "quantity": 50
+          },
+          "lotNumber": "",
+          "manuallyAdded": "<masked>",
+          "orderId": null,
+          "orderItemId": null,
+          "orderNumber": null,
+          "packSize": 1,
+          "packsRequested": 5,
+          "palletName": "",
+          "product": {
+            "active": true,
+            "category": "IT Equipment",
+            "color": null,
+            "dateCreated": "<masked>",
+            "description": "",
+            "displayNames": {
+              "default": null
+            },
+            "handlingIcons": [],
+            "id": "<masked>",
+            "lastUpdated": "<masked>",
+            "lotAndExpiryControl": false,
+            "name": "Adapter, USB-C male to HDMI + VGA female",
+            "pricePerUnit": 25.99,
+            "productCode": "AX738",
+            "unitOfMeasure": "Each",
+            "updatedBy": "Miss Administrator"
+          },
+          "productCode": "AX738",
+          "productSupplier": null,
+          "quantityAllowed": null,
+          "quantityAvailable": null,
+          "quantityCanceled": null,
+          "quantityCounted": null,
+          "quantityOnHand": null,
+          "quantityPicked": 0,
+          "quantityRequested": 5,
+          "quantityRequired": 5,
+          "quantityRevised": null,
+          "reasonCode": null,
+          "recipient": null,
+          "sortOrder": "<masked>",
+          "statusCode": "APPROVED",
+          "substitutionItems": [],
+          "unitOfMeasure": null,
+          "version": 0
+        }
+      ],
+      "name": "MainWarehouse-BOSO-01Jul2026-Characterizationtestmovement",
+      "order": {
+        "id": null,
+        "name": null,
+        "orderNumber": null
+      },
+      "origin": {
+        "id": "<masked>",
+        "isDepot": true,
+        "locationGroup": null,
+        "locationNumber": null,
+        "locationType": {
+          "description": "Depot",
+          "id": "<masked>",
+          "locationTypeCode": "DEPOT",
+          "name": "Depot"
+        },
+        "name": "Main Warehouse",
+        "organizationCode": "<masked>",
+        "organizationName": "Main Organization",
+        "supportedActivities": []
+      },
+      "picklist": {
+        "id": null
+      },
+      "received": false,
+      "replenishmentType": null,
+      "requestType": null,
+      "requestedBy": {
+        "email": "admin@admin.com",
+        "firstName": "Miss",
+        "id": "<masked>",
+        "lastName": "Administrator",
+        "name": "Miss Administrator",
+        "roles": [
+          "ROLE_FINANCE",
+          "ROLE_PRODUCT_NOTIFICATION",
+          "ROLE_SHIPMENT_NOTIFICATION",
+          "ROLE_SUPERUSER"
+        ],
+        "username": "admin"
+      },
+      "shipmentStatus": "PENDING",
+      "shipmentType": {
+        "description": null,
+        "displayName": "Default",
+        "id": "<masked>",
+        "name": "Default"
+      },
+      "shipped": false,
+      "sourceType": null,
+      "statusCode": "CREATED",
+      "stocklist": {
+        "id": null,
+        "name": null
+      },
+      "trackingNumber": null
+    }
+  },
+  "contentType": "application/json",
+  "request": {
+    "method": "POST",
+    "params": {},
+    "path": "/api/stockMovements/<id>/updateItems"
+  },
+  "status": 200
+}

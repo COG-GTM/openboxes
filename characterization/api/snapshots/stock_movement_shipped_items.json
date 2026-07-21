@@ -1,0 +1,14 @@
+{
+  "body": {
+    "errorMessage": "No shipment items found"
+  },
+  "contentType": "application/json",
+  "request": {
+    "method": "GET",
+    "params": {
+      "destination": "<id>"
+    },
+    "path": "/api/stockMovements/shippedItems"
+  },
+  "status": 404
+}

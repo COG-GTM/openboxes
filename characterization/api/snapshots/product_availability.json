@@ -1,0 +1,61 @@
+{
+  "body": {
+    "data": [
+      {
+        "binLocation": null,
+        "binLocationName": "DEFAULT",
+        "dateCreated": "<masked>",
+        "id": "<masked>",
+        "inventoryItem": {
+          "id": "<masked>"
+        },
+        "lastUpdated": "<masked>",
+        "location": {
+          "id": "<masked>"
+        },
+        "lotNumber": "DEFAULT",
+        "product": {
+          "id": "<masked>"
+        },
+        "productCode": "AX738",
+        "quantityAllocated": 0,
+        "quantityAvailableToPromise": 0,
+        "quantityNotPicked": 0,
+        "quantityOnHand": 0,
+        "quantityOnHold": 0
+      },
+      {
+        "binLocation": {
+          "id": "<masked>"
+        },
+        "binLocationName": "RM1-RACK3-SHELF1",
+        "dateCreated": "<masked>",
+        "id": "<masked>",
+        "inventoryItem": {
+          "id": "<masked>"
+        },
+        "lastUpdated": "<masked>",
+        "location": {
+          "id": "<masked>"
+        },
+        "lotNumber": "DEFAULT",
+        "product": {
+          "id": "<masked>"
+        },
+        "productCode": "AX738",
+        "quantityAllocated": 0,
+        "quantityAvailableToPromise": 30,
+        "quantityNotPicked": 30,
+        "quantityOnHand": 30,
+        "quantityOnHold": 0
+      }
+    ]
+  },
+  "contentType": "application/json",
+  "request": {
+    "method": "GET",
+    "params": {},
+    "path": "/api/products/<id>/productAvailability"
+  },
+  "status": 200
+}

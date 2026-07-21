@@ -1,0 +1,14 @@
+{
+  "body": {
+    "errorMessage": "No pending requisition items found"
+  },
+  "contentType": "application/json",
+  "request": {
+    "method": "GET",
+    "params": {
+      "origin": "1"
+    },
+    "path": "/api/stockMovements/pendingRequisitionItems"
+  },
+  "status": 404
+}

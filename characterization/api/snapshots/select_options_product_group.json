@@ -1,0 +1,12 @@
+{
+  "body": {
+    "data": []
+  },
+  "contentType": "application/json",
+  "request": {
+    "method": "GET",
+    "params": {},
+    "path": "/api/productGroupOptions"
+  },
+  "status": 200
+}

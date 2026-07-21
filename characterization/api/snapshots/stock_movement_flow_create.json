@@ -1,0 +1,126 @@
+{
+  "body": {
+    "data": {
+      "approvers": null,
+      "associations": {
+        "documents": null,
+        "requisition": {
+          "id": "<masked>",
+          "requestNumber": "<masked>",
+          "status": "CREATED"
+        },
+        "shipment": {
+          "id": null,
+          "shipmentNumber": null,
+          "status": null
+        },
+        "shipments": null
+      },
+      "comments": null,
+      "currentEvent": null,
+      "currentStatus": null,
+      "dateCreated": "<masked>",
+      "dateDeliveryRequested": null,
+      "dateRequested": "<masked>",
+      "dateShipped": null,
+      "description": "Characterization test movement",
+      "destination": {
+        "id": "<masked>",
+        "locationGroup": {
+          "id": "<masked>",
+          "name": "NorthEast"
+        },
+        "locationNumber": "BOSO",
+        "locationType": {
+          "description": "Dispensary",
+          "id": "<masked>",
+          "locationTypeCode": "DISPENSARY",
+          "name": "Dispensary"
+        },
+        "name": "Boston Office",
+        "organizationCode": "<masked>",
+        "organizationName": "My Organization",
+        "supportedActivities": []
+      },
+      "displayStatus": {
+        "label": "Created",
+        "name": "CREATED",
+        "variant": "success"
+      },
+      "driverName": null,
+      "expectedDeliveryDate": null,
+      "hasManageInventory": true,
+      "id": "<masked>",
+      "identifier": "<masked>",
+      "isElectronicType": false,
+      "isFromOrder": false,
+      "isPartiallyReceived": false,
+      "isPending": false,
+      "isReceived": false,
+      "isReturn": false,
+      "isShipped": false,
+      "lastUpdated": "<masked>",
+      "lineItemCount": 0,
+      "lineItems": [],
+      "name": "MainWarehouse-BOSO-01Jul2026-Characterizationtestmovement",
+      "order": {
+        "id": null,
+        "name": null,
+        "orderNumber": null
+      },
+      "origin": {
+        "id": "<masked>",
+        "isDepot": true,
+        "locationGroup": null,
+        "locationNumber": null,
+        "locationType": {
+          "description": "Depot",
+          "id": "<masked>",
+          "locationTypeCode": "DEPOT",
+          "name": "Depot"
+        },
+        "name": "Main Warehouse",
+        "organizationCode": "<masked>",
+        "organizationName": "Main Organization",
+        "supportedActivities": []
+      },
+      "picklist": {
+        "id": null
+      },
+      "received": false,
+      "replenishmentType": null,
+      "requestType": null,
+      "requestedBy": {
+        "email": "admin@admin.com",
+        "firstName": "Miss",
+        "id": "<masked>",
+        "lastName": "Administrator",
+        "name": "Miss Administrator",
+        "roles": [
+          "ROLE_FINANCE",
+          "ROLE_PRODUCT_NOTIFICATION",
+          "ROLE_SHIPMENT_NOTIFICATION",
+          "ROLE_SUPERUSER"
+        ],
+        "username": "admin"
+      },
+      "shipmentStatus": null,
+      "shipmentType": null,
+      "shipped": false,
+      "sourceType": null,
+      "statusCode": "CREATED",
+      "stocklist": {
+        "id": null,
+        "name": null
+      },
+      "trackingNumber": null
+    }
+  },
+  "contentType": "application/json",
+  "request": {
+    "method": "POST",
+    "params": {},
+    "path": "/api/stockMovements"
+  },
+  "status": 201
+}

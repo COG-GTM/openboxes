@@ -1,0 +1,37 @@
+{
+  "body": {
+    "data": [
+      {
+        "id": "<masked>",
+        "label": "Approved",
+        "value": "APPROVED",
+        "variant": "PRIMARY"
+      },
+      {
+        "id": "<masked>",
+        "label": "Canceled",
+        "value": "CANCELED",
+        "variant": "DANGER"
+      },
+      {
+        "id": "<masked>",
+        "label": "Completed",
+        "value": "COMPLETED",
+        "variant": "SUCCESS"
+      },
+      {
+        "id": "<masked>",
+        "label": "Pending",
+        "value": "PENDING",
+        "variant": "WARNING"
+      }
+    ]
+  },
+  "contentType": "application/json",
+  "request": {
+    "method": "GET",
+    "params": {},
+    "path": "/api/stockTransfers/statusOptions"
+  },
+  "status": 200
+}

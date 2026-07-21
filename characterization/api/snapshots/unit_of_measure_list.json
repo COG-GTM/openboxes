@@ -1,0 +1,149 @@
+{
+  "body": {
+    "data": [
+      {
+        "code": "BTL",
+        "createdBy": {
+          "id": "<masked>"
+        },
+        "dateCreated": "<masked>",
+        "description": null,
+        "id": "<masked>",
+        "lastUpdated": "<masked>",
+        "name": "Bottle",
+        "uomClass": {
+          "id": "<masked>"
+        },
+        "updatedBy": {
+          "id": "<masked>"
+        }
+      },
+      {
+        "code": "BX",
+        "createdBy": {
+          "id": "<masked>"
+        },
+        "dateCreated": "<masked>",
+        "description": null,
+        "id": "<masked>",
+        "lastUpdated": "<masked>",
+        "name": "Box",
+        "uomClass": {
+          "id": "<masked>"
+        },
+        "updatedBy": {
+          "id": "<masked>"
+        }
+      },
+      {
+        "code": "CS",
+        "createdBy": {
+          "id": "<masked>"
+        },
+        "dateCreated": "<masked>",
+        "description": null,
+        "id": "<masked>",
+        "lastUpdated": "<masked>",
+        "name": "Case",
+        "uomClass": {
+          "id": "<masked>"
+        },
+        "updatedBy": {
+          "id": "<masked>"
+        }
+      },
+      {
+        "code": "EA",
+        "createdBy": {
+          "id": "<masked>"
+        },
+        "dateCreated": "<masked>",
+        "description": null,
+        "id": "<masked>",
+        "lastUpdated": "<masked>",
+        "name": "Each",
+        "uomClass": {
+          "id": "<masked>"
+        },
+        "updatedBy": {
+          "id": "<masked>"
+        }
+      },
+      {
+        "code": "EUR",
+        "createdBy": {
+          "id": "<masked>"
+        },
+        "dateCreated": "<masked>",
+        "description": "EUR (€)",
+        "id": "<masked>",
+        "lastUpdated": "<masked>",
+        "name": "Euro",
+        "uomClass": {
+          "id": "<masked>"
+        },
+        "updatedBy": {
+          "id": "<masked>"
+        }
+      },
+      {
+        "code": "PK",
+        "createdBy": {
+          "id": "<masked>"
+        },
+        "dateCreated": "<masked>",
+        "description": null,
+        "id": "<masked>",
+        "lastUpdated": "<masked>",
+        "name": "Pack",
+        "uomClass": {
+          "id": "<masked>"
+        },
+        "updatedBy": {
+          "id": "<masked>"
+        }
+      },
+      {
+        "code": "RL",
+        "createdBy": {
+          "id": "<masked>"
+        },
+        "dateCreated": "<masked>",
+        "description": null,
+        "id": "<masked>",
+        "lastUpdated": "<masked>",
+        "name": "Roll",
+        "uomClass": {
+          "id": "<masked>"
+        },
+        "updatedBy": {
+          "id": "<masked>"
+        }
+      },
+      {
+        "code": "USD",
+        "createdBy": {
+          "id": "<masked>"
+        },
+        "dateCreated": "<masked>",
+        "description": "USD (US$)",
+        "id": "<masked>",
+        "lastUpdated": "<masked>",
+        "name": "US Dollar",
+        "uomClass": {
+          "id": "<masked>"
+        },
+        "updatedBy": {
+          "id": "<masked>"
+        }
+      }
+    ]
+  },
+  "contentType": "application/json",
+  "request": {
+    "method": "GET",
+    "params": {},
+    "path": "/api/unitOfMeasures"
+  },
+  "status": 200
+}

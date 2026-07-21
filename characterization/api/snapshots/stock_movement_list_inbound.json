@@ -1,0 +1,17 @@
+{
+  "body": {
+    "data": [],
+    "totalCount": 0
+  },
+  "contentType": "application/json",
+  "request": {
+    "method": "GET",
+    "params": {
+      "destination": "1",
+      "direction": "INBOUND",
+      "max": "10"
+    },
+    "path": "/api/stockMovements"
+  },
+  "status": 200
+}

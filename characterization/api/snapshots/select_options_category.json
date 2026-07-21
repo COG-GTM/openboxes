@@ -1,0 +1,117 @@
+{
+  "body": {
+    "data": [
+      {
+        "id": "<masked>",
+        "label": "ARVS"
+      },
+      {
+        "id": "<masked>",
+        "label": "Anesteshia"
+      },
+      {
+        "id": "<masked>",
+        "label": "Cancer"
+      },
+      {
+        "id": "<masked>",
+        "label": "Chronic Care"
+      },
+      {
+        "id": "<masked>",
+        "label": "Dental"
+      },
+      {
+        "id": "<masked>",
+        "label": "Food"
+      },
+      {
+        "id": "<masked>",
+        "label": "Furniture and Equipment"
+      },
+      {
+        "id": "<masked>",
+        "label": "Hospital and Clinic Supplies"
+      },
+      {
+        "id": "<masked>",
+        "label": "IT Equipment"
+      },
+      {
+        "id": "<masked>",
+        "label": "Lab"
+      },
+      {
+        "id": "<masked>",
+        "label": "Medical Equipment"
+      },
+      {
+        "id": "<masked>",
+        "label": "Medical Supplies"
+      },
+      {
+        "id": "<masked>",
+        "label": "Office Supplies"
+      },
+      {
+        "id": "<masked>",
+        "label": "Other"
+      },
+      {
+        "id": "<masked>",
+        "label": "Other"
+      },
+      {
+        "id": "<masked>",
+        "label": "Pain"
+      },
+      {
+        "id": "<masked>",
+        "label": "ROOT > Equipment"
+      },
+      {
+        "id": "<masked>",
+        "label": "ROOT > Medicines"
+      },
+      {
+        "id": "<masked>",
+        "label": "ROOT > Other"
+      },
+      {
+        "id": "<masked>",
+        "label": "ROOT > Perishables"
+      },
+      {
+        "id": "<masked>",
+        "label": "ROOT > Supplies"
+      },
+      {
+        "id": "<masked>",
+        "label": "ROOT"
+      },
+      {
+        "id": "<masked>",
+        "label": "Surgical Equipment"
+      },
+      {
+        "id": "<masked>",
+        "label": "Surgical"
+      },
+      {
+        "id": "<masked>",
+        "label": "TB"
+      },
+      {
+        "id": "<masked>",
+        "label": "X-Ray"
+      }
+    ]
+  },
+  "contentType": "application/json",
+  "request": {
+    "method": "GET",
+    "params": {},
+    "path": "/api/categoryOptions"
+  },
+  "status": 200
+}

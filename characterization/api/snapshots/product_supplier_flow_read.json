@@ -1,0 +1,54 @@
+{
+  "body": {
+    "data": {
+      "active": true,
+      "attributes": [],
+      "brandName": null,
+      "code": "CHARTEST-PS",
+      "contractPrice": null,
+      "createdBy": {
+        "id": "<masked>",
+        "name": "Miss Administrator"
+      },
+      "dateCreated": "<masked>",
+      "defaultProductPackage": null,
+      "description": null,
+      "id": "<masked>",
+      "lastUpdated": "<masked>",
+      "manufacturer": null,
+      "manufacturerCode": null,
+      "minOrderQuantity": null,
+      "name": "Characterization Test Product Source",
+      "packagePrice": 0.0,
+      "packageSize": null,
+      "product": {
+        "id": "<masked>",
+        "name": "Adapter, USB-C male to HDMI + VGA female",
+        "productCode": "AX738"
+      },
+      "productCode": null,
+      "productSupplierPreferences": [],
+      "ratingTypeCode": null,
+      "supplier": {
+        "code": "MO",
+        "displayName": "MO - Main Organization",
+        "id": "<masked>",
+        "name": "Main Organization"
+      },
+      "supplierCode": null,
+      "tieredPricing": false,
+      "unitPrice": 0.0,
+      "updatedBy": {
+        "id": "<masked>",
+        "name": "Miss Administrator"
+      }
+    }
+  },
+  "contentType": "application/json",
+  "request": {
+    "method": "GET",
+    "params": {},
+    "path": "/api/productSuppliers/<id>"
+  },
+  "status": 200
+}

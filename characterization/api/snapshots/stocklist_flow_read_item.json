@@ -1,0 +1,27 @@
+{
+  "body": {
+    "data": {
+      "location.id": "1",
+      "location.name": "Main Warehouse",
+      "locationGroup.id": null,
+      "locationGroup.name": null,
+      "manager.email": "admin@admin.com",
+      "manager.id": "1",
+      "manager.name": "Miss Administrator",
+      "maxQuantity": 25,
+      "monthlyDemand": null,
+      "name": "Characterization Test Stocklist",
+      "replenishmentPeriod": 0,
+      "requisitionItem.id": "<id>",
+      "stocklistId": "<id>",
+      "uom": "Each"
+    }
+  },
+  "contentType": "application/json",
+  "request": {
+    "method": "GET",
+    "params": {},
+    "path": "/api/stocklistItems/<id>"
+  },
+  "status": 200
+}

@@ -1,0 +1,33 @@
+{
+  "body": {
+    "data": [
+      {
+        "id": "<masked>",
+        "location.id": "<id>",
+        "location.name": "Central Warehouse (NYC)",
+        "locationGroup.id": "<id>",
+        "locationGroup.name": "NorthEast",
+        "manager.id": "1",
+        "manager.name": "Miss Administrator",
+        "name": "Boston Monthly Replenishment"
+      },
+      {
+        "id": "<masked>",
+        "location.id": "<id>",
+        "location.name": "Central Warehouse (NYC)",
+        "locationGroup.id": "<id>",
+        "locationGroup.name": "NorthEast",
+        "manager.id": "1",
+        "manager.name": "Miss Administrator",
+        "name": "Chicago Monthly Replenishment"
+      }
+    ]
+  },
+  "contentType": "application/json",
+  "request": {
+    "method": "GET",
+    "params": {},
+    "path": "/api/stocklistItems/availableStocklists"
+  },
+  "status": 200
+}

@@ -1,0 +1,43 @@
+{
+  "body": {
+    "data": [
+      {
+        "id": "<masked>",
+        "label": "Approved",
+        "value": "APPROVED"
+      },
+      {
+        "id": "<masked>",
+        "label": "Contract",
+        "value": "CONTRACT"
+      },
+      {
+        "id": "<masked>",
+        "label": "Do Not Order",
+        "value": "DO NOT ORDER"
+      },
+      {
+        "id": "<masked>",
+        "label": "Not Qualified",
+        "value": "NOT QUALIFIED"
+      },
+      {
+        "id": "<masked>",
+        "label": "Preferred",
+        "value": "PREFERRED"
+      },
+      {
+        "id": "<masked>",
+        "label": "Qualified",
+        "value": "QUALIFIED"
+      }
+    ]
+  },
+  "contentType": "application/json",
+  "request": {
+    "method": "GET",
+    "params": {},
+    "path": "/api/preferenceTypeOptions"
+  },
+  "status": 200
+}

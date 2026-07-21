@@ -1,0 +1,16 @@
+{
+  "body": {
+    "data": {
+      "id": "<masked>",
+      "name": "Correction",
+      "sortOrder": "<masked>"
+    }
+  },
+  "contentType": "application/json",
+  "request": {
+    "method": "GET",
+    "params": {},
+    "path": "/api/reasonCodes/CORRECTION"
+  },
+  "status": 200
+}

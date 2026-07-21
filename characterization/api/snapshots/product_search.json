@@ -1,0 +1,39 @@
+{
+  "body": {
+    "data": [
+      {
+        "active": true,
+        "color": null,
+        "displayName": null,
+        "exactMatch": false,
+        "handlingIcons": [],
+        "id": "<masked>",
+        "lotAndExpiryControl": false,
+        "name": "Adapter, USB-C Male to HDMI Female",
+        "productCode": "GK233",
+        "unitOfMeasure": "Each"
+      },
+      {
+        "active": true,
+        "color": null,
+        "displayName": null,
+        "exactMatch": false,
+        "handlingIcons": [],
+        "id": "<masked>",
+        "lotAndExpiryControl": false,
+        "name": "Adapter, USB-C male to HDMI + VGA female",
+        "productCode": "AX738",
+        "unitOfMeasure": "Each"
+      }
+    ]
+  },
+  "contentType": "application/json",
+  "request": {
+    "method": "GET",
+    "params": {
+      "name": "Adapter"
+    },
+    "path": "/api/products/search"
+  },
+  "status": 200
+}

@@ -15,3 +15,7 @@ jobs:
   run-backend-tests:
     uses: ./.github/workflows/backend-tests.yml
     secrets: inherit
+
+  run-characterization-tests:
+    uses: ./.github/workflows/characterization-tests.yml
+    secrets: inherit
