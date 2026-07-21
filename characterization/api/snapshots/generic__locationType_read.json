@@ -1,0 +1,17 @@
+{
+  "body": {
+    "data": {
+      "description": "Depot",
+      "id": "<masked>",
+      "locationTypeCode": "DEPOT",
+      "name": "Depot"
+    }
+  },
+  "contentType": "application/json",
+  "request": {
+    "method": "GET",
+    "params": {},
+    "path": "/api/generic/locationType/2"
+  },
+  "status": 200
+}

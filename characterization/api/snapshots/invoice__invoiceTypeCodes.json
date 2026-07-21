@@ -1,0 +1,28 @@
+{
+  "body": {
+    "data": [
+      {
+        "id": "<masked>",
+        "label": "Credit Note",
+        "value": "CREDIT_NOTE"
+      },
+      {
+        "id": "<masked>",
+        "label": "Invoice",
+        "value": "INVOICE"
+      },
+      {
+        "id": "<masked>",
+        "label": "Prepayment Invoice",
+        "value": "PREPAYMENT_INVOICE"
+      }
+    ]
+  },
+  "contentType": "application/json",
+  "request": {
+    "method": "GET",
+    "params": {},
+    "path": "/api/invoiceTypeCodes"
+  },
+  "status": 200
+}

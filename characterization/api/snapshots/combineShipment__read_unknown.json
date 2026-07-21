@@ -1,0 +1,12 @@
+{
+  "body": {
+    "data": null
+  },
+  "contentType": "application/json",
+  "request": {
+    "method": "GET",
+    "params": {},
+    "path": "/api/combineShipments/doesnotexist0000"
+  },
+  "status": 200
+}

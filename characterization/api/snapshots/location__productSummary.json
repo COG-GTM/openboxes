@@ -1,0 +1,355 @@
+{
+  "body": {
+    "data": [
+      {
+        "productCode": "AX738",
+        "productId": "<id>",
+        "productName": "Adapter, USB-C male to HDMI + VGA female",
+        "quantityOnHand": 30
+      },
+      {
+        "productCode": "BF640",
+        "productId": "<id>",
+        "productName": "Coat, Laboratory, Large, Unisex",
+        "quantityOnHand": 20
+      },
+      {
+        "productCode": "BX996",
+        "productId": "<id>",
+        "productName": "Beaker, Graduated, Borosilicate glass, 400mL",
+        "quantityOnHand": 15
+      },
+      {
+        "productCode": "CG819",
+        "productId": "<id>",
+        "productName": "File cabinet, Lateral, 5-drawer",
+        "quantityOnHand": 4
+      },
+      {
+        "productCode": "CM871",
+        "productId": "<id>",
+        "productName": "Lamivudine 150mg tablet",
+        "quantityOnHand": 7296
+      },
+      {
+        "productCode": "CR388",
+        "productId": "<id>",
+        "productName": "Lamivudine 150mg + nevirapine 200mg + zidovudine 300mg tablet",
+        "quantityOnHand": 0
+      },
+      {
+        "productCode": "DA693",
+        "productId": "<id>",
+        "productName": "Isoniazid 50mg + pyrazinamide 150mg + rifampicin 75mg tablet",
+        "quantityOnHand": 0
+      },
+      {
+        "productCode": "DD108",
+        "productId": "<id>",
+        "productName": "Envelope, A3, White",
+        "quantityOnHand": 1500
+      },
+      {
+        "productCode": "DJ064",
+        "productId": "<id>",
+        "productName": "Tube, Blood collection, K2 EDTA, Whole blood, Lavender, 2mL (pediatric)",
+        "quantityOnHand": 5000
+      },
+      {
+        "productCode": "DP854",
+        "productId": "<id>",
+        "productName": "Printer cartridge, HP 122A/Q3962A, Yellow",
+        "quantityOnHand": 20
+      },
+      {
+        "productCode": "EK670",
+        "productId": "<id>",
+        "productName": "Vincristine injection, 1mL",
+        "quantityOnHand": 768
+      },
+      {
+        "productCode": "ET383",
+        "productId": "<id>",
+        "productName": "Computer, Desktop, ThinkCentre M920z",
+        "quantityOnHand": 2
+      },
+      {
+        "productCode": "FF240",
+        "productId": "<id>",
+        "productName": "Envelope, A3, Manila",
+        "quantityOnHand": 1000
+      },
+      {
+        "productCode": "GA472",
+        "productId": "<id>",
+        "productName": "Printer cartridge, HP 122A/Q3963A, Magenta",
+        "quantityOnHand": 15
+      },
+      {
+        "productCode": "GH964",
+        "productId": "<id>",
+        "productName": "Printer cartridge, HP 122A/Q3961A, Cyan",
+        "quantityOnHand": 0
+      },
+      {
+        "productCode": "GK233",
+        "productId": "<id>",
+        "productName": "Adapter, USB-C Male to HDMI Female",
+        "quantityOnHand": 10
+      },
+      {
+        "productCode": "GM080",
+        "productId": "<id>",
+        "productName": "Bleomycin injection, 15mg",
+        "quantityOnHand": 467
+      },
+      {
+        "productCode": "GT068",
+        "productId": "<id>",
+        "productName": "Staples 23/13 pack of 1000",
+        "quantityOnHand": 50
+      },
+      {
+        "productCode": "GX785",
+        "productId": "<id>",
+        "productName": "Cellphone, Unlocked, 8GB, BLU 5.2",
+        "quantityOnHand": 10
+      },
+      {
+        "productCode": "HG966",
+        "productId": "<id>",
+        "productName": "Tube, Blood collection, K2 EDTA, Lavender top, Plastic, 4mL",
+        "quantityOnHand": 3000
+      },
+      {
+        "productCode": "HP196",
+        "productId": "<id>",
+        "productName": "Beaker, Graduated, Borosilicate glass, 100mL",
+        "quantityOnHand": 43
+      },
+      {
+        "productCode": "JG794",
+        "productId": "<id>",
+        "productName": "Camera, 600EXII-RT, Canon",
+        "quantityOnHand": 2
+      },
+      {
+        "productCode": "KY133",
+        "productId": "<id>",
+        "productName": "Tube, Blood collection, Serum, Red, Plastic, 4mL",
+        "quantityOnHand": 1200
+      },
+      {
+        "productCode": "MC017",
+        "productId": "<id>",
+        "productName": "Lamivudine 30mg + nevirapine 50mg + zidovudine 60mg tablet",
+        "quantityOnHand": 3420
+      },
+      {
+        "productCode": "MG983",
+        "productId": "<id>",
+        "productName": "Chair, Office, Rolling",
+        "quantityOnHand": 10
+      },
+      {
+        "productCode": "MM489",
+        "productId": "<id>",
+        "productName": "Charger, Laptop, Lenovo, TP60/SL500",
+        "quantityOnHand": 33
+      },
+      {
+        "productCode": "MR962",
+        "productId": "<id>",
+        "productName": "Stool, rolling",
+        "quantityOnHand": 0
+      },
+      {
+        "productCode": "MV069",
+        "productId": "<id>",
+        "productName": "Binder clips, 32mm",
+        "quantityOnHand": 100
+      },
+      {
+        "productCode": "MY523",
+        "productId": "<id>",
+        "productName": "Beaker, Graduated, Borosilicate glass, 250mL",
+        "quantityOnHand": 24
+      },
+      {
+        "productCode": "PH950",
+        "productId": "<id>",
+        "productName": "Staples 23/17 pack of 1000",
+        "quantityOnHand": 75
+      },
+      {
+        "productCode": "PK000",
+        "productId": "<id>",
+        "productName": "Ethanol (ethyl alcohol), 95%, reagent grade, 16oz",
+        "quantityOnHand": 0
+      },
+      {
+        "productCode": "PU011",
+        "productId": "<id>",
+        "productName": "Computer, Desktop, Dell Optiplex 390 SFF",
+        "quantityOnHand": 1
+      },
+      {
+        "productCode": "PU084",
+        "productId": "<id>",
+        "productName": "Camera, Canon, EOS 80D, with 18-55mm lens, with accessories",
+        "quantityOnHand": 3
+      },
+      {
+        "productCode": "QA069",
+        "productId": "<id>",
+        "productName": "Battery, for canon LP-E6N",
+        "quantityOnHand": 4
+      },
+      {
+        "productCode": "QD991",
+        "productId": "<id>",
+        "productName": "Printer cartridge, HP 122A/Q3960A, Black",
+        "quantityOnHand": 10
+      },
+      {
+        "productCode": "QS823",
+        "productId": "<id>",
+        "productName": "Coat, Laboratory, Medium, Unisex",
+        "quantityOnHand": 29
+      },
+      {
+        "productCode": "QX039",
+        "productId": "<id>",
+        "productName": "Morphine 10mg immediate release tablet",
+        "quantityOnHand": 100000
+      },
+      {
+        "productCode": "QX419",
+        "productId": "<id>",
+        "productName": "Isoniazid 300mg + rifapentine 300mg tablet",
+        "quantityOnHand": 19600
+      },
+      {
+        "productCode": "RS138",
+        "productId": "<id>",
+        "productName": "Binder clips, 25mm",
+        "quantityOnHand": 200
+      },
+      {
+        "productCode": "RU651",
+        "productId": "<id>",
+        "productName": "Batteries, Non Rechargeable, AAA",
+        "quantityOnHand": 500
+      },
+      {
+        "productCode": "RV624",
+        "productId": "<id>",
+        "productName": "Isoniazid 50mg + rifampicin 75mg tablet",
+        "quantityOnHand": 9800
+      },
+      {
+        "productCode": "RZ479",
+        "productId": "<id>",
+        "productName": "Chair, Plastic",
+        "quantityOnHand": 100
+      },
+      {
+        "productCode": "SJ489",
+        "productId": "<id>",
+        "productName": "Coat, Laboratory, Small, Unisex",
+        "quantityOnHand": 5
+      },
+      {
+        "productCode": "SJ730",
+        "productId": "<id>",
+        "productName": "Case, Tablet, Samsung Galaxy, 10.5in",
+        "quantityOnHand": 50
+      },
+      {
+        "productCode": "SZ449",
+        "productId": "<id>",
+        "productName": "Desk, Office, Wooden or metal",
+        "quantityOnHand": 0
+      },
+      {
+        "productCode": "TN940",
+        "productId": "<id>",
+        "productName": "Tube, Blood collection, Serum, Red, Plastic, 3mL (pediatric)",
+        "quantityOnHand": 0
+      },
+      {
+        "productCode": "TS894",
+        "productId": "<id>",
+        "productName": "Morphine injection, 10mg/mL in 1mL ampoule",
+        "quantityOnHand": 2000
+      },
+      {
+        "productCode": "TZ835",
+        "productId": "<id>",
+        "productName": "Lamivudine 150mg + zidovudine 300mg tablet",
+        "quantityOnHand": 7600
+      },
+      {
+        "productCode": "UB995",
+        "productId": "<id>",
+        "productName": "Charger, for Lenovo Thinkpad T400 series Laptop",
+        "quantityOnHand": 25
+      },
+      {
+        "productCode": "UM228",
+        "productId": "<id>",
+        "productName": "Printer, Multi-function, Scanner, HP MFP 426A",
+        "quantityOnHand": 0
+      },
+      {
+        "productCode": "UQ102",
+        "productId": "<id>",
+        "productName": "File cabinet, Lateral, 6-drawer",
+        "quantityOnHand": 1
+      },
+      {
+        "productCode": "VX576",
+        "productId": "<id>",
+        "productName": "Printer, Multifunction, Color, HP Inkjet PageWide Pro 477dw",
+        "quantityOnHand": 1
+      },
+      {
+        "productCode": "XJ173",
+        "productId": "<id>",
+        "productName": "Batteries, Non Rechargeable, AA",
+        "quantityOnHand": 0
+      },
+      {
+        "productCode": "XJ252",
+        "productId": "<id>",
+        "productName": "Binder clips, 19mm",
+        "quantityOnHand": 300
+      },
+      {
+        "productCode": "XM026",
+        "productId": "<id>",
+        "productName": "Isoniazid 300mg tablet",
+        "quantityOnHand": 34300
+      },
+      {
+        "productCode": "ZC462",
+        "productId": "<id>",
+        "productName": "Laptop, E490, ThinkPad",
+        "quantityOnHand": 8
+      },
+      {
+        "productCode": "ZZ113",
+        "productId": "<id>",
+        "productName": "Laptop, Dell Inspiron, T8TJG",
+        "quantityOnHand": 5
+      }
+    ]
+  },
+  "contentType": "application/json",
+  "request": {
+    "method": "GET",
+    "params": {},
+    "path": "/api/locations/1/productSummary"
+  },
+  "status": 200
+}

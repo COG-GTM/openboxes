@@ -1,0 +1,45 @@
+{
+  "body": {
+    "data": {
+      "colorNumber": null,
+      "datasets": [
+        {
+          "data": [
+            0,
+            0,
+            0,
+            48,
+            9
+          ],
+          "label": "Inventory Summary",
+          "links": [
+            "/openboxes/inventory/listInStock",
+            "/openboxes/inventory/listLowStock",
+            "/openboxes/inventory/listOverStock",
+            "/openboxes/inventory/listQuantityOnHandZero",
+            "/openboxes/inventory/listReorderStock"
+          ],
+          "type": null,
+          "yAxisID": null
+        }
+      ],
+      "labels": [
+        "Above maximum",
+        "Below minimum",
+        "Below reorder",
+        "In stock",
+        "No longer in stock"
+      ]
+    },
+    "link": null
+  },
+  "contentType": "application/json",
+  "request": {
+    "method": "GET",
+    "params": {
+      "locationId": "1"
+    },
+    "path": "/api/dashboard/inventorySummary"
+  },
+  "status": 200
+}

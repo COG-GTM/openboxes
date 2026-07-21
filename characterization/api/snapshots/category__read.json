@@ -1,0 +1,82 @@
+{
+  "body": {
+    "categories": [
+      {
+        "categories": [],
+        "dateCreated": "<masked>",
+        "deleted": false,
+        "description": null,
+        "id": "<masked>",
+        "isRoot": false,
+        "lastUpdated": "<masked>",
+        "name": "Equipment",
+        "sortOrder": "<masked>",
+        "version": 0
+      },
+      {
+        "categories": [],
+        "dateCreated": "<masked>",
+        "deleted": false,
+        "description": null,
+        "id": "<masked>",
+        "isRoot": false,
+        "lastUpdated": "<masked>",
+        "name": "Medicines",
+        "sortOrder": "<masked>",
+        "version": 0
+      },
+      {
+        "categories": [],
+        "dateCreated": "<masked>",
+        "deleted": false,
+        "description": null,
+        "id": "<masked>",
+        "isRoot": false,
+        "lastUpdated": "<masked>",
+        "name": "Other",
+        "sortOrder": "<masked>",
+        "version": 0
+      },
+      {
+        "categories": [],
+        "dateCreated": "<masked>",
+        "deleted": false,
+        "description": null,
+        "id": "<masked>",
+        "isRoot": false,
+        "lastUpdated": "<masked>",
+        "name": "Perishables",
+        "sortOrder": "<masked>",
+        "version": 0
+      },
+      {
+        "categories": [],
+        "dateCreated": "<masked>",
+        "deleted": false,
+        "description": null,
+        "id": "<masked>",
+        "isRoot": false,
+        "lastUpdated": "<masked>",
+        "name": "Supplies",
+        "sortOrder": "<masked>",
+        "version": 0
+      }
+    ],
+    "dateCreated": "<masked>",
+    "deleted": false,
+    "description": null,
+    "id": "<masked>",
+    "isRoot": true,
+    "lastUpdated": "<masked>",
+    "name": "ROOT",
+    "sortOrder": "<masked>",
+    "version": 0
+  },
+  "contentType": "application/json",
+  "request": {
+    "method": "GET",
+    "params": {},
+    "path": "/api/categories/<id>"
+  },
+  "status": 200
+}

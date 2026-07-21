@@ -1,0 +1,100 @@
+{
+  "body": {
+    "data": [
+      {
+        "id": "<masked>",
+        "name": "COLD ROOM",
+        "zoneId": null,
+        "zoneName": null
+      },
+      {
+        "id": "<masked>",
+        "name": "RM1-RACK1-SHELF1",
+        "zoneId": null,
+        "zoneName": null
+      },
+      {
+        "id": "<masked>",
+        "name": "RM1-RACK1-SHELF2",
+        "zoneId": null,
+        "zoneName": null
+      },
+      {
+        "id": "<masked>",
+        "name": "RM1-RACK1-SHELF3",
+        "zoneId": null,
+        "zoneName": null
+      },
+      {
+        "id": "<masked>",
+        "name": "RM1-RACK2-SHELF1",
+        "zoneId": null,
+        "zoneName": null
+      },
+      {
+        "id": "<masked>",
+        "name": "RM1-RACK2-SHELF2",
+        "zoneId": null,
+        "zoneName": null
+      },
+      {
+        "id": "<masked>",
+        "name": "RM1-RACK2-SHELF3",
+        "zoneId": null,
+        "zoneName": null
+      },
+      {
+        "id": "<masked>",
+        "name": "RM1-RACK3-SHELF1",
+        "zoneId": null,
+        "zoneName": null
+      },
+      {
+        "id": "<masked>",
+        "name": "RM1-RACK3-SHELF2",
+        "zoneId": null,
+        "zoneName": null
+      },
+      {
+        "id": "<masked>",
+        "name": "RM1-RACK3-SHELF3",
+        "zoneId": null,
+        "zoneName": null
+      },
+      {
+        "id": "<masked>",
+        "name": "RM2-RACK1-SHELF1",
+        "zoneId": null,
+        "zoneName": null
+      },
+      {
+        "id": "<masked>",
+        "name": "RM2-RACK1-SHELF2",
+        "zoneId": null,
+        "zoneName": null
+      },
+      {
+        "id": "<masked>",
+        "name": "RM2-RACK1-SHELF3",
+        "zoneId": null,
+        "zoneName": null
+      },
+      {
+        "id": "<masked>",
+        "name": "RM2-RACK2-SHELF1",
+        "zoneId": null,
+        "zoneName": null
+      }
+    ]
+  },
+  "contentType": "application/json",
+  "request": {
+    "method": "GET",
+    "params": {
+      "location.id": "1",
+      "shipmentNumber": "TEST123"
+    },
+    "path": "/api/internalLocations/receiving"
+  },
+  "status": 200
+}

@@ -1,0 +1,43 @@
+{
+  "body": {
+    "data": [
+      "ADJUST_INVENTORY",
+      "ALLOW_OVERPICK",
+      "APPROVE_ORDER",
+      "APPROVE_REQUEST",
+      "AUTOSAVE",
+      "CONSUME_STOCK",
+      "CROSS_DOCKING",
+      "CYCLE_COUNT",
+      "DYNAMIC_CREATION",
+      "ENABLE_CENTRAL_PURCHASING",
+      "ENABLE_FULFILLER_APPROVAL_NOTIFICATIONS",
+      "ENABLE_NOTIFICATIONS",
+      "ENABLE_REQUESTOR_APPROVAL_NOTIFICATIONS",
+      "ENABLE_WEBHOOKS",
+      "EXTERNAL",
+      "FULFILL_ORDER",
+      "FULFILL_REQUEST",
+      "HOLD_STOCK",
+      "MANAGE_INVENTORY",
+      "NONE",
+      "PACK_SHIPMENT",
+      "PARTIAL_RECEIVING",
+      "PICK_STOCK",
+      "PLACE_ORDER",
+      "PLACE_REQUEST",
+      "PUTAWAY_STOCK",
+      "RECEIVE_STOCK",
+      "REQUIRE_ACCOUNTING",
+      "SEND_STOCK",
+      "SUBMIT_REQUEST"
+    ]
+  },
+  "contentType": "application/json",
+  "request": {
+    "method": "GET",
+    "params": {},
+    "path": "/api/locations/supportedActivities"
+  },
+  "status": 200
+}

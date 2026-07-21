@@ -1,0 +1,16 @@
+{
+  "body": {
+    "code": "default.button.save.label",
+    "currentLocale": "en",
+    "message": "Save"
+  },
+  "contentType": "application/json",
+  "request": {
+    "method": "GET",
+    "params": {
+      "lang": "en"
+    },
+    "path": "/api/localizations/default.button.save.label"
+  },
+  "status": 200
+}

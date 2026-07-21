@@ -1,0 +1,27 @@
+{
+  "body": {
+    "data": {
+      "colorNumber": null,
+      "datasets": [
+        {
+          "data": [],
+          "label": "Number of requests",
+          "links": null,
+          "type": "doughnut",
+          "yAxisID": null
+        }
+      ],
+      "labels": []
+    },
+    "link": "/openboxes/stockMovement/list?direction=OUTBOUND"
+  },
+  "contentType": "application/json",
+  "request": {
+    "method": "GET",
+    "params": {
+      "locationId": "1"
+    },
+    "path": "/api/dashboard/percentageAdHoc"
+  },
+  "status": 200
+}

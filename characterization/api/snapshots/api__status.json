@@ -1,0 +1,16 @@
+{
+  "body": {
+    "database": {
+      "message": "Database is available",
+      "status": true
+    },
+    "status": "OK"
+  },
+  "contentType": "application/json",
+  "request": {
+    "method": "GET",
+    "params": {},
+    "path": "/api/status"
+  },
+  "status": 200
+}

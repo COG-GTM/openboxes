@@ -1,0 +1,10 @@
+{
+  "contentType": "",
+  "request": {
+    "method": "DELETE",
+    "params": {},
+    "path": "/api/locationGroups/<id>"
+  },
+  "status": 204,
+  "text": ""
+}

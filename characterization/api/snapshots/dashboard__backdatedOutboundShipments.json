@@ -1,0 +1,43 @@
+{
+  "body": {
+    "data": {
+      "colorNumber": null,
+      "datasets": [
+        {
+          "data": [
+            0,
+            0,
+            0,
+            0,
+            0,
+            0,
+            0
+          ],
+          "label": "Backdated shipments",
+          "links": null,
+          "type": null,
+          "yAxisID": null
+        }
+      ],
+      "labels": [
+        "2 days",
+        "3 days",
+        "4 days",
+        "5 days",
+        "6 days",
+        "7 days",
+        "7+ days"
+      ]
+    },
+    "link": null
+  },
+  "contentType": "application/json",
+  "request": {
+    "method": "GET",
+    "params": {
+      "locationId": "1"
+    },
+    "path": "/api/dashboard/backdatedOutboundShipments"
+  },
+  "status": 200
+}

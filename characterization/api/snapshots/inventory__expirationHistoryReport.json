@@ -1,0 +1,19 @@
+{
+  "body": {
+    "data": [],
+    "totalCount": 0,
+    "totalQuantityLostToExpiry": 0,
+    "totalValueLostToExpiry": 0
+  },
+  "contentType": "application/json",
+  "request": {
+    "method": "GET",
+    "params": {
+      "endDate": "01/01/2011 00:00:00 Z",
+      "facilityId": "1",
+      "startDate": "01/01/2010 00:00:00 Z"
+    },
+    "path": "/api/inventories/expirationHistoryReport"
+  },
+  "status": 200
+}

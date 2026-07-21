@@ -1,0 +1,16 @@
+{
+  "body": {
+    "data": [],
+    "totalCount": 0
+  },
+  "contentType": "application/json",
+  "request": {
+    "method": "GET",
+    "params": {
+      "max": "10",
+      "offset": "0"
+    },
+    "path": "/api/invoices"
+  },
+  "status": 200
+}

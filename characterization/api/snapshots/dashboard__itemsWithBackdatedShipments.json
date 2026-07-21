@@ -1,0 +1,56 @@
+{
+  "body": {
+    "data": {
+      "numbersIndicator": {
+        "first": {
+          "color": null,
+          "link": null,
+          "order": 1,
+          "subtitle": "1 shipment",
+          "value": 0,
+          "value2": null
+        },
+        "fourth": {
+          "color": null,
+          "link": null,
+          "order": 4,
+          "subtitle": "4 or more",
+          "value": 0,
+          "value2": null
+        },
+        "second": {
+          "color": null,
+          "link": null,
+          "order": 2,
+          "subtitle": "2 shipments",
+          "value": 0,
+          "value2": null
+        },
+        "third": {
+          "color": null,
+          "link": null,
+          "order": 3,
+          "subtitle": "3 shipments",
+          "value": 0,
+          "value2": null
+        }
+      },
+      "tableData": {
+        "body": [],
+        "name": "Shipments",
+        "number": "Item",
+        "value": "Last Count"
+      }
+    },
+    "link": null
+  },
+  "contentType": "application/json",
+  "request": {
+    "method": "GET",
+    "params": {
+      "locationId": "1"
+    },
+    "path": "/api/dashboard/itemsWithBackdatedShipments"
+  },
+  "status": 200
+}

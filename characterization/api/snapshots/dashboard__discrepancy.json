@@ -1,0 +1,20 @@
+{
+  "body": {
+    "data": {
+      "body": [],
+      "name": "Name",
+      "number": "Shipment",
+      "value": "Discrepancy"
+    },
+    "link": null
+  },
+  "contentType": "application/json",
+  "request": {
+    "method": "GET",
+    "params": {
+      "locationId": "1"
+    },
+    "path": "/api/dashboard/discrepancy"
+  },
+  "status": 200
+}

@@ -1,0 +1,41 @@
+{
+  "body": {
+    "data": {
+      "first": {
+        "color": null,
+        "link": "/openboxes/stockMovement/list?direction=OUTBOUND&requisitionStatusCode=CREATED&requisitionStatusCode=EDITING&requisitionStatusCode=VERIFYING&requisitionStatusCode=PICKING&requisitionStatusCode=PICKED&requisitionStatusCode=CHECKING&createdAfter=07/17/2026",
+        "order": null,
+        "subtitle": "Created < 4 days ago",
+        "value": 0,
+        "value2": null
+      },
+      "fourth": null,
+      "second": {
+        "color": null,
+        "link": "/openboxes/stockMovement/list?direction=OUTBOUND&requisitionStatusCode=CREATED&requisitionStatusCode=EDITING&requisitionStatusCode=VERIFYING&requisitionStatusCode=PICKING&requisitionStatusCode=PICKED&requisitionStatusCode=CHECKING&createdAfter=07/14/2026&createdBefore=07/17/2026",
+        "order": null,
+        "subtitle": "Created > 4 days ago",
+        "value": 0,
+        "value2": null
+      },
+      "third": {
+        "color": null,
+        "link": "/openboxes/stockMovement/list?direction=OUTBOUND&requisitionStatusCode=CREATED&requisitionStatusCode=EDITING&requisitionStatusCode=VERIFYING&requisitionStatusCode=PICKING&requisitionStatusCode=PICKED&requisitionStatusCode=CHECKING&createdBefore=07/14/2026",
+        "order": null,
+        "subtitle": "Created > 7 days ago",
+        "value": 0,
+        "value2": null
+      }
+    },
+    "link": "/openboxes/stockMovement/list?direction=OUTBOUND&receiptStatusCode=PENDING"
+  },
+  "contentType": "application/json",
+  "request": {
+    "method": "GET",
+    "params": {
+      "locationId": "1"
+    },
+    "path": "/api/dashboard/outgoingStock"
+  },
+  "status": 200
+}

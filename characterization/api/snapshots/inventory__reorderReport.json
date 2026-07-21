@@ -1,0 +1,4719 @@
+{
+  "body": {
+    "data": [
+      {
+        "expectedReorderCost": 10.5,
+        "expiredQuantityAvailableToPromise": 0,
+        "finalQuantityAvailableToPromise": 43,
+        "inventoryLevel": {
+          "abcClass": null,
+          "binLocation": null,
+          "comments": null,
+          "dateCreated": "<masked>",
+          "demandTimePeriodDays": null,
+          "expectedLeadTimeDays": null,
+          "forecastPeriodDays": 30.0,
+          "forecastQuantity": null,
+          "id": "<masked>",
+          "internalLocation": null,
+          "inventory": {
+            "id": "<masked>"
+          },
+          "lastUpdated": "<masked>",
+          "maxQuantity": 50,
+          "minQuantity": 5,
+          "preferred": false,
+          "preferredBinLocation": {
+            "id": "<masked>"
+          },
+          "product": {
+            "id": "<masked>"
+          },
+          "reorderQuantity": null,
+          "replenishmentLocation": null,
+          "replenishmentPeriodDays": null,
+          "status": null
+        },
+        "inventoryStatus": "IN_STOCK",
+        "monthlyDemand": 0,
+        "product": {
+          "active": true,
+          "category": "Lab",
+          "color": null,
+          "dateCreated": "<masked>",
+          "description": "",
+          "displayNames": {
+            "default": null
+          },
+          "handlingIcons": [],
+          "id": "<masked>",
+          "lastUpdated": "<masked>",
+          "lotAndExpiryControl": false,
+          "name": "Beaker, Graduated, Borosilicate glass, 100mL",
+          "pricePerUnit": 1.5,
+          "productCode": "HP196",
+          "unitOfMeasure": "Each",
+          "updatedBy": "Miss Administrator"
+        },
+        "quantityToOrder": 7,
+        "tags": [
+          {
+            "createdBy": {
+              "id": "<masked>"
+            },
+            "dateCreated": "<masked>",
+            "id": "<masked>",
+            "isActive": true,
+            "lastUpdated": "<masked>",
+            "products": [
+              {
+                "id": "<masked>"
+              },
+              {
+                "id": "<masked>"
+              },
+              {
+                "id": "<masked>"
+              },
+              {
+                "id": "<masked>"
+              },
+              {
+                "id": "<masked>"
+              },
+              {
+                "id": "<masked>"
+              },
+              {
+                "id": "<masked>"
+              },
+              {
+                "id": "<masked>"
+              },
+              {
+                "id": "<masked>"
+              },
+              {
+                "id": "<masked>"
+              },
+              {
+                "id": "<masked>"
+              },
+              {
+                "id": "<masked>"
+              },
+              {
+                "id": "<masked>"
+              },
+              {
+                "id": "<masked>"
+              },
+              {
+                "id": "<masked>"
+              }
+            ],
+            "tag": "Tertiary Care",
+            "updatedBy": {
+              "id": "<masked>"
+            }
+          }
+        ],
+        "unitCost": 1.5
+      },
+      {
+        "expectedReorderCost": 1000.0,
+        "expiredQuantityAvailableToPromise": 0,
+        "finalQuantityAvailableToPromise": 10,
+        "inventoryLevel": {
+          "abcClass": null,
+          "binLocation": null,
+          "comments": null,
+          "dateCreated": "<masked>",
+          "demandTimePeriodDays": null,
+          "expectedLeadTimeDays": null,
+          "forecastPeriodDays": 30.0,
+          "forecastQuantity": null,
+          "id": "<masked>",
+          "internalLocation": null,
+          "inventory": {
+            "id": "<masked>"
+          },
+          "lastUpdated": "<masked>",
+          "maxQuantity": 50,
+          "minQuantity": 5,
+          "preferred": false,
+          "preferredBinLocation": {
+            "id": "<masked>"
+          },
+          "product": {
+            "id": "<masked>"
+          },
+          "reorderQuantity": null,
+          "replenishmentLocation": null,
+          "replenishmentPeriodDays": null,
+          "status": null
+        },
+        "inventoryStatus": "IN_STOCK",
+        "monthlyDemand": 0,
+        "product": {
+          "active": true,
+          "category": "Furniture and Equipment",
+          "color": null,
+          "dateCreated": "<masked>",
+          "description": "",
+          "displayNames": {
+            "default": null
+          },
+          "handlingIcons": [],
+          "id": "<masked>",
+          "lastUpdated": "<masked>",
+          "lotAndExpiryControl": false,
+          "name": "Chair, Office, Rolling",
+          "pricePerUnit": 25.0,
+          "productCode": "MG983",
+          "unitOfMeasure": "Each",
+          "updatedBy": "Miss Administrator"
+        },
+        "quantityToOrder": 40,
+        "tags": [
+          {
+            "createdBy": {
+              "id": "<masked>"
+            },
+            "dateCreated": "<masked>",
+            "id": "<masked>",
+            "isActive": true,
+            "lastUpdated": "<masked>",
+            "products": [
+              {
+                "id": "<masked>"
+              },
+              {
+                "id": "<masked>"
+              },
+              {
+                "id": "<masked>"
+              },
+              {
+                "id": "<masked>"
+              }
+            ],
+            "tag": "New Employee Package",
+            "updatedBy": {
+              "id": "<masked>"
+            }
+          }
+        ],
+        "unitCost": 25.0
+      },
+      {
+        "expectedReorderCost": 11200.0,
+        "expiredQuantityAvailableToPromise": 467,
+        "finalQuantityAvailableToPromise": 0,
+        "inventoryLevel": {
+          "abcClass": null,
+          "binLocation": null,
+          "comments": null,
+          "dateCreated": "<masked>",
+          "demandTimePeriodDays": null,
+          "expectedLeadTimeDays": null,
+          "forecastPeriodDays": 30.0,
+          "forecastQuantity": null,
+          "id": "<masked>",
+          "internalLocation": null,
+          "inventory": {
+            "id": "<masked>"
+          },
+          "lastUpdated": "<masked>",
+          "maxQuantity": 1000,
+          "minQuantity": 100,
+          "preferred": false,
+          "preferredBinLocation": {
+            "id": "<masked>"
+          },
+          "product": {
+            "id": "<masked>"
+          },
+          "reorderQuantity": null,
+          "replenishmentLocation": null,
+          "replenishmentPeriodDays": null,
+          "status": null
+        },
+        "inventoryStatus": "IN_STOCK",
+        "monthlyDemand": 0,
+        "product": {
+          "active": true,
+          "category": "Cancer",
+          "color": null,
+          "dateCreated": "<masked>",
+          "description": "",
+          "displayNames": {
+            "default": null
+          },
+          "handlingIcons": [
+            {
+              "color": "#3bafda",
+              "icon": "fa-snowflake",
+              "label": "Cold chain"
+            }
+          ],
+          "id": "<masked>",
+          "lastUpdated": "<masked>",
+          "lotAndExpiryControl": true,
+          "name": "Bleomycin injection, 15mg",
+          "pricePerUnit": 11.2,
+          "productCode": "GM080",
+          "unitOfMeasure": "Each",
+          "updatedBy": "Miss Administrator"
+        },
+        "quantityToOrder": 1000,
+        "tags": [
+          {
+            "createdBy": {
+              "id": "<masked>"
+            },
+            "dateCreated": "<masked>",
+            "id": "<masked>",
+            "isActive": true,
+            "lastUpdated": "<masked>",
+            "products": [
+              {
+                "id": "<masked>"
+              },
+              {
+                "id": "<masked>"
+              },
+              {
+                "id": "<masked>"
+              },
+              {
+                "id": "<masked>"
+              },
+              {
+                "id": "<masked>"
+              },
+              {
+                "id": "<masked>"
+              },
+              {
+                "id": "<masked>"
+              },
+              {
+                "id": "<masked>"
+              },
+              {
+                "id": "<masked>"
+              },
+              {
+                "id": "<masked>"
+              },
+              {
+                "id": "<masked>"
+              },
+              {
+                "id": "<masked>"
+              },
+              {
+                "id": "<masked>"
+              },
+              {
+                "id": "<masked>"
+              },
+              {
+                "id": "<masked>"
+              }
+            ],
+            "tag": "Tertiary Care",
+            "updatedBy": {
+              "id": "<masked>"
+            }
+          }
+        ],
+        "unitCost": 11.2
+      },
+      {
+        "expectedReorderCost": 12500.0,
+        "expiredQuantityAvailableToPromise": 2000,
+        "finalQuantityAvailableToPromise": 0,
+        "inventoryLevel": {
+          "abcClass": null,
+          "binLocation": null,
+          "comments": null,
+          "dateCreated": "<masked>",
+          "demandTimePeriodDays": null,
+          "expectedLeadTimeDays": null,
+          "forecastPeriodDays": 30.0,
+          "forecastQuantity": null,
+          "id": "<masked>",
+          "internalLocation": null,
+          "inventory": {
+            "id": "<masked>"
+          },
+          "lastUpdated": "<masked>",
+          "maxQuantity": 10000,
+          "minQuantity": 1000,
+          "preferred": false,
+          "preferredBinLocation": {
+            "id": "<masked>"
+          },
+          "product": {
+            "id": "<masked>"
+          },
+          "reorderQuantity": null,
+          "replenishmentLocation": null,
+          "replenishmentPeriodDays": null,
+          "status": null
+        },
+        "inventoryStatus": "IN_STOCK",
+        "monthlyDemand": 0,
+        "product": {
+          "active": true,
+          "category": "Pain",
+          "color": null,
+          "dateCreated": "<masked>",
+          "description": "",
+          "displayNames": {
+            "default": null
+          },
+          "handlingIcons": [
+            {
+              "color": "#db1919",
+              "icon": "fa-exclamation-circle",
+              "label": "Controlled substance"
+            }
+          ],
+          "id": "<masked>",
+          "lastUpdated": "<masked>",
+          "lotAndExpiryControl": true,
+          "name": "Morphine injection, 10mg/mL in 1mL ampoule",
+          "pricePerUnit": 1.25,
+          "productCode": "TS894",
+          "unitOfMeasure": "Each",
+          "updatedBy": "Miss Administrator"
+        },
+        "quantityToOrder": 10000,
+        "tags": [
+          {
+            "createdBy": {
+              "id": "<masked>"
+            },
+            "dateCreated": "<masked>",
+            "id": "<masked>",
+            "isActive": true,
+            "lastUpdated": "<masked>",
+            "products": [
+              {
+                "id": "<masked>"
+              },
+              {
+                "id": "<masked>"
+              },
+              {
+                "id": "<masked>"
+              },
+              {
+                "id": "<masked>"
+              },
+              {
+                "id": "<masked>"
+              },
+              {
+                "id": "<masked>"
+              },
+              {
+                "id": "<masked>"
+              },
+              {
+                "id": "<masked>"
+              },
+              {
+                "id": "<masked>"
+              },
+              {
+                "id": "<masked>"
+              },
+              {
+                "id": "<masked>"
+              },
+              {
+                "id": "<masked>"
+              },
+              {
+                "id": "<masked>"
+              },
+              {
+                "id": "<masked>"
+              },
+              {
+                "id": "<masked>"
+              }
+            ],
+            "tag": "Tertiary Care",
+            "updatedBy": {
+              "id": "<masked>"
+            }
+          }
+        ],
+        "unitCost": 1.25
+      },
+      {
+        "expectedReorderCost": 1360.0,
+        "expiredQuantityAvailableToPromise": 3000,
+        "finalQuantityAvailableToPromise": 0,
+        "inventoryLevel": {
+          "abcClass": null,
+          "binLocation": null,
+          "comments": null,
+          "dateCreated": "<masked>",
+          "demandTimePeriodDays": null,
+          "expectedLeadTimeDays": null,
+          "forecastPeriodDays": 30.0,
+          "forecastQuantity": null,
+          "id": "<masked>",
+          "internalLocation": null,
+          "inventory": {
+            "id": "<masked>"
+          },
+          "lastUpdated": "<masked>",
+          "maxQuantity": 20000,
+          "minQuantity": 2000,
+          "preferred": false,
+          "preferredBinLocation": {
+            "id": "<masked>"
+          },
+          "product": {
+            "id": "<masked>"
+          },
+          "reorderQuantity": null,
+          "replenishmentLocation": null,
+          "replenishmentPeriodDays": null,
+          "status": null
+        },
+        "inventoryStatus": "IN_STOCK",
+        "monthlyDemand": 0,
+        "product": {
+          "active": true,
+          "category": "Lab",
+          "color": null,
+          "dateCreated": "<masked>",
+          "description": "",
+          "displayNames": {
+            "default": null
+          },
+          "handlingIcons": [],
+          "id": "<masked>",
+          "lastUpdated": "<masked>",
+          "lotAndExpiryControl": true,
+          "name": "Tube, Blood collection, K2 EDTA, Lavender top, Plastic, 4mL",
+          "pricePerUnit": 0.068,
+          "productCode": "HG966",
+          "unitOfMeasure": "Each",
+          "updatedBy": "Miss Administrator"
+        },
+        "quantityToOrder": 20000,
+        "tags": [
+          {
+            "createdBy": {
+              "id": "<masked>"
+            },
+            "dateCreated": "<masked>",
+            "id": "<masked>",
+            "isActive": true,
+            "lastUpdated": "<masked>",
+            "products": [
+              {
+                "id": "<masked>"
+              },
+              {
+                "id": "<masked>"
+              },
+              {
+                "id": "<masked>"
+              },
+              {
+                "id": "<masked>"
+              },
+              {
+                "id": "<masked>"
+              },
+              {
+                "id": "<masked>"
+              },
+              {
+                "id": "<masked>"
+              },
+              {
+                "id": "<masked>"
+              },
+              {
+                "id": "<masked>"
+              },
+              {
+                "id": "<masked>"
+              },
+              {
+                "id": "<masked>"
+              },
+              {
+                "id": "<masked>"
+              },
+              {
+                "id": "<masked>"
+              },
+              {
+                "id": "<masked>"
+              },
+              {
+                "id": "<masked>"
+              }
+            ],
+            "tag": "Tertiary Care",
+            "updatedBy": {
+              "id": "<masked>"
+            }
+          }
+        ],
+        "unitCost": 0.068
+      },
+      {
+        "expectedReorderCost": 1360.0,
+        "expiredQuantityAvailableToPromise": 5000,
+        "finalQuantityAvailableToPromise": 0,
+        "inventoryLevel": {
+          "abcClass": null,
+          "binLocation": null,
+          "comments": null,
+          "dateCreated": "<masked>",
+          "demandTimePeriodDays": null,
+          "expectedLeadTimeDays": null,
+          "forecastPeriodDays": 30.0,
+          "forecastQuantity": null,
+          "id": "<masked>",
+          "internalLocation": null,
+          "inventory": {
+            "id": "<masked>"
+          },
+          "lastUpdated": "<masked>",
+          "maxQuantity": 20000,
+          "minQuantity": 2000,
+          "preferred": false,
+          "preferredBinLocation": {
+            "id": "<masked>"
+          },
+          "product": {
+            "id": "<masked>"
+          },
+          "reorderQuantity": null,
+          "replenishmentLocation": null,
+          "replenishmentPeriodDays": null,
+          "status": null
+        },
+        "inventoryStatus": "IN_STOCK",
+        "monthlyDemand": 0,
+        "product": {
+          "active": true,
+          "category": "Lab",
+          "color": null,
+          "dateCreated": "<masked>",
+          "description": "",
+          "displayNames": {
+            "default": null
+          },
+          "handlingIcons": [],
+          "id": "<masked>",
+          "lastUpdated": "<masked>",
+          "lotAndExpiryControl": true,
+          "name": "Tube, Blood collection, K2 EDTA, Whole blood, Lavender, 2mL (pediatric)",
+          "pricePerUnit": 0.068,
+          "productCode": "DJ064",
+          "unitOfMeasure": "Each",
+          "updatedBy": "Miss Administrator"
+        },
+        "quantityToOrder": 20000,
+        "tags": [
+          {
+            "createdBy": {
+              "id": "<masked>"
+            },
+            "dateCreated": "<masked>",
+            "id": "<masked>",
+            "isActive": true,
+            "lastUpdated": "<masked>",
+            "products": [
+              {
+                "id": "<masked>"
+              },
+              {
+                "id": "<masked>"
+              },
+              {
+                "id": "<masked>"
+              },
+              {
+                "id": "<masked>"
+              },
+              {
+                "id": "<masked>"
+              },
+              {
+                "id": "<masked>"
+              },
+              {
+                "id": "<masked>"
+              },
+              {
+                "id": "<masked>"
+              },
+              {
+                "id": "<masked>"
+              },
+              {
+                "id": "<masked>"
+              },
+              {
+                "id": "<masked>"
+              },
+              {
+                "id": "<masked>"
+              },
+              {
+                "id": "<masked>"
+              },
+              {
+                "id": "<masked>"
+              },
+              {
+                "id": "<masked>"
+              }
+            ],
+            "tag": "Tertiary Care",
+            "updatedBy": {
+              "id": "<masked>"
+            }
+          }
+        ],
+        "unitCost": 0.068
+      },
+      {
+        "expectedReorderCost": 1384.0,
+        "expiredQuantityAvailableToPromise": 0,
+        "finalQuantityAvailableToPromise": 0,
+        "inventoryLevel": {
+          "abcClass": null,
+          "binLocation": null,
+          "comments": null,
+          "dateCreated": "<masked>",
+          "demandTimePeriodDays": null,
+          "expectedLeadTimeDays": null,
+          "forecastPeriodDays": 30.0,
+          "forecastQuantity": null,
+          "id": "<masked>",
+          "internalLocation": null,
+          "inventory": {
+            "id": "<masked>"
+          },
+          "lastUpdated": "<masked>",
+          "maxQuantity": 20000,
+          "minQuantity": 2000,
+          "preferred": false,
+          "preferredBinLocation": {
+            "id": "<masked>"
+          },
+          "product": {
+            "id": "<masked>"
+          },
+          "reorderQuantity": null,
+          "replenishmentLocation": null,
+          "replenishmentPeriodDays": null,
+          "status": null
+        },
+        "inventoryStatus": "STOCK_OUT",
+        "monthlyDemand": 0,
+        "product": {
+          "active": true,
+          "category": "Lab",
+          "color": null,
+          "dateCreated": "<masked>",
+          "description": "",
+          "displayNames": {
+            "default": null
+          },
+          "handlingIcons": [],
+          "id": "<masked>",
+          "lastUpdated": "<masked>",
+          "lotAndExpiryControl": true,
+          "name": "Tube, Blood collection, Serum, Red, Plastic, 3mL (pediatric)",
+          "pricePerUnit": 0.0692,
+          "productCode": "TN940",
+          "unitOfMeasure": "Each",
+          "updatedBy": "Miss Administrator"
+        },
+        "quantityToOrder": 20000,
+        "tags": [
+          {
+            "createdBy": {
+              "id": "<masked>"
+            },
+            "dateCreated": "<masked>",
+            "id": "<masked>",
+            "isActive": true,
+            "lastUpdated": "<masked>",
+            "products": [
+              {
+                "id": "<masked>"
+              },
+              {
+                "id": "<masked>"
+              },
+              {
+                "id": "<masked>"
+              },
+              {
+                "id": "<masked>"
+              },
+              {
+                "id": "<masked>"
+              },
+              {
+                "id": "<masked>"
+              },
+              {
+                "id": "<masked>"
+              },
+              {
+                "id": "<masked>"
+              },
+              {
+                "id": "<masked>"
+              },
+              {
+                "id": "<masked>"
+              },
+              {
+                "id": "<masked>"
+              },
+              {
+                "id": "<masked>"
+              },
+              {
+                "id": "<masked>"
+              },
+              {
+                "id": "<masked>"
+              },
+              {
+                "id": "<masked>"
+              }
+            ],
+            "tag": "Tertiary Care",
+            "updatedBy": {
+              "id": "<masked>"
+            }
+          }
+        ],
+        "unitCost": 0.0692
+      },
+      {
+        "expectedReorderCost": 141.75,
+        "expiredQuantityAvailableToPromise": 0,
+        "finalQuantityAvailableToPromise": 15,
+        "inventoryLevel": {
+          "abcClass": null,
+          "binLocation": null,
+          "comments": null,
+          "dateCreated": "<masked>",
+          "demandTimePeriodDays": null,
+          "expectedLeadTimeDays": null,
+          "forecastPeriodDays": 30.0,
+          "forecastQuantity": null,
+          "id": "<masked>",
+          "internalLocation": null,
+          "inventory": {
+            "id": "<masked>"
+          },
+          "lastUpdated": "<masked>",
+          "maxQuantity": 50,
+          "minQuantity": 5,
+          "preferred": false,
+          "preferredBinLocation": {
+            "id": "<masked>"
+          },
+          "product": {
+            "id": "<masked>"
+          },
+          "reorderQuantity": null,
+          "replenishmentLocation": null,
+          "replenishmentPeriodDays": null,
+          "status": null
+        },
+        "inventoryStatus": "IN_STOCK",
+        "monthlyDemand": 0,
+        "product": {
+          "active": true,
+          "category": "Lab",
+          "color": null,
+          "dateCreated": "<masked>",
+          "description": "",
+          "displayNames": {
+            "default": null
+          },
+          "handlingIcons": [],
+          "id": "<masked>",
+          "lastUpdated": "<masked>",
+          "lotAndExpiryControl": false,
+          "name": "Beaker, Graduated, Borosilicate glass, 400mL",
+          "pricePerUnit": 4.05,
+          "productCode": "BX996",
+          "unitOfMeasure": "Each",
+          "updatedBy": "Miss Administrator"
+        },
+        "quantityToOrder": 35,
+        "tags": [
+          {
+            "createdBy": {
+              "id": "<masked>"
+            },
+            "dateCreated": "<masked>",
+            "id": "<masked>",
+            "isActive": true,
+            "lastUpdated": "<masked>",
+            "products": [
+              {
+                "id": "<masked>"
+              },
+              {
+                "id": "<masked>"
+              },
+              {
+                "id": "<masked>"
+              },
+              {
+                "id": "<masked>"
+              },
+              {
+                "id": "<masked>"
+              },
+              {
+                "id": "<masked>"
+              },
+              {
+                "id": "<masked>"
+              },
+              {
+                "id": "<masked>"
+              },
+              {
+                "id": "<masked>"
+              },
+              {
+                "id": "<masked>"
+              },
+              {
+                "id": "<masked>"
+              },
+              {
+                "id": "<masked>"
+              },
+              {
+                "id": "<masked>"
+              },
+              {
+                "id": "<masked>"
+              },
+              {
+                "id": "<masked>"
+              }
+            ],
+            "tag": "Tertiary Care",
+            "updatedBy": {
+              "id": "<masked>"
+            }
+          }
+        ],
+        "unitCost": 4.05
+      },
+      {
+        "expectedReorderCost": 1420.0,
+        "expiredQuantityAvailableToPromise": 0,
+        "finalQuantityAvailableToPromise": 29,
+        "inventoryLevel": {
+          "abcClass": null,
+          "binLocation": null,
+          "comments": null,
+          "dateCreated": "<masked>",
+          "demandTimePeriodDays": null,
+          "expectedLeadTimeDays": null,
+          "forecastPeriodDays": 30.0,
+          "forecastQuantity": null,
+          "id": "<masked>",
+          "internalLocation": null,
+          "inventory": {
+            "id": "<masked>"
+          },
+          "lastUpdated": "<masked>",
+          "maxQuantity": 100,
+          "minQuantity": 10,
+          "preferred": false,
+          "preferredBinLocation": {
+            "id": "<masked>"
+          },
+          "product": {
+            "id": "<masked>"
+          },
+          "reorderQuantity": null,
+          "replenishmentLocation": null,
+          "replenishmentPeriodDays": null,
+          "status": null
+        },
+        "inventoryStatus": "IN_STOCK",
+        "monthlyDemand": 0,
+        "product": {
+          "active": true,
+          "category": "Lab",
+          "color": null,
+          "dateCreated": "<masked>",
+          "description": "",
+          "displayNames": {
+            "default": null
+          },
+          "handlingIcons": [],
+          "id": "<masked>",
+          "lastUpdated": "<masked>",
+          "lotAndExpiryControl": false,
+          "name": "Coat, Laboratory, Medium, Unisex",
+          "pricePerUnit": 20.0,
+          "productCode": "QS823",
+          "unitOfMeasure": "Each",
+          "updatedBy": "Miss Administrator"
+        },
+        "quantityToOrder": 71,
+        "tags": [
+          {
+            "createdBy": {
+              "id": "<masked>"
+            },
+            "dateCreated": "<masked>",
+            "id": "<masked>",
+            "isActive": true,
+            "lastUpdated": "<masked>",
+            "products": [
+              {
+                "id": "<masked>"
+              },
+              {
+                "id": "<masked>"
+              },
+              {
+                "id": "<masked>"
+              },
+              {
+                "id": "<masked>"
+              },
+              {
+                "id": "<masked>"
+              },
+              {
+                "id": "<masked>"
+              },
+              {
+                "id": "<masked>"
+              },
+              {
+                "id": "<masked>"
+              },
+              {
+                "id": "<masked>"
+              },
+              {
+                "id": "<masked>"
+              },
+              {
+                "id": "<masked>"
+              },
+              {
+                "id": "<masked>"
+              },
+              {
+                "id": "<masked>"
+              },
+              {
+                "id": "<masked>"
+              },
+              {
+                "id": "<masked>"
+              }
+            ],
+            "tag": "Tertiary Care",
+            "updatedBy": {
+              "id": "<masked>"
+            }
+          }
+        ],
+        "unitCost": 20.0
+      },
+      {
+        "expectedReorderCost": 14399.2,
+        "expiredQuantityAvailableToPromise": 0,
+        "finalQuantityAvailableToPromise": 20,
+        "inventoryLevel": {
+          "abcClass": null,
+          "binLocation": null,
+          "comments": null,
+          "dateCreated": "<masked>",
+          "demandTimePeriodDays": null,
+          "expectedLeadTimeDays": null,
+          "forecastPeriodDays": 30.0,
+          "forecastQuantity": null,
+          "id": "<masked>",
+          "internalLocation": null,
+          "inventory": {
+            "id": "<masked>"
+          },
+          "lastUpdated": "<masked>",
+          "maxQuantity": 100,
+          "minQuantity": 10,
+          "preferred": false,
+          "preferredBinLocation": {
+            "id": "<masked>"
+          },
+          "product": {
+            "id": "<masked>"
+          },
+          "reorderQuantity": null,
+          "replenishmentLocation": null,
+          "replenishmentPeriodDays": null,
+          "status": null
+        },
+        "inventoryStatus": "IN_STOCK",
+        "monthlyDemand": 0,
+        "product": {
+          "active": true,
+          "category": "IT Equipment",
+          "color": null,
+          "dateCreated": "<masked>",
+          "description": "",
+          "displayNames": {
+            "default": null
+          },
+          "handlingIcons": [],
+          "id": "<masked>",
+          "lastUpdated": "<masked>",
+          "lotAndExpiryControl": false,
+          "name": "Printer cartridge, HP 122A/Q3962A, Yellow",
+          "pricePerUnit": 179.99,
+          "productCode": "DP854",
+          "unitOfMeasure": "Each",
+          "updatedBy": "Miss Administrator"
+        },
+        "quantityToOrder": 80,
+        "tags": [],
+        "unitCost": 179.99
+      },
+      {
+        "expectedReorderCost": 15000.0,
+        "expiredQuantityAvailableToPromise": 0,
+        "finalQuantityAvailableToPromise": 100,
+        "inventoryLevel": {
+          "abcClass": null,
+          "binLocation": null,
+          "comments": null,
+          "dateCreated": "<masked>",
+          "demandTimePeriodDays": null,
+          "expectedLeadTimeDays": null,
+          "forecastPeriodDays": 30.0,
+          "forecastQuantity": null,
+          "id": "<masked>",
+          "internalLocation": null,
+          "inventory": {
+            "id": "<masked>"
+          },
+          "lastUpdated": "<masked>",
+          "maxQuantity": 250,
+          "minQuantity": 25,
+          "preferred": false,
+          "preferredBinLocation": {
+            "id": "<masked>"
+          },
+          "product": {
+            "id": "<masked>"
+          },
+          "reorderQuantity": null,
+          "replenishmentLocation": null,
+          "replenishmentPeriodDays": null,
+          "status": null
+        },
+        "inventoryStatus": "IN_STOCK",
+        "monthlyDemand": 0,
+        "product": {
+          "active": true,
+          "category": "Furniture and Equipment",
+          "color": null,
+          "dateCreated": "<masked>",
+          "description": "",
+          "displayNames": {
+            "default": null
+          },
+          "handlingIcons": [],
+          "id": "<masked>",
+          "lastUpdated": "<masked>",
+          "lotAndExpiryControl": false,
+          "name": "Chair, Plastic",
+          "pricePerUnit": 100.0,
+          "productCode": "RZ479",
+          "unitOfMeasure": "Each",
+          "updatedBy": "Miss Administrator"
+        },
+        "quantityToOrder": 150,
+        "tags": [],
+        "unitCost": 100.0
+      },
+      {
+        "expectedReorderCost": 15000.0,
+        "expiredQuantityAvailableToPromise": 768,
+        "finalQuantityAvailableToPromise": 0,
+        "inventoryLevel": {
+          "abcClass": null,
+          "binLocation": null,
+          "comments": null,
+          "dateCreated": "<masked>",
+          "demandTimePeriodDays": null,
+          "expectedLeadTimeDays": null,
+          "forecastPeriodDays": 30.0,
+          "forecastQuantity": null,
+          "id": "<masked>",
+          "internalLocation": null,
+          "inventory": {
+            "id": "<masked>"
+          },
+          "lastUpdated": "<masked>",
+          "maxQuantity": 1000,
+          "minQuantity": 100,
+          "preferred": false,
+          "preferredBinLocation": {
+            "id": "<masked>"
+          },
+          "product": {
+            "id": "<masked>"
+          },
+          "reorderQuantity": null,
+          "replenishmentLocation": null,
+          "replenishmentPeriodDays": null,
+          "status": null
+        },
+        "inventoryStatus": "IN_STOCK",
+        "monthlyDemand": 0,
+        "product": {
+          "active": true,
+          "category": "Cancer",
+          "color": null,
+          "dateCreated": "<masked>",
+          "description": "",
+          "displayNames": {
+            "default": null
+          },
+          "handlingIcons": [
+            {
+              "color": "#3bafda",
+              "icon": "fa-snowflake",
+              "label": "Cold chain"
+            }
+          ],
+          "id": "<masked>",
+          "lastUpdated": "<masked>",
+          "lotAndExpiryControl": true,
+          "name": "Vincristine injection, 1mL",
+          "pricePerUnit": 15.0,
+          "productCode": "EK670",
+          "unitOfMeasure": "Each",
+          "updatedBy": "Miss Administrator"
+        },
+        "quantityToOrder": 1000,
+        "tags": [
+          {
+            "createdBy": {
+              "id": "<masked>"
+            },
+            "dateCreated": "<masked>",
+            "id": "<masked>",
+            "isActive": true,
+            "lastUpdated": "<masked>",
+            "products": [
+              {
+                "id": "<masked>"
+              },
+              {
+                "id": "<masked>"
+              },
+              {
+                "id": "<masked>"
+              },
+              {
+                "id": "<masked>"
+              },
+              {
+                "id": "<masked>"
+              },
+              {
+                "id": "<masked>"
+              },
+              {
+                "id": "<masked>"
+              },
+              {
+                "id": "<masked>"
+              },
+              {
+                "id": "<masked>"
+              },
+              {
+                "id": "<masked>"
+              },
+              {
+                "id": "<masked>"
+              },
+              {
+                "id": "<masked>"
+              },
+              {
+                "id": "<masked>"
+              },
+              {
+                "id": "<masked>"
+              },
+              {
+                "id": "<masked>"
+              }
+            ],
+            "tag": "Tertiary Care",
+            "updatedBy": {
+              "id": "<masked>"
+            }
+          }
+        ],
+        "unitCost": 15.0
+      },
+      {
+        "expectedReorderCost": 15299.15,
+        "expiredQuantityAvailableToPromise": 0,
+        "finalQuantityAvailableToPromise": 15,
+        "inventoryLevel": {
+          "abcClass": null,
+          "binLocation": null,
+          "comments": null,
+          "dateCreated": "<masked>",
+          "demandTimePeriodDays": null,
+          "expectedLeadTimeDays": null,
+          "forecastPeriodDays": 30.0,
+          "forecastQuantity": null,
+          "id": "<masked>",
+          "internalLocation": null,
+          "inventory": {
+            "id": "<masked>"
+          },
+          "lastUpdated": "<masked>",
+          "maxQuantity": 100,
+          "minQuantity": 10,
+          "preferred": false,
+          "preferredBinLocation": {
+            "id": "<masked>"
+          },
+          "product": {
+            "id": "<masked>"
+          },
+          "reorderQuantity": null,
+          "replenishmentLocation": null,
+          "replenishmentPeriodDays": null,
+          "status": null
+        },
+        "inventoryStatus": "IN_STOCK",
+        "monthlyDemand": 0,
+        "product": {
+          "active": true,
+          "category": "IT Equipment",
+          "color": null,
+          "dateCreated": "<masked>",
+          "description": "",
+          "displayNames": {
+            "default": null
+          },
+          "handlingIcons": [],
+          "id": "<masked>",
+          "lastUpdated": "<masked>",
+          "lotAndExpiryControl": false,
+          "name": "Printer cartridge, HP 122A/Q3963A, Magenta",
+          "pricePerUnit": 179.99,
+          "productCode": "GA472",
+          "unitOfMeasure": "Each",
+          "updatedBy": "Miss Administrator"
+        },
+        "quantityToOrder": 85,
+        "tags": [],
+        "unitCost": 179.99
+      },
+      {
+        "expectedReorderCost": 1600.0,
+        "expiredQuantityAvailableToPromise": 0,
+        "finalQuantityAvailableToPromise": 20,
+        "inventoryLevel": {
+          "abcClass": null,
+          "binLocation": null,
+          "comments": null,
+          "dateCreated": "<masked>",
+          "demandTimePeriodDays": null,
+          "expectedLeadTimeDays": null,
+          "forecastPeriodDays": 30.0,
+          "forecastQuantity": null,
+          "id": "<masked>",
+          "internalLocation": null,
+          "inventory": {
+            "id": "<masked>"
+          },
+          "lastUpdated": "<masked>",
+          "maxQuantity": 100,
+          "minQuantity": 10,
+          "preferred": false,
+          "preferredBinLocation": {
+            "id": "<masked>"
+          },
+          "product": {
+            "id": "<masked>"
+          },
+          "reorderQuantity": null,
+          "replenishmentLocation": null,
+          "replenishmentPeriodDays": null,
+          "status": null
+        },
+        "inventoryStatus": "IN_STOCK",
+        "monthlyDemand": 0,
+        "product": {
+          "active": true,
+          "category": "Lab",
+          "color": null,
+          "dateCreated": "<masked>",
+          "description": "",
+          "displayNames": {
+            "default": null
+          },
+          "handlingIcons": [],
+          "id": "<masked>",
+          "lastUpdated": "<masked>",
+          "lotAndExpiryControl": false,
+          "name": "Coat, Laboratory, Large, Unisex",
+          "pricePerUnit": 20.0,
+          "productCode": "BF640",
+          "unitOfMeasure": "Each",
+          "updatedBy": "Miss Administrator"
+        },
+        "quantityToOrder": 80,
+        "tags": [
+          {
+            "createdBy": {
+              "id": "<masked>"
+            },
+            "dateCreated": "<masked>",
+            "id": "<masked>",
+            "isActive": true,
+            "lastUpdated": "<masked>",
+            "products": [
+              {
+                "id": "<masked>"
+              },
+              {
+                "id": "<masked>"
+              },
+              {
+                "id": "<masked>"
+              },
+              {
+                "id": "<masked>"
+              },
+              {
+                "id": "<masked>"
+              },
+              {
+                "id": "<masked>"
+              },
+              {
+                "id": "<masked>"
+              },
+              {
+                "id": "<masked>"
+              },
+              {
+                "id": "<masked>"
+              },
+              {
+                "id": "<masked>"
+              },
+              {
+                "id": "<masked>"
+              },
+              {
+                "id": "<masked>"
+              },
+              {
+                "id": "<masked>"
+              },
+              {
+                "id": "<masked>"
+              },
+              {
+                "id": "<masked>"
+              }
+            ],
+            "tag": "Tertiary Care",
+            "updatedBy": {
+              "id": "<masked>"
+            }
+          }
+        ],
+        "unitCost": 20.0
+      },
+      {
+        "expectedReorderCost": 16199.1,
+        "expiredQuantityAvailableToPromise": 0,
+        "finalQuantityAvailableToPromise": 10,
+        "inventoryLevel": {
+          "abcClass": null,
+          "binLocation": null,
+          "comments": null,
+          "dateCreated": "<masked>",
+          "demandTimePeriodDays": null,
+          "expectedLeadTimeDays": null,
+          "forecastPeriodDays": 30.0,
+          "forecastQuantity": null,
+          "id": "<masked>",
+          "internalLocation": null,
+          "inventory": {
+            "id": "<masked>"
+          },
+          "lastUpdated": "<masked>",
+          "maxQuantity": 100,
+          "minQuantity": 10,
+          "preferred": false,
+          "preferredBinLocation": {
+            "id": "<masked>"
+          },
+          "product": {
+            "id": "<masked>"
+          },
+          "reorderQuantity": null,
+          "replenishmentLocation": null,
+          "replenishmentPeriodDays": null,
+          "status": null
+        },
+        "inventoryStatus": "LOW_STOCK",
+        "monthlyDemand": 0,
+        "product": {
+          "active": true,
+          "category": "IT Equipment",
+          "color": null,
+          "dateCreated": "<masked>",
+          "description": "",
+          "displayNames": {
+            "default": null
+          },
+          "handlingIcons": [],
+          "id": "<masked>",
+          "lastUpdated": "<masked>",
+          "lotAndExpiryControl": false,
+          "name": "Printer cartridge, HP 122A/Q3960A, Black",
+          "pricePerUnit": 179.99,
+          "productCode": "QD991",
+          "unitOfMeasure": "Each",
+          "updatedBy": "Miss Administrator"
+        },
+        "quantityToOrder": 90,
+        "tags": [],
+        "unitCost": 179.99
+      },
+      {
+        "expectedReorderCost": 1642.5,
+        "expiredQuantityAvailableToPromise": 0,
+        "finalQuantityAvailableToPromise": 50,
+        "inventoryLevel": {
+          "abcClass": null,
+          "binLocation": null,
+          "comments": null,
+          "dateCreated": "<masked>",
+          "demandTimePeriodDays": null,
+          "expectedLeadTimeDays": null,
+          "forecastPeriodDays": 30.0,
+          "forecastQuantity": null,
+          "id": "<masked>",
+          "internalLocation": null,
+          "inventory": {
+            "id": "<masked>"
+          },
+          "lastUpdated": "<masked>",
+          "maxQuantity": 200,
+          "minQuantity": 20,
+          "preferred": false,
+          "preferredBinLocation": {
+            "id": "<masked>"
+          },
+          "product": {
+            "id": "<masked>"
+          },
+          "reorderQuantity": null,
+          "replenishmentLocation": null,
+          "replenishmentPeriodDays": null,
+          "status": null
+        },
+        "inventoryStatus": "IN_STOCK",
+        "monthlyDemand": 0,
+        "product": {
+          "active": true,
+          "category": "IT Equipment",
+          "color": null,
+          "dateCreated": "<masked>",
+          "description": "",
+          "displayNames": {
+            "default": null
+          },
+          "handlingIcons": [],
+          "id": "<masked>",
+          "lastUpdated": "<masked>",
+          "lotAndExpiryControl": false,
+          "name": "Case, Tablet, Samsung Galaxy, 10.5in",
+          "pricePerUnit": 10.95,
+          "productCode": "SJ730",
+          "unitOfMeasure": "Each",
+          "updatedBy": "Miss Administrator"
+        },
+        "quantityToOrder": 150,
+        "tags": [],
+        "unitCost": 10.95
+      },
+      {
+        "expectedReorderCost": 1690.0,
+        "expiredQuantityAvailableToPromise": 1200,
+        "finalQuantityAvailableToPromise": 0,
+        "inventoryLevel": {
+          "abcClass": null,
+          "binLocation": null,
+          "comments": null,
+          "dateCreated": "<masked>",
+          "demandTimePeriodDays": null,
+          "expectedLeadTimeDays": null,
+          "forecastPeriodDays": 30.0,
+          "forecastQuantity": null,
+          "id": "<masked>",
+          "internalLocation": null,
+          "inventory": {
+            "id": "<masked>"
+          },
+          "lastUpdated": "<masked>",
+          "maxQuantity": 20000,
+          "minQuantity": 2000,
+          "preferred": false,
+          "preferredBinLocation": {
+            "id": "<masked>"
+          },
+          "product": {
+            "id": "<masked>"
+          },
+          "reorderQuantity": null,
+          "replenishmentLocation": null,
+          "replenishmentPeriodDays": null,
+          "status": null
+        },
+        "inventoryStatus": "LOW_STOCK",
+        "monthlyDemand": 0,
+        "product": {
+          "active": true,
+          "category": "Lab",
+          "color": null,
+          "dateCreated": "<masked>",
+          "description": "",
+          "displayNames": {
+            "default": null
+          },
+          "handlingIcons": [],
+          "id": "<masked>",
+          "lastUpdated": "<masked>",
+          "lotAndExpiryControl": true,
+          "name": "Tube, Blood collection, Serum, Red, Plastic, 4mL",
+          "pricePerUnit": 0.0845,
+          "productCode": "KY133",
+          "unitOfMeasure": "Each",
+          "updatedBy": "Miss Administrator"
+        },
+        "quantityToOrder": 20000,
+        "tags": [
+          {
+            "createdBy": {
+              "id": "<masked>"
+            },
+            "dateCreated": "<masked>",
+            "id": "<masked>",
+            "isActive": true,
+            "lastUpdated": "<masked>",
+            "products": [
+              {
+                "id": "<masked>"
+              },
+              {
+                "id": "<masked>"
+              },
+              {
+                "id": "<masked>"
+              },
+              {
+                "id": "<masked>"
+              },
+              {
+                "id": "<masked>"
+              },
+              {
+                "id": "<masked>"
+              },
+              {
+                "id": "<masked>"
+              },
+              {
+                "id": "<masked>"
+              },
+              {
+                "id": "<masked>"
+              },
+              {
+                "id": "<masked>"
+              },
+              {
+                "id": "<masked>"
+              },
+              {
+                "id": "<masked>"
+              },
+              {
+                "id": "<masked>"
+              },
+              {
+                "id": "<masked>"
+              },
+              {
+                "id": "<masked>"
+              }
+            ],
+            "tag": "Tertiary Care",
+            "updatedBy": {
+              "id": "<masked>"
+            }
+          }
+        ],
+        "unitCost": 0.0845
+      },
+      {
+        "expectedReorderCost": 1700.0,
+        "expiredQuantityAvailableToPromise": 0,
+        "finalQuantityAvailableToPromise": 300,
+        "inventoryLevel": {
+          "abcClass": null,
+          "binLocation": null,
+          "comments": null,
+          "dateCreated": "<masked>",
+          "demandTimePeriodDays": null,
+          "expectedLeadTimeDays": null,
+          "forecastPeriodDays": 30.0,
+          "forecastQuantity": null,
+          "id": "<masked>",
+          "internalLocation": null,
+          "inventory": {
+            "id": "<masked>"
+          },
+          "lastUpdated": "<masked>",
+          "maxQuantity": 2000,
+          "minQuantity": 200,
+          "preferred": false,
+          "preferredBinLocation": {
+            "id": "<masked>"
+          },
+          "product": {
+            "id": "<masked>"
+          },
+          "reorderQuantity": null,
+          "replenishmentLocation": null,
+          "replenishmentPeriodDays": null,
+          "status": null
+        },
+        "inventoryStatus": "IN_STOCK",
+        "monthlyDemand": 0,
+        "product": {
+          "active": true,
+          "category": "Office Supplies",
+          "color": null,
+          "dateCreated": "<masked>",
+          "description": "",
+          "displayNames": {
+            "default": null
+          },
+          "handlingIcons": [],
+          "id": "<masked>",
+          "lastUpdated": "<masked>",
+          "lotAndExpiryControl": false,
+          "name": "Binder clips, 19mm",
+          "pricePerUnit": 1.0,
+          "productCode": "XJ252",
+          "unitOfMeasure": "Each",
+          "updatedBy": "Miss Administrator"
+        },
+        "quantityToOrder": 1700,
+        "tags": [],
+        "unitCost": 1.0
+      },
+      {
+        "expectedReorderCost": 17999.0,
+        "expiredQuantityAvailableToPromise": 0,
+        "finalQuantityAvailableToPromise": 0,
+        "inventoryLevel": {
+          "abcClass": null,
+          "binLocation": null,
+          "comments": null,
+          "dateCreated": "<masked>",
+          "demandTimePeriodDays": null,
+          "expectedLeadTimeDays": null,
+          "forecastPeriodDays": 30.0,
+          "forecastQuantity": null,
+          "id": "<masked>",
+          "internalLocation": null,
+          "inventory": {
+            "id": "<masked>"
+          },
+          "lastUpdated": "<masked>",
+          "maxQuantity": 100,
+          "minQuantity": 10,
+          "preferred": false,
+          "preferredBinLocation": {
+            "id": "<masked>"
+          },
+          "product": {
+            "id": "<masked>"
+          },
+          "reorderQuantity": null,
+          "replenishmentLocation": null,
+          "replenishmentPeriodDays": null,
+          "status": null
+        },
+        "inventoryStatus": "STOCK_OUT",
+        "monthlyDemand": 0,
+        "product": {
+          "active": true,
+          "category": "IT Equipment",
+          "color": null,
+          "dateCreated": "<masked>",
+          "description": "",
+          "displayNames": {
+            "default": null
+          },
+          "handlingIcons": [],
+          "id": "<masked>",
+          "lastUpdated": "<masked>",
+          "lotAndExpiryControl": false,
+          "name": "Printer cartridge, HP 122A/Q3961A, Cyan",
+          "pricePerUnit": 179.99,
+          "productCode": "GH964",
+          "unitOfMeasure": "Each",
+          "updatedBy": "Miss Administrator"
+        },
+        "quantityToOrder": 100,
+        "tags": [],
+        "unitCost": 179.99
+      },
+      {
+        "expectedReorderCost": 1800.0,
+        "expiredQuantityAvailableToPromise": 0,
+        "finalQuantityAvailableToPromise": 200,
+        "inventoryLevel": {
+          "abcClass": null,
+          "binLocation": null,
+          "comments": null,
+          "dateCreated": "<masked>",
+          "demandTimePeriodDays": null,
+          "expectedLeadTimeDays": null,
+          "forecastPeriodDays": 30.0,
+          "forecastQuantity": null,
+          "id": "<masked>",
+          "internalLocation": null,
+          "inventory": {
+            "id": "<masked>"
+          },
+          "lastUpdated": "<masked>",
+          "maxQuantity": 2000,
+          "minQuantity": 200,
+          "preferred": false,
+          "preferredBinLocation": {
+            "id": "<masked>"
+          },
+          "product": {
+            "id": "<masked>"
+          },
+          "reorderQuantity": null,
+          "replenishmentLocation": null,
+          "replenishmentPeriodDays": null,
+          "status": null
+        },
+        "inventoryStatus": "LOW_STOCK",
+        "monthlyDemand": 0,
+        "product": {
+          "active": true,
+          "category": "Office Supplies",
+          "color": null,
+          "dateCreated": "<masked>",
+          "description": "",
+          "displayNames": {
+            "default": null
+          },
+          "handlingIcons": [],
+          "id": "<masked>",
+          "lastUpdated": "<masked>",
+          "lotAndExpiryControl": false,
+          "name": "Binder clips, 25mm",
+          "pricePerUnit": 1.0,
+          "productCode": "RS138",
+          "unitOfMeasure": "Each",
+          "updatedBy": "Miss Administrator"
+        },
+        "quantityToOrder": 1800,
+        "tags": [],
+        "unitCost": 1.0
+      },
+      {
+        "expectedReorderCost": 1819.3,
+        "expiredQuantityAvailableToPromise": 0,
+        "finalQuantityAvailableToPromise": 30,
+        "inventoryLevel": {
+          "abcClass": null,
+          "binLocation": null,
+          "comments": null,
+          "dateCreated": "<masked>",
+          "demandTimePeriodDays": null,
+          "expectedLeadTimeDays": null,
+          "forecastPeriodDays": 30.0,
+          "forecastQuantity": null,
+          "id": "<masked>",
+          "internalLocation": null,
+          "inventory": {
+            "id": "<masked>"
+          },
+          "lastUpdated": "<masked>",
+          "maxQuantity": 100,
+          "minQuantity": 10,
+          "preferred": false,
+          "preferredBinLocation": {
+            "id": "<masked>"
+          },
+          "product": {
+            "id": "<masked>"
+          },
+          "reorderQuantity": null,
+          "replenishmentLocation": null,
+          "replenishmentPeriodDays": null,
+          "status": null
+        },
+        "inventoryStatus": "IN_STOCK",
+        "monthlyDemand": 0,
+        "product": {
+          "active": true,
+          "category": "IT Equipment",
+          "color": null,
+          "dateCreated": "<masked>",
+          "description": "",
+          "displayNames": {
+            "default": null
+          },
+          "handlingIcons": [],
+          "id": "<masked>",
+          "lastUpdated": "<masked>",
+          "lotAndExpiryControl": false,
+          "name": "Adapter, USB-C male to HDMI + VGA female",
+          "pricePerUnit": 25.99,
+          "productCode": "AX738",
+          "unitOfMeasure": "Each",
+          "updatedBy": "Miss Administrator"
+        },
+        "quantityToOrder": 70,
+        "tags": [],
+        "unitCost": 25.99
+      },
+      {
+        "expectedReorderCost": 1900.0,
+        "expiredQuantityAvailableToPromise": 0,
+        "finalQuantityAvailableToPromise": 100,
+        "inventoryLevel": {
+          "abcClass": null,
+          "binLocation": null,
+          "comments": null,
+          "dateCreated": "<masked>",
+          "demandTimePeriodDays": null,
+          "expectedLeadTimeDays": null,
+          "forecastPeriodDays": 30.0,
+          "forecastQuantity": null,
+          "id": "<masked>",
+          "internalLocation": null,
+          "inventory": {
+            "id": "<masked>"
+          },
+          "lastUpdated": "<masked>",
+          "maxQuantity": 2000,
+          "minQuantity": 200,
+          "preferred": false,
+          "preferredBinLocation": {
+            "id": "<masked>"
+          },
+          "product": {
+            "id": "<masked>"
+          },
+          "reorderQuantity": null,
+          "replenishmentLocation": null,
+          "replenishmentPeriodDays": null,
+          "status": null
+        },
+        "inventoryStatus": "LOW_STOCK",
+        "monthlyDemand": 0,
+        "product": {
+          "active": true,
+          "category": "Office Supplies",
+          "color": null,
+          "dateCreated": "<masked>",
+          "description": "",
+          "displayNames": {
+            "default": null
+          },
+          "handlingIcons": [],
+          "id": "<masked>",
+          "lastUpdated": "<masked>",
+          "lotAndExpiryControl": false,
+          "name": "Binder clips, 32mm",
+          "pricePerUnit": 1.0,
+          "productCode": "MV069",
+          "unitOfMeasure": "Each",
+          "updatedBy": "Miss Administrator"
+        },
+        "quantityToOrder": 1900,
+        "tags": [],
+        "unitCost": 1.0
+      },
+      {
+        "expectedReorderCost": 1900.0,
+        "expiredQuantityAvailableToPromise": 0,
+        "finalQuantityAvailableToPromise": 5,
+        "inventoryLevel": {
+          "abcClass": null,
+          "binLocation": null,
+          "comments": null,
+          "dateCreated": "<masked>",
+          "demandTimePeriodDays": null,
+          "expectedLeadTimeDays": null,
+          "forecastPeriodDays": 30.0,
+          "forecastQuantity": null,
+          "id": "<masked>",
+          "internalLocation": null,
+          "inventory": {
+            "id": "<masked>"
+          },
+          "lastUpdated": "<masked>",
+          "maxQuantity": 100,
+          "minQuantity": 10,
+          "preferred": false,
+          "preferredBinLocation": {
+            "id": "<masked>"
+          },
+          "product": {
+            "id": "<masked>"
+          },
+          "reorderQuantity": null,
+          "replenishmentLocation": null,
+          "replenishmentPeriodDays": null,
+          "status": null
+        },
+        "inventoryStatus": "LOW_STOCK",
+        "monthlyDemand": 0,
+        "product": {
+          "active": true,
+          "category": "Lab",
+          "color": null,
+          "dateCreated": "<masked>",
+          "description": "",
+          "displayNames": {
+            "default": null
+          },
+          "handlingIcons": [],
+          "id": "<masked>",
+          "lastUpdated": "<masked>",
+          "lotAndExpiryControl": false,
+          "name": "Coat, Laboratory, Small, Unisex",
+          "pricePerUnit": 20.0,
+          "productCode": "SJ489",
+          "unitOfMeasure": "Each",
+          "updatedBy": "Miss Administrator"
+        },
+        "quantityToOrder": 95,
+        "tags": [
+          {
+            "createdBy": {
+              "id": "<masked>"
+            },
+            "dateCreated": "<masked>",
+            "id": "<masked>",
+            "isActive": true,
+            "lastUpdated": "<masked>",
+            "products": [
+              {
+                "id": "<masked>"
+              },
+              {
+                "id": "<masked>"
+              },
+              {
+                "id": "<masked>"
+              },
+              {
+                "id": "<masked>"
+              },
+              {
+                "id": "<masked>"
+              },
+              {
+                "id": "<masked>"
+              },
+              {
+                "id": "<masked>"
+              },
+              {
+                "id": "<masked>"
+              },
+              {
+                "id": "<masked>"
+              },
+              {
+                "id": "<masked>"
+              },
+              {
+                "id": "<masked>"
+              },
+              {
+                "id": "<masked>"
+              },
+              {
+                "id": "<masked>"
+              },
+              {
+                "id": "<masked>"
+              },
+              {
+                "id": "<masked>"
+              }
+            ],
+            "tag": "Tertiary Care",
+            "updatedBy": {
+              "id": "<masked>"
+            }
+          }
+        ],
+        "unitCost": 20.0
+      },
+      {
+        "expectedReorderCost": 22040.0,
+        "expiredQuantityAvailableToPromise": 0,
+        "finalQuantityAvailableToPromise": 0,
+        "inventoryLevel": {
+          "abcClass": null,
+          "binLocation": null,
+          "comments": null,
+          "dateCreated": "<masked>",
+          "demandTimePeriodDays": null,
+          "expectedLeadTimeDays": null,
+          "forecastPeriodDays": 30.0,
+          "forecastQuantity": null,
+          "id": "<masked>",
+          "internalLocation": null,
+          "inventory": {
+            "id": "<masked>"
+          },
+          "lastUpdated": "<masked>",
+          "maxQuantity": 76000,
+          "minQuantity": 7600,
+          "preferred": false,
+          "preferredBinLocation": {
+            "id": "<masked>"
+          },
+          "product": {
+            "id": "<masked>"
+          },
+          "reorderQuantity": null,
+          "replenishmentLocation": null,
+          "replenishmentPeriodDays": null,
+          "status": null
+        },
+        "inventoryStatus": "STOCK_OUT",
+        "monthlyDemand": 0,
+        "product": {
+          "active": true,
+          "category": "ARVS",
+          "color": null,
+          "dateCreated": "<masked>",
+          "description": "",
+          "displayNames": {
+            "default": null
+          },
+          "handlingIcons": [],
+          "id": "<masked>",
+          "lastUpdated": "<masked>",
+          "lotAndExpiryControl": true,
+          "name": "Lamivudine 150mg + nevirapine 200mg + zidovudine 300mg tablet",
+          "pricePerUnit": 0.29,
+          "productCode": "CR388",
+          "unitOfMeasure": "Each",
+          "updatedBy": "Miss Administrator"
+        },
+        "quantityToOrder": 76000,
+        "tags": [
+          {
+            "createdBy": {
+              "id": "<masked>"
+            },
+            "dateCreated": "<masked>",
+            "id": "<masked>",
+            "isActive": true,
+            "lastUpdated": "<masked>",
+            "products": [
+              {
+                "id": "<masked>"
+              },
+              {
+                "id": "<masked>"
+              },
+              {
+                "id": "<masked>"
+              },
+              {
+                "id": "<masked>"
+              },
+              {
+                "id": "<masked>"
+              },
+              {
+                "id": "<masked>"
+              },
+              {
+                "id": "<masked>"
+              },
+              {
+                "id": "<masked>"
+              }
+            ],
+            "tag": "Primary Care",
+            "updatedBy": {
+              "id": "<masked>"
+            }
+          }
+        ],
+        "unitCost": 0.29
+      },
+      {
+        "expectedReorderCost": 22040.0,
+        "expiredQuantityAvailableToPromise": 3420,
+        "finalQuantityAvailableToPromise": 0,
+        "inventoryLevel": {
+          "abcClass": null,
+          "binLocation": null,
+          "comments": null,
+          "dateCreated": "<masked>",
+          "demandTimePeriodDays": null,
+          "expectedLeadTimeDays": null,
+          "forecastPeriodDays": 30.0,
+          "forecastQuantity": null,
+          "id": "<masked>",
+          "internalLocation": null,
+          "inventory": {
+            "id": "<masked>"
+          },
+          "lastUpdated": "<masked>",
+          "maxQuantity": 76000,
+          "minQuantity": 7600,
+          "preferred": false,
+          "preferredBinLocation": {
+            "id": "<masked>"
+          },
+          "product": {
+            "id": "<masked>"
+          },
+          "reorderQuantity": null,
+          "replenishmentLocation": null,
+          "replenishmentPeriodDays": null,
+          "status": null
+        },
+        "inventoryStatus": "LOW_STOCK",
+        "monthlyDemand": 0,
+        "product": {
+          "active": true,
+          "category": "ARVS",
+          "color": null,
+          "dateCreated": "<masked>",
+          "description": "",
+          "displayNames": {
+            "default": null
+          },
+          "handlingIcons": [],
+          "id": "<masked>",
+          "lastUpdated": "<masked>",
+          "lotAndExpiryControl": true,
+          "name": "Lamivudine 30mg + nevirapine 50mg + zidovudine 60mg tablet",
+          "pricePerUnit": 0.29,
+          "productCode": "MC017",
+          "unitOfMeasure": "Each",
+          "updatedBy": "Miss Administrator"
+        },
+        "quantityToOrder": 76000,
+        "tags": [
+          {
+            "createdBy": {
+              "id": "<masked>"
+            },
+            "dateCreated": "<masked>",
+            "id": "<masked>",
+            "isActive": true,
+            "lastUpdated": "<masked>",
+            "products": [
+              {
+                "id": "<masked>"
+              },
+              {
+                "id": "<masked>"
+              },
+              {
+                "id": "<masked>"
+              },
+              {
+                "id": "<masked>"
+              },
+              {
+                "id": "<masked>"
+              },
+              {
+                "id": "<masked>"
+              },
+              {
+                "id": "<masked>"
+              },
+              {
+                "id": "<masked>"
+              }
+            ],
+            "tag": "Primary Care",
+            "updatedBy": {
+              "id": "<masked>"
+            }
+          }
+        ],
+        "unitCost": 0.29
+      },
+      {
+        "expectedReorderCost": 22040.0,
+        "expiredQuantityAvailableToPromise": 7296,
+        "finalQuantityAvailableToPromise": 0,
+        "inventoryLevel": {
+          "abcClass": null,
+          "binLocation": null,
+          "comments": null,
+          "dateCreated": "<masked>",
+          "demandTimePeriodDays": null,
+          "expectedLeadTimeDays": null,
+          "forecastPeriodDays": 30.0,
+          "forecastQuantity": null,
+          "id": "<masked>",
+          "internalLocation": null,
+          "inventory": {
+            "id": "<masked>"
+          },
+          "lastUpdated": "<masked>",
+          "maxQuantity": 76000,
+          "minQuantity": 7600,
+          "preferred": false,
+          "preferredBinLocation": {
+            "id": "<masked>"
+          },
+          "product": {
+            "id": "<masked>"
+          },
+          "reorderQuantity": null,
+          "replenishmentLocation": null,
+          "replenishmentPeriodDays": null,
+          "status": null
+        },
+        "inventoryStatus": "LOW_STOCK",
+        "monthlyDemand": 0,
+        "product": {
+          "active": true,
+          "category": "ARVS",
+          "color": null,
+          "dateCreated": "<masked>",
+          "description": "",
+          "displayNames": {
+            "default": null
+          },
+          "handlingIcons": [],
+          "id": "<masked>",
+          "lastUpdated": "<masked>",
+          "lotAndExpiryControl": true,
+          "name": "Lamivudine 150mg tablet",
+          "pricePerUnit": 0.29,
+          "productCode": "CM871",
+          "unitOfMeasure": "Each",
+          "updatedBy": "Miss Administrator"
+        },
+        "quantityToOrder": 76000,
+        "tags": [
+          {
+            "createdBy": {
+              "id": "<masked>"
+            },
+            "dateCreated": "<masked>",
+            "id": "<masked>",
+            "isActive": true,
+            "lastUpdated": "<masked>",
+            "products": [
+              {
+                "id": "<masked>"
+              },
+              {
+                "id": "<masked>"
+              },
+              {
+                "id": "<masked>"
+              },
+              {
+                "id": "<masked>"
+              },
+              {
+                "id": "<masked>"
+              },
+              {
+                "id": "<masked>"
+              },
+              {
+                "id": "<masked>"
+              },
+              {
+                "id": "<masked>"
+              }
+            ],
+            "tag": "Primary Care",
+            "updatedBy": {
+              "id": "<masked>"
+            }
+          }
+        ],
+        "unitCost": 0.29
+      },
+      {
+        "expectedReorderCost": 22040.0,
+        "expiredQuantityAvailableToPromise": 7600,
+        "finalQuantityAvailableToPromise": 0,
+        "inventoryLevel": {
+          "abcClass": null,
+          "binLocation": null,
+          "comments": null,
+          "dateCreated": "<masked>",
+          "demandTimePeriodDays": null,
+          "expectedLeadTimeDays": null,
+          "forecastPeriodDays": 30.0,
+          "forecastQuantity": null,
+          "id": "<masked>",
+          "internalLocation": null,
+          "inventory": {
+            "id": "<masked>"
+          },
+          "lastUpdated": "<masked>",
+          "maxQuantity": 76000,
+          "minQuantity": 7600,
+          "preferred": false,
+          "preferredBinLocation": {
+            "id": "<masked>"
+          },
+          "product": {
+            "id": "<masked>"
+          },
+          "reorderQuantity": null,
+          "replenishmentLocation": null,
+          "replenishmentPeriodDays": null,
+          "status": null
+        },
+        "inventoryStatus": "LOW_STOCK",
+        "monthlyDemand": 0,
+        "product": {
+          "active": true,
+          "category": "ARVS",
+          "color": null,
+          "dateCreated": "<masked>",
+          "description": "",
+          "displayNames": {
+            "default": null
+          },
+          "handlingIcons": [],
+          "id": "<masked>",
+          "lastUpdated": "<masked>",
+          "lotAndExpiryControl": true,
+          "name": "Lamivudine 150mg + zidovudine 300mg tablet",
+          "pricePerUnit": 0.29,
+          "productCode": "TZ835",
+          "unitOfMeasure": "Each",
+          "updatedBy": "Miss Administrator"
+        },
+        "quantityToOrder": 76000,
+        "tags": [
+          {
+            "createdBy": {
+              "id": "<masked>"
+            },
+            "dateCreated": "<masked>",
+            "id": "<masked>",
+            "isActive": true,
+            "lastUpdated": "<masked>",
+            "products": [
+              {
+                "id": "<masked>"
+              },
+              {
+                "id": "<masked>"
+              },
+              {
+                "id": "<masked>"
+              },
+              {
+                "id": "<masked>"
+              },
+              {
+                "id": "<masked>"
+              },
+              {
+                "id": "<masked>"
+              },
+              {
+                "id": "<masked>"
+              },
+              {
+                "id": "<masked>"
+              }
+            ],
+            "tag": "Primary Care",
+            "updatedBy": {
+              "id": "<masked>"
+            }
+          }
+        ],
+        "unitCost": 0.29
+      },
+      {
+        "expectedReorderCost": 235.5,
+        "expiredQuantityAvailableToPromise": 0,
+        "finalQuantityAvailableToPromise": 0,
+        "inventoryLevel": {
+          "abcClass": null,
+          "binLocation": null,
+          "comments": null,
+          "dateCreated": "<masked>",
+          "demandTimePeriodDays": null,
+          "expectedLeadTimeDays": null,
+          "forecastPeriodDays": 30.0,
+          "forecastQuantity": null,
+          "id": "<masked>",
+          "internalLocation": null,
+          "inventory": {
+            "id": "<masked>"
+          },
+          "lastUpdated": "<masked>",
+          "maxQuantity": 50,
+          "minQuantity": 5,
+          "preferred": false,
+          "preferredBinLocation": {
+            "id": "<masked>"
+          },
+          "product": {
+            "id": "<masked>"
+          },
+          "reorderQuantity": null,
+          "replenishmentLocation": null,
+          "replenishmentPeriodDays": null,
+          "status": null
+        },
+        "inventoryStatus": "STOCK_OUT",
+        "monthlyDemand": 0,
+        "product": {
+          "active": true,
+          "category": "Lab",
+          "color": null,
+          "dateCreated": "<masked>",
+          "description": "",
+          "displayNames": {
+            "default": null
+          },
+          "handlingIcons": [
+            {
+              "color": "#ffa500",
+              "icon": "fa-exclamation-triangle",
+              "label": "Hazardous material"
+            }
+          ],
+          "id": "<masked>",
+          "lastUpdated": "<masked>",
+          "lotAndExpiryControl": false,
+          "name": "Ethanol (ethyl alcohol), 95%, reagent grade, 16oz",
+          "pricePerUnit": 4.71,
+          "productCode": "PK000",
+          "unitOfMeasure": "Each",
+          "updatedBy": "Miss Administrator"
+        },
+        "quantityToOrder": 50,
+        "tags": [
+          {
+            "createdBy": {
+              "id": "<masked>"
+            },
+            "dateCreated": "<masked>",
+            "id": "<masked>",
+            "isActive": true,
+            "lastUpdated": "<masked>",
+            "products": [
+              {
+                "id": "<masked>"
+              },
+              {
+                "id": "<masked>"
+              },
+              {
+                "id": "<masked>"
+              },
+              {
+                "id": "<masked>"
+              },
+              {
+                "id": "<masked>"
+              },
+              {
+                "id": "<masked>"
+              },
+              {
+                "id": "<masked>"
+              },
+              {
+                "id": "<masked>"
+              },
+              {
+                "id": "<masked>"
+              },
+              {
+                "id": "<masked>"
+              },
+              {
+                "id": "<masked>"
+              },
+              {
+                "id": "<masked>"
+              },
+              {
+                "id": "<masked>"
+              },
+              {
+                "id": "<masked>"
+              },
+              {
+                "id": "<masked>"
+              }
+            ],
+            "tag": "Tertiary Care",
+            "updatedBy": {
+              "id": "<masked>"
+            }
+          }
+        ],
+        "unitCost": 4.71
+      },
+      {
+        "expectedReorderCost": 25000.0,
+        "expiredQuantityAvailableToPromise": 100000,
+        "finalQuantityAvailableToPromise": 0,
+        "inventoryLevel": {
+          "abcClass": null,
+          "binLocation": null,
+          "comments": null,
+          "dateCreated": "<masked>",
+          "demandTimePeriodDays": null,
+          "expectedLeadTimeDays": null,
+          "forecastPeriodDays": 30.0,
+          "forecastQuantity": null,
+          "id": "<masked>",
+          "internalLocation": null,
+          "inventory": {
+            "id": "<masked>"
+          },
+          "lastUpdated": "<masked>",
+          "maxQuantity": 100000,
+          "minQuantity": 10000,
+          "preferred": false,
+          "preferredBinLocation": {
+            "id": "<masked>"
+          },
+          "product": {
+            "id": "<masked>"
+          },
+          "reorderQuantity": null,
+          "replenishmentLocation": null,
+          "replenishmentPeriodDays": null,
+          "status": null
+        },
+        "inventoryStatus": "IN_STOCK",
+        "monthlyDemand": 0,
+        "product": {
+          "active": true,
+          "category": "Pain",
+          "color": null,
+          "dateCreated": "<masked>",
+          "description": "",
+          "displayNames": {
+            "default": null
+          },
+          "handlingIcons": [
+            {
+              "color": "#db1919",
+              "icon": "fa-exclamation-circle",
+              "label": "Controlled substance"
+            }
+          ],
+          "id": "<masked>",
+          "lastUpdated": "<masked>",
+          "lotAndExpiryControl": true,
+          "name": "Morphine 10mg immediate release tablet",
+          "pricePerUnit": 0.25,
+          "productCode": "QX039",
+          "unitOfMeasure": "Each",
+          "updatedBy": "Miss Administrator"
+        },
+        "quantityToOrder": 100000,
+        "tags": [
+          {
+            "createdBy": {
+              "id": "<masked>"
+            },
+            "dateCreated": "<masked>",
+            "id": "<masked>",
+            "isActive": true,
+            "lastUpdated": "<masked>",
+            "products": [
+              {
+                "id": "<masked>"
+              },
+              {
+                "id": "<masked>"
+              },
+              {
+                "id": "<masked>"
+              },
+              {
+                "id": "<masked>"
+              },
+              {
+                "id": "<masked>"
+              },
+              {
+                "id": "<masked>"
+              },
+              {
+                "id": "<masked>"
+              },
+              {
+                "id": "<masked>"
+              },
+              {
+                "id": "<masked>"
+              },
+              {
+                "id": "<masked>"
+              },
+              {
+                "id": "<masked>"
+              },
+              {
+                "id": "<masked>"
+              },
+              {
+                "id": "<masked>"
+              },
+              {
+                "id": "<masked>"
+              },
+              {
+                "id": "<masked>"
+              }
+            ],
+            "tag": "Tertiary Care",
+            "updatedBy": {
+              "id": "<masked>"
+            }
+          }
+        ],
+        "unitCost": 0.25
+      },
+      {
+        "expectedReorderCost": 2919.2,
+        "expiredQuantityAvailableToPromise": 0,
+        "finalQuantityAvailableToPromise": 0,
+        "inventoryLevel": {
+          "abcClass": null,
+          "binLocation": null,
+          "comments": null,
+          "dateCreated": "<masked>",
+          "demandTimePeriodDays": null,
+          "expectedLeadTimeDays": null,
+          "forecastPeriodDays": 30.0,
+          "forecastQuantity": null,
+          "id": "<masked>",
+          "internalLocation": null,
+          "inventory": {
+            "id": "<masked>"
+          },
+          "lastUpdated": "<masked>",
+          "maxQuantity": 20,
+          "minQuantity": 2,
+          "preferred": false,
+          "preferredBinLocation": {
+            "id": "<masked>"
+          },
+          "product": {
+            "id": "<masked>"
+          },
+          "reorderQuantity": null,
+          "replenishmentLocation": null,
+          "replenishmentPeriodDays": null,
+          "status": null
+        },
+        "inventoryStatus": "STOCK_OUT",
+        "monthlyDemand": 0,
+        "product": {
+          "active": true,
+          "category": "Furniture and Equipment",
+          "color": null,
+          "dateCreated": "<masked>",
+          "description": "",
+          "displayNames": {
+            "default": null
+          },
+          "handlingIcons": [],
+          "id": "<masked>",
+          "lastUpdated": "<masked>",
+          "lotAndExpiryControl": false,
+          "name": "Stool, rolling",
+          "pricePerUnit": 145.96,
+          "productCode": "MR962",
+          "unitOfMeasure": "Each",
+          "updatedBy": "Miss Administrator"
+        },
+        "quantityToOrder": 20,
+        "tags": [],
+        "unitCost": 145.96
+      },
+      {
+        "expectedReorderCost": 3144.4,
+        "expiredQuantityAvailableToPromise": 0,
+        "finalQuantityAvailableToPromise": 10,
+        "inventoryLevel": {
+          "abcClass": null,
+          "binLocation": null,
+          "comments": null,
+          "dateCreated": "<masked>",
+          "demandTimePeriodDays": null,
+          "expectedLeadTimeDays": null,
+          "forecastPeriodDays": 30.0,
+          "forecastQuantity": null,
+          "id": "<masked>",
+          "internalLocation": null,
+          "inventory": {
+            "id": "<masked>"
+          },
+          "lastUpdated": "<masked>",
+          "maxQuantity": 50,
+          "minQuantity": 5,
+          "preferred": false,
+          "preferredBinLocation": {
+            "id": "<masked>"
+          },
+          "product": {
+            "id": "<masked>"
+          },
+          "reorderQuantity": null,
+          "replenishmentLocation": null,
+          "replenishmentPeriodDays": null,
+          "status": null
+        },
+        "inventoryStatus": "IN_STOCK",
+        "monthlyDemand": 0,
+        "product": {
+          "active": true,
+          "category": "IT Equipment",
+          "color": null,
+          "dateCreated": "<masked>",
+          "description": "",
+          "displayNames": {
+            "default": null
+          },
+          "handlingIcons": [],
+          "id": "<masked>",
+          "lastUpdated": "<masked>",
+          "lotAndExpiryControl": false,
+          "name": "Cellphone, Unlocked, 8GB, BLU 5.2",
+          "pricePerUnit": 78.61,
+          "productCode": "GX785",
+          "unitOfMeasure": "Each",
+          "updatedBy": "Miss Administrator"
+        },
+        "quantityToOrder": 40,
+        "tags": [
+          {
+            "createdBy": {
+              "id": "<masked>"
+            },
+            "dateCreated": "<masked>",
+            "id": "<masked>",
+            "isActive": true,
+            "lastUpdated": "<masked>",
+            "products": [
+              {
+                "id": "<masked>"
+              },
+              {
+                "id": "<masked>"
+              },
+              {
+                "id": "<masked>"
+              },
+              {
+                "id": "<masked>"
+              }
+            ],
+            "tag": "New Employee Package",
+            "updatedBy": {
+              "id": "<masked>"
+            }
+          }
+        ],
+        "unitCost": 78.61
+      },
+      {
+        "expectedReorderCost": 330.0,
+        "expiredQuantityAvailableToPromise": 0,
+        "finalQuantityAvailableToPromise": 4,
+        "inventoryLevel": {
+          "abcClass": null,
+          "binLocation": null,
+          "comments": null,
+          "dateCreated": "<masked>",
+          "demandTimePeriodDays": null,
+          "expectedLeadTimeDays": null,
+          "forecastPeriodDays": 30.0,
+          "forecastQuantity": null,
+          "id": "<masked>",
+          "internalLocation": null,
+          "inventory": {
+            "id": "<masked>"
+          },
+          "lastUpdated": "<masked>",
+          "maxQuantity": 10,
+          "minQuantity": 1,
+          "preferred": false,
+          "preferredBinLocation": {
+            "id": "<masked>"
+          },
+          "product": {
+            "id": "<masked>"
+          },
+          "reorderQuantity": null,
+          "replenishmentLocation": null,
+          "replenishmentPeriodDays": null,
+          "status": null
+        },
+        "inventoryStatus": "IN_STOCK",
+        "monthlyDemand": 0,
+        "product": {
+          "active": true,
+          "category": "Furniture and Equipment",
+          "color": null,
+          "dateCreated": "<masked>",
+          "description": "",
+          "displayNames": {
+            "default": null
+          },
+          "handlingIcons": [],
+          "id": "<masked>",
+          "lastUpdated": "<masked>",
+          "lotAndExpiryControl": false,
+          "name": "File cabinet, Lateral, 5-drawer",
+          "pricePerUnit": 55.0,
+          "productCode": "CG819",
+          "unitOfMeasure": "Each",
+          "updatedBy": "Miss Administrator"
+        },
+        "quantityToOrder": 6,
+        "tags": [],
+        "unitCost": 55.0
+      },
+      {
+        "expectedReorderCost": 36480.0,
+        "expiredQuantityAvailableToPromise": 0,
+        "finalQuantityAvailableToPromise": 0,
+        "inventoryLevel": {
+          "abcClass": null,
+          "binLocation": null,
+          "comments": null,
+          "dateCreated": "<masked>",
+          "demandTimePeriodDays": null,
+          "expectedLeadTimeDays": null,
+          "forecastPeriodDays": 30.0,
+          "forecastQuantity": null,
+          "id": "<masked>",
+          "internalLocation": null,
+          "inventory": {
+            "id": "<masked>"
+          },
+          "lastUpdated": "<masked>",
+          "maxQuantity": 96000,
+          "minQuantity": 9600,
+          "preferred": false,
+          "preferredBinLocation": {
+            "id": "<masked>"
+          },
+          "product": {
+            "id": "<masked>"
+          },
+          "reorderQuantity": null,
+          "replenishmentLocation": null,
+          "replenishmentPeriodDays": null,
+          "status": null
+        },
+        "inventoryStatus": "STOCK_OUT",
+        "monthlyDemand": 0,
+        "product": {
+          "active": true,
+          "category": "TB",
+          "color": null,
+          "dateCreated": "<masked>",
+          "description": "",
+          "displayNames": {
+            "default": null
+          },
+          "handlingIcons": [],
+          "id": "<masked>",
+          "lastUpdated": "<masked>",
+          "lotAndExpiryControl": true,
+          "name": "Isoniazid 50mg + pyrazinamide 150mg + rifampicin 75mg tablet",
+          "pricePerUnit": 0.38,
+          "productCode": "DA693",
+          "unitOfMeasure": "Each",
+          "updatedBy": "Miss Administrator"
+        },
+        "quantityToOrder": 96000,
+        "tags": [
+          {
+            "createdBy": {
+              "id": "<masked>"
+            },
+            "dateCreated": "<masked>",
+            "id": "<masked>",
+            "isActive": true,
+            "lastUpdated": "<masked>",
+            "products": [
+              {
+                "id": "<masked>"
+              },
+              {
+                "id": "<masked>"
+              },
+              {
+                "id": "<masked>"
+              },
+              {
+                "id": "<masked>"
+              },
+              {
+                "id": "<masked>"
+              },
+              {
+                "id": "<masked>"
+              },
+              {
+                "id": "<masked>"
+              },
+              {
+                "id": "<masked>"
+              }
+            ],
+            "tag": "Primary Care",
+            "updatedBy": {
+              "id": "<masked>"
+            }
+          }
+        ],
+        "unitCost": 0.38
+      },
+      {
+        "expectedReorderCost": 36480.0,
+        "expiredQuantityAvailableToPromise": 19600,
+        "finalQuantityAvailableToPromise": 0,
+        "inventoryLevel": {
+          "abcClass": null,
+          "binLocation": null,
+          "comments": null,
+          "dateCreated": "<masked>",
+          "demandTimePeriodDays": null,
+          "expectedLeadTimeDays": null,
+          "forecastPeriodDays": 30.0,
+          "forecastQuantity": null,
+          "id": "<masked>",
+          "internalLocation": null,
+          "inventory": {
+            "id": "<masked>"
+          },
+          "lastUpdated": "<masked>",
+          "maxQuantity": 96000,
+          "minQuantity": 9600,
+          "preferred": false,
+          "preferredBinLocation": {
+            "id": "<masked>"
+          },
+          "product": {
+            "id": "<masked>"
+          },
+          "reorderQuantity": null,
+          "replenishmentLocation": null,
+          "replenishmentPeriodDays": null,
+          "status": null
+        },
+        "inventoryStatus": "IN_STOCK",
+        "monthlyDemand": 0,
+        "product": {
+          "active": true,
+          "category": "TB",
+          "color": null,
+          "dateCreated": "<masked>",
+          "description": "",
+          "displayNames": {
+            "default": null
+          },
+          "handlingIcons": [],
+          "id": "<masked>",
+          "lastUpdated": "<masked>",
+          "lotAndExpiryControl": true,
+          "name": "Isoniazid 300mg + rifapentine 300mg tablet",
+          "pricePerUnit": 0.38,
+          "productCode": "QX419",
+          "unitOfMeasure": "Each",
+          "updatedBy": "Miss Administrator"
+        },
+        "quantityToOrder": 96000,
+        "tags": [
+          {
+            "createdBy": {
+              "id": "<masked>"
+            },
+            "dateCreated": "<masked>",
+            "id": "<masked>",
+            "isActive": true,
+            "lastUpdated": "<masked>",
+            "products": [
+              {
+                "id": "<masked>"
+              },
+              {
+                "id": "<masked>"
+              },
+              {
+                "id": "<masked>"
+              },
+              {
+                "id": "<masked>"
+              },
+              {
+                "id": "<masked>"
+              },
+              {
+                "id": "<masked>"
+              },
+              {
+                "id": "<masked>"
+              },
+              {
+                "id": "<masked>"
+              }
+            ],
+            "tag": "Primary Care",
+            "updatedBy": {
+              "id": "<masked>"
+            }
+          }
+        ],
+        "unitCost": 0.38
+      },
+      {
+        "expectedReorderCost": 36480.0,
+        "expiredQuantityAvailableToPromise": 34300,
+        "finalQuantityAvailableToPromise": 0,
+        "inventoryLevel": {
+          "abcClass": null,
+          "binLocation": null,
+          "comments": null,
+          "dateCreated": "<masked>",
+          "demandTimePeriodDays": null,
+          "expectedLeadTimeDays": null,
+          "forecastPeriodDays": 30.0,
+          "forecastQuantity": null,
+          "id": "<masked>",
+          "internalLocation": null,
+          "inventory": {
+            "id": "<masked>"
+          },
+          "lastUpdated": "<masked>",
+          "maxQuantity": 96000,
+          "minQuantity": 9600,
+          "preferred": false,
+          "preferredBinLocation": {
+            "id": "<masked>"
+          },
+          "product": {
+            "id": "<masked>"
+          },
+          "reorderQuantity": null,
+          "replenishmentLocation": null,
+          "replenishmentPeriodDays": null,
+          "status": null
+        },
+        "inventoryStatus": "IN_STOCK",
+        "monthlyDemand": 0,
+        "product": {
+          "active": true,
+          "category": "TB",
+          "color": null,
+          "dateCreated": "<masked>",
+          "description": "",
+          "displayNames": {
+            "default": null
+          },
+          "handlingIcons": [],
+          "id": "<masked>",
+          "lastUpdated": "<masked>",
+          "lotAndExpiryControl": true,
+          "name": "Isoniazid 300mg tablet",
+          "pricePerUnit": 0.38,
+          "productCode": "XM026",
+          "unitOfMeasure": "Each",
+          "updatedBy": "Miss Administrator"
+        },
+        "quantityToOrder": 96000,
+        "tags": [
+          {
+            "createdBy": {
+              "id": "<masked>"
+            },
+            "dateCreated": "<masked>",
+            "id": "<masked>",
+            "isActive": true,
+            "lastUpdated": "<masked>",
+            "products": [
+              {
+                "id": "<masked>"
+              },
+              {
+                "id": "<masked>"
+              },
+              {
+                "id": "<masked>"
+              },
+              {
+                "id": "<masked>"
+              },
+              {
+                "id": "<masked>"
+              },
+              {
+                "id": "<masked>"
+              },
+              {
+                "id": "<masked>"
+              },
+              {
+                "id": "<masked>"
+              }
+            ],
+            "tag": "Primary Care",
+            "updatedBy": {
+              "id": "<masked>"
+            }
+          }
+        ],
+        "unitCost": 0.38
+      },
+      {
+        "expectedReorderCost": 36480.0,
+        "expiredQuantityAvailableToPromise": 9800,
+        "finalQuantityAvailableToPromise": 0,
+        "inventoryLevel": {
+          "abcClass": null,
+          "binLocation": null,
+          "comments": null,
+          "dateCreated": "<masked>",
+          "demandTimePeriodDays": null,
+          "expectedLeadTimeDays": null,
+          "forecastPeriodDays": 30.0,
+          "forecastQuantity": null,
+          "id": "<masked>",
+          "internalLocation": null,
+          "inventory": {
+            "id": "<masked>"
+          },
+          "lastUpdated": "<masked>",
+          "maxQuantity": 96000,
+          "minQuantity": 9600,
+          "preferred": false,
+          "preferredBinLocation": {
+            "id": "<masked>"
+          },
+          "product": {
+            "id": "<masked>"
+          },
+          "reorderQuantity": null,
+          "replenishmentLocation": null,
+          "replenishmentPeriodDays": null,
+          "status": null
+        },
+        "inventoryStatus": "IN_STOCK",
+        "monthlyDemand": 0,
+        "product": {
+          "active": true,
+          "category": "TB",
+          "color": null,
+          "dateCreated": "<masked>",
+          "description": "",
+          "displayNames": {
+            "default": null
+          },
+          "handlingIcons": [],
+          "id": "<masked>",
+          "lastUpdated": "<masked>",
+          "lotAndExpiryControl": true,
+          "name": "Isoniazid 50mg + rifampicin 75mg tablet",
+          "pricePerUnit": 0.38,
+          "productCode": "RV624",
+          "unitOfMeasure": "Each",
+          "updatedBy": "Miss Administrator"
+        },
+        "quantityToOrder": 96000,
+        "tags": [
+          {
+            "createdBy": {
+              "id": "<masked>"
+            },
+            "dateCreated": "<masked>",
+            "id": "<masked>",
+            "isActive": true,
+            "lastUpdated": "<masked>",
+            "products": [
+              {
+                "id": "<masked>"
+              },
+              {
+                "id": "<masked>"
+              },
+              {
+                "id": "<masked>"
+              },
+              {
+                "id": "<masked>"
+              },
+              {
+                "id": "<masked>"
+              },
+              {
+                "id": "<masked>"
+              },
+              {
+                "id": "<masked>"
+              },
+              {
+                "id": "<masked>"
+              }
+            ],
+            "tag": "Primary Care",
+            "updatedBy": {
+              "id": "<masked>"
+            }
+          }
+        ],
+        "unitCost": 0.38
+      },
+      {
+        "expectedReorderCost": 375.0,
+        "expiredQuantityAvailableToPromise": 0,
+        "finalQuantityAvailableToPromise": 75,
+        "inventoryLevel": {
+          "abcClass": null,
+          "binLocation": null,
+          "comments": null,
+          "dateCreated": "<masked>",
+          "demandTimePeriodDays": null,
+          "expectedLeadTimeDays": null,
+          "forecastPeriodDays": 30.0,
+          "forecastQuantity": null,
+          "id": "<masked>",
+          "internalLocation": null,
+          "inventory": {
+            "id": "<masked>"
+          },
+          "lastUpdated": "<masked>",
+          "maxQuantity": 200,
+          "minQuantity": 20,
+          "preferred": false,
+          "preferredBinLocation": {
+            "id": "<masked>"
+          },
+          "product": {
+            "id": "<masked>"
+          },
+          "reorderQuantity": null,
+          "replenishmentLocation": null,
+          "replenishmentPeriodDays": null,
+          "status": null
+        },
+        "inventoryStatus": "IN_STOCK",
+        "monthlyDemand": 0,
+        "product": {
+          "active": true,
+          "category": "Office Supplies",
+          "color": null,
+          "dateCreated": "<masked>",
+          "description": "",
+          "displayNames": {
+            "default": null
+          },
+          "handlingIcons": [],
+          "id": "<masked>",
+          "lastUpdated": "<masked>",
+          "lotAndExpiryControl": false,
+          "name": "Staples 23/17 pack of 1000",
+          "pricePerUnit": 3.0,
+          "productCode": "PH950",
+          "unitOfMeasure": "Each",
+          "updatedBy": "Miss Administrator"
+        },
+        "quantityToOrder": 125,
+        "tags": [
+          {
+            "createdBy": {
+              "id": "<masked>"
+            },
+            "dateCreated": "<masked>",
+            "id": "<masked>",
+            "isActive": true,
+            "lastUpdated": "<masked>",
+            "products": [
+              {
+                "id": "<masked>"
+              },
+              {
+                "id": "<masked>"
+              },
+              {
+                "id": "<masked>"
+              },
+              {
+                "id": "<masked>"
+              }
+            ],
+            "tag": "Mail Room",
+            "updatedBy": {
+              "id": "<masked>"
+            }
+          }
+        ],
+        "unitCost": 3.0
+      },
+      {
+        "expectedReorderCost": 3922.85,
+        "expiredQuantityAvailableToPromise": 0,
+        "finalQuantityAvailableToPromise": 33,
+        "inventoryLevel": {
+          "abcClass": null,
+          "binLocation": null,
+          "comments": null,
+          "dateCreated": "<masked>",
+          "demandTimePeriodDays": null,
+          "expectedLeadTimeDays": null,
+          "forecastPeriodDays": 30.0,
+          "forecastQuantity": null,
+          "id": "<masked>",
+          "internalLocation": null,
+          "inventory": {
+            "id": "<masked>"
+          },
+          "lastUpdated": "<masked>",
+          "maxQuantity": 100,
+          "minQuantity": 10,
+          "preferred": false,
+          "preferredBinLocation": {
+            "id": "<masked>"
+          },
+          "product": {
+            "id": "<masked>"
+          },
+          "reorderQuantity": null,
+          "replenishmentLocation": null,
+          "replenishmentPeriodDays": null,
+          "status": null
+        },
+        "inventoryStatus": "IN_STOCK",
+        "monthlyDemand": 0,
+        "product": {
+          "active": true,
+          "category": "IT Equipment",
+          "color": null,
+          "dateCreated": "<masked>",
+          "description": "",
+          "displayNames": {
+            "default": null
+          },
+          "handlingIcons": [
+            {
+              "color": "#ffa500",
+              "icon": "fa-exclamation-triangle",
+              "label": "Hazardous material"
+            }
+          ],
+          "id": "<masked>",
+          "lastUpdated": "<masked>",
+          "lotAndExpiryControl": false,
+          "name": "Charger, Laptop, Lenovo, TP60/SL500",
+          "pricePerUnit": 58.55,
+          "productCode": "MM489",
+          "unitOfMeasure": "Each",
+          "updatedBy": "Miss Administrator"
+        },
+        "quantityToOrder": 67,
+        "tags": [
+          {
+            "createdBy": {
+              "id": "<masked>"
+            },
+            "dateCreated": "<masked>",
+            "id": "<masked>",
+            "isActive": true,
+            "lastUpdated": "<masked>",
+            "products": [
+              {
+                "id": "<masked>"
+              },
+              {
+                "id": "<masked>"
+              },
+              {
+                "id": "<masked>"
+              },
+              {
+                "id": "<masked>"
+              }
+            ],
+            "tag": "New Employee Package",
+            "updatedBy": {
+              "id": "<masked>"
+            }
+          }
+        ],
+        "unitCost": 58.55
+      },
+      {
+        "expectedReorderCost": 4391.25,
+        "expiredQuantityAvailableToPromise": 0,
+        "finalQuantityAvailableToPromise": 25,
+        "inventoryLevel": {
+          "abcClass": null,
+          "binLocation": null,
+          "comments": null,
+          "dateCreated": "<masked>",
+          "demandTimePeriodDays": null,
+          "expectedLeadTimeDays": null,
+          "forecastPeriodDays": 30.0,
+          "forecastQuantity": null,
+          "id": "<masked>",
+          "internalLocation": null,
+          "inventory": {
+            "id": "<masked>"
+          },
+          "lastUpdated": "<masked>",
+          "maxQuantity": 100,
+          "minQuantity": 10,
+          "preferred": false,
+          "preferredBinLocation": {
+            "id": "<masked>"
+          },
+          "product": {
+            "id": "<masked>"
+          },
+          "reorderQuantity": null,
+          "replenishmentLocation": null,
+          "replenishmentPeriodDays": null,
+          "status": null
+        },
+        "inventoryStatus": "IN_STOCK",
+        "monthlyDemand": 0,
+        "product": {
+          "active": true,
+          "category": "IT Equipment",
+          "color": null,
+          "dateCreated": "<masked>",
+          "description": "",
+          "displayNames": {
+            "default": null
+          },
+          "handlingIcons": [],
+          "id": "<masked>",
+          "lastUpdated": "<masked>",
+          "lotAndExpiryControl": false,
+          "name": "Charger, for Lenovo Thinkpad T400 series Laptop",
+          "pricePerUnit": 58.55,
+          "productCode": "UB995",
+          "unitOfMeasure": "Each",
+          "updatedBy": "Miss Administrator"
+        },
+        "quantityToOrder": 75,
+        "tags": [],
+        "unitCost": 58.55
+      },
+      {
+        "expectedReorderCost": 4461.0,
+        "expiredQuantityAvailableToPromise": 0,
+        "finalQuantityAvailableToPromise": 2,
+        "inventoryLevel": {
+          "abcClass": null,
+          "binLocation": null,
+          "comments": null,
+          "dateCreated": "<masked>",
+          "demandTimePeriodDays": null,
+          "expectedLeadTimeDays": null,
+          "forecastPeriodDays": 30.0,
+          "forecastQuantity": null,
+          "id": "<masked>",
+          "internalLocation": null,
+          "inventory": {
+            "id": "<masked>"
+          },
+          "lastUpdated": "<masked>",
+          "maxQuantity": 6,
+          "minQuantity": 2,
+          "preferred": false,
+          "preferredBinLocation": {
+            "id": "<masked>"
+          },
+          "product": {
+            "id": "<masked>"
+          },
+          "reorderQuantity": null,
+          "replenishmentLocation": null,
+          "replenishmentPeriodDays": null,
+          "status": null
+        },
+        "inventoryStatus": "LOW_STOCK",
+        "monthlyDemand": 0,
+        "product": {
+          "active": true,
+          "category": "IT Equipment",
+          "color": null,
+          "dateCreated": "<masked>",
+          "description": "",
+          "displayNames": {
+            "default": null
+          },
+          "handlingIcons": [
+            {
+              "color": "#ffa500",
+              "icon": "fa-exclamation-triangle",
+              "label": "Hazardous material"
+            }
+          ],
+          "id": "<masked>",
+          "lastUpdated": "<masked>",
+          "lotAndExpiryControl": false,
+          "name": "Computer, Desktop, ThinkCentre M920z",
+          "pricePerUnit": 1115.25,
+          "productCode": "ET383",
+          "unitOfMeasure": "Each",
+          "updatedBy": "Miss Administrator"
+        },
+        "quantityToOrder": 4,
+        "tags": [],
+        "unitCost": 1115.25
+      },
+      {
+        "expectedReorderCost": 450.0,
+        "expiredQuantityAvailableToPromise": 0,
+        "finalQuantityAvailableToPromise": 50,
+        "inventoryLevel": {
+          "abcClass": null,
+          "binLocation": null,
+          "comments": null,
+          "dateCreated": "<masked>",
+          "demandTimePeriodDays": null,
+          "expectedLeadTimeDays": null,
+          "forecastPeriodDays": 30.0,
+          "forecastQuantity": null,
+          "id": "<masked>",
+          "internalLocation": null,
+          "inventory": {
+            "id": "<masked>"
+          },
+          "lastUpdated": "<masked>",
+          "maxQuantity": 200,
+          "minQuantity": 20,
+          "preferred": false,
+          "preferredBinLocation": {
+            "id": "<masked>"
+          },
+          "product": {
+            "id": "<masked>"
+          },
+          "reorderQuantity": null,
+          "replenishmentLocation": null,
+          "replenishmentPeriodDays": null,
+          "status": null
+        },
+        "inventoryStatus": "IN_STOCK",
+        "monthlyDemand": 0,
+        "product": {
+          "active": true,
+          "category": "Office Supplies",
+          "color": null,
+          "dateCreated": "<masked>",
+          "description": "",
+          "displayNames": {
+            "default": null
+          },
+          "handlingIcons": [],
+          "id": "<masked>",
+          "lastUpdated": "<masked>",
+          "lotAndExpiryControl": false,
+          "name": "Staples 23/13 pack of 1000",
+          "pricePerUnit": 3.0,
+          "productCode": "GT068",
+          "unitOfMeasure": "Each",
+          "updatedBy": "Miss Administrator"
+        },
+        "quantityToOrder": 150,
+        "tags": [
+          {
+            "createdBy": {
+              "id": "<masked>"
+            },
+            "dateCreated": "<masked>",
+            "id": "<masked>",
+            "isActive": true,
+            "lastUpdated": "<masked>",
+            "products": [
+              {
+                "id": "<masked>"
+              },
+              {
+                "id": "<masked>"
+              },
+              {
+                "id": "<masked>"
+              },
+              {
+                "id": "<masked>"
+              }
+            ],
+            "tag": "Mail Room",
+            "updatedBy": {
+              "id": "<masked>"
+            }
+          }
+        ],
+        "unitCost": 3.0
+      },
+      {
+        "expectedReorderCost": 4670.0,
+        "expiredQuantityAvailableToPromise": 0,
+        "finalQuantityAvailableToPromise": 1,
+        "inventoryLevel": {
+          "abcClass": null,
+          "binLocation": null,
+          "comments": null,
+          "dateCreated": "<masked>",
+          "demandTimePeriodDays": null,
+          "expectedLeadTimeDays": null,
+          "forecastPeriodDays": 30.0,
+          "forecastQuantity": null,
+          "id": "<masked>",
+          "internalLocation": null,
+          "inventory": {
+            "id": "<masked>"
+          },
+          "lastUpdated": "<masked>",
+          "maxQuantity": 6,
+          "minQuantity": 2,
+          "preferred": false,
+          "preferredBinLocation": {
+            "id": "<masked>"
+          },
+          "product": {
+            "id": "<masked>"
+          },
+          "reorderQuantity": null,
+          "replenishmentLocation": null,
+          "replenishmentPeriodDays": null,
+          "status": null
+        },
+        "inventoryStatus": "LOW_STOCK",
+        "monthlyDemand": 0,
+        "product": {
+          "active": true,
+          "category": "IT Equipment",
+          "color": null,
+          "dateCreated": "<masked>",
+          "description": "",
+          "displayNames": {
+            "default": null
+          },
+          "handlingIcons": [
+            {
+              "color": "#ffa500",
+              "icon": "fa-exclamation-triangle",
+              "label": "Hazardous material"
+            }
+          ],
+          "id": "<masked>",
+          "lastUpdated": "<masked>",
+          "lotAndExpiryControl": false,
+          "name": "Computer, Desktop, Dell Optiplex 390 SFF",
+          "pricePerUnit": 934.0,
+          "productCode": "PU011",
+          "unitOfMeasure": "Each",
+          "updatedBy": "Miss Administrator"
+        },
+        "quantityToOrder": 5,
+        "tags": [],
+        "unitCost": 934.0
+      },
+      {
+        "expectedReorderCost": 495.0,
+        "expiredQuantityAvailableToPromise": 0,
+        "finalQuantityAvailableToPromise": 1,
+        "inventoryLevel": {
+          "abcClass": null,
+          "binLocation": null,
+          "comments": null,
+          "dateCreated": "<masked>",
+          "demandTimePeriodDays": null,
+          "expectedLeadTimeDays": null,
+          "forecastPeriodDays": 30.0,
+          "forecastQuantity": null,
+          "id": "<masked>",
+          "internalLocation": null,
+          "inventory": {
+            "id": "<masked>"
+          },
+          "lastUpdated": "<masked>",
+          "maxQuantity": 10,
+          "minQuantity": 1,
+          "preferred": false,
+          "preferredBinLocation": {
+            "id": "<masked>"
+          },
+          "product": {
+            "id": "<masked>"
+          },
+          "reorderQuantity": null,
+          "replenishmentLocation": null,
+          "replenishmentPeriodDays": null,
+          "status": null
+        },
+        "inventoryStatus": "LOW_STOCK",
+        "monthlyDemand": 0,
+        "product": {
+          "active": true,
+          "category": "Furniture and Equipment",
+          "color": null,
+          "dateCreated": "<masked>",
+          "description": "",
+          "displayNames": {
+            "default": null
+          },
+          "handlingIcons": [],
+          "id": "<masked>",
+          "lastUpdated": "<masked>",
+          "lotAndExpiryControl": false,
+          "name": "File cabinet, Lateral, 6-drawer",
+          "pricePerUnit": 55.0,
+          "productCode": "UQ102",
+          "unitOfMeasure": "Each",
+          "updatedBy": "Miss Administrator"
+        },
+        "quantityToOrder": 9,
+        "tags": [],
+        "unitCost": 55.0
+      },
+      {
+        "expectedReorderCost": 5399.1,
+        "expiredQuantityAvailableToPromise": 0,
+        "finalQuantityAvailableToPromise": 10,
+        "inventoryLevel": {
+          "abcClass": null,
+          "binLocation": null,
+          "comments": null,
+          "dateCreated": "<masked>",
+          "demandTimePeriodDays": null,
+          "expectedLeadTimeDays": null,
+          "forecastPeriodDays": 30.0,
+          "forecastQuantity": null,
+          "id": "<masked>",
+          "internalLocation": null,
+          "inventory": {
+            "id": "<masked>"
+          },
+          "lastUpdated": "<masked>",
+          "maxQuantity": 100,
+          "minQuantity": 10,
+          "preferred": false,
+          "preferredBinLocation": {
+            "id": "<masked>"
+          },
+          "product": {
+            "id": "<masked>"
+          },
+          "reorderQuantity": null,
+          "replenishmentLocation": null,
+          "replenishmentPeriodDays": null,
+          "status": null
+        },
+        "inventoryStatus": "LOW_STOCK",
+        "monthlyDemand": 0,
+        "product": {
+          "active": true,
+          "category": "IT Equipment",
+          "color": null,
+          "dateCreated": "<masked>",
+          "description": "",
+          "displayNames": {
+            "default": null
+          },
+          "handlingIcons": [],
+          "id": "<masked>",
+          "lastUpdated": "<masked>",
+          "lotAndExpiryControl": false,
+          "name": "Adapter, USB-C Male to HDMI Female",
+          "pricePerUnit": 59.99,
+          "productCode": "GK233",
+          "unitOfMeasure": "Each",
+          "updatedBy": "Miss Administrator"
+        },
+        "quantityToOrder": 90,
+        "tags": [],
+        "unitCost": 59.99
+      },
+      {
+        "expectedReorderCost": 5453.0,
+        "expiredQuantityAvailableToPromise": 0,
+        "finalQuantityAvailableToPromise": 8,
+        "inventoryLevel": {
+          "abcClass": null,
+          "binLocation": null,
+          "comments": null,
+          "dateCreated": "<masked>",
+          "demandTimePeriodDays": null,
+          "expectedLeadTimeDays": null,
+          "forecastPeriodDays": 30.0,
+          "forecastQuantity": null,
+          "id": "<masked>",
+          "internalLocation": null,
+          "inventory": {
+            "id": "<masked>"
+          },
+          "lastUpdated": "<masked>",
+          "maxQuantity": 15,
+          "minQuantity": 5,
+          "preferred": false,
+          "preferredBinLocation": {
+            "id": "<masked>"
+          },
+          "product": {
+            "id": "<masked>"
+          },
+          "reorderQuantity": null,
+          "replenishmentLocation": null,
+          "replenishmentPeriodDays": null,
+          "status": null
+        },
+        "inventoryStatus": "IN_STOCK",
+        "monthlyDemand": 0,
+        "product": {
+          "active": true,
+          "category": "IT Equipment",
+          "color": null,
+          "dateCreated": "<masked>",
+          "description": "",
+          "displayNames": {
+            "default": null
+          },
+          "handlingIcons": [
+            {
+              "color": "#ffa500",
+              "icon": "fa-exclamation-triangle",
+              "label": "Hazardous material"
+            }
+          ],
+          "id": "<masked>",
+          "lastUpdated": "<masked>",
+          "lotAndExpiryControl": false,
+          "name": "Laptop, E490, ThinkPad",
+          "pricePerUnit": 779.0,
+          "productCode": "ZC462",
+          "unitOfMeasure": "Each",
+          "updatedBy": "Miss Administrator"
+        },
+        "quantityToOrder": 7,
+        "tags": [
+          {
+            "createdBy": {
+              "id": "<masked>"
+            },
+            "dateCreated": "<masked>",
+            "id": "<masked>",
+            "isActive": true,
+            "lastUpdated": "<masked>",
+            "products": [
+              {
+                "id": "<masked>"
+              },
+              {
+                "id": "<masked>"
+              },
+              {
+                "id": "<masked>"
+              },
+              {
+                "id": "<masked>"
+              }
+            ],
+            "tag": "New Employee Package",
+            "updatedBy": {
+              "id": "<masked>"
+            }
+          }
+        ],
+        "unitCost": 779.0
+      },
+      {
+        "expectedReorderCost": 61.1,
+        "expiredQuantityAvailableToPromise": 0,
+        "finalQuantityAvailableToPromise": 24,
+        "inventoryLevel": {
+          "abcClass": null,
+          "binLocation": null,
+          "comments": null,
+          "dateCreated": "<masked>",
+          "demandTimePeriodDays": null,
+          "expectedLeadTimeDays": null,
+          "forecastPeriodDays": 30.0,
+          "forecastQuantity": null,
+          "id": "<masked>",
+          "internalLocation": null,
+          "inventory": {
+            "id": "<masked>"
+          },
+          "lastUpdated": "<masked>",
+          "maxQuantity": 50,
+          "minQuantity": 5,
+          "preferred": false,
+          "preferredBinLocation": {
+            "id": "<masked>"
+          },
+          "product": {
+            "id": "<masked>"
+          },
+          "reorderQuantity": null,
+          "replenishmentLocation": null,
+          "replenishmentPeriodDays": null,
+          "status": null
+        },
+        "inventoryStatus": "IN_STOCK",
+        "monthlyDemand": 0,
+        "product": {
+          "active": true,
+          "category": "Lab",
+          "color": null,
+          "dateCreated": "<masked>",
+          "description": "",
+          "displayNames": {
+            "default": null
+          },
+          "handlingIcons": [],
+          "id": "<masked>",
+          "lastUpdated": "<masked>",
+          "lotAndExpiryControl": false,
+          "name": "Beaker, Graduated, Borosilicate glass, 250mL",
+          "pricePerUnit": 2.35,
+          "productCode": "MY523",
+          "unitOfMeasure": "Each",
+          "updatedBy": "Miss Administrator"
+        },
+        "quantityToOrder": 26,
+        "tags": [
+          {
+            "createdBy": {
+              "id": "<masked>"
+            },
+            "dateCreated": "<masked>",
+            "id": "<masked>",
+            "isActive": true,
+            "lastUpdated": "<masked>",
+            "products": [
+              {
+                "id": "<masked>"
+              },
+              {
+                "id": "<masked>"
+              },
+              {
+                "id": "<masked>"
+              },
+              {
+                "id": "<masked>"
+              },
+              {
+                "id": "<masked>"
+              },
+              {
+                "id": "<masked>"
+              },
+              {
+                "id": "<masked>"
+              },
+              {
+                "id": "<masked>"
+              },
+              {
+                "id": "<masked>"
+              },
+              {
+                "id": "<masked>"
+              },
+              {
+                "id": "<masked>"
+              },
+              {
+                "id": "<masked>"
+              },
+              {
+                "id": "<masked>"
+              },
+              {
+                "id": "<masked>"
+              },
+              {
+                "id": "<masked>"
+              }
+            ],
+            "tag": "Tertiary Care",
+            "updatedBy": {
+              "id": "<masked>"
+            }
+          }
+        ],
+        "unitCost": 2.35
+      },
+      {
+        "expectedReorderCost": 6450.0,
+        "expiredQuantityAvailableToPromise": 0,
+        "finalQuantityAvailableToPromise": 500,
+        "inventoryLevel": {
+          "abcClass": null,
+          "binLocation": null,
+          "comments": null,
+          "dateCreated": "<masked>",
+          "demandTimePeriodDays": null,
+          "expectedLeadTimeDays": null,
+          "forecastPeriodDays": 30.0,
+          "forecastQuantity": null,
+          "id": "<masked>",
+          "internalLocation": null,
+          "inventory": {
+            "id": "<masked>"
+          },
+          "lastUpdated": "<masked>",
+          "maxQuantity": 4800,
+          "minQuantity": 480,
+          "preferred": false,
+          "preferredBinLocation": {
+            "id": "<masked>"
+          },
+          "product": {
+            "id": "<masked>"
+          },
+          "reorderQuantity": null,
+          "replenishmentLocation": null,
+          "replenishmentPeriodDays": null,
+          "status": null
+        },
+        "inventoryStatus": "IN_STOCK",
+        "monthlyDemand": 0,
+        "product": {
+          "active": true,
+          "category": "Office Supplies",
+          "color": null,
+          "dateCreated": "<masked>",
+          "description": "",
+          "displayNames": {
+            "default": null
+          },
+          "handlingIcons": [
+            {
+              "color": "#ffa500",
+              "icon": "fa-exclamation-triangle",
+              "label": "Hazardous material"
+            }
+          ],
+          "id": "<masked>",
+          "lastUpdated": "<masked>",
+          "lotAndExpiryControl": false,
+          "name": "Batteries, Non Rechargeable, AAA",
+          "pricePerUnit": 1.5,
+          "productCode": "RU651",
+          "unitOfMeasure": "Each",
+          "updatedBy": "Miss Administrator"
+        },
+        "quantityToOrder": 4300,
+        "tags": [],
+        "unitCost": 1.5
+      },
+      {
+        "expectedReorderCost": 7200.0,
+        "expiredQuantityAvailableToPromise": 0,
+        "finalQuantityAvailableToPromise": 0,
+        "inventoryLevel": {
+          "abcClass": null,
+          "binLocation": null,
+          "comments": null,
+          "dateCreated": "<masked>",
+          "demandTimePeriodDays": null,
+          "expectedLeadTimeDays": null,
+          "forecastPeriodDays": 30.0,
+          "forecastQuantity": null,
+          "id": "<masked>",
+          "internalLocation": null,
+          "inventory": {
+            "id": "<masked>"
+          },
+          "lastUpdated": "<masked>",
+          "maxQuantity": 4800,
+          "minQuantity": 480,
+          "preferred": false,
+          "preferredBinLocation": {
+            "id": "<masked>"
+          },
+          "product": {
+            "id": "<masked>"
+          },
+          "reorderQuantity": null,
+          "replenishmentLocation": null,
+          "replenishmentPeriodDays": null,
+          "status": null
+        },
+        "inventoryStatus": "STOCK_OUT",
+        "monthlyDemand": 0,
+        "product": {
+          "active": true,
+          "category": "Office Supplies",
+          "color": null,
+          "dateCreated": "<masked>",
+          "description": "",
+          "displayNames": {
+            "default": null
+          },
+          "handlingIcons": [
+            {
+              "color": "#ffa500",
+              "icon": "fa-exclamation-triangle",
+              "label": "Hazardous material"
+            }
+          ],
+          "id": "<masked>",
+          "lastUpdated": "<masked>",
+          "lotAndExpiryControl": false,
+          "name": "Batteries, Non Rechargeable, AA",
+          "pricePerUnit": 1.5,
+          "productCode": "XJ173",
+          "unitOfMeasure": "Each",
+          "updatedBy": "Miss Administrator"
+        },
+        "quantityToOrder": 4800,
+        "tags": [],
+        "unitCost": 1.5
+      },
+      {
+        "expectedReorderCost": 85.0,
+        "expiredQuantityAvailableToPromise": 0,
+        "finalQuantityAvailableToPromise": 1500,
+        "inventoryLevel": {
+          "abcClass": null,
+          "binLocation": null,
+          "comments": null,
+          "dateCreated": "<masked>",
+          "demandTimePeriodDays": null,
+          "expectedLeadTimeDays": null,
+          "forecastPeriodDays": 30.0,
+          "forecastQuantity": null,
+          "id": "<masked>",
+          "internalLocation": null,
+          "inventory": {
+            "id": "<masked>"
+          },
+          "lastUpdated": "<masked>",
+          "maxQuantity": 10000,
+          "minQuantity": 1000,
+          "preferred": false,
+          "preferredBinLocation": {
+            "id": "<masked>"
+          },
+          "product": {
+            "id": "<masked>"
+          },
+          "reorderQuantity": null,
+          "replenishmentLocation": null,
+          "replenishmentPeriodDays": null,
+          "status": null
+        },
+        "inventoryStatus": "IN_STOCK",
+        "monthlyDemand": 0,
+        "product": {
+          "active": true,
+          "category": "Office Supplies",
+          "color": null,
+          "dateCreated": "<masked>",
+          "description": "",
+          "displayNames": {
+            "default": null
+          },
+          "handlingIcons": [],
+          "id": "<masked>",
+          "lastUpdated": "<masked>",
+          "lotAndExpiryControl": false,
+          "name": "Envelope, A3, White",
+          "pricePerUnit": 0.01,
+          "productCode": "DD108",
+          "unitOfMeasure": "Each",
+          "updatedBy": "Miss Administrator"
+        },
+        "quantityToOrder": 8500,
+        "tags": [
+          {
+            "createdBy": {
+              "id": "<masked>"
+            },
+            "dateCreated": "<masked>",
+            "id": "<masked>",
+            "isActive": true,
+            "lastUpdated": "<masked>",
+            "products": [
+              {
+                "id": "<masked>"
+              },
+              {
+                "id": "<masked>"
+              },
+              {
+                "id": "<masked>"
+              },
+              {
+                "id": "<masked>"
+              }
+            ],
+            "tag": "Mail Room",
+            "updatedBy": {
+              "id": "<masked>"
+            }
+          }
+        ],
+        "unitCost": 0.01
+      },
+      {
+        "expectedReorderCost": 8794.3,
+        "expiredQuantityAvailableToPromise": 0,
+        "finalQuantityAvailableToPromise": 5,
+        "inventoryLevel": {
+          "abcClass": null,
+          "binLocation": null,
+          "comments": null,
+          "dateCreated": "<masked>",
+          "demandTimePeriodDays": null,
+          "expectedLeadTimeDays": null,
+          "forecastPeriodDays": 30.0,
+          "forecastQuantity": null,
+          "id": "<masked>",
+          "internalLocation": null,
+          "inventory": {
+            "id": "<masked>"
+          },
+          "lastUpdated": "<masked>",
+          "maxQuantity": 15,
+          "minQuantity": 5,
+          "preferred": false,
+          "preferredBinLocation": {
+            "id": "<masked>"
+          },
+          "product": {
+            "id": "<masked>"
+          },
+          "reorderQuantity": null,
+          "replenishmentLocation": null,
+          "replenishmentPeriodDays": null,
+          "status": null
+        },
+        "inventoryStatus": "LOW_STOCK",
+        "monthlyDemand": 0,
+        "product": {
+          "active": true,
+          "category": "IT Equipment",
+          "color": null,
+          "dateCreated": "<masked>",
+          "description": "",
+          "displayNames": {
+            "default": null
+          },
+          "handlingIcons": [
+            {
+              "color": "#ffa500",
+              "icon": "fa-exclamation-triangle",
+              "label": "Hazardous material"
+            }
+          ],
+          "id": "<masked>",
+          "lastUpdated": "<masked>",
+          "lotAndExpiryControl": false,
+          "name": "Laptop, Dell Inspiron, T8TJG",
+          "pricePerUnit": 879.43,
+          "productCode": "ZZ113",
+          "unitOfMeasure": "Each",
+          "updatedBy": "Miss Administrator"
+        },
+        "quantityToOrder": 10,
+        "tags": [],
+        "unitCost": 879.43
+      },
+      {
+        "expectedReorderCost": 90.0,
+        "expiredQuantityAvailableToPromise": 0,
+        "finalQuantityAvailableToPromise": 1000,
+        "inventoryLevel": {
+          "abcClass": null,
+          "binLocation": null,
+          "comments": null,
+          "dateCreated": "<masked>",
+          "demandTimePeriodDays": null,
+          "expectedLeadTimeDays": null,
+          "forecastPeriodDays": 30.0,
+          "forecastQuantity": null,
+          "id": "<masked>",
+          "internalLocation": null,
+          "inventory": {
+            "id": "<masked>"
+          },
+          "lastUpdated": "<masked>",
+          "maxQuantity": 10000,
+          "minQuantity": 1000,
+          "preferred": false,
+          "preferredBinLocation": {
+            "id": "<masked>"
+          },
+          "product": {
+            "id": "<masked>"
+          },
+          "reorderQuantity": null,
+          "replenishmentLocation": null,
+          "replenishmentPeriodDays": null,
+          "status": null
+        },
+        "inventoryStatus": "LOW_STOCK",
+        "monthlyDemand": 0,
+        "product": {
+          "active": true,
+          "category": "Office Supplies",
+          "color": null,
+          "dateCreated": "<masked>",
+          "description": "",
+          "displayNames": {
+            "default": null
+          },
+          "handlingIcons": [],
+          "id": "<masked>",
+          "lastUpdated": "<masked>",
+          "lotAndExpiryControl": false,
+          "name": "Envelope, A3, Manila",
+          "pricePerUnit": 0.01,
+          "productCode": "FF240",
+          "unitOfMeasure": "Each",
+          "updatedBy": "Miss Administrator"
+        },
+        "quantityToOrder": 9000,
+        "tags": [
+          {
+            "createdBy": {
+              "id": "<masked>"
+            },
+            "dateCreated": "<masked>",
+            "id": "<masked>",
+            "isActive": true,
+            "lastUpdated": "<masked>",
+            "products": [
+              {
+                "id": "<masked>"
+              },
+              {
+                "id": "<masked>"
+              },
+              {
+                "id": "<masked>"
+              },
+              {
+                "id": "<masked>"
+              }
+            ],
+            "tag": "Mail Room",
+            "updatedBy": {
+              "id": "<masked>"
+            }
+          }
+        ],
+        "unitCost": 0.01
+      },
+      {
+        "expectedReorderCost": 976.0,
+        "expiredQuantityAvailableToPromise": 0,
+        "finalQuantityAvailableToPromise": 4,
+        "inventoryLevel": {
+          "abcClass": null,
+          "binLocation": null,
+          "comments": null,
+          "dateCreated": "<masked>",
+          "demandTimePeriodDays": null,
+          "expectedLeadTimeDays": null,
+          "forecastPeriodDays": 30.0,
+          "forecastQuantity": null,
+          "id": "<masked>",
+          "internalLocation": null,
+          "inventory": {
+            "id": "<masked>"
+          },
+          "lastUpdated": "<masked>",
+          "maxQuantity": 20,
+          "minQuantity": 2,
+          "preferred": false,
+          "preferredBinLocation": {
+            "id": "<masked>"
+          },
+          "product": {
+            "id": "<masked>"
+          },
+          "reorderQuantity": null,
+          "replenishmentLocation": null,
+          "replenishmentPeriodDays": null,
+          "status": null
+        },
+        "inventoryStatus": "IN_STOCK",
+        "monthlyDemand": 0,
+        "product": {
+          "active": true,
+          "category": "IT Equipment",
+          "color": null,
+          "dateCreated": "<masked>",
+          "description": "",
+          "displayNames": {
+            "default": null
+          },
+          "handlingIcons": [
+            {
+              "color": "#ffa500",
+              "icon": "fa-exclamation-triangle",
+              "label": "Hazardous material"
+            }
+          ],
+          "id": "<masked>",
+          "lastUpdated": "<masked>",
+          "lotAndExpiryControl": false,
+          "name": "Battery, for canon LP-E6N",
+          "pricePerUnit": 61.0,
+          "productCode": "QA069",
+          "unitOfMeasure": "Each",
+          "updatedBy": "Miss Administrator"
+        },
+        "quantityToOrder": 16,
+        "tags": [],
+        "unitCost": 61.0
+      },
+      {
+        "expectedReorderCost": null,
+        "expiredQuantityAvailableToPromise": 0,
+        "finalQuantityAvailableToPromise": 0,
+        "inventoryLevel": null,
+        "inventoryStatus": "STOCK_OUT",
+        "monthlyDemand": 0,
+        "product": {
+          "active": true,
+          "category": "Furniture and Equipment",
+          "color": null,
+          "dateCreated": "<masked>",
+          "description": "",
+          "displayNames": {
+            "default": null
+          },
+          "handlingIcons": [],
+          "id": "<masked>",
+          "lastUpdated": "<masked>",
+          "lotAndExpiryControl": false,
+          "name": "Desk, Office, Wooden or metal",
+          "pricePerUnit": 250.0,
+          "productCode": "SZ449",
+          "unitOfMeasure": "Each",
+          "updatedBy": "Miss Administrator"
+        },
+        "quantityToOrder": null,
+        "tags": [],
+        "unitCost": 250.0
+      },
+      {
+        "expectedReorderCost": null,
+        "expiredQuantityAvailableToPromise": 0,
+        "finalQuantityAvailableToPromise": 0,
+        "inventoryLevel": null,
+        "inventoryStatus": "STOCK_OUT",
+        "monthlyDemand": 0,
+        "product": {
+          "active": true,
+          "category": "IT Equipment",
+          "color": null,
+          "dateCreated": "<masked>",
+          "description": "",
+          "displayNames": {
+            "default": null
+          },
+          "handlingIcons": [],
+          "id": "<masked>",
+          "lastUpdated": "<masked>",
+          "lotAndExpiryControl": false,
+          "name": "Printer, Multi-function, Scanner, HP MFP 426A",
+          "pricePerUnit": 795.3,
+          "productCode": "UM228",
+          "unitOfMeasure": "Each",
+          "updatedBy": "Miss Administrator"
+        },
+        "quantityToOrder": null,
+        "tags": [],
+        "unitCost": 795.3
+      },
+      {
+        "expectedReorderCost": null,
+        "expiredQuantityAvailableToPromise": 0,
+        "finalQuantityAvailableToPromise": 1,
+        "inventoryLevel": null,
+        "inventoryStatus": "IN_STOCK",
+        "monthlyDemand": 0,
+        "product": {
+          "active": true,
+          "category": "IT Equipment",
+          "color": null,
+          "dateCreated": "<masked>",
+          "description": "",
+          "displayNames": {
+            "default": null
+          },
+          "handlingIcons": [],
+          "id": "<masked>",
+          "lastUpdated": "<masked>",
+          "lotAndExpiryControl": false,
+          "name": "Printer, Multifunction, Color, HP Inkjet PageWide Pro 477dw",
+          "pricePerUnit": 1229.0,
+          "productCode": "VX576",
+          "unitOfMeasure": "Each",
+          "updatedBy": "Miss Administrator"
+        },
+        "quantityToOrder": null,
+        "tags": [],
+        "unitCost": 1229.0
+      },
+      {
+        "expectedReorderCost": null,
+        "expiredQuantityAvailableToPromise": 0,
+        "finalQuantityAvailableToPromise": 2,
+        "inventoryLevel": null,
+        "inventoryStatus": "IN_STOCK",
+        "monthlyDemand": 0,
+        "product": {
+          "active": true,
+          "category": "IT Equipment",
+          "color": null,
+          "dateCreated": "<masked>",
+          "description": "",
+          "displayNames": {
+            "default": null
+          },
+          "handlingIcons": [],
+          "id": "<masked>",
+          "lastUpdated": "<masked>",
+          "lotAndExpiryControl": false,
+          "name": "Camera, 600EXII-RT, Canon",
+          "pricePerUnit": 475.0,
+          "productCode": "JG794",
+          "unitOfMeasure": "Each",
+          "updatedBy": "Miss Administrator"
+        },
+        "quantityToOrder": null,
+        "tags": [],
+        "unitCost": 475.0
+      },
+      {
+        "expectedReorderCost": null,
+        "expiredQuantityAvailableToPromise": 0,
+        "finalQuantityAvailableToPromise": 3,
+        "inventoryLevel": null,
+        "inventoryStatus": "IN_STOCK",
+        "monthlyDemand": 0,
+        "product": {
+          "active": true,
+          "category": "IT Equipment",
+          "color": null,
+          "dateCreated": "<masked>",
+          "description": "",
+          "displayNames": {
+            "default": null
+          },
+          "handlingIcons": [],
+          "id": "<masked>",
+          "lastUpdated": "<masked>",
+          "lotAndExpiryControl": false,
+          "name": "Camera, Canon, EOS 80D, with 18-55mm lens, with accessories",
+          "pricePerUnit": 1199.0,
+          "productCode": "PU084",
+          "unitOfMeasure": "Each",
+          "updatedBy": "Miss Administrator"
+        },
+        "quantityToOrder": null,
+        "tags": [],
+        "unitCost": 1199.0
+      }
+    ]
+  },
+  "contentType": "application/json",
+  "request": {
+    "method": "GET",
+    "params": {
+      "max": "10",
+      "offset": "0"
+    },
+    "path": "/api/facilities/1/inventories/reorderReport"
+  },
+  "status": 200
+}

@@ -1,0 +1,15 @@
+{
+  "body": {
+    "data": {
+      "activeLanguage": "en",
+      "activeLanguageTag": "en"
+    }
+  },
+  "contentType": "application/json",
+  "request": {
+    "method": "GET",
+    "params": {},
+    "path": "/api/chooseLocale/en"
+  },
+  "status": 200
+}

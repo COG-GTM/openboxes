@@ -1,0 +1,611 @@
+{
+  "body": {
+    "data": [
+      {
+        "active": true,
+        "address": {
+          "address": "",
+          "address2": "",
+          "city": "",
+          "country": "",
+          "description": "",
+          "postalCode": "",
+          "stateOrProvince": ""
+        },
+        "backgroundColor": "FFFFFF",
+        "description": null,
+        "hasBinLocationSupport": true,
+        "hasCentralPurchasingEnabled": false,
+        "hasPackingSupport": false,
+        "hasPartialReceivingSupport": false,
+        "id": "<masked>",
+        "locationGroup": null,
+        "locationNumber": "BOS-1-1",
+        "locationType": {
+          "description": "Default bin location type",
+          "id": "<masked>",
+          "locationTypeCode": "BIN_LOCATION",
+          "name": "Bin Location"
+        },
+        "manager": null,
+        "name": "RACK1-SHELF1",
+        "organization": null,
+        "organizationCode": null,
+        "organizationName": null,
+        "parentLocation": {
+          "active": true,
+          "address": {
+            "address": "300 Apple St",
+            "address2": "",
+            "city": "Boston",
+            "country": "USA",
+            "description": "",
+            "postalCode": "54888",
+            "stateOrProvince": "MA"
+          },
+          "backgroundColor": "FFFFFF",
+          "description": null,
+          "hasBinLocationSupport": true,
+          "hasCentralPurchasingEnabled": false,
+          "hasPackingSupport": false,
+          "hasPartialReceivingSupport": false,
+          "id": "<masked>",
+          "locationGroup": {
+            "id": "<masked>",
+            "name": "NorthEast"
+          },
+          "locationNumber": "BOSW",
+          "locationType": {
+            "description": "Depot",
+            "id": "<masked>",
+            "locationTypeCode": "DEPOT",
+            "name": "Depot"
+          },
+          "manager": null,
+          "name": "Boston Warehouse",
+          "organization": {
+            "code": "MO-<seq>",
+            "dateCreated": "<masked>",
+            "defaultLocation": null,
+            "description": null,
+            "displayName": "MO-<seq> - My Organization",
+            "id": "<masked>",
+            "lastUpdated": "<masked>",
+            "name": "My Organization",
+            "partyType": {
+              "code": "ORG",
+              "id": "<masked>",
+              "name": "Organization",
+              "partyTypeCode": "ORGANIZATION"
+            },
+            "roles": [
+              {
+                "endDate": null,
+                "id": "<masked>",
+                "roleType": "ROLE_BUYER",
+                "startDate": null
+              }
+            ],
+            "sequences": {}
+          },
+          "organizationCode": "<masked>",
+          "organizationName": "My Organization",
+          "parentLocation": null,
+          "sortOrder": null,
+          "supportedActivities": [
+            "ADJUST_INVENTORY",
+            "ENABLE_FULFILLER_APPROVAL_NOTIFICATIONS",
+            "ENABLE_REQUESTOR_APPROVAL_NOTIFICATIONS",
+            "EXTERNAL",
+            "FULFILL_REQUEST",
+            "MANAGE_INVENTORY",
+            "PICK_STOCK",
+            "PLACE_ORDER",
+            "PLACE_REQUEST",
+            "PUTAWAY_STOCK",
+            "RECEIVE_STOCK",
+            "SEND_STOCK",
+            "SUBMIT_REQUEST"
+          ],
+          "zoneId": null,
+          "zoneName": null
+        },
+        "sortOrder": null,
+        "supportedActivities": [
+          "PICK_STOCK",
+          "PUTAWAY_STOCK"
+        ],
+        "zoneId": null,
+        "zoneName": null
+      },
+      {
+        "active": true,
+        "address": {
+          "address": "",
+          "address2": "",
+          "city": "",
+          "country": "",
+          "description": "",
+          "postalCode": "",
+          "stateOrProvince": ""
+        },
+        "backgroundColor": "FFFFFF",
+        "description": null,
+        "hasBinLocationSupport": true,
+        "hasCentralPurchasingEnabled": false,
+        "hasPackingSupport": false,
+        "hasPartialReceivingSupport": false,
+        "id": "<masked>",
+        "locationGroup": null,
+        "locationNumber": "BOS-COLD",
+        "locationType": {
+          "description": "Default bin location type",
+          "id": "<masked>",
+          "locationTypeCode": "BIN_LOCATION",
+          "name": "Bin Location"
+        },
+        "manager": null,
+        "name": "COLD ROOM",
+        "organization": null,
+        "organizationCode": null,
+        "organizationName": null,
+        "parentLocation": {
+          "active": true,
+          "address": {
+            "address": "300 Apple St",
+            "address2": "",
+            "city": "Boston",
+            "country": "USA",
+            "description": "",
+            "postalCode": "54888",
+            "stateOrProvince": "MA"
+          },
+          "backgroundColor": "FFFFFF",
+          "description": null,
+          "hasBinLocationSupport": true,
+          "hasCentralPurchasingEnabled": false,
+          "hasPackingSupport": false,
+          "hasPartialReceivingSupport": false,
+          "id": "<masked>",
+          "locationGroup": {
+            "id": "<masked>",
+            "name": "NorthEast"
+          },
+          "locationNumber": "BOSW",
+          "locationType": {
+            "description": "Depot",
+            "id": "<masked>",
+            "locationTypeCode": "DEPOT",
+            "name": "Depot"
+          },
+          "manager": null,
+          "name": "Boston Warehouse",
+          "organization": {
+            "code": "MO-<seq>",
+            "dateCreated": "<masked>",
+            "defaultLocation": null,
+            "description": null,
+            "displayName": "MO-<seq> - My Organization",
+            "id": "<masked>",
+            "lastUpdated": "<masked>",
+            "name": "My Organization",
+            "partyType": {
+              "code": "ORG",
+              "id": "<masked>",
+              "name": "Organization",
+              "partyTypeCode": "ORGANIZATION"
+            },
+            "roles": [
+              {
+                "endDate": null,
+                "id": "<masked>",
+                "roleType": "ROLE_BUYER",
+                "startDate": null
+              }
+            ],
+            "sequences": {}
+          },
+          "organizationCode": "<masked>",
+          "organizationName": "My Organization",
+          "parentLocation": null,
+          "sortOrder": null,
+          "supportedActivities": [
+            "ADJUST_INVENTORY",
+            "ENABLE_FULFILLER_APPROVAL_NOTIFICATIONS",
+            "ENABLE_REQUESTOR_APPROVAL_NOTIFICATIONS",
+            "EXTERNAL",
+            "FULFILL_REQUEST",
+            "MANAGE_INVENTORY",
+            "PICK_STOCK",
+            "PLACE_ORDER",
+            "PLACE_REQUEST",
+            "PUTAWAY_STOCK",
+            "RECEIVE_STOCK",
+            "SEND_STOCK",
+            "SUBMIT_REQUEST"
+          ],
+          "zoneId": null,
+          "zoneName": null
+        },
+        "sortOrder": null,
+        "supportedActivities": [
+          "PICK_STOCK",
+          "PUTAWAY_STOCK"
+        ],
+        "zoneId": null,
+        "zoneName": null
+      },
+      {
+        "active": true,
+        "address": {
+          "address": "",
+          "address2": "",
+          "city": "",
+          "country": "",
+          "description": "",
+          "postalCode": "",
+          "stateOrProvince": ""
+        },
+        "backgroundColor": "FFFFFF",
+        "description": null,
+        "hasBinLocationSupport": true,
+        "hasCentralPurchasingEnabled": false,
+        "hasPackingSupport": false,
+        "hasPartialReceivingSupport": false,
+        "id": "<masked>",
+        "locationGroup": null,
+        "locationNumber": "CHI-1-1-1",
+        "locationType": {
+          "description": "Default bin location type",
+          "id": "<masked>",
+          "locationTypeCode": "BIN_LOCATION",
+          "name": "Bin Location"
+        },
+        "manager": null,
+        "name": "RACK1-SHELF1",
+        "organization": null,
+        "organizationCode": null,
+        "organizationName": null,
+        "parentLocation": {
+          "active": true,
+          "address": {
+            "address": "150 Hatfield ct",
+            "address2": "Doors 2-4",
+            "city": "Chicago",
+            "country": "USA",
+            "description": "",
+            "postalCode": "75898",
+            "stateOrProvince": "IL"
+          },
+          "backgroundColor": "FFFFFF",
+          "description": null,
+          "hasBinLocationSupport": true,
+          "hasCentralPurchasingEnabled": false,
+          "hasPackingSupport": false,
+          "hasPartialReceivingSupport": false,
+          "id": "<masked>",
+          "locationGroup": {
+            "id": "<masked>",
+            "name": "MidWest"
+          },
+          "locationNumber": "CHIW",
+          "locationType": {
+            "description": "Depot",
+            "id": "<masked>",
+            "locationTypeCode": "DEPOT",
+            "name": "Depot"
+          },
+          "manager": null,
+          "name": "Chicago Warehouse",
+          "organization": {
+            "code": "MO-<seq>",
+            "dateCreated": "<masked>",
+            "defaultLocation": null,
+            "description": null,
+            "displayName": "MO-<seq> - My Organization",
+            "id": "<masked>",
+            "lastUpdated": "<masked>",
+            "name": "My Organization",
+            "partyType": {
+              "code": "ORG",
+              "id": "<masked>",
+              "name": "Organization",
+              "partyTypeCode": "ORGANIZATION"
+            },
+            "roles": [
+              {
+                "endDate": null,
+                "id": "<masked>",
+                "roleType": "ROLE_BUYER",
+                "startDate": null
+              }
+            ],
+            "sequences": {}
+          },
+          "organizationCode": "<masked>",
+          "organizationName": "My Organization",
+          "parentLocation": null,
+          "sortOrder": null,
+          "supportedActivities": [
+            "ADJUST_INVENTORY",
+            "ENABLE_FULFILLER_APPROVAL_NOTIFICATIONS",
+            "ENABLE_REQUESTOR_APPROVAL_NOTIFICATIONS",
+            "EXTERNAL",
+            "FULFILL_REQUEST",
+            "MANAGE_INVENTORY",
+            "PICK_STOCK",
+            "PLACE_ORDER",
+            "PLACE_REQUEST",
+            "PUTAWAY_STOCK",
+            "RECEIVE_STOCK",
+            "SEND_STOCK",
+            "SUBMIT_REQUEST"
+          ],
+          "zoneId": null,
+          "zoneName": null
+        },
+        "sortOrder": null,
+        "supportedActivities": [
+          "PICK_STOCK",
+          "PUTAWAY_STOCK"
+        ],
+        "zoneId": null,
+        "zoneName": null
+      },
+      {
+        "active": true,
+        "address": {
+          "address": "",
+          "address2": "",
+          "city": "",
+          "country": "",
+          "description": "",
+          "postalCode": "",
+          "stateOrProvince": ""
+        },
+        "backgroundColor": "FFFFFF",
+        "description": null,
+        "hasBinLocationSupport": true,
+        "hasCentralPurchasingEnabled": false,
+        "hasPackingSupport": false,
+        "hasPartialReceivingSupport": false,
+        "id": "<masked>",
+        "locationGroup": null,
+        "locationNumber": "CHI-COLD",
+        "locationType": {
+          "description": "Default bin location type",
+          "id": "<masked>",
+          "locationTypeCode": "BIN_LOCATION",
+          "name": "Bin Location"
+        },
+        "manager": null,
+        "name": "COLD ROOM",
+        "organization": null,
+        "organizationCode": null,
+        "organizationName": null,
+        "parentLocation": {
+          "active": true,
+          "address": {
+            "address": "150 Hatfield ct",
+            "address2": "Doors 2-4",
+            "city": "Chicago",
+            "country": "USA",
+            "description": "",
+            "postalCode": "75898",
+            "stateOrProvince": "IL"
+          },
+          "backgroundColor": "FFFFFF",
+          "description": null,
+          "hasBinLocationSupport": true,
+          "hasCentralPurchasingEnabled": false,
+          "hasPackingSupport": false,
+          "hasPartialReceivingSupport": false,
+          "id": "<masked>",
+          "locationGroup": {
+            "id": "<masked>",
+            "name": "MidWest"
+          },
+          "locationNumber": "CHIW",
+          "locationType": {
+            "description": "Depot",
+            "id": "<masked>",
+            "locationTypeCode": "DEPOT",
+            "name": "Depot"
+          },
+          "manager": null,
+          "name": "Chicago Warehouse",
+          "organization": {
+            "code": "MO-<seq>",
+            "dateCreated": "<masked>",
+            "defaultLocation": null,
+            "description": null,
+            "displayName": "MO-<seq> - My Organization",
+            "id": "<masked>",
+            "lastUpdated": "<masked>",
+            "name": "My Organization",
+            "partyType": {
+              "code": "ORG",
+              "id": "<masked>",
+              "name": "Organization",
+              "partyTypeCode": "ORGANIZATION"
+            },
+            "roles": [
+              {
+                "endDate": null,
+                "id": "<masked>",
+                "roleType": "ROLE_BUYER",
+                "startDate": null
+              }
+            ],
+            "sequences": {}
+          },
+          "organizationCode": "<masked>",
+          "organizationName": "My Organization",
+          "parentLocation": null,
+          "sortOrder": null,
+          "supportedActivities": [
+            "ADJUST_INVENTORY",
+            "ENABLE_FULFILLER_APPROVAL_NOTIFICATIONS",
+            "ENABLE_REQUESTOR_APPROVAL_NOTIFICATIONS",
+            "EXTERNAL",
+            "FULFILL_REQUEST",
+            "MANAGE_INVENTORY",
+            "PICK_STOCK",
+            "PLACE_ORDER",
+            "PLACE_REQUEST",
+            "PUTAWAY_STOCK",
+            "RECEIVE_STOCK",
+            "SEND_STOCK",
+            "SUBMIT_REQUEST"
+          ],
+          "zoneId": null,
+          "zoneName": null
+        },
+        "sortOrder": null,
+        "supportedActivities": [
+          "PICK_STOCK",
+          "PUTAWAY_STOCK"
+        ],
+        "zoneId": null,
+        "zoneName": null
+      },
+      {
+        "active": true,
+        "address": {
+          "address": "",
+          "address2": "",
+          "city": "",
+          "country": "",
+          "description": "",
+          "postalCode": "",
+          "stateOrProvince": ""
+        },
+        "backgroundColor": "FFFFFF",
+        "description": null,
+        "hasBinLocationSupport": true,
+        "hasCentralPurchasingEnabled": false,
+        "hasPackingSupport": false,
+        "hasPartialReceivingSupport": false,
+        "id": "<masked>",
+        "locationGroup": null,
+        "locationNumber": "MW-COLD",
+        "locationType": {
+          "description": "Default bin location type",
+          "id": "<masked>",
+          "locationTypeCode": "BIN_LOCATION",
+          "name": "Bin Location"
+        },
+        "manager": null,
+        "name": "COLD ROOM",
+        "organization": null,
+        "organizationCode": null,
+        "organizationName": null,
+        "parentLocation": {
+          "active": true,
+          "address": {
+            "address": "888 Commonwealth Avenue",
+            "address2": "Third Floor",
+            "city": "Boston",
+            "country": "United States",
+            "description": null,
+            "postalCode": "02215",
+            "stateOrProvince": "MA"
+          },
+          "backgroundColor": "FFFFFF",
+          "description": null,
+          "hasBinLocationSupport": true,
+          "hasCentralPurchasingEnabled": false,
+          "hasPackingSupport": false,
+          "hasPartialReceivingSupport": false,
+          "id": "<masked>",
+          "locationGroup": null,
+          "locationNumber": null,
+          "locationType": {
+            "description": "Depot",
+            "id": "<masked>",
+            "locationTypeCode": "DEPOT",
+            "name": "Depot"
+          },
+          "manager": {
+            "email": "admin@admin.com",
+            "firstName": "Miss",
+            "id": "<masked>",
+            "lastName": "Administrator",
+            "name": "Miss Administrator",
+            "roles": [
+              "ROLE_FINANCE",
+              "ROLE_PRODUCT_NOTIFICATION",
+              "ROLE_SHIPMENT_NOTIFICATION",
+              "ROLE_SUPERUSER"
+            ],
+            "username": "admin"
+          },
+          "name": "Main Warehouse",
+          "organization": {
+            "code": "MO",
+            "dateCreated": "<masked>",
+            "defaultLocation": null,
+            "description": null,
+            "displayName": "MO - Main Organization",
+            "id": "<masked>",
+            "lastUpdated": "<masked>",
+            "name": "Main Organization",
+            "partyType": {
+              "code": "ORG",
+              "id": "<masked>",
+              "name": "Organization",
+              "partyTypeCode": "ORGANIZATION"
+            },
+            "roles": [
+              {
+                "endDate": null,
+                "id": "<masked>",
+                "roleType": "ROLE_ORGANIZATION",
+                "startDate": null
+              }
+            ],
+            "sequences": {}
+          },
+          "organizationCode": "<masked>",
+          "organizationName": "Main Organization",
+          "parentLocation": null,
+          "sortOrder": "<masked>",
+          "supportedActivities": [
+            "ADJUST_INVENTORY",
+            "ENABLE_FULFILLER_APPROVAL_NOTIFICATIONS",
+            "ENABLE_REQUESTOR_APPROVAL_NOTIFICATIONS",
+            "EXTERNAL",
+            "FULFILL_REQUEST",
+            "MANAGE_INVENTORY",
+            "PICK_STOCK",
+            "PLACE_ORDER",
+            "PLACE_REQUEST",
+            "PUTAWAY_STOCK",
+            "RECEIVE_STOCK",
+            "SEND_STOCK",
+            "SUBMIT_REQUEST"
+          ],
+          "zoneId": null,
+          "zoneName": null
+        },
+        "sortOrder": null,
+        "supportedActivities": [
+          "PICK_STOCK",
+          "PUTAWAY_STOCK"
+        ],
+        "zoneId": null,
+        "zoneName": null
+      }
+    ],
+    "totalCount": 40
+  },
+  "contentType": "application/json",
+  "request": {
+    "method": "GET",
+    "params": {
+      "max": "5"
+    },
+    "path": "/api/internalLocations/search"
+  },
+  "status": 200
+}

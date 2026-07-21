@@ -1,0 +1,83 @@
+{
+  "body": {
+    "data": {
+      "colorNumber": null,
+      "datasets": [
+        {
+          "data": [
+            0,
+            0,
+            0,
+            0,
+            0,
+            0
+          ],
+          "label": "Inventory value expired last day of month",
+          "links": null,
+          "type": "bar",
+          "yAxisID": null
+        },
+        {
+          "data": [
+            0,
+            0,
+            0,
+            0,
+            0,
+            0
+          ],
+          "label": "Inventory value not expired last day of month",
+          "links": null,
+          "type": "bar",
+          "yAxisID": null
+        },
+        {
+          "data": [
+            0,
+            0,
+            0,
+            0,
+            0,
+            0
+          ],
+          "label": "Inventory value removed due to expiry",
+          "links": null,
+          "type": "bar",
+          "yAxisID": null
+        },
+        {
+          "data": [
+            0,
+            0,
+            0,
+            0,
+            0,
+            0
+          ],
+          "label": "Percentage removed due to expiry",
+          "links": null,
+          "type": "line",
+          "yAxisID": null
+        }
+      ],
+      "labels": [
+        "<date>",
+        "<date>",
+        "<date>",
+        "<date>",
+        "<date>",
+        "<date>"
+      ]
+    },
+    "link": null
+  },
+  "contentType": "application/json",
+  "request": {
+    "method": "GET",
+    "params": {
+      "locationId": "1"
+    },
+    "path": "/api/dashboard/lossCausedByExpiry"
+  },
+  "status": 200
+}

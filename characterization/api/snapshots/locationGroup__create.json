@@ -1,0 +1,14 @@
+{
+  "body": {
+    "data": {
+      "id": "<masked>"
+    }
+  },
+  "contentType": "application/json",
+  "request": {
+    "method": "POST",
+    "params": {},
+    "path": "/api/locationGroups"
+  },
+  "status": 200
+}

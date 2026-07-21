@@ -1,0 +1,603 @@
+{
+  "body": {
+    "data": {
+      "menuConfig": [
+        {
+          "href": "/openboxes/dashboard/index",
+          "id": "<masked>",
+          "label": "Dashboard"
+        },
+        {
+          "id": "<masked>",
+          "label": "Configuration",
+          "subsections": [
+            {
+              "label": "Administration",
+              "menuItems": [
+                {
+                  "href": "/openboxes/admin/cache",
+                  "label": "Cache"
+                },
+                {
+                  "href": "/openboxes/admin/sendMail",
+                  "label": "Email"
+                },
+                {
+                  "href": "/openboxes/admin/showSettings",
+                  "label": "Settings"
+                },
+                {
+                  "href": "/openboxes/batch/importData",
+                  "label": "Data Import"
+                },
+                {
+                  "href": "/openboxes/console/index",
+                  "label": "Console"
+                },
+                {
+                  "href": "/openboxes/localization/list",
+                  "label": "Localization"
+                },
+                {
+                  "href": "/openboxes/migration/index",
+                  "label": "Data Migration"
+                }
+              ]
+            },
+            {
+              "label": "Locations",
+              "menuItems": [
+                {
+                  "href": "/openboxes/location/list",
+                  "label": "Locations"
+                },
+                {
+                  "href": "/openboxes/locationGroup/list",
+                  "label": "Location groups"
+                },
+                {
+                  "href": "/openboxes/locationType/list",
+                  "label": "Location Types"
+                },
+                {
+                  "href": "/openboxes/organization/list",
+                  "label": "Organizations"
+                },
+                {
+                  "href": "/openboxes/partyRole/list",
+                  "label": "Party roles"
+                },
+                {
+                  "href": "/openboxes/partyType/list",
+                  "label": "Party types"
+                },
+                {
+                  "href": "/openboxes/person/list",
+                  "label": "People"
+                },
+                {
+                  "href": "/openboxes/role",
+                  "label": "Roles"
+                },
+                {
+                  "href": "/openboxes/user/list",
+                  "label": "Users"
+                }
+              ]
+            },
+            {
+              "label": "Other",
+              "menuItems": [
+                {
+                  "href": "/openboxes/budgetCode/list",
+                  "label": "Budget Code"
+                },
+                {
+                  "href": "/openboxes/containerType",
+                  "label": "Container Types"
+                },
+                {
+                  "href": "/openboxes/document/list",
+                  "label": "Documents"
+                },
+                {
+                  "href": "/openboxes/documentType",
+                  "label": "Document Types"
+                },
+                {
+                  "href": "/openboxes/eventType/list",
+                  "label": "Event types"
+                },
+                {
+                  "href": "/openboxes/glAccount/list",
+                  "label": "GL Account"
+                },
+                {
+                  "href": "/openboxes/glAccountType/list",
+                  "label": "GL Account Type"
+                },
+                {
+                  "href": "/openboxes/loadData/index",
+                  "label": "Load Data"
+                },
+                {
+                  "href": "/openboxes/locationsConfiguration/index",
+                  "label": "Locations Configuration"
+                },
+                {
+                  "href": "/openboxes/orderAdjustmentType/list",
+                  "label": "Order Adjustment Type"
+                },
+                {
+                  "href": "/openboxes/paymentMethodType",
+                  "label": "Payment Method Types"
+                },
+                {
+                  "href": "/openboxes/paymentTerm/list",
+                  "label": "Payment Terms"
+                },
+                {
+                  "href": "/openboxes/preferenceType/list",
+                  "label": "Preference Type"
+                },
+                {
+                  "href": "/openboxes/productsConfiguration/index",
+                  "label": "Categories and Products Configuration"
+                },
+                {
+                  "href": "/openboxes/resettingInstanceInfo/index",
+                  "label": "Reset your instance"
+                },
+                {
+                  "href": "/openboxes/shipmentWorkflow/list",
+                  "label": "Shipment Workflows"
+                },
+                {
+                  "href": "/openboxes/shipper",
+                  "label": "Shippers"
+                }
+              ]
+            },
+            {
+              "label": "Transactions",
+              "menuItems": [
+                {
+                  "href": "/openboxes/batch/importData?type=inventory",
+                  "label": "Import Inventory"
+                },
+                {
+                  "href": "/openboxes/batch/importData?type=inventoryLevel",
+                  "label": "Import Inventory Level"
+                },
+                {
+                  "href": "/openboxes/inventory/listAllTransactions",
+                  "label": "Transactions"
+                },
+                {
+                  "href": "/openboxes/transactionType",
+                  "label": "Transactions Types"
+                }
+              ]
+            }
+          ]
+        },
+        {
+          "id": "<masked>",
+          "label": "Inbound",
+          "subsections": [
+            {
+              "label": "Putaways",
+              "menuItems": [
+                {
+                  "href": "/openboxes/order/list?orderType=PUTAWAY_ORDER&status=PENDING",
+                  "label": "List Putaways"
+                },
+                {
+                  "href": "/openboxes/putAway/create",
+                  "label": "Create Putaway"
+                }
+              ]
+            },
+            {
+              "label": "Stock Movements",
+              "menuItems": [
+                {
+                  "href": "/openboxes/stockMovement/createInbound?direction=INBOUND",
+                  "label": "Create Inbound Movement"
+                },
+                {
+                  "href": "/openboxes/stockMovement/createRequest",
+                  "label": "Create Stock Request"
+                },
+                {
+                  "href": "/openboxes/stockMovement/list?direction=INBOUND",
+                  "label": "List Inbound Movements"
+                },
+                {
+                  "href": "/openboxes/stockTransfer/createInboundReturn",
+                  "label": "Create Inbound Return"
+                }
+              ]
+            }
+          ]
+        },
+        {
+          "id": "<masked>",
+          "label": "Inventory",
+          "subsections": [
+            {
+              "label": "Cycle count",
+              "menuItems": [
+                {
+                  "href": "/openboxes/inventory/cycleCount",
+                  "label": "Manage Cycle Count"
+                },
+                {
+                  "href": "/openboxes/inventory/cycleCount/reporting?tab=PRODUCTS",
+                  "label": "Reporting"
+                },
+                {
+                  "href": "/openboxes/inventory/cycleCount?tab=TO_COUNT",
+                  "label": "Perform Cycle Count"
+                }
+              ]
+            },
+            {
+              "label": "Inventory Transactions",
+              "menuItems": [
+                {
+                  "href": "/openboxes/replenishment/create",
+                  "label": "Replenish picking bins"
+                },
+                {
+                  "href": "/openboxes/stockTransfer/create",
+                  "label": "Transfer stock internally"
+                },
+                {
+                  "href": "/openboxes/stockTransfer/list",
+                  "label": "List Stock Transfers"
+                }
+              ]
+            },
+            {
+              "label": "View Inventory",
+              "menuItems": [
+                {
+                  "href": "/openboxes/inventory/browse?resetSearch=true",
+                  "label": "Inventory Browser"
+                },
+                {
+                  "href": "/openboxes/inventory/listInStock",
+                  "label": "Inventory Summary Report"
+                },
+                {
+                  "href": "/openboxes/report/showBinLocationReport",
+                  "label": "Inventory Details Report"
+                },
+                {
+                  "href": "/openboxes/report/showInventoryByLocationReport",
+                  "label": "Inventory By Location Report"
+                }
+              ]
+            }
+          ]
+        },
+        {
+          "id": "<masked>",
+          "label": "Outbound",
+          "subsections": [
+            {
+              "label": "",
+              "menuItems": [
+                {
+                  "href": "/openboxes/stockMovement/createOutbound?direction=OUTBOUND",
+                  "label": "Create Outbound Movement"
+                },
+                {
+                  "href": "/openboxes/stockMovement/importOutboundStockMovement",
+                  "label": "Import Completed Outbound"
+                },
+                {
+                  "href": "/openboxes/stockMovement/list?direction=OUTBOUND",
+                  "label": "List Outbound Movements"
+                },
+                {
+                  "href": "/openboxes/stockMovement/list?direction=OUTBOUND&sourceType=ELECTRONIC",
+                  "label": "List Requests"
+                },
+                {
+                  "href": "/openboxes/stockTransfer/createOutboundReturn",
+                  "label": "Create Outbound Return"
+                }
+              ]
+            }
+          ]
+        },
+        {
+          "id": "<masked>",
+          "label": "Products",
+          "subsections": [
+            {
+              "label": "",
+              "menuItems": [
+                {
+                  "href": "/openboxes/attribute/list",
+                  "label": "Attributes"
+                },
+                {
+                  "href": "/openboxes/category/tree",
+                  "label": "Categories"
+                },
+                {
+                  "href": "/openboxes/productAssociation/list",
+                  "label": "Associations"
+                },
+                {
+                  "href": "/openboxes/productCatalog/list",
+                  "label": "Catalogs"
+                },
+                {
+                  "href": "/openboxes/tag/list",
+                  "label": "Tags"
+                }
+              ]
+            },
+            {
+              "label": "",
+              "menuItems": [
+                {
+                  "href": "/openboxes/product/batchEdit",
+                  "label": "Batch edit products"
+                },
+                {
+                  "href": "/openboxes/product/create",
+                  "label": "Create product"
+                },
+                {
+                  "href": "/openboxes/product/exportAsCsv",
+                  "label": "Export products"
+                },
+                {
+                  "href": "/openboxes/product/importAsCsv",
+                  "label": "Import products"
+                },
+                {
+                  "href": "/openboxes/product/list",
+                  "label": "List Products"
+                },
+                {
+                  "href": "/openboxes/productType/list",
+                  "label": "Product Type"
+                }
+              ]
+            },
+            {
+              "label": "",
+              "menuItems": [
+                {
+                  "href": "/openboxes/productComponent",
+                  "label": "Components"
+                },
+                {
+                  "href": "/openboxes/productGroup/list",
+                  "label": "Product Groups"
+                },
+                {
+                  "href": "/openboxes/productSupplier/list",
+                  "label": "Product Sources"
+                },
+                {
+                  "href": "/openboxes/unitOfMeasure",
+                  "label": "Unit of Measure"
+                },
+                {
+                  "href": "/openboxes/unitOfMeasureClass",
+                  "label": "Uom Class"
+                },
+                {
+                  "href": "/openboxes/unitOfMeasureConversion/list",
+                  "label": "Uom Conversion"
+                }
+              ]
+            }
+          ]
+        },
+        {
+          "id": "<masked>",
+          "label": "Purchasing",
+          "subsections": [
+            {
+              "label": "",
+              "menuItems": [
+                {
+                  "href": "/openboxes/dashboard/supplier",
+                  "label": "Supplier Dashboard"
+                },
+                {
+                  "href": "/openboxes/purchaseOrder/create",
+                  "label": "Create Purchase Order"
+                },
+                {
+                  "href": "/openboxes/purchaseOrder/list",
+                  "label": "List Purchase Orders"
+                },
+                {
+                  "href": "/openboxes/stockMovement/createCombinedShipments?direction=INBOUND",
+                  "label": "Ship from Purchase Order"
+                },
+                {
+                  "href": "/openboxes/supplier/list",
+                  "label": "List Suppliers"
+                }
+              ]
+            }
+          ]
+        },
+        {
+          "id": "<masked>",
+          "label": "Reporting",
+          "subsections": [
+            {
+              "label": "Data Exports",
+              "menuItems": [
+                {
+                  "href": "/openboxes/dataExport/index",
+                  "label": "Custom data exports"
+                },
+                {
+                  "href": "/openboxes/inventory/exportLatestInventoryDate",
+                  "label": "Export latest inventory date"
+                },
+                {
+                  "href": "/openboxes/inventoryLevel/export?format=csv",
+                  "label": "Export inventory levels"
+                },
+                {
+                  "href": "/openboxes/product/exportAsCsv",
+                  "label": "Export products"
+                },
+                {
+                  "href": "/openboxes/productSupplier/export",
+                  "label": "Export product sources"
+                },
+                {
+                  "href": "/openboxes/report/exportBinLocation?downloadFormat=csv",
+                  "label": "Export bin locations"
+                },
+                {
+                  "href": "/openboxes/report/exportDemandReport?downloadFormat=csv",
+                  "label": "Export product demand"
+                },
+                {
+                  "href": "/openboxes/requisition/export",
+                  "label": "Export requisitions"
+                }
+              ]
+            },
+            {
+              "label": "Inventory Reports",
+              "menuItems": [
+                {
+                  "href": "/openboxes/inventory/listExpiredStock",
+                  "label": "Expired Stock Report"
+                },
+                {
+                  "href": "/openboxes/inventory/listExpiringStock",
+                  "label": "Expiring Stock"
+                },
+                {
+                  "href": "/openboxes/inventory/listInStock",
+                  "label": "Inventory Summary Report"
+                },
+                {
+                  "href": "/openboxes/report/showBinLocationReport",
+                  "label": "Inventory Details Report"
+                },
+                {
+                  "href": "/openboxes/report/showCycleCountReport",
+                  "label": "Cycle Count Report"
+                },
+                {
+                  "href": "/openboxes/report/showInventoryByLocationReport",
+                  "label": "Inventory By Location Report"
+                },
+                {
+                  "href": "/openboxes/report/showOnOrderReport",
+                  "label": "On Order Report"
+                }
+              ]
+            },
+            {
+              "label": "Order Reports",
+              "menuItems": [
+                {
+                  "href": "/openboxes/inventory/reorderReport",
+                  "label": "Reorder Report"
+                },
+                {
+                  "href": "/openboxes/report/amountOutstandingOnOrdersReport",
+                  "label": "Amount Outstanding Report"
+                },
+                {
+                  "href": "/openboxes/report/showForecastReport",
+                  "label": "Forecast Report"
+                }
+              ]
+            },
+            {
+              "label": "Transaction Reports",
+              "menuItems": [
+                {
+                  "href": "/openboxes/consumption/show",
+                  "label": "Consumption Report"
+                },
+                {
+                  "href": "/openboxes/report/expirationHistoryReport",
+                  "label": "Expiration History Report"
+                },
+                {
+                  "href": "/openboxes/report/showRequestDetailReport",
+                  "label": "Request Detail Report"
+                },
+                {
+                  "href": "/openboxes/report/showTransactionReport",
+                  "label": "Transaction Report"
+                }
+              ]
+            }
+          ]
+        },
+        {
+          "id": "<masked>",
+          "label": "Stocklists",
+          "menuItems": [
+            {
+              "href": "/openboxes/requisitionTemplate/create",
+              "label": "Create stock list"
+            },
+            {
+              "href": "/openboxes/requisitionTemplate/list",
+              "label": "List stock lists"
+            }
+          ]
+        }
+      ],
+      "menuSectionsUrlParts": {
+        "configuration": [
+          "locationsConfiguration"
+        ],
+        "injectedDirectly": [
+          "order",
+          "stockMovement"
+        ],
+        "inventory": [
+          "inventory",
+          "inventoryItem",
+          "stockTransfer"
+        ],
+        "invoicing": [
+          "invoice"
+        ],
+        "outbound": [
+          "verifyRequest"
+        ],
+        "products": [
+          "product"
+        ],
+        "purchasing": [
+          "purchaseOrder"
+        ],
+        "requisitionTemplate": [
+          "requisitionTemplate"
+        ]
+      }
+    }
+  },
+  "contentType": "application/json",
+  "request": {
+    "method": "GET",
+    "params": {},
+    "path": "/api/getMenuConfig"
+  },
+  "status": 200
+}

@@ -1,0 +1,242 @@
+{
+  "body": {
+    "data": {
+      "activeLanguage": "en",
+      "activeLanguageTag": "en",
+      "appVersion": "<masked>",
+      "branchName": "<masked>",
+      "browserConnectionTimeout": 8000,
+      "buildDate": "<masked>",
+      "buildNumber": "<masked>",
+      "currencyCode": "USD",
+      "currentLocationRoles": [],
+      "cycleCountMaxSelectedProducts": 50,
+      "displayDateDefaultValue": "-",
+      "displayDateFormat": "MMM DD, yyyy",
+      "environment": "<masked>",
+      "grailsVersion": "<masked>",
+      "highestRole": "Superuser",
+      "hostname": "<masked>",
+      "ipAddress": "<masked>",
+      "isAutosaveEnabled": false,
+      "isHelpScoutEnabled": true,
+      "isImpersonated": false,
+      "isPaginated": true,
+      "isSuperuser": true,
+      "isUserAdmin": true,
+      "isUserApprover": false,
+      "isUserManager": true,
+      "isUserRequestApprover": false,
+      "localizationModeEnabled": false,
+      "localizationModeLocale": "ach",
+      "localizedHelpScoutKey": "<id>",
+      "location": {
+        "active": true,
+        "address": {
+          "address": "888 Commonwealth Avenue",
+          "address2": "Third Floor",
+          "city": "Boston",
+          "country": "United States",
+          "description": null,
+          "postalCode": "02215",
+          "stateOrProvince": "MA"
+        },
+        "backgroundColor": "FFFFFF",
+        "description": null,
+        "hasBinLocationSupport": true,
+        "hasCentralPurchasingEnabled": false,
+        "hasPackingSupport": false,
+        "hasPartialReceivingSupport": false,
+        "id": "<masked>",
+        "locationGroup": null,
+        "locationNumber": null,
+        "locationType": {
+          "description": "Depot",
+          "id": "<masked>",
+          "locationTypeCode": "DEPOT",
+          "name": "Depot"
+        },
+        "manager": {
+          "email": "admin@admin.com",
+          "firstName": "Miss",
+          "id": "<masked>",
+          "lastName": "Administrator",
+          "name": "Miss Administrator",
+          "roles": [
+            "ROLE_FINANCE",
+            "ROLE_PRODUCT_NOTIFICATION",
+            "ROLE_SHIPMENT_NOTIFICATION",
+            "ROLE_SUPERUSER"
+          ],
+          "username": "admin"
+        },
+        "name": "Main Warehouse",
+        "organization": {
+          "code": "MO",
+          "dateCreated": "<masked>",
+          "defaultLocation": null,
+          "description": null,
+          "displayName": "MO - Main Organization",
+          "id": "<masked>",
+          "lastUpdated": "<masked>",
+          "name": "Main Organization",
+          "partyType": {
+            "code": "ORG",
+            "id": "<masked>",
+            "name": "Organization",
+            "partyTypeCode": "ORGANIZATION"
+          },
+          "roles": [
+            {
+              "endDate": null,
+              "id": "<masked>",
+              "roleType": "ROLE_ORGANIZATION",
+              "startDate": null
+            }
+          ],
+          "sequences": {}
+        },
+        "organizationCode": "<masked>",
+        "organizationName": "Main Organization",
+        "parentLocation": null,
+        "sortOrder": "<masked>",
+        "supportedActivities": [
+          "ADJUST_INVENTORY",
+          "ENABLE_FULFILLER_APPROVAL_NOTIFICATIONS",
+          "ENABLE_REQUESTOR_APPROVAL_NOTIFICATIONS",
+          "EXTERNAL",
+          "FULFILL_REQUEST",
+          "MANAGE_INVENTORY",
+          "PICK_STOCK",
+          "PLACE_ORDER",
+          "PLACE_REQUEST",
+          "PUTAWAY_STOCK",
+          "RECEIVE_STOCK",
+          "SEND_STOCK",
+          "SUBMIT_REQUEST"
+        ],
+        "zoneId": null,
+        "zoneName": null
+      },
+      "logoLabel": "",
+      "logoUrl": "/openboxes/assets/openboxes_logo_40x40.jpg",
+      "maxUploadFileSize": 2097152,
+      "menuItems": [
+        {
+          "label": "Edit Profile",
+          "linkAction": "/openboxes/user/edit/1",
+          "linkIcon": "/openboxes/static/images/icons/silk/user.png",
+          "linkReactIcon": "profile"
+        },
+        {
+          "label": "Enable localization mode",
+          "linkAction": "/openboxes/user/enableLocalizationMode",
+          "linkIcon": "/openboxes/static/images/icons/silk/world_add.png",
+          "linkReactIcon": "localization-mode"
+        },
+        {
+          "label": "Logout",
+          "linkAction": "/openboxes/auth/logout",
+          "linkIcon": "/openboxes/static/images/icons/silk/door.png",
+          "linkReactIcon": "logout"
+        },
+        {
+          "label": "Refresh caches",
+          "linkAction": "/openboxes/dashboard/flushCache",
+          "linkIcon": "/openboxes/static/images/icons/silk/database_wrench.png",
+          "linkReactIcon": "flush-cache"
+        }
+      ],
+      "minimumExpirationDate": "<masked>",
+      "notificationAutohideDelay": 8000,
+      "pageSize": 10,
+      "supportedActivities": [
+        "ADJUST_INVENTORY",
+        "ENABLE_FULFILLER_APPROVAL_NOTIFICATIONS",
+        "ENABLE_REQUESTOR_APPROVAL_NOTIFICATIONS",
+        "EXTERNAL",
+        "FULFILL_REQUEST",
+        "MANAGE_INVENTORY",
+        "PICK_STOCK",
+        "PLACE_ORDER",
+        "PLACE_REQUEST",
+        "PUTAWAY_STOCK",
+        "RECEIVE_STOCK",
+        "SEND_STOCK",
+        "SUBMIT_REQUEST"
+      ],
+      "supportedLocales": [
+        {
+          "code": "ach",
+          "name": "Acholi"
+        },
+        {
+          "code": "ar",
+          "name": "عربى"
+        },
+        {
+          "code": "de",
+          "name": "Deutsche"
+        },
+        {
+          "code": "en",
+          "name": "English"
+        },
+        {
+          "code": "es",
+          "name": "Español (España)"
+        },
+        {
+          "code": "es_MX",
+          "name": "Español (México)"
+        },
+        {
+          "code": "fi",
+          "name": "Suomi"
+        },
+        {
+          "code": "fr",
+          "name": "Français"
+        },
+        {
+          "code": "ht",
+          "name": "Kreyòl"
+        },
+        {
+          "code": "it",
+          "name": "Italiano"
+        },
+        {
+          "code": "pt",
+          "name": "Português"
+        },
+        {
+          "code": "zh",
+          "name": "Chinese"
+        }
+      ],
+      "timezone": null,
+      "user": {
+        "email": "admin@admin.com",
+        "firstName": "Miss",
+        "id": "<masked>",
+        "lastName": "Administrator",
+        "name": "Miss Administrator",
+        "roles": [
+          "ROLE_FINANCE",
+          "ROLE_PRODUCT_NOTIFICATION",
+          "ROLE_SHIPMENT_NOTIFICATION",
+          "ROLE_SUPERUSER"
+        ],
+        "username": "admin"
+      }
+    }
+  },
+  "contentType": "application/json",
+  "request": {
+    "method": "GET",
+    "params": {},
+    "path": "/api/getAppContext"
+  },
+  "status": 200
+}

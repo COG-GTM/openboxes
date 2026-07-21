@@ -1,0 +1,17 @@
+{
+  "body": {
+    "data": {
+      "configureOrganizationsAndLocations": "https://openboxes.atlassian.net/wiki/spaces/OBW/pages/1291452471/Configure+Organizations+and+Locations",
+      "discussionForum": "https://discuss.openboxes.com/",
+      "knowledgeBase": "https://openboxes.helpscoutdocs.com/",
+      "manageBinLocations": "https://openboxes.atlassian.net/wiki/spaces/OBW/pages/1311572061/Manage+Bin+Locations"
+    }
+  },
+  "contentType": "application/json",
+  "request": {
+    "method": "GET",
+    "params": {},
+    "path": "/api/supportLinks"
+  },
+  "status": 200
+}

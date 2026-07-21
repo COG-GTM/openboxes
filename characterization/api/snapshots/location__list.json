@@ -1,0 +1,1427 @@
+{
+  "body": {
+    "data": [
+      {
+        "active": true,
+        "address": null,
+        "backgroundColor": "FFFFFF",
+        "description": null,
+        "hasBinLocationSupport": false,
+        "hasCentralPurchasingEnabled": false,
+        "hasPackingSupport": false,
+        "hasPartialReceivingSupport": false,
+        "id": "<masked>",
+        "locationGroup": null,
+        "locationNumber": null,
+        "locationType": {
+          "description": "Supplier",
+          "id": "<masked>",
+          "locationTypeCode": "SUPPLIER",
+          "name": "Supplier"
+        },
+        "manager": null,
+        "name": "Main Supplier",
+        "organization": {
+          "code": "SO",
+          "dateCreated": "<masked>",
+          "defaultLocation": null,
+          "description": null,
+          "displayName": "SO - Supplier Organization",
+          "id": "<masked>",
+          "lastUpdated": "<masked>",
+          "name": "Supplier Organization",
+          "partyType": {
+            "code": "ORG",
+            "id": "<masked>",
+            "name": "Organization",
+            "partyTypeCode": "ORGANIZATION"
+          },
+          "roles": [
+            {
+              "endDate": null,
+              "id": "<masked>",
+              "roleType": "ROLE_SUPPLIER",
+              "startDate": null
+            }
+          ],
+          "sequences": {}
+        },
+        "organizationCode": "<masked>",
+        "organizationName": "Supplier Organization",
+        "parentLocation": null,
+        "sortOrder": "<masked>",
+        "supportedActivities": [
+          "EXTERNAL",
+          "FULFILL_ORDER",
+          "SEND_STOCK"
+        ],
+        "zoneId": null,
+        "zoneName": null
+      },
+      {
+        "active": true,
+        "address": {
+          "address": "",
+          "address2": "",
+          "city": "",
+          "country": "",
+          "description": "",
+          "postalCode": "",
+          "stateOrProvince": ""
+        },
+        "backgroundColor": "FFFFFF",
+        "description": null,
+        "hasBinLocationSupport": false,
+        "hasCentralPurchasingEnabled": false,
+        "hasPackingSupport": false,
+        "hasPartialReceivingSupport": false,
+        "id": "<masked>",
+        "locationGroup": null,
+        "locationNumber": "AMAZON",
+        "locationType": {
+          "description": "Supplier",
+          "id": "<masked>",
+          "locationTypeCode": "SUPPLIER",
+          "name": "Supplier"
+        },
+        "manager": null,
+        "name": "Amazon.com",
+        "organization": {
+          "code": "AMAZON",
+          "dateCreated": "<masked>",
+          "defaultLocation": null,
+          "description": null,
+          "displayName": "AMAZON - Amazon.com",
+          "id": "<masked>",
+          "lastUpdated": "<masked>",
+          "name": "Amazon.com",
+          "partyType": {
+            "code": "ORG",
+            "id": "<masked>",
+            "name": "Organization",
+            "partyTypeCode": "ORGANIZATION"
+          },
+          "roles": [
+            {
+              "endDate": null,
+              "id": "<masked>",
+              "roleType": "ROLE_MANUFACTURER",
+              "startDate": null
+            },
+            {
+              "endDate": null,
+              "id": "<masked>",
+              "roleType": "ROLE_SUPPLIER",
+              "startDate": null
+            }
+          ],
+          "sequences": {}
+        },
+        "organizationCode": "<masked>",
+        "organizationName": "Amazon.com",
+        "parentLocation": null,
+        "sortOrder": null,
+        "supportedActivities": [
+          "EXTERNAL",
+          "FULFILL_ORDER",
+          "SEND_STOCK"
+        ],
+        "zoneId": null,
+        "zoneName": null
+      },
+      {
+        "active": true,
+        "address": {
+          "address": "",
+          "address2": "",
+          "city": "",
+          "country": "",
+          "description": "",
+          "postalCode": "",
+          "stateOrProvince": ""
+        },
+        "backgroundColor": "FFFFFF",
+        "description": null,
+        "hasBinLocationSupport": false,
+        "hasCentralPurchasingEnabled": false,
+        "hasPackingSupport": false,
+        "hasPartialReceivingSupport": false,
+        "id": "<masked>",
+        "locationGroup": null,
+        "locationNumber": "GRAINGER",
+        "locationType": {
+          "description": "Supplier",
+          "id": "<masked>",
+          "locationTypeCode": "SUPPLIER",
+          "name": "Supplier"
+        },
+        "manager": null,
+        "name": "Grainger",
+        "organization": {
+          "code": "GRAING",
+          "dateCreated": "<masked>",
+          "defaultLocation": null,
+          "description": null,
+          "displayName": "GRAING - Grainger",
+          "id": "<masked>",
+          "lastUpdated": "<masked>",
+          "name": "Grainger",
+          "partyType": {
+            "code": "ORG",
+            "id": "<masked>",
+            "name": "Organization",
+            "partyTypeCode": "ORGANIZATION"
+          },
+          "roles": [
+            {
+              "endDate": null,
+              "id": "<masked>",
+              "roleType": "ROLE_MANUFACTURER",
+              "startDate": null
+            },
+            {
+              "endDate": null,
+              "id": "<masked>",
+              "roleType": "ROLE_SUPPLIER",
+              "startDate": null
+            }
+          ],
+          "sequences": {}
+        },
+        "organizationCode": "<masked>",
+        "organizationName": "Grainger",
+        "parentLocation": null,
+        "sortOrder": null,
+        "supportedActivities": [
+          "EXTERNAL",
+          "FULFILL_ORDER",
+          "SEND_STOCK"
+        ],
+        "zoneId": null,
+        "zoneName": null
+      },
+      {
+        "active": true,
+        "address": {
+          "address": "",
+          "address2": "",
+          "city": "",
+          "country": "",
+          "description": "",
+          "postalCode": "",
+          "stateOrProvince": ""
+        },
+        "backgroundColor": "FFFFFF",
+        "description": null,
+        "hasBinLocationSupport": false,
+        "hasCentralPurchasingEnabled": false,
+        "hasPackingSupport": false,
+        "hasPartialReceivingSupport": false,
+        "id": "<masked>",
+        "locationGroup": {
+          "id": "<masked>",
+          "name": "MidWest"
+        },
+        "locationNumber": "ANNO",
+        "locationType": {
+          "description": "Dispensary",
+          "id": "<masked>",
+          "locationTypeCode": "DISPENSARY",
+          "name": "Dispensary"
+        },
+        "manager": null,
+        "name": "Ann Arbor Office",
+        "organization": {
+          "code": "MO-<seq>",
+          "dateCreated": "<masked>",
+          "defaultLocation": null,
+          "description": null,
+          "displayName": "MO-<seq> - My Organization",
+          "id": "<masked>",
+          "lastUpdated": "<masked>",
+          "name": "My Organization",
+          "partyType": {
+            "code": "ORG",
+            "id": "<masked>",
+            "name": "Organization",
+            "partyTypeCode": "ORGANIZATION"
+          },
+          "roles": [
+            {
+              "endDate": null,
+              "id": "<masked>",
+              "roleType": "ROLE_BUYER",
+              "startDate": null
+            }
+          ],
+          "sequences": {}
+        },
+        "organizationCode": "<masked>",
+        "organizationName": "My Organization",
+        "parentLocation": null,
+        "sortOrder": null,
+        "supportedActivities": [
+          "DYNAMIC_CREATION",
+          "RECEIVE_STOCK",
+          "SEND_STOCK"
+        ],
+        "zoneId": null,
+        "zoneName": null
+      },
+      {
+        "active": true,
+        "address": {
+          "address": "",
+          "address2": "",
+          "city": "",
+          "country": "",
+          "description": "",
+          "postalCode": "",
+          "stateOrProvince": ""
+        },
+        "backgroundColor": "FFFFFF",
+        "description": null,
+        "hasBinLocationSupport": false,
+        "hasCentralPurchasingEnabled": false,
+        "hasPackingSupport": false,
+        "hasPartialReceivingSupport": false,
+        "id": "<masked>",
+        "locationGroup": {
+          "id": "<masked>",
+          "name": "MidWest"
+        },
+        "locationNumber": "CEDO",
+        "locationType": {
+          "description": "Dispensary",
+          "id": "<masked>",
+          "locationTypeCode": "DISPENSARY",
+          "name": "Dispensary"
+        },
+        "manager": null,
+        "name": "Cedar Rapids Office",
+        "organization": {
+          "code": "MO-<seq>",
+          "dateCreated": "<masked>",
+          "defaultLocation": null,
+          "description": null,
+          "displayName": "MO-<seq> - My Organization",
+          "id": "<masked>",
+          "lastUpdated": "<masked>",
+          "name": "My Organization",
+          "partyType": {
+            "code": "ORG",
+            "id": "<masked>",
+            "name": "Organization",
+            "partyTypeCode": "ORGANIZATION"
+          },
+          "roles": [
+            {
+              "endDate": null,
+              "id": "<masked>",
+              "roleType": "ROLE_BUYER",
+              "startDate": null
+            }
+          ],
+          "sequences": {}
+        },
+        "organizationCode": "<masked>",
+        "organizationName": "My Organization",
+        "parentLocation": null,
+        "sortOrder": null,
+        "supportedActivities": [
+          "DYNAMIC_CREATION",
+          "RECEIVE_STOCK",
+          "SEND_STOCK"
+        ],
+        "zoneId": null,
+        "zoneName": null
+      },
+      {
+        "active": true,
+        "address": {
+          "address": "",
+          "address2": "",
+          "city": "",
+          "country": "",
+          "description": "",
+          "postalCode": "",
+          "stateOrProvince": ""
+        },
+        "backgroundColor": "FFFFFF",
+        "description": null,
+        "hasBinLocationSupport": false,
+        "hasCentralPurchasingEnabled": false,
+        "hasPackingSupport": false,
+        "hasPartialReceivingSupport": false,
+        "id": "<masked>",
+        "locationGroup": {
+          "id": "<masked>",
+          "name": "MidWest"
+        },
+        "locationNumber": "CHICO",
+        "locationType": {
+          "description": "Dispensary",
+          "id": "<masked>",
+          "locationTypeCode": "DISPENSARY",
+          "name": "Dispensary"
+        },
+        "manager": null,
+        "name": "Chicago Office",
+        "organization": {
+          "code": "MO-<seq>",
+          "dateCreated": "<masked>",
+          "defaultLocation": null,
+          "description": null,
+          "displayName": "MO-<seq> - My Organization",
+          "id": "<masked>",
+          "lastUpdated": "<masked>",
+          "name": "My Organization",
+          "partyType": {
+            "code": "ORG",
+            "id": "<masked>",
+            "name": "Organization",
+            "partyTypeCode": "ORGANIZATION"
+          },
+          "roles": [
+            {
+              "endDate": null,
+              "id": "<masked>",
+              "roleType": "ROLE_BUYER",
+              "startDate": null
+            }
+          ],
+          "sequences": {}
+        },
+        "organizationCode": "<masked>",
+        "organizationName": "My Organization",
+        "parentLocation": null,
+        "sortOrder": null,
+        "supportedActivities": [
+          "DYNAMIC_CREATION",
+          "RECEIVE_STOCK",
+          "SEND_STOCK"
+        ],
+        "zoneId": null,
+        "zoneName": null
+      },
+      {
+        "active": true,
+        "address": {
+          "address": "",
+          "address2": "",
+          "city": "",
+          "country": "",
+          "description": "",
+          "postalCode": "",
+          "stateOrProvince": ""
+        },
+        "backgroundColor": "FFFFFF",
+        "description": null,
+        "hasBinLocationSupport": false,
+        "hasCentralPurchasingEnabled": false,
+        "hasPackingSupport": false,
+        "hasPartialReceivingSupport": false,
+        "id": "<masked>",
+        "locationGroup": {
+          "id": "<masked>",
+          "name": "MidWest"
+        },
+        "locationNumber": "DESO",
+        "locationType": {
+          "description": "Dispensary",
+          "id": "<masked>",
+          "locationTypeCode": "DISPENSARY",
+          "name": "Dispensary"
+        },
+        "manager": null,
+        "name": "Des Moines Office",
+        "organization": {
+          "code": "MO-<seq>",
+          "dateCreated": "<masked>",
+          "defaultLocation": null,
+          "description": null,
+          "displayName": "MO-<seq> - My Organization",
+          "id": "<masked>",
+          "lastUpdated": "<masked>",
+          "name": "My Organization",
+          "partyType": {
+            "code": "ORG",
+            "id": "<masked>",
+            "name": "Organization",
+            "partyTypeCode": "ORGANIZATION"
+          },
+          "roles": [
+            {
+              "endDate": null,
+              "id": "<masked>",
+              "roleType": "ROLE_BUYER",
+              "startDate": null
+            }
+          ],
+          "sequences": {}
+        },
+        "organizationCode": "<masked>",
+        "organizationName": "My Organization",
+        "parentLocation": null,
+        "sortOrder": null,
+        "supportedActivities": [
+          "DYNAMIC_CREATION",
+          "RECEIVE_STOCK",
+          "SEND_STOCK"
+        ],
+        "zoneId": null,
+        "zoneName": null
+      },
+      {
+        "active": true,
+        "address": {
+          "address": "",
+          "address2": "",
+          "city": "",
+          "country": "",
+          "description": "",
+          "postalCode": "",
+          "stateOrProvince": ""
+        },
+        "backgroundColor": "FFFFFF",
+        "description": null,
+        "hasBinLocationSupport": false,
+        "hasCentralPurchasingEnabled": false,
+        "hasPackingSupport": false,
+        "hasPartialReceivingSupport": false,
+        "id": "<masked>",
+        "locationGroup": {
+          "id": "<masked>",
+          "name": "NorthEast"
+        },
+        "locationNumber": "BOSO",
+        "locationType": {
+          "description": "Dispensary",
+          "id": "<masked>",
+          "locationTypeCode": "DISPENSARY",
+          "name": "Dispensary"
+        },
+        "manager": null,
+        "name": "Boston Office",
+        "organization": {
+          "code": "MO-<seq>",
+          "dateCreated": "<masked>",
+          "defaultLocation": null,
+          "description": null,
+          "displayName": "MO-<seq> - My Organization",
+          "id": "<masked>",
+          "lastUpdated": "<masked>",
+          "name": "My Organization",
+          "partyType": {
+            "code": "ORG",
+            "id": "<masked>",
+            "name": "Organization",
+            "partyTypeCode": "ORGANIZATION"
+          },
+          "roles": [
+            {
+              "endDate": null,
+              "id": "<masked>",
+              "roleType": "ROLE_BUYER",
+              "startDate": null
+            }
+          ],
+          "sequences": {}
+        },
+        "organizationCode": "<masked>",
+        "organizationName": "My Organization",
+        "parentLocation": null,
+        "sortOrder": null,
+        "supportedActivities": [
+          "DYNAMIC_CREATION",
+          "RECEIVE_STOCK",
+          "SEND_STOCK"
+        ],
+        "zoneId": null,
+        "zoneName": null
+      },
+      {
+        "active": true,
+        "address": {
+          "address": "",
+          "address2": "",
+          "city": "",
+          "country": "",
+          "description": "",
+          "postalCode": "",
+          "stateOrProvince": ""
+        },
+        "backgroundColor": "FFFFFF",
+        "description": null,
+        "hasBinLocationSupport": false,
+        "hasCentralPurchasingEnabled": false,
+        "hasPackingSupport": false,
+        "hasPartialReceivingSupport": false,
+        "id": "<masked>",
+        "locationGroup": {
+          "id": "<masked>",
+          "name": "NorthEast"
+        },
+        "locationNumber": "NEWO",
+        "locationType": {
+          "description": "Dispensary",
+          "id": "<masked>",
+          "locationTypeCode": "DISPENSARY",
+          "name": "Dispensary"
+        },
+        "manager": null,
+        "name": "Newark Office",
+        "organization": {
+          "code": "MO-<seq>",
+          "dateCreated": "<masked>",
+          "defaultLocation": null,
+          "description": null,
+          "displayName": "MO-<seq> - My Organization",
+          "id": "<masked>",
+          "lastUpdated": "<masked>",
+          "name": "My Organization",
+          "partyType": {
+            "code": "ORG",
+            "id": "<masked>",
+            "name": "Organization",
+            "partyTypeCode": "ORGANIZATION"
+          },
+          "roles": [
+            {
+              "endDate": null,
+              "id": "<masked>",
+              "roleType": "ROLE_BUYER",
+              "startDate": null
+            }
+          ],
+          "sequences": {}
+        },
+        "organizationCode": "<masked>",
+        "organizationName": "My Organization",
+        "parentLocation": null,
+        "sortOrder": null,
+        "supportedActivities": [
+          "DYNAMIC_CREATION",
+          "RECEIVE_STOCK",
+          "SEND_STOCK"
+        ],
+        "zoneId": null,
+        "zoneName": null
+      },
+      {
+        "active": true,
+        "address": {
+          "address": "",
+          "address2": "",
+          "city": "",
+          "country": "",
+          "description": "",
+          "postalCode": "",
+          "stateOrProvince": ""
+        },
+        "backgroundColor": "FFFFFF",
+        "description": null,
+        "hasBinLocationSupport": false,
+        "hasCentralPurchasingEnabled": false,
+        "hasPackingSupport": false,
+        "hasPartialReceivingSupport": false,
+        "id": "<masked>",
+        "locationGroup": {
+          "id": "<masked>",
+          "name": "NorthEast"
+        },
+        "locationNumber": "NYCO",
+        "locationType": {
+          "description": "Dispensary",
+          "id": "<masked>",
+          "locationTypeCode": "DISPENSARY",
+          "name": "Dispensary"
+        },
+        "manager": null,
+        "name": "NYC Office",
+        "organization": {
+          "code": "MO-<seq>",
+          "dateCreated": "<masked>",
+          "defaultLocation": null,
+          "description": null,
+          "displayName": "MO-<seq> - My Organization",
+          "id": "<masked>",
+          "lastUpdated": "<masked>",
+          "name": "My Organization",
+          "partyType": {
+            "code": "ORG",
+            "id": "<masked>",
+            "name": "Organization",
+            "partyTypeCode": "ORGANIZATION"
+          },
+          "roles": [
+            {
+              "endDate": null,
+              "id": "<masked>",
+              "roleType": "ROLE_BUYER",
+              "startDate": null
+            }
+          ],
+          "sequences": {}
+        },
+        "organizationCode": "<masked>",
+        "organizationName": "My Organization",
+        "parentLocation": null,
+        "sortOrder": null,
+        "supportedActivities": [
+          "DYNAMIC_CREATION",
+          "RECEIVE_STOCK",
+          "SEND_STOCK"
+        ],
+        "zoneId": null,
+        "zoneName": null
+      },
+      {
+        "active": true,
+        "address": {
+          "address": "",
+          "address2": "",
+          "city": "",
+          "country": "",
+          "description": "",
+          "postalCode": "",
+          "stateOrProvince": ""
+        },
+        "backgroundColor": "FFFFFF",
+        "description": null,
+        "hasBinLocationSupport": false,
+        "hasCentralPurchasingEnabled": false,
+        "hasPackingSupport": false,
+        "hasPartialReceivingSupport": false,
+        "id": "<masked>",
+        "locationGroup": {
+          "id": "<masked>",
+          "name": "NorthEast"
+        },
+        "locationNumber": "PORTLO",
+        "locationType": {
+          "description": "Dispensary",
+          "id": "<masked>",
+          "locationTypeCode": "DISPENSARY",
+          "name": "Dispensary"
+        },
+        "manager": null,
+        "name": "Portland Office",
+        "organization": {
+          "code": "MO-<seq>",
+          "dateCreated": "<masked>",
+          "defaultLocation": null,
+          "description": null,
+          "displayName": "MO-<seq> - My Organization",
+          "id": "<masked>",
+          "lastUpdated": "<masked>",
+          "name": "My Organization",
+          "partyType": {
+            "code": "ORG",
+            "id": "<masked>",
+            "name": "Organization",
+            "partyTypeCode": "ORGANIZATION"
+          },
+          "roles": [
+            {
+              "endDate": null,
+              "id": "<masked>",
+              "roleType": "ROLE_BUYER",
+              "startDate": null
+            }
+          ],
+          "sequences": {}
+        },
+        "organizationCode": "<masked>",
+        "organizationName": "My Organization",
+        "parentLocation": null,
+        "sortOrder": null,
+        "supportedActivities": [
+          "DYNAMIC_CREATION",
+          "RECEIVE_STOCK",
+          "SEND_STOCK"
+        ],
+        "zoneId": null,
+        "zoneName": null
+      },
+      {
+        "active": true,
+        "address": {
+          "address": "",
+          "address2": "",
+          "city": "",
+          "country": "",
+          "description": "",
+          "postalCode": "",
+          "stateOrProvince": ""
+        },
+        "backgroundColor": "FFFFFF",
+        "description": null,
+        "hasBinLocationSupport": false,
+        "hasCentralPurchasingEnabled": false,
+        "hasPackingSupport": false,
+        "hasPartialReceivingSupport": false,
+        "id": "<masked>",
+        "locationGroup": {
+          "id": "<masked>",
+          "name": "NorthEast"
+        },
+        "locationNumber": "PORTSO",
+        "locationType": {
+          "description": "Dispensary",
+          "id": "<masked>",
+          "locationTypeCode": "DISPENSARY",
+          "name": "Dispensary"
+        },
+        "manager": null,
+        "name": "Portsmouth Office",
+        "organization": {
+          "code": "MO-<seq>",
+          "dateCreated": "<masked>",
+          "defaultLocation": null,
+          "description": null,
+          "displayName": "MO-<seq> - My Organization",
+          "id": "<masked>",
+          "lastUpdated": "<masked>",
+          "name": "My Organization",
+          "partyType": {
+            "code": "ORG",
+            "id": "<masked>",
+            "name": "Organization",
+            "partyTypeCode": "ORGANIZATION"
+          },
+          "roles": [
+            {
+              "endDate": null,
+              "id": "<masked>",
+              "roleType": "ROLE_BUYER",
+              "startDate": null
+            }
+          ],
+          "sequences": {}
+        },
+        "organizationCode": "<masked>",
+        "organizationName": "My Organization",
+        "parentLocation": null,
+        "sortOrder": null,
+        "supportedActivities": [
+          "DYNAMIC_CREATION",
+          "RECEIVE_STOCK",
+          "SEND_STOCK"
+        ],
+        "zoneId": null,
+        "zoneName": null
+      },
+      {
+        "active": true,
+        "address": {
+          "address": "",
+          "address2": "",
+          "city": "",
+          "country": "",
+          "description": "",
+          "postalCode": "",
+          "stateOrProvince": ""
+        },
+        "backgroundColor": "FFFFFF",
+        "description": null,
+        "hasBinLocationSupport": false,
+        "hasCentralPurchasingEnabled": false,
+        "hasPackingSupport": false,
+        "hasPartialReceivingSupport": false,
+        "id": "<masked>",
+        "locationGroup": {
+          "id": "<masked>",
+          "name": "NorthEast"
+        },
+        "locationNumber": "PROVO",
+        "locationType": {
+          "description": "Dispensary",
+          "id": "<masked>",
+          "locationTypeCode": "DISPENSARY",
+          "name": "Dispensary"
+        },
+        "manager": null,
+        "name": "Providence Office",
+        "organization": {
+          "code": "MO-<seq>",
+          "dateCreated": "<masked>",
+          "defaultLocation": null,
+          "description": null,
+          "displayName": "MO-<seq> - My Organization",
+          "id": "<masked>",
+          "lastUpdated": "<masked>",
+          "name": "My Organization",
+          "partyType": {
+            "code": "ORG",
+            "id": "<masked>",
+            "name": "Organization",
+            "partyTypeCode": "ORGANIZATION"
+          },
+          "roles": [
+            {
+              "endDate": null,
+              "id": "<masked>",
+              "roleType": "ROLE_BUYER",
+              "startDate": null
+            }
+          ],
+          "sequences": {}
+        },
+        "organizationCode": "<masked>",
+        "organizationName": "My Organization",
+        "parentLocation": null,
+        "sortOrder": null,
+        "supportedActivities": [
+          "DYNAMIC_CREATION",
+          "RECEIVE_STOCK",
+          "SEND_STOCK"
+        ],
+        "zoneId": null,
+        "zoneName": null
+      },
+      {
+        "active": true,
+        "address": {
+          "address": "150 Hatfield ct",
+          "address2": "Doors 2-4",
+          "city": "Chicago",
+          "country": "USA",
+          "description": "",
+          "postalCode": "75898",
+          "stateOrProvince": "IL"
+        },
+        "backgroundColor": "FFFFFF",
+        "description": null,
+        "hasBinLocationSupport": true,
+        "hasCentralPurchasingEnabled": false,
+        "hasPackingSupport": false,
+        "hasPartialReceivingSupport": false,
+        "id": "<masked>",
+        "locationGroup": {
+          "id": "<masked>",
+          "name": "MidWest"
+        },
+        "locationNumber": "CHIW",
+        "locationType": {
+          "description": "Depot",
+          "id": "<masked>",
+          "locationTypeCode": "DEPOT",
+          "name": "Depot"
+        },
+        "manager": null,
+        "name": "Chicago Warehouse",
+        "organization": {
+          "code": "MO-<seq>",
+          "dateCreated": "<masked>",
+          "defaultLocation": null,
+          "description": null,
+          "displayName": "MO-<seq> - My Organization",
+          "id": "<masked>",
+          "lastUpdated": "<masked>",
+          "name": "My Organization",
+          "partyType": {
+            "code": "ORG",
+            "id": "<masked>",
+            "name": "Organization",
+            "partyTypeCode": "ORGANIZATION"
+          },
+          "roles": [
+            {
+              "endDate": null,
+              "id": "<masked>",
+              "roleType": "ROLE_BUYER",
+              "startDate": null
+            }
+          ],
+          "sequences": {}
+        },
+        "organizationCode": "<masked>",
+        "organizationName": "My Organization",
+        "parentLocation": null,
+        "sortOrder": null,
+        "supportedActivities": [
+          "ADJUST_INVENTORY",
+          "ENABLE_FULFILLER_APPROVAL_NOTIFICATIONS",
+          "ENABLE_REQUESTOR_APPROVAL_NOTIFICATIONS",
+          "EXTERNAL",
+          "FULFILL_REQUEST",
+          "MANAGE_INVENTORY",
+          "PICK_STOCK",
+          "PLACE_ORDER",
+          "PLACE_REQUEST",
+          "PUTAWAY_STOCK",
+          "RECEIVE_STOCK",
+          "SEND_STOCK",
+          "SUBMIT_REQUEST"
+        ],
+        "zoneId": null,
+        "zoneName": null
+      },
+      {
+        "active": true,
+        "address": {
+          "address": "30 West Hybrid Place",
+          "address2": "",
+          "city": "New York",
+          "country": "USA",
+          "description": "",
+          "postalCode": "30456",
+          "stateOrProvince": "New York"
+        },
+        "backgroundColor": "FFFFFF",
+        "description": null,
+        "hasBinLocationSupport": false,
+        "hasCentralPurchasingEnabled": false,
+        "hasPackingSupport": false,
+        "hasPartialReceivingSupport": false,
+        "id": "<masked>",
+        "locationGroup": null,
+        "locationNumber": "TOYOTA",
+        "locationType": {
+          "description": "Supplier",
+          "id": "<masked>",
+          "locationTypeCode": "SUPPLIER",
+          "name": "Supplier"
+        },
+        "manager": null,
+        "name": "Toyota USA",
+        "organization": {
+          "code": "TU",
+          "dateCreated": "<masked>",
+          "defaultLocation": null,
+          "description": null,
+          "displayName": "TU - Toyota USA",
+          "id": "<masked>",
+          "lastUpdated": "<masked>",
+          "name": "Toyota USA",
+          "partyType": {
+            "code": "ORG",
+            "id": "<masked>",
+            "name": "Organization",
+            "partyTypeCode": "ORGANIZATION"
+          },
+          "roles": [
+            {
+              "endDate": null,
+              "id": "<masked>",
+              "roleType": "ROLE_MANUFACTURER",
+              "startDate": null
+            },
+            {
+              "endDate": null,
+              "id": "<masked>",
+              "roleType": "ROLE_SUPPLIER",
+              "startDate": null
+            }
+          ],
+          "sequences": {}
+        },
+        "organizationCode": "<masked>",
+        "organizationName": "Toyota USA",
+        "parentLocation": null,
+        "sortOrder": null,
+        "supportedActivities": [
+          "EXTERNAL",
+          "FULFILL_ORDER",
+          "SEND_STOCK"
+        ],
+        "zoneId": null,
+        "zoneName": null
+      },
+      {
+        "active": true,
+        "address": {
+          "address": "300 Apple St",
+          "address2": "",
+          "city": "Boston",
+          "country": "USA",
+          "description": "",
+          "postalCode": "54888",
+          "stateOrProvince": "MA"
+        },
+        "backgroundColor": "FFFFFF",
+        "description": null,
+        "hasBinLocationSupport": true,
+        "hasCentralPurchasingEnabled": false,
+        "hasPackingSupport": false,
+        "hasPartialReceivingSupport": false,
+        "id": "<masked>",
+        "locationGroup": {
+          "id": "<masked>",
+          "name": "NorthEast"
+        },
+        "locationNumber": "BOSW",
+        "locationType": {
+          "description": "Depot",
+          "id": "<masked>",
+          "locationTypeCode": "DEPOT",
+          "name": "Depot"
+        },
+        "manager": null,
+        "name": "Boston Warehouse",
+        "organization": {
+          "code": "MO-<seq>",
+          "dateCreated": "<masked>",
+          "defaultLocation": null,
+          "description": null,
+          "displayName": "MO-<seq> - My Organization",
+          "id": "<masked>",
+          "lastUpdated": "<masked>",
+          "name": "My Organization",
+          "partyType": {
+            "code": "ORG",
+            "id": "<masked>",
+            "name": "Organization",
+            "partyTypeCode": "ORGANIZATION"
+          },
+          "roles": [
+            {
+              "endDate": null,
+              "id": "<masked>",
+              "roleType": "ROLE_BUYER",
+              "startDate": null
+            }
+          ],
+          "sequences": {}
+        },
+        "organizationCode": "<masked>",
+        "organizationName": "My Organization",
+        "parentLocation": null,
+        "sortOrder": null,
+        "supportedActivities": [
+          "ADJUST_INVENTORY",
+          "ENABLE_FULFILLER_APPROVAL_NOTIFICATIONS",
+          "ENABLE_REQUESTOR_APPROVAL_NOTIFICATIONS",
+          "EXTERNAL",
+          "FULFILL_REQUEST",
+          "MANAGE_INVENTORY",
+          "PICK_STOCK",
+          "PLACE_ORDER",
+          "PLACE_REQUEST",
+          "PUTAWAY_STOCK",
+          "RECEIVE_STOCK",
+          "SEND_STOCK",
+          "SUBMIT_REQUEST"
+        ],
+        "zoneId": null,
+        "zoneName": null
+      },
+      {
+        "active": true,
+        "address": {
+          "address": "400 Gentle Lane",
+          "address2": "Suite 6",
+          "city": "New York",
+          "country": "USA",
+          "description": "",
+          "postalCode": "30456",
+          "stateOrProvince": "New York"
+        },
+        "backgroundColor": "FFFFFF",
+        "description": null,
+        "hasBinLocationSupport": true,
+        "hasCentralPurchasingEnabled": false,
+        "hasPackingSupport": false,
+        "hasPartialReceivingSupport": false,
+        "id": "<masked>",
+        "locationGroup": {
+          "id": "<masked>",
+          "name": "NorthEast"
+        },
+        "locationNumber": "NYCW",
+        "locationType": {
+          "description": "Depot",
+          "id": "<masked>",
+          "locationTypeCode": "DEPOT",
+          "name": "Depot"
+        },
+        "manager": null,
+        "name": "Central Warehouse (NYC)",
+        "organization": {
+          "code": "MO-<seq>",
+          "dateCreated": "<masked>",
+          "defaultLocation": null,
+          "description": null,
+          "displayName": "MO-<seq> - My Organization",
+          "id": "<masked>",
+          "lastUpdated": "<masked>",
+          "name": "My Organization",
+          "partyType": {
+            "code": "ORG",
+            "id": "<masked>",
+            "name": "Organization",
+            "partyTypeCode": "ORGANIZATION"
+          },
+          "roles": [
+            {
+              "endDate": null,
+              "id": "<masked>",
+              "roleType": "ROLE_BUYER",
+              "startDate": null
+            }
+          ],
+          "sequences": {}
+        },
+        "organizationCode": "<masked>",
+        "organizationName": "My Organization",
+        "parentLocation": null,
+        "sortOrder": null,
+        "supportedActivities": [
+          "ADJUST_INVENTORY",
+          "ENABLE_FULFILLER_APPROVAL_NOTIFICATIONS",
+          "ENABLE_REQUESTOR_APPROVAL_NOTIFICATIONS",
+          "EXTERNAL",
+          "FULFILL_REQUEST",
+          "MANAGE_INVENTORY",
+          "PICK_STOCK",
+          "PLACE_ORDER",
+          "PLACE_REQUEST",
+          "PUTAWAY_STOCK",
+          "RECEIVE_STOCK",
+          "SEND_STOCK",
+          "SUBMIT_REQUEST"
+        ],
+        "zoneId": null,
+        "zoneName": null
+      },
+      {
+        "active": true,
+        "address": {
+          "address": "45 Florence Rd",
+          "address2": "",
+          "city": "Milwauke",
+          "country": "USA",
+          "description": "",
+          "postalCode": "54765",
+          "stateOrProvince": "Wisconsin"
+        },
+        "backgroundColor": "FFFFFF",
+        "description": null,
+        "hasBinLocationSupport": false,
+        "hasCentralPurchasingEnabled": false,
+        "hasPackingSupport": false,
+        "hasPartialReceivingSupport": false,
+        "id": "<masked>",
+        "locationGroup": null,
+        "locationNumber": "MEDICAL",
+        "locationType": {
+          "description": "Supplier",
+          "id": "<masked>",
+          "locationTypeCode": "SUPPLIER",
+          "name": "Supplier"
+        },
+        "manager": null,
+        "name": "Medical Items Depot",
+        "organization": {
+          "code": "MID",
+          "dateCreated": "<masked>",
+          "defaultLocation": null,
+          "description": null,
+          "displayName": "MID - Medical Items Depot",
+          "id": "<masked>",
+          "lastUpdated": "<masked>",
+          "name": "Medical Items Depot",
+          "partyType": {
+            "code": "ORG",
+            "id": "<masked>",
+            "name": "Organization",
+            "partyTypeCode": "ORGANIZATION"
+          },
+          "roles": [
+            {
+              "endDate": null,
+              "id": "<masked>",
+              "roleType": "ROLE_MANUFACTURER",
+              "startDate": null
+            },
+            {
+              "endDate": null,
+              "id": "<masked>",
+              "roleType": "ROLE_SUPPLIER",
+              "startDate": null
+            }
+          ],
+          "sequences": {}
+        },
+        "organizationCode": "<masked>",
+        "organizationName": "Medical Items Depot",
+        "parentLocation": null,
+        "sortOrder": null,
+        "supportedActivities": [
+          "EXTERNAL",
+          "FULFILL_ORDER",
+          "SEND_STOCK"
+        ],
+        "zoneId": null,
+        "zoneName": null
+      },
+      {
+        "active": true,
+        "address": {
+          "address": "858 W 52nd St",
+          "address2": "",
+          "city": "Washington DC",
+          "country": "USA",
+          "description": "",
+          "postalCode": "43457",
+          "stateOrProvince": ""
+        },
+        "backgroundColor": "FFFFFF",
+        "description": null,
+        "hasBinLocationSupport": false,
+        "hasCentralPurchasingEnabled": false,
+        "hasPackingSupport": false,
+        "hasPartialReceivingSupport": false,
+        "id": "<masked>",
+        "locationGroup": null,
+        "locationNumber": "CDW",
+        "locationType": {
+          "description": "Supplier",
+          "id": "<masked>",
+          "locationTypeCode": "SUPPLIER",
+          "name": "Supplier"
+        },
+        "manager": null,
+        "name": "CDW",
+        "organization": {
+          "code": "CDW",
+          "dateCreated": "<masked>",
+          "defaultLocation": null,
+          "description": null,
+          "displayName": "CDW - CDW",
+          "id": "<masked>",
+          "lastUpdated": "<masked>",
+          "name": "CDW",
+          "partyType": {
+            "code": "ORG",
+            "id": "<masked>",
+            "name": "Organization",
+            "partyTypeCode": "ORGANIZATION"
+          },
+          "roles": [
+            {
+              "endDate": null,
+              "id": "<masked>",
+              "roleType": "ROLE_MANUFACTURER",
+              "startDate": null
+            },
+            {
+              "endDate": null,
+              "id": "<masked>",
+              "roleType": "ROLE_SUPPLIER",
+              "startDate": null
+            }
+          ],
+          "sequences": {}
+        },
+        "organizationCode": "<masked>",
+        "organizationName": "CDW",
+        "parentLocation": null,
+        "sortOrder": null,
+        "supportedActivities": [
+          "EXTERNAL",
+          "FULFILL_ORDER",
+          "SEND_STOCK"
+        ],
+        "zoneId": null,
+        "zoneName": null
+      },
+      {
+        "active": true,
+        "address": {
+          "address": "888 Commonwealth Avenue",
+          "address2": "Third Floor",
+          "city": "Boston",
+          "country": "United States",
+          "description": null,
+          "postalCode": "02215",
+          "stateOrProvince": "MA"
+        },
+        "backgroundColor": "FFFFFF",
+        "description": null,
+        "hasBinLocationSupport": true,
+        "hasCentralPurchasingEnabled": false,
+        "hasPackingSupport": false,
+        "hasPartialReceivingSupport": false,
+        "id": "<masked>",
+        "locationGroup": null,
+        "locationNumber": null,
+        "locationType": {
+          "description": "Depot",
+          "id": "<masked>",
+          "locationTypeCode": "DEPOT",
+          "name": "Depot"
+        },
+        "manager": {
+          "email": "admin@admin.com",
+          "firstName": "Miss",
+          "id": "<masked>",
+          "lastName": "Administrator",
+          "name": "Miss Administrator",
+          "roles": [
+            "ROLE_FINANCE",
+            "ROLE_PRODUCT_NOTIFICATION",
+            "ROLE_SHIPMENT_NOTIFICATION",
+            "ROLE_SUPERUSER"
+          ],
+          "username": "admin"
+        },
+        "name": "Main Warehouse",
+        "organization": {
+          "code": "MO",
+          "dateCreated": "<masked>",
+          "defaultLocation": null,
+          "description": null,
+          "displayName": "MO - Main Organization",
+          "id": "<masked>",
+          "lastUpdated": "<masked>",
+          "name": "Main Organization",
+          "partyType": {
+            "code": "ORG",
+            "id": "<masked>",
+            "name": "Organization",
+            "partyTypeCode": "ORGANIZATION"
+          },
+          "roles": [
+            {
+              "endDate": null,
+              "id": "<masked>",
+              "roleType": "ROLE_ORGANIZATION",
+              "startDate": null
+            }
+          ],
+          "sequences": {}
+        },
+        "organizationCode": "<masked>",
+        "organizationName": "Main Organization",
+        "parentLocation": null,
+        "sortOrder": "<masked>",
+        "supportedActivities": [
+          "ADJUST_INVENTORY",
+          "ENABLE_FULFILLER_APPROVAL_NOTIFICATIONS",
+          "ENABLE_REQUESTOR_APPROVAL_NOTIFICATIONS",
+          "EXTERNAL",
+          "FULFILL_REQUEST",
+          "MANAGE_INVENTORY",
+          "PICK_STOCK",
+          "PLACE_ORDER",
+          "PLACE_REQUEST",
+          "PUTAWAY_STOCK",
+          "RECEIVE_STOCK",
+          "SEND_STOCK",
+          "SUBMIT_REQUEST"
+        ],
+        "zoneId": null,
+        "zoneName": null
+      }
+    ]
+  },
+  "contentType": "application/json",
+  "request": {
+    "method": "GET",
+    "params": {},
+    "path": "/api/locations"
+  },
+  "status": 200
+}

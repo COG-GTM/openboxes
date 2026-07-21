@@ -1,0 +1,31 @@
+{
+  "body": {
+    "data": {
+      "colorNumber": null,
+      "datasets": [
+        {
+          "data": [
+            57
+          ],
+          "label": "Number of stockout",
+          "links": null,
+          "type": "doughnut",
+          "yAxisID": null
+        }
+      ],
+      "labels": [
+        "Never"
+      ]
+    },
+    "link": null
+  },
+  "contentType": "application/json",
+  "request": {
+    "method": "GET",
+    "params": {
+      "locationId": "1"
+    },
+    "path": "/api/dashboard/stockOutLastMonth"
+  },
+  "status": 200
+}

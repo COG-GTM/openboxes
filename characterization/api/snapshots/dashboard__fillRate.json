@@ -1,0 +1,87 @@
+{
+  "body": {
+    "data": {
+      "colorNumber": null,
+      "datasets": [
+        {
+          "data": [
+            0,
+            0,
+            0,
+            0,
+            0,
+            0
+          ],
+          "label": "Average Fill Rate",
+          "links": null,
+          "pointStyle": "circle",
+          "type": "line",
+          "yAxisID": "right-y-axis"
+        },
+        {
+          "data": [
+            0,
+            0,
+            0,
+            0,
+            0,
+            0
+          ],
+          "label": "Lines cancelled stock out",
+          "links": null,
+          "pointStyle": "circle",
+          "type": "bar",
+          "yAxisID": "left-y-axis"
+        },
+        {
+          "data": [
+            0,
+            0,
+            0,
+            0,
+            0,
+            0
+          ],
+          "label": "Request lines submitted",
+          "links": null,
+          "pointStyle": "circle",
+          "type": "bar",
+          "yAxisID": "left-y-axis"
+        },
+        {
+          "data": [
+            90.0,
+            90.0,
+            90.0,
+            90.0,
+            90.0,
+            90.0
+          ],
+          "label": "Average of target Fill Rate",
+          "links": null,
+          "pointStyle": "circle",
+          "type": "line",
+          "yAxisID": "right-y-axis"
+        }
+      ],
+      "labels": [
+        "<date>",
+        "<date>",
+        "<date>",
+        "<date>",
+        "<date>",
+        "<date>"
+      ]
+    },
+    "link": null
+  },
+  "contentType": "application/json",
+  "request": {
+    "method": "GET",
+    "params": {
+      "locationId": "1"
+    },
+    "path": "/api/dashboard/fillRate"
+  },
+  "status": 200
+}

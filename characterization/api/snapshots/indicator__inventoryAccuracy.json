@@ -1,0 +1,19 @@
+{
+  "body": {
+    "data": {
+      "firstValue": 0,
+      "name": "inventoryAccuracy",
+      "secondValue": 0,
+      "type": "DOUBLE"
+    }
+  },
+  "contentType": "application/json",
+  "request": {
+    "method": "GET",
+    "params": {
+      "facility": "1"
+    },
+    "path": "/api/reports/indicators/inventoryAccuracy"
+  },
+  "status": 200
+}

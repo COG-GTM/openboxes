@@ -1,0 +1,18 @@
+{
+  "body": {
+    "data": {
+      "name": "productsInventoried",
+      "type": "SINGLE",
+      "value": 57
+    }
+  },
+  "contentType": "application/json",
+  "request": {
+    "method": "GET",
+    "params": {
+      "facility": "1"
+    },
+    "path": "/api/reports/indicators/productsInventoried"
+  },
+  "status": 200
+}

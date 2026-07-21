@@ -1,0 +1,17 @@
+{
+  "body": {
+    "data": {
+      "description": null,
+      "id": "<masked>",
+      "locationTypeCode": "INTERNAL",
+      "name": "ZZ Characterization Location Type"
+    }
+  },
+  "contentType": "application/json",
+  "request": {
+    "method": "POST",
+    "params": {},
+    "path": "/api/generic/locationType/"
+  },
+  "status": 201
+}

@@ -1,0 +1,55 @@
+{
+  "body": {
+    "data": {
+      "colorNumber": null,
+      "datasets": [
+        {
+          "data": [
+            0,
+            0,
+            0,
+            13
+          ],
+          "label": "Expiration(s)",
+          "links": [
+            "",
+            "/openboxes/inventory/listExpiredStock?status=expired",
+            "/openboxes/inventory/listExpiringStock?status=within30Days",
+            "/openboxes/inventory/listExpiringStock?status=within90Days"
+          ],
+          "type": null,
+          "yAxisID": null
+        }
+      ],
+      "labels": [
+        {
+          "code": "react.dashboard.timeline.today.label",
+          "message": "today"
+        },
+        {
+          "code": "react.dashboard.timeline.within30Days.label",
+          "message": "within 30 days"
+        },
+        {
+          "code": "react.dashboard.timeline.within60Days.label",
+          "message": "within 60 days"
+        },
+        {
+          "code": "react.dashboard.timeline.within90Days.label",
+          "message": "within 90 days"
+        }
+      ]
+    },
+    "link": "/openboxes/inventory/listExpiringStock"
+  },
+  "contentType": "application/json",
+  "request": {
+    "method": "GET",
+    "params": {
+      "locationId": "1",
+      "querySize": "3"
+    },
+    "path": "/api/dashboard/expirationSummary"
+  },
+  "status": 200
+}

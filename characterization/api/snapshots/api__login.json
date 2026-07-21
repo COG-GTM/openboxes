@@ -1,0 +1,10 @@
+{
+  "contentType": "text/html",
+  "request": {
+    "method": "POST",
+    "params": {},
+    "path": "/api/login"
+  },
+  "status": 200,
+  "text": "Authentication was successful"
+}

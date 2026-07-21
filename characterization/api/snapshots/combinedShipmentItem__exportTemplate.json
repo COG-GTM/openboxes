@@ -1,0 +1,12 @@
+{
+  "contentType": "text/csv",
+  "request": {
+    "method": "GET",
+    "params": {
+      "blank": "true"
+    },
+    "path": "/api/combinedShipmentItems/exportTemplate"
+  },
+  "status": 200,
+  "text": "\"Order Number\",\"Order Item ID\",\"Product Code\",\"Product name\",\"Lot Number\",\"Expiry\",\"Quantity to Ship\",\"UOM\",\"Pack level 1\",\"Pack level 2\",\"Recipient\",\"Budget Code\",\"Supplier Code\"\n\"\",\"\",\"\",\"\",\"\",\"\",\"\",\"\",\"\",\"\",\"\",\"\",\"\""
+}

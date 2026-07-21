@@ -1,0 +1,42 @@
+{
+  "body": {
+    "data": {
+      "code": "AMAZON",
+      "dateCreated": "<masked>",
+      "defaultLocation": null,
+      "description": null,
+      "displayName": "AMAZON - Amazon.com",
+      "id": "<masked>",
+      "lastUpdated": "<masked>",
+      "name": "Amazon.com",
+      "partyType": {
+        "code": "ORG",
+        "id": "<masked>",
+        "name": "Organization",
+        "partyTypeCode": "ORGANIZATION"
+      },
+      "roles": [
+        {
+          "endDate": null,
+          "id": "<masked>",
+          "roleType": "ROLE_MANUFACTURER",
+          "startDate": null
+        },
+        {
+          "endDate": null,
+          "id": "<masked>",
+          "roleType": "ROLE_SUPPLIER",
+          "startDate": null
+        }
+      ],
+      "sequences": {}
+    }
+  },
+  "contentType": "application/json",
+  "request": {
+    "method": "GET",
+    "params": {},
+    "path": "/api/organizations/<id>"
+  },
+  "status": 200
+}

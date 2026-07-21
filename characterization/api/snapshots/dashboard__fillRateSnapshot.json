@@ -1,0 +1,61 @@
+{
+  "body": {
+    "data": {
+      "colorNumber": {
+        "color": "error",
+        "link": null,
+        "order": null,
+        "subtitle": "Fill Rate Last Month",
+        "value": "0%",
+        "value2": "-90 %"
+      },
+      "datasets": [
+        {
+          "data": [
+            0,
+            0,
+            0,
+            0,
+            0,
+            0,
+            0,
+            0,
+            0,
+            0,
+            0,
+            0
+          ],
+          "label": "Average Fill Rate",
+          "links": null,
+          "type": "line",
+          "yAxisID": null
+        }
+      ],
+      "labels": [
+        "<date>",
+        "<date>",
+        "<date>",
+        "<date>",
+        "<date>",
+        "<date>",
+        "<date>",
+        "<date>",
+        "<date>",
+        "<date>",
+        "<date>",
+        "<date>"
+      ]
+    },
+    "link": null
+  },
+  "contentType": "application/json",
+  "request": {
+    "method": "GET",
+    "params": {
+      "destinationLocation": "<id>",
+      "locationId": "1"
+    },
+    "path": "/api/dashboard/fillRateSnapshot"
+  },
+  "status": 200
+}

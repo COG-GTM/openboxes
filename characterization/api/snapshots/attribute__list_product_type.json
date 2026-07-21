@@ -1,0 +1,14 @@
+{
+  "body": {
+    "data": []
+  },
+  "contentType": "application/json",
+  "request": {
+    "method": "GET",
+    "params": {
+      "entityType": "PRODUCT"
+    },
+    "path": "/api/attributes"
+  },
+  "status": 200
+}

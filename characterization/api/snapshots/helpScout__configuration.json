@@ -1,0 +1,18 @@
+{
+  "body": {
+    "color": "#3AB4B1",
+    "enableFabAnimation": false,
+    "labels": {
+      "noTimeToWaitAround": null,
+      "responseTime": null
+    },
+    "localizedHelpScoutKey": "<id>"
+  },
+  "contentType": "application/json",
+  "request": {
+    "method": "GET",
+    "params": {},
+    "path": "/api/helpscout/configuration"
+  },
+  "status": 200
+}

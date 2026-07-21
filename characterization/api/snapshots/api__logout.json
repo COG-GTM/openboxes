@@ -1,0 +1,10 @@
+{
+  "contentType": "text/html",
+  "request": {
+    "method": "GET",
+    "params": {},
+    "path": "/api/logout"
+  },
+  "status": 200,
+  "text": "Logout was successful"
+}

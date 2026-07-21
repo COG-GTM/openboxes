@@ -1,0 +1,58 @@
+{
+  "body": {
+    "data": {
+      "listColorNumber": [
+        {
+          "color": "success",
+          "link": null,
+          "order": null,
+          "subtitle": "< 12 months",
+          "value": "119%",
+          "value2": null
+        },
+        {
+          "color": "success",
+          "link": null,
+          "order": null,
+          "subtitle": "< 3 months",
+          "value": "119%",
+          "value2": null
+        },
+        {
+          "color": "success",
+          "link": null,
+          "order": null,
+          "subtitle": "< 6 months",
+          "value": "119%",
+          "value2": null
+        },
+        {
+          "color": "success",
+          "link": null,
+          "order": null,
+          "subtitle": "< 9 months",
+          "value": "119%",
+          "value2": null
+        },
+        {
+          "color": "success",
+          "link": null,
+          "order": null,
+          "subtitle": "Ever",
+          "value": "119%",
+          "value2": null
+        }
+      ]
+    },
+    "link": null
+  },
+  "contentType": "application/json",
+  "request": {
+    "method": "GET",
+    "params": {
+      "locationId": "1"
+    },
+    "path": "/api/dashboard/productsInventoried"
+  },
+  "status": 200
+}

@@ -1,0 +1,123 @@
+{
+  "body": {
+    "data": [
+      {
+        "description": "Default bin location type",
+        "id": "<masked>",
+        "locationTypeCode": "BIN_LOCATION",
+        "name": "Bin Location",
+        "supportedActivities": [
+          "PICK_STOCK",
+          "PUTAWAY_STOCK"
+        ]
+      },
+      {
+        "description": "Default hold location type",
+        "id": "<masked>",
+        "locationTypeCode": "INTERNAL",
+        "name": "Hold",
+        "supportedActivities": [
+          "HOLD_STOCK",
+          "PUTAWAY_STOCK"
+        ]
+      },
+      {
+        "description": "Default receiving location type",
+        "id": "<masked>",
+        "locationTypeCode": "INTERNAL",
+        "name": "Cross-docking",
+        "supportedActivities": [
+          "PICK_STOCK",
+          "PUTAWAY_STOCK",
+          "RECEIVE_STOCK"
+        ]
+      },
+      {
+        "description": "Default receiving location type",
+        "id": "<masked>",
+        "locationTypeCode": "INTERNAL",
+        "name": "Receiving",
+        "supportedActivities": [
+          "PICK_STOCK",
+          "PUTAWAY_STOCK",
+          "RECEIVE_STOCK"
+        ]
+      },
+      {
+        "description": "Default zone location type",
+        "id": "<masked>",
+        "locationTypeCode": "ZONE",
+        "name": "Zone",
+        "supportedActivities": []
+      },
+      {
+        "description": "Depot",
+        "id": "<masked>",
+        "locationTypeCode": "DEPOT",
+        "name": "Depot",
+        "supportedActivities": [
+          "ADJUST_INVENTORY",
+          "ENABLE_FULFILLER_APPROVAL_NOTIFICATIONS",
+          "ENABLE_REQUESTOR_APPROVAL_NOTIFICATIONS",
+          "EXTERNAL",
+          "FULFILL_REQUEST",
+          "MANAGE_INVENTORY",
+          "PICK_STOCK",
+          "PLACE_ORDER",
+          "PLACE_REQUEST",
+          "PUTAWAY_STOCK",
+          "RECEIVE_STOCK",
+          "SEND_STOCK",
+          "SUBMIT_REQUEST"
+        ]
+      },
+      {
+        "description": "Dispensary",
+        "id": "<masked>",
+        "locationTypeCode": "DISPENSARY",
+        "name": "Dispensary",
+        "supportedActivities": [
+          "DYNAMIC_CREATION",
+          "RECEIVE_STOCK",
+          "SEND_STOCK"
+        ]
+      },
+      {
+        "description": "Pharmacy",
+        "id": "<masked>",
+        "locationTypeCode": "DISPENSARY",
+        "name": "Pharmacy",
+        "supportedActivities": [
+          "DYNAMIC_CREATION"
+        ]
+      },
+      {
+        "description": "Supplier",
+        "id": "<masked>",
+        "locationTypeCode": "SUPPLIER",
+        "name": "Supplier",
+        "supportedActivities": [
+          "EXTERNAL",
+          "FULFILL_ORDER",
+          "SEND_STOCK"
+        ]
+      },
+      {
+        "description": "Ward",
+        "id": "<masked>",
+        "locationTypeCode": "WARD",
+        "name": "Ward",
+        "supportedActivities": [
+          "DYNAMIC_CREATION"
+        ]
+      }
+    ]
+  },
+  "contentType": "application/json",
+  "request": {
+    "method": "GET",
+    "params": {},
+    "path": "/api/locations/locationTypes"
+  },
+  "status": 200
+}

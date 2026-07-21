@@ -1,0 +1,12 @@
+{
+  "body": {
+    "orderItems": []
+  },
+  "contentType": "application/json",
+  "request": {
+    "method": "POST",
+    "params": {},
+    "path": "/api/combinedShipmentItems/findOrderItems"
+  },
+  "status": 200
+}

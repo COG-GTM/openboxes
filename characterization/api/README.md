@@ -50,13 +50,19 @@ UPDATE_SNAPSHOTS=1 ./characterization/api/run.sh
   list elements are sorted; CSV bodies are masked and line-sorted.
 - Test records resolve seeded entities by stable natural keys (location
   names, product codes) — never by generated ids.
-- Write flows (`test_m_z_flows.py`) create dedicated test records, snapshot
-  every step, and delete what they created so the suite is re-runnable.
+- Write flows (`test_a_l_flows.py`, `test_m_z_flows.py`) create dedicated
+  test records, snapshot every step, and delete what they created so the
+  suite is re-runnable.
+- A–L-specific masks live in `a_l.py`: dashboard month/FY time-series
+  labels, generated `NNNLLL` sequence codes (e.g. organization code
+  suffixes), build/host metadata keys, and per-request values in Grails
+  HTML error pages. `a_l.py` also warms up the product-availability table
+  (synchronous refresh) so stock-derived endpoints are populated on a
+  freshly seeded database.
 - CI: `.github/workflows/characterization-tests.yml`, called from
   `test-pull-request.yml`.
 
 ## Coverage
 
+- Controllers A–L: see [docs/migration/API_SNAPSHOT_COVERAGE_A.md](../../docs/migration/API_SNAPSHOT_COVERAGE_A.md)
 - Controllers M–Z: see [docs/migration/API_SNAPSHOT_COVERAGE_B.md](../../docs/migration/API_SNAPSHOT_COVERAGE_B.md)
-  (Phase 0.3b). Controllers A–L (Phase 0.3a) should follow the same
-  conventions in this directory.

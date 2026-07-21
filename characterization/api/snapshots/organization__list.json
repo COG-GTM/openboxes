@@ -1,0 +1,243 @@
+{
+  "body": {
+    "data": [
+      {
+        "code": "AMAZON",
+        "dateCreated": "<masked>",
+        "defaultLocation": null,
+        "description": null,
+        "displayName": "AMAZON - Amazon.com",
+        "id": "<masked>",
+        "lastUpdated": "<masked>",
+        "name": "Amazon.com",
+        "partyType": {
+          "code": "ORG",
+          "id": "<masked>",
+          "name": "Organization",
+          "partyTypeCode": "ORGANIZATION"
+        },
+        "roles": [
+          {
+            "endDate": null,
+            "id": "<masked>",
+            "roleType": "ROLE_MANUFACTURER",
+            "startDate": null
+          },
+          {
+            "endDate": null,
+            "id": "<masked>",
+            "roleType": "ROLE_SUPPLIER",
+            "startDate": null
+          }
+        ],
+        "sequences": {}
+      },
+      {
+        "code": "CDW",
+        "dateCreated": "<masked>",
+        "defaultLocation": null,
+        "description": null,
+        "displayName": "CDW - CDW",
+        "id": "<masked>",
+        "lastUpdated": "<masked>",
+        "name": "CDW",
+        "partyType": {
+          "code": "ORG",
+          "id": "<masked>",
+          "name": "Organization",
+          "partyTypeCode": "ORGANIZATION"
+        },
+        "roles": [
+          {
+            "endDate": null,
+            "id": "<masked>",
+            "roleType": "ROLE_MANUFACTURER",
+            "startDate": null
+          },
+          {
+            "endDate": null,
+            "id": "<masked>",
+            "roleType": "ROLE_SUPPLIER",
+            "startDate": null
+          }
+        ],
+        "sequences": {}
+      },
+      {
+        "code": "GRAING",
+        "dateCreated": "<masked>",
+        "defaultLocation": null,
+        "description": null,
+        "displayName": "GRAING - Grainger",
+        "id": "<masked>",
+        "lastUpdated": "<masked>",
+        "name": "Grainger",
+        "partyType": {
+          "code": "ORG",
+          "id": "<masked>",
+          "name": "Organization",
+          "partyTypeCode": "ORGANIZATION"
+        },
+        "roles": [
+          {
+            "endDate": null,
+            "id": "<masked>",
+            "roleType": "ROLE_MANUFACTURER",
+            "startDate": null
+          },
+          {
+            "endDate": null,
+            "id": "<masked>",
+            "roleType": "ROLE_SUPPLIER",
+            "startDate": null
+          }
+        ],
+        "sequences": {}
+      },
+      {
+        "code": "MID",
+        "dateCreated": "<masked>",
+        "defaultLocation": null,
+        "description": null,
+        "displayName": "MID - Medical Items Depot",
+        "id": "<masked>",
+        "lastUpdated": "<masked>",
+        "name": "Medical Items Depot",
+        "partyType": {
+          "code": "ORG",
+          "id": "<masked>",
+          "name": "Organization",
+          "partyTypeCode": "ORGANIZATION"
+        },
+        "roles": [
+          {
+            "endDate": null,
+            "id": "<masked>",
+            "roleType": "ROLE_MANUFACTURER",
+            "startDate": null
+          },
+          {
+            "endDate": null,
+            "id": "<masked>",
+            "roleType": "ROLE_SUPPLIER",
+            "startDate": null
+          }
+        ],
+        "sequences": {}
+      },
+      {
+        "code": "MO",
+        "dateCreated": "<masked>",
+        "defaultLocation": null,
+        "description": null,
+        "displayName": "MO - Main Organization",
+        "id": "<masked>",
+        "lastUpdated": "<masked>",
+        "name": "Main Organization",
+        "partyType": {
+          "code": "ORG",
+          "id": "<masked>",
+          "name": "Organization",
+          "partyTypeCode": "ORGANIZATION"
+        },
+        "roles": [
+          {
+            "endDate": null,
+            "id": "<masked>",
+            "roleType": "ROLE_ORGANIZATION",
+            "startDate": null
+          }
+        ],
+        "sequences": {}
+      },
+      {
+        "code": "MO-<seq>",
+        "dateCreated": "<masked>",
+        "defaultLocation": null,
+        "description": null,
+        "displayName": "MO-<seq> - My Organization",
+        "id": "<masked>",
+        "lastUpdated": "<masked>",
+        "name": "My Organization",
+        "partyType": {
+          "code": "ORG",
+          "id": "<masked>",
+          "name": "Organization",
+          "partyTypeCode": "ORGANIZATION"
+        },
+        "roles": [
+          {
+            "endDate": null,
+            "id": "<masked>",
+            "roleType": "ROLE_BUYER",
+            "startDate": null
+          }
+        ],
+        "sequences": {}
+      },
+      {
+        "code": "SO",
+        "dateCreated": "<masked>",
+        "defaultLocation": null,
+        "description": null,
+        "displayName": "SO - Supplier Organization",
+        "id": "<masked>",
+        "lastUpdated": "<masked>",
+        "name": "Supplier Organization",
+        "partyType": {
+          "code": "ORG",
+          "id": "<masked>",
+          "name": "Organization",
+          "partyTypeCode": "ORGANIZATION"
+        },
+        "roles": [
+          {
+            "endDate": null,
+            "id": "<masked>",
+            "roleType": "ROLE_SUPPLIER",
+            "startDate": null
+          }
+        ],
+        "sequences": {}
+      },
+      {
+        "code": "TU",
+        "dateCreated": "<masked>",
+        "defaultLocation": null,
+        "description": null,
+        "displayName": "TU - Toyota USA",
+        "id": "<masked>",
+        "lastUpdated": "<masked>",
+        "name": "Toyota USA",
+        "partyType": {
+          "code": "ORG",
+          "id": "<masked>",
+          "name": "Organization",
+          "partyTypeCode": "ORGANIZATION"
+        },
+        "roles": [
+          {
+            "endDate": null,
+            "id": "<masked>",
+            "roleType": "ROLE_MANUFACTURER",
+            "startDate": null
+          },
+          {
+            "endDate": null,
+            "id": "<masked>",
+            "roleType": "ROLE_SUPPLIER",
+            "startDate": null
+          }
+        ],
+        "sequences": {}
+      }
+    ]
+  },
+  "contentType": "application/json",
+  "request": {
+    "method": "GET",
+    "params": {},
+    "path": "/api/organizations"
+  },
+  "status": 200
+}

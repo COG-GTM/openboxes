@@ -1,0 +1,21 @@
+{
+  "body": {
+    "data": [
+      {
+        "id": "<masked>",
+        "name": "MidWest"
+      },
+      {
+        "id": "<masked>",
+        "name": "NorthEast"
+      }
+    ]
+  },
+  "contentType": "application/json",
+  "request": {
+    "method": "GET",
+    "params": {},
+    "path": "/api/locationGroups"
+  },
+  "status": 200
+}

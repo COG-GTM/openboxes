@@ -1,0 +1,16 @@
+{
+  "body": {
+    "link": "/openboxes/report/showBinLocationReport?location.id=1&status=inStock",
+    "number": 48.0,
+    "tooltipData": null
+  },
+  "contentType": "application/json",
+  "request": {
+    "method": "GET",
+    "params": {
+      "locationId": "1"
+    },
+    "path": "/api/dashboard/inventoryByLotAndBin"
+  },
+  "status": 200
+}

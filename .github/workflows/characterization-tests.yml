@@ -8,6 +8,12 @@ name: Characterization Tests
 on:
   workflow_call:
 
+env:
+  # Pin the app image to the exact digest the snapshots were recorded
+  # against, so upstream image releases can't fail unrelated PRs.
+  # Bump this digest (and re-baseline with UPDATE_SNAPSHOTS=1) intentionally.
+  OB_VERSION: "latest@sha256:117b40a462c2a9edc29592ce88b8c659e4241f4779f8d85de8639b9b010fa9e8"
+
 jobs:
   api-snapshot-tests:
     runs-on: ubuntu-latest

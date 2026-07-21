@@ -1,0 +1,41 @@
+{
+  "body": {
+    "data": {
+      "first": {
+        "color": null,
+        "link": "/openboxes/stockMovement/list?direction=INBOUND&receiptStatusCode=PENDING",
+        "order": null,
+        "subtitle": "Pending",
+        "value": 0,
+        "value2": null
+      },
+      "fourth": null,
+      "second": {
+        "color": null,
+        "link": "/openboxes/stockMovement/list?direction=INBOUND&receiptStatusCode=SHIPPED",
+        "order": null,
+        "subtitle": "Shipped",
+        "value": 0,
+        "value2": null
+      },
+      "third": {
+        "color": null,
+        "link": "/openboxes/stockMovement/list?direction=INBOUND&receiptStatusCode=PARTIALLY_RECEIVED",
+        "order": null,
+        "subtitle": "Partially Received",
+        "value": 0,
+        "value2": null
+      }
+    },
+    "link": "/openboxes/stockMovement/list?direction=INBOUND"
+  },
+  "contentType": "application/json",
+  "request": {
+    "method": "GET",
+    "params": {
+      "locationId": "1"
+    },
+    "path": "/api/dashboard/incomingStock"
+  },
+  "status": 200
+}

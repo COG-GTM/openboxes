@@ -1,0 +1,75 @@
+{
+  "body": {
+    "data": [
+      {
+        "description": "Default bin location type",
+        "id": "<masked>",
+        "locationTypeCode": "BIN_LOCATION",
+        "name": "Bin Location"
+      },
+      {
+        "description": "Default hold location type",
+        "id": "<masked>",
+        "locationTypeCode": "INTERNAL",
+        "name": "Hold"
+      },
+      {
+        "description": "Default receiving location type",
+        "id": "<masked>",
+        "locationTypeCode": "INTERNAL",
+        "name": "Cross-docking"
+      },
+      {
+        "description": "Default receiving location type",
+        "id": "<masked>",
+        "locationTypeCode": "INTERNAL",
+        "name": "Receiving"
+      },
+      {
+        "description": "Default zone location type",
+        "id": "<masked>",
+        "locationTypeCode": "ZONE",
+        "name": "Zone"
+      },
+      {
+        "description": "Depot",
+        "id": "<masked>",
+        "locationTypeCode": "DEPOT",
+        "name": "Depot"
+      },
+      {
+        "description": "Dispensary",
+        "id": "<masked>",
+        "locationTypeCode": "DISPENSARY",
+        "name": "Dispensary"
+      },
+      {
+        "description": "Pharmacy",
+        "id": "<masked>",
+        "locationTypeCode": "DISPENSARY",
+        "name": "Pharmacy"
+      },
+      {
+        "description": "Supplier",
+        "id": "<masked>",
+        "locationTypeCode": "SUPPLIER",
+        "name": "Supplier"
+      },
+      {
+        "description": "Ward",
+        "id": "<masked>",
+        "locationTypeCode": "WARD",
+        "name": "Ward"
+      }
+    ]
+  },
+  "contentType": "application/json",
+  "request": {
+    "method": "POST",
+    "params": {
+      "max": "5"
+    },
+    "path": "/api/generic/locationType/search"
+  },
+  "status": 200
+}

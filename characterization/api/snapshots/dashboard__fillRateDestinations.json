@@ -1,0 +1,22 @@
+{
+  "body": {
+    "data": [
+      {
+        "id": "<masked>",
+        "name": {
+          "code": "react.dashboard.locationFilter.all.label",
+          "message": "react.dashboard.locationFilter.all"
+        }
+      }
+    ]
+  },
+  "contentType": "application/json",
+  "request": {
+    "method": "GET",
+    "params": {
+      "locationId": "1"
+    },
+    "path": "/api/dashboard/fillRateDestinations"
+  },
+  "status": 200
+}

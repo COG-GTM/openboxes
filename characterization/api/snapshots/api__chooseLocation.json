@@ -1,0 +1,10 @@
+{
+  "contentType": "text/html",
+  "request": {
+    "method": "GET",
+    "params": {},
+    "path": "/api/chooseLocation/1"
+  },
+  "status": 200,
+  "text": "User Miss Administrator is now logged into Main Warehouse"
+}
