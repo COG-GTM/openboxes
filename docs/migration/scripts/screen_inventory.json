@@ -1,0 +1,3706 @@
+{
+ "counts": {
+  "LIVE": 274,
+  "DEAD": 104,
+  "TEMPLATE": 231,
+  "SUPERSEDED": 7
+ },
+ "screens": [
+  {
+   "gsp": "grails-app/views/admin/cache.gsp",
+   "key": "admin/cache",
+   "classification": "LIVE",
+   "evidence": "grails-app/controllers/org/pih/warehouse/admin/AdminController.groovy:60 (controller action (convention))"
+  },
+  {
+   "gsp": "grails-app/views/admin/controllerActions.gsp",
+   "key": "admin/controllerActions",
+   "classification": "LIVE",
+   "evidence": "grails-app/controllers/org/pih/warehouse/admin/AdminController.groovy:35 (controller action (convention))"
+  },
+  {
+   "gsp": "grails-app/views/admin/index.gsp",
+   "key": "admin/index",
+   "classification": "LIVE",
+   "evidence": "grails-app/controllers/org/pih/warehouse/admin/AdminController.groovy:33 (controller action (convention))"
+  },
+  {
+   "gsp": "grails-app/views/admin/plugins.gsp",
+   "key": "admin/plugins",
+   "classification": "LIVE",
+   "evidence": "grails-app/controllers/org/pih/warehouse/admin/AdminController.groovy:64 (controller action (convention))"
+  },
+  {
+   "gsp": "grails-app/views/admin/sendMail.gsp",
+   "key": "admin/sendMail",
+   "classification": "LIVE",
+   "evidence": "grails-app/controllers/org/pih/warehouse/admin/AdminController.groovy:99 (controller action (convention))"
+  },
+  {
+   "gsp": "grails-app/views/admin/showSettings.gsp",
+   "key": "admin/showSettings",
+   "classification": "LIVE",
+   "evidence": "grails-app/controllers/org/pih/warehouse/admin/AdminController.groovy:187 (controller action (convention))"
+  },
+  {
+   "gsp": "grails-app/views/admin/showUpgrade.gsp",
+   "key": "admin/showUpgrade",
+   "classification": "LIVE",
+   "evidence": "grails-app/controllers/org/pih/warehouse/admin/AdminController.groovy:69 (controller action (convention))"
+  },
+  {
+   "gsp": "grails-app/views/admin/status.gsp",
+   "key": "admin/status",
+   "classification": "LIVE",
+   "evidence": "grails-app/controllers/org/pih/warehouse/admin/AdminController.groovy:66 (controller action (convention))"
+  },
+  {
+   "gsp": "grails-app/views/api/index.gsp",
+   "key": "api/index",
+   "classification": "DEAD",
+   "evidence": "no controller action, URL mapping, menu, render, or link reference found"
+  },
+  {
+   "gsp": "grails-app/views/attribute/_renderFormList.gsp",
+   "key": "attribute/_renderFormList",
+   "classification": "TEMPLATE",
+   "evidence": "grails-app/views/productSupplier/edit.gsp:193 (included by live page)"
+  },
+  {
+   "gsp": "grails-app/views/attribute/edit.gsp",
+   "key": "attribute/edit",
+   "classification": "LIVE",
+   "evidence": "grails-app/controllers/org/pih/warehouse/product/AttributeController.groovy:49 (controller action (convention))"
+  },
+  {
+   "gsp": "grails-app/views/attribute/list.gsp",
+   "key": "attribute/list",
+   "classification": "LIVE",
+   "evidence": "grails-app/controllers/org/pih/warehouse/product/AttributeController.groovy:25 (controller action (convention))"
+  },
+  {
+   "gsp": "grails-app/views/attribute/show.gsp",
+   "key": "attribute/show",
+   "classification": "LIVE",
+   "evidence": "grails-app/controllers/org/pih/warehouse/product/AttributeController.groovy:33 (controller action (convention))"
+  },
+  {
+   "gsp": "grails-app/views/auth/login.gsp",
+   "key": "auth/login",
+   "classification": "LIVE",
+   "evidence": "grails-app/controllers/org/pih/warehouse/user/AuthController.groovy:50 (controller action (convention))"
+  },
+  {
+   "gsp": "grails-app/views/auth/signup.gsp",
+   "key": "auth/signup",
+   "classification": "LIVE",
+   "evidence": "grails-app/controllers/org/pih/warehouse/user/AuthController.groovy:153 (controller action (convention))"
+  },
+  {
+   "gsp": "grails-app/views/batch/_uploadFileForm.gsp",
+   "key": "batch/_uploadFileForm",
+   "classification": "TEMPLATE",
+   "evidence": "grails-app/views/batch/importData.gsp:137 (included by live page)"
+  },
+  {
+   "gsp": "grails-app/views/batch/importData.gsp",
+   "key": "batch/importData",
+   "classification": "LIVE",
+   "evidence": "grails-app/controllers/org/pih/warehouse/batch/BatchController.groovy:106 (controller action (convention))"
+  },
+  {
+   "gsp": "grails-app/views/budgetCode/create.gsp",
+   "key": "budgetCode/create",
+   "classification": "LIVE",
+   "evidence": "grails-app/controllers/org/pih/warehouse/core/BudgetCodeController.groovy:26 (controller action (convention))"
+  },
+  {
+   "gsp": "grails-app/views/budgetCode/edit.gsp",
+   "key": "budgetCode/edit",
+   "classification": "LIVE",
+   "evidence": "grails-app/controllers/org/pih/warehouse/core/BudgetCodeController.groovy:32 (controller action (convention))"
+  },
+  {
+   "gsp": "grails-app/views/budgetCode/list.gsp",
+   "key": "budgetCode/list",
+   "classification": "LIVE",
+   "evidence": "grails-app/controllers/org/pih/warehouse/core/BudgetCodeController.groovy:21 (controller action (convention))"
+  },
+  {
+   "gsp": "grails-app/views/category/_selectOptions.gsp",
+   "key": "category/_selectOptions",
+   "classification": "TEMPLATE",
+   "evidence": "grails-app/taglib/org/pih/warehouse/CategorySelectTagLib.groovy:61 (rendered from controller/taglib)"
+  },
+  {
+   "gsp": "grails-app/views/category/_tree.gsp",
+   "key": "category/_tree",
+   "classification": "TEMPLATE",
+   "evidence": "grails-app/views/category/tree.gsp:52 (included by live page)"
+  },
+  {
+   "gsp": "grails-app/views/category/create.gsp",
+   "key": "category/create",
+   "classification": "LIVE",
+   "evidence": "grails-app/controllers/org/pih/warehouse/product/CategoryController.groovy:100 (controller action (convention))"
+  },
+  {
+   "gsp": "grails-app/views/category/edit.gsp",
+   "key": "category/edit",
+   "classification": "LIVE",
+   "evidence": "grails-app/controllers/org/pih/warehouse/product/CategoryController.groovy:129 (controller action (convention))"
+  },
+  {
+   "gsp": "grails-app/views/category/tree.gsp",
+   "key": "category/tree",
+   "classification": "LIVE",
+   "evidence": "grails-app/controllers/org/pih/warehouse/product/CategoryController.groovy:25 (controller action (convention))"
+  },
+  {
+   "gsp": "grails-app/views/common/_breadcrumb.gsp",
+   "key": "common/_breadcrumb",
+   "classification": "DEAD",
+   "evidence": "template/layout not included by any live page"
+  },
+  {
+   "gsp": "grails-app/views/common/_customCss.gsp",
+   "key": "common/_customCss",
+   "classification": "TEMPLATE",
+   "evidence": "grails-app/views/layouts/custom.gsp:52 (included by live page)"
+  },
+  {
+   "gsp": "grails-app/views/common/_customVariables.gsp",
+   "key": "common/_customVariables",
+   "classification": "TEMPLATE",
+   "evidence": "grails-app/views/layouts/custom.gsp:65 (included by live page)"
+  },
+  {
+   "gsp": "grails-app/views/common/_dataTable.gsp",
+   "key": "common/_dataTable",
+   "classification": "TEMPLATE",
+   "evidence": "grails-app/views/migration/productAvailability.gsp:1 (included by live page)"
+  },
+  {
+   "gsp": "grails-app/views/common/_footer.gsp",
+   "key": "common/_footer",
+   "classification": "TEMPLATE",
+   "evidence": "grails-app/controllers/org/pih/warehouse/user/DashboardController.groovy:161 (rendered from controller/taglib)"
+  },
+  {
+   "gsp": "grails-app/views/common/_fullstory.gsp",
+   "key": "common/_fullstory",
+   "classification": "TEMPLATE",
+   "evidence": "grails-app/views/layouts/custom.gsp:53 (included by live page)"
+  },
+  {
+   "gsp": "grails-app/views/common/_header.gsp",
+   "key": "common/_header",
+   "classification": "DEAD",
+   "evidence": "template/layout not included by any live page"
+  },
+  {
+   "gsp": "grails-app/views/common/_hotjar.gsp",
+   "key": "common/_hotjar",
+   "classification": "TEMPLATE",
+   "evidence": "grails-app/views/layouts/custom.gsp:54 (included by live page)"
+  },
+  {
+   "gsp": "grails-app/views/common/_localization.gsp",
+   "key": "common/_localization",
+   "classification": "TEMPLATE",
+   "evidence": "grails-app/views/layouts/custom.gsp:185 (included by live page)"
+  },
+  {
+   "gsp": "grails-app/views/common/_menu.gsp",
+   "key": "common/_menu",
+   "classification": "DEAD",
+   "evidence": "template/layout not included by any live page"
+  },
+  {
+   "gsp": "grails-app/views/common/_menuicons.gsp",
+   "key": "common/_menuicons",
+   "classification": "TEMPLATE",
+   "evidence": "grails-app/views/dashboard/megamenu.gsp:93 (included by live page)"
+  },
+  {
+   "gsp": "grails-app/views/common/_navbar.gsp",
+   "key": "common/_navbar",
+   "classification": "TEMPLATE",
+   "evidence": "grails-app/views/layouts/analytics.gsp:65 (included by live page)"
+  },
+  {
+   "gsp": "grails-app/views/common/_personAutocomplete.gsp",
+   "key": "common/_personAutocomplete",
+   "classification": "DEAD",
+   "evidence": "template/layout not included by any live page"
+  },
+  {
+   "gsp": "grails-app/views/consumption/_filters.gsp",
+   "key": "consumption/_filters",
+   "classification": "TEMPLATE",
+   "evidence": "grails-app/views/consumption/show.gsp:23 (included by live page)"
+  },
+  {
+   "gsp": "grails-app/views/consumption/_product.gsp",
+   "key": "consumption/_product",
+   "classification": "TEMPLATE",
+   "evidence": "grails-app/controllers/org/pih/warehouse/reporting/ConsumptionController.groovy:457 (rendered from controller/taglib)"
+  },
+  {
+   "gsp": "grails-app/views/consumption/list.gsp",
+   "key": "consumption/list",
+   "classification": "LIVE",
+   "evidence": "grails-app/controllers/org/pih/warehouse/reporting/ConsumptionController.groovy:400 (controller action (convention))"
+  },
+  {
+   "gsp": "grails-app/views/consumption/pivot.gsp",
+   "key": "consumption/pivot",
+   "classification": "LIVE",
+   "evidence": "grails-app/controllers/org/pih/warehouse/reporting/ConsumptionController.groovy:389 (controller action (convention))"
+  },
+  {
+   "gsp": "grails-app/views/consumption/show.gsp",
+   "key": "consumption/show",
+   "classification": "LIVE",
+   "evidence": "grails-app/controllers/org/pih/warehouse/reporting/ConsumptionController.groovy:47 (controller action (convention))"
+  },
+  {
+   "gsp": "grails-app/views/container/_summary.gsp",
+   "key": "container/_summary",
+   "classification": "TEMPLATE",
+   "evidence": "grails-app/views/createShipmentWorkflow/createShipment/enterContainerDetails.gsp:346 (included by live page)"
+  },
+  {
+   "gsp": "grails-app/views/country/list.gsp",
+   "key": "country/list",
+   "classification": "DEAD",
+   "evidence": "no controller action, URL mapping, menu, render, or link reference found"
+  },
+  {
+   "gsp": "grails-app/views/createShipmentWorkflow/_addIncomingItem.gsp",
+   "key": "createShipmentWorkflow/_addIncomingItem",
+   "classification": "TEMPLATE",
+   "evidence": "grails-app/views/createShipmentWorkflow/createShipment/enterContainerDetails.gsp:76 (included by live page)"
+  },
+  {
+   "gsp": "grails-app/views/createShipmentWorkflow/_addItem.gsp",
+   "key": "createShipmentWorkflow/_addItem",
+   "classification": "TEMPLATE",
+   "evidence": "grails-app/views/createShipmentWorkflow/createShipment/enterContainerDetails.gsp:85 (included by live page)"
+  },
+  {
+   "gsp": "grails-app/views/createShipmentWorkflow/_addLocation.gsp",
+   "key": "createShipmentWorkflow/_addLocation",
+   "classification": "TEMPLATE",
+   "evidence": "grails-app/views/createShipmentWorkflow/createShipment/enterShipmentDetails.gsp:20 (included by live page)"
+  },
+  {
+   "gsp": "grails-app/views/createShipmentWorkflow/_addPerson.gsp",
+   "key": "createShipmentWorkflow/_addPerson",
+   "classification": "TEMPLATE",
+   "evidence": "grails-app/views/createShipmentWorkflow/createShipment/enterTrackingDetails.gsp:21 (included by live page)"
+  },
+  {
+   "gsp": "grails-app/views/createShipmentWorkflow/_addShipper.gsp",
+   "key": "createShipmentWorkflow/_addShipper",
+   "classification": "TEMPLATE",
+   "evidence": "grails-app/views/createShipmentWorkflow/createShipment/enterTrackingDetails.gsp:24 (included by live page)"
+  },
+  {
+   "gsp": "grails-app/views/createShipmentWorkflow/_containerButtons.gsp",
+   "key": "createShipmentWorkflow/_containerButtons",
+   "classification": "TEMPLATE",
+   "evidence": "grails-app/views/createShipmentWorkflow/createShipment/enterContainerDetails.gsp:101 (included by live page)"
+  },
+  {
+   "gsp": "grails-app/views/createShipmentWorkflow/_containerFields.gsp",
+   "key": "createShipmentWorkflow/_containerFields",
+   "classification": "TEMPLATE",
+   "evidence": "grails-app/views/createShipmentWorkflow/_editBox.gsp:12 (included by live page)"
+  },
+  {
+   "gsp": "grails-app/views/createShipmentWorkflow/_containerMenuItems.gsp",
+   "key": "createShipmentWorkflow/_containerMenuItems",
+   "classification": "TEMPLATE",
+   "evidence": "grails-app/views/createShipmentWorkflow/createShipment/enterContainerDetails.gsp:150 (included by live page)"
+  },
+  {
+   "gsp": "grails-app/views/createShipmentWorkflow/_editBox.gsp",
+   "key": "createShipmentWorkflow/_editBox",
+   "classification": "TEMPLATE",
+   "evidence": "grails-app/views/createShipmentWorkflow/createShipment/enterContainerDetails.gsp:70 (included by live page)"
+  },
+  {
+   "gsp": "grails-app/views/createShipmentWorkflow/_editContainer.gsp",
+   "key": "createShipmentWorkflow/_editContainer",
+   "classification": "TEMPLATE",
+   "evidence": "grails-app/views/createShipmentWorkflow/createShipment/enterContainerDetails.gsp:64 (included by live page)"
+  },
+  {
+   "gsp": "grails-app/views/createShipmentWorkflow/_editItem.gsp",
+   "key": "createShipmentWorkflow/_editItem",
+   "classification": "TEMPLATE",
+   "evidence": "grails-app/views/createShipmentWorkflow/createShipment/enterContainerDetails.gsp:79 (included by live page)"
+  },
+  {
+   "gsp": "grails-app/views/createShipmentWorkflow/_flowHeader.gsp",
+   "key": "createShipmentWorkflow/_flowHeader",
+   "classification": "TEMPLATE",
+   "evidence": "grails-app/views/createShipmentWorkflow/createShipment/enterContainerDetails.gsp:60 (included by live page)"
+  },
+  {
+   "gsp": "grails-app/views/createShipmentWorkflow/_itemFields.gsp",
+   "key": "createShipmentWorkflow/_itemFields",
+   "classification": "TEMPLATE",
+   "evidence": "grails-app/views/createShipmentWorkflow/_editItem.gsp:8 (included by live page)"
+  },
+  {
+   "gsp": "grails-app/views/createShipmentWorkflow/_itemFoundFields.gsp",
+   "key": "createShipmentWorkflow/_itemFoundFields",
+   "classification": "TEMPLATE",
+   "evidence": "grails-app/views/createShipmentWorkflow/_addItem.gsp:25 (included by live page)"
+  },
+  {
+   "gsp": "grails-app/views/createShipmentWorkflow/_itemMenuItems.gsp",
+   "key": "createShipmentWorkflow/_itemMenuItems",
+   "classification": "TEMPLATE",
+   "evidence": "grails-app/views/createShipmentWorkflow/createShipment/enterContainerDetails.gsp:383 (included by live page)"
+  },
+  {
+   "gsp": "grails-app/views/createShipmentWorkflow/_itemTableRow.gsp",
+   "key": "createShipmentWorkflow/_itemTableRow",
+   "classification": "DEAD",
+   "evidence": "template/layout not included by any live page"
+  },
+  {
+   "gsp": "grails-app/views/createShipmentWorkflow/_moveContainer.gsp",
+   "key": "createShipmentWorkflow/_moveContainer",
+   "classification": "TEMPLATE",
+   "evidence": "grails-app/views/createShipmentWorkflow/createShipment/enterContainerDetails.gsp:67 (included by live page)"
+  },
+  {
+   "gsp": "grails-app/views/createShipmentWorkflow/_moveDraggableItem.gsp",
+   "key": "createShipmentWorkflow/_moveDraggableItem",
+   "classification": "DEAD",
+   "evidence": "template/layout not included by any live page"
+  },
+  {
+   "gsp": "grails-app/views/createShipmentWorkflow/_moveItem.gsp",
+   "key": "createShipmentWorkflow/_moveItem",
+   "classification": "TEMPLATE",
+   "evidence": "grails-app/views/createShipmentWorkflow/createShipment/enterContainerDetails.gsp:95 (included by live page)"
+  },
+  {
+   "gsp": "grails-app/views/createShipmentWorkflow/_shipmentButtons.gsp",
+   "key": "createShipmentWorkflow/_shipmentButtons",
+   "classification": "TEMPLATE",
+   "evidence": "grails-app/views/createShipmentWorkflow/createShipment/enterContainerDetails.gsp:100 (included by live page)"
+  },
+  {
+   "gsp": "grails-app/views/createShipmentWorkflow/_shipmentMenuItems.gsp",
+   "key": "createShipmentWorkflow/_shipmentMenuItems",
+   "classification": "TEMPLATE",
+   "evidence": "grails-app/views/createShipmentWorkflow/createShipment/enterContainerDetails.gsp:151 (included by live page)"
+  },
+  {
+   "gsp": "grails-app/views/createShipmentWorkflow/createShipment/enterContainerDetails.gsp",
+   "key": "createShipmentWorkflow/createShipment/enterContainerDetails",
+   "classification": "LIVE",
+   "evidence": "grails-app/controllers/org/pih/warehouse/shipping/CreateShipmentWorkflowController.groovy:38 (webflow state view)"
+  },
+  {
+   "gsp": "grails-app/views/createShipmentWorkflow/createShipment/enterShipmentDetails.gsp",
+   "key": "createShipmentWorkflow/createShipment/enterShipmentDetails",
+   "classification": "LIVE",
+   "evidence": "grails-app/controllers/org/pih/warehouse/shipping/CreateShipmentWorkflowController.groovy:38 (webflow state view)"
+  },
+  {
+   "gsp": "grails-app/views/createShipmentWorkflow/createShipment/enterTrackingDetails.gsp",
+   "key": "createShipmentWorkflow/createShipment/enterTrackingDetails",
+   "classification": "LIVE",
+   "evidence": "grails-app/controllers/org/pih/warehouse/shipping/CreateShipmentWorkflowController.groovy:38 (webflow state view)"
+  },
+  {
+   "gsp": "grails-app/views/createShipmentWorkflow/createShipment/pickShipmentItems.gsp",
+   "key": "createShipmentWorkflow/createShipment/pickShipmentItems",
+   "classification": "LIVE",
+   "evidence": "grails-app/controllers/org/pih/warehouse/shipping/CreateShipmentWorkflowController.groovy:38 (webflow state view)"
+  },
+  {
+   "gsp": "grails-app/views/createShipmentWorkflow/createShipment/sendShipment.gsp",
+   "key": "createShipmentWorkflow/createShipment/sendShipment",
+   "classification": "LIVE",
+   "evidence": "grails-app/controllers/org/pih/warehouse/shipping/CreateShipmentWorkflowController.groovy:38 (webflow state view)"
+  },
+  {
+   "gsp": "grails-app/views/cycleCount/_printCount.gsp",
+   "key": "cycleCount/_printCount",
+   "classification": "TEMPLATE",
+   "evidence": "grails-app/controllers/org/pih/warehouse/api/CycleCountApiController.groovy:151 (template path string literal)"
+  },
+  {
+   "gsp": "grails-app/views/cycleCount/_printRecount.gsp",
+   "key": "cycleCount/_printRecount",
+   "classification": "TEMPLATE",
+   "evidence": "grails-app/controllers/org/pih/warehouse/api/CycleCountApiController.groovy:169 (template path string literal)"
+  },
+  {
+   "gsp": "grails-app/views/dashboard/_activitySummary.gsp",
+   "key": "dashboard/_activitySummary",
+   "classification": "DEAD",
+   "evidence": "template/layout not included by any live page"
+  },
+  {
+   "gsp": "grails-app/views/dashboard/_alertSummary.gsp",
+   "key": "dashboard/_alertSummary",
+   "classification": "DEAD",
+   "evidence": "template/layout not included by any live page"
+  },
+  {
+   "gsp": "grails-app/views/dashboard/_binLocationSummary.gsp",
+   "key": "dashboard/_binLocationSummary",
+   "classification": "DEAD",
+   "evidence": "template/layout not included by any live page"
+  },
+  {
+   "gsp": "grails-app/views/dashboard/_catalogsSummary.gsp",
+   "key": "dashboard/_catalogsSummary",
+   "classification": "DEAD",
+   "evidence": "template/layout not included by any live page"
+  },
+  {
+   "gsp": "grails-app/views/dashboard/_expiringSummary.gsp",
+   "key": "dashboard/_expiringSummary",
+   "classification": "DEAD",
+   "evidence": "template/layout not included by any live page"
+  },
+  {
+   "gsp": "grails-app/views/dashboard/_genericProductSummary.gsp",
+   "key": "dashboard/_genericProductSummary",
+   "classification": "DEAD",
+   "evidence": "template/layout not included by any live page"
+  },
+  {
+   "gsp": "grails-app/views/dashboard/_indicatorSummary.gsp",
+   "key": "dashboard/_indicatorSummary",
+   "classification": "DEAD",
+   "evidence": "template/layout not included by any live page"
+  },
+  {
+   "gsp": "grails-app/views/dashboard/_loginLocations.gsp",
+   "key": "dashboard/_loginLocations",
+   "classification": "TEMPLATE",
+   "evidence": "grails-app/views/dashboard/chooseLocation.gsp:18 (included by live page)"
+  },
+  {
+   "gsp": "grails-app/views/dashboard/_newsSummary.gsp",
+   "key": "dashboard/_newsSummary",
+   "classification": "DEAD",
+   "evidence": "template/layout not included by any live page"
+  },
+  {
+   "gsp": "grails-app/views/dashboard/_orderSummary.gsp",
+   "key": "dashboard/_orderSummary",
+   "classification": "DEAD",
+   "evidence": "template/layout not included by any live page"
+  },
+  {
+   "gsp": "grails-app/views/dashboard/_productSummary.gsp",
+   "key": "dashboard/_productSummary",
+   "classification": "DEAD",
+   "evidence": "template/layout not included by any live page"
+  },
+  {
+   "gsp": "grails-app/views/dashboard/_receiptSummary.gsp",
+   "key": "dashboard/_receiptSummary",
+   "classification": "DEAD",
+   "evidence": "template/layout not included by any live page"
+  },
+  {
+   "gsp": "grails-app/views/dashboard/_requisitionItemSummary.gsp",
+   "key": "dashboard/_requisitionItemSummary",
+   "classification": "DEAD",
+   "evidence": "template/layout not included by any live page"
+  },
+  {
+   "gsp": "grails-app/views/dashboard/_requisitionSummary.gsp",
+   "key": "dashboard/_requisitionSummary",
+   "classification": "DEAD",
+   "evidence": "template/layout not included by any live page"
+  },
+  {
+   "gsp": "grails-app/views/dashboard/_shipmentSummary.gsp",
+   "key": "dashboard/_shipmentSummary",
+   "classification": "DEAD",
+   "evidence": "template/layout not included by any live page"
+  },
+  {
+   "gsp": "grails-app/views/dashboard/_tagSummary.gsp",
+   "key": "dashboard/_tagSummary",
+   "classification": "DEAD",
+   "evidence": "template/layout not included by any live page"
+  },
+  {
+   "gsp": "grails-app/views/dashboard/_valueSummary.gsp",
+   "key": "dashboard/_valueSummary",
+   "classification": "DEAD",
+   "evidence": "template/layout not included by any live page"
+  },
+  {
+   "gsp": "grails-app/views/dashboard/chooseLocation.gsp",
+   "key": "dashboard/chooseLocation",
+   "classification": "LIVE",
+   "evidence": "grails-app/controllers/org/pih/warehouse/user/DashboardController.groovy:209 (controller action (convention))"
+  },
+  {
+   "gsp": "grails-app/views/dashboard/megamenu.gsp",
+   "key": "dashboard/megamenu",
+   "classification": "LIVE",
+   "evidence": "grails-app/controllers/org/pih/warehouse/user/DashboardController.groovy:163 (controller action (convention))"
+  },
+  {
+   "gsp": "grails-app/views/dashboard/old.gsp",
+   "key": "dashboard/old",
+   "classification": "DEAD",
+   "evidence": "no controller action, URL mapping, menu, render, or link reference found"
+  },
+  {
+   "gsp": "grails-app/views/dataExport/index.gsp",
+   "key": "dataExport/index",
+   "classification": "LIVE",
+   "evidence": "grails-app/controllers/org/pih/warehouse/data/DataExportController.groovy:22 (controller action (convention))"
+  },
+  {
+   "gsp": "grails-app/views/deliveryNote/_addressSection.gsp",
+   "key": "deliveryNote/_addressSection",
+   "classification": "TEMPLATE",
+   "evidence": "grails-app/views/deliveryNote/print.gsp:28 (included by live page)"
+  },
+  {
+   "gsp": "grails-app/views/deliveryNote/_notesSection.gsp",
+   "key": "deliveryNote/_notesSection",
+   "classification": "TEMPLATE",
+   "evidence": "grails-app/views/deliveryNote/print.gsp:82 (included by live page)"
+  },
+  {
+   "gsp": "grails-app/views/deliveryNote/_printHeader.gsp",
+   "key": "deliveryNote/_printHeader",
+   "classification": "TEMPLATE",
+   "evidence": "grails-app/views/deliveryNote/print.gsp:16 (included by live page)"
+  },
+  {
+   "gsp": "grails-app/views/deliveryNote/_printOutboundReturnTable.gsp",
+   "key": "deliveryNote/_printOutboundReturnTable",
+   "classification": "TEMPLATE",
+   "evidence": "grails-app/views/deliveryNote/printOutboundReturn.gsp:28 (included by live page)"
+  },
+  {
+   "gsp": "grails-app/views/deliveryNote/_printPage.gsp",
+   "key": "deliveryNote/_printPage",
+   "classification": "TEMPLATE",
+   "evidence": "grails-app/views/deliveryNote/print.gsp:44 (included by live page)"
+  },
+  {
+   "gsp": "grails-app/views/deliveryNote/_printToolbar.gsp",
+   "key": "deliveryNote/_printToolbar",
+   "classification": "TEMPLATE",
+   "evidence": "grails-app/views/deliveryNote/print.gsp:14 (included by live page)"
+  },
+  {
+   "gsp": "grails-app/views/deliveryNote/_signaturesSection.gsp",
+   "key": "deliveryNote/_signaturesSection",
+   "classification": "TEMPLATE",
+   "evidence": "grails-app/views/deliveryNote/print.gsp:83 (included by live page)"
+  },
+  {
+   "gsp": "grails-app/views/deliveryNote/_styles.gsp",
+   "key": "deliveryNote/_styles",
+   "classification": "TEMPLATE",
+   "evidence": "grails-app/views/deliveryNote/print.gsp:10 (included by live page)"
+  },
+  {
+   "gsp": "grails-app/views/deliveryNote/print.gsp",
+   "key": "deliveryNote/print",
+   "classification": "LIVE",
+   "evidence": "grails-app/controllers/org/pih/warehouse/requisition/DeliveryNoteController.groovy:19 (controller action (convention))"
+  },
+  {
+   "gsp": "grails-app/views/deliveryNote/printOutboundReturn.gsp",
+   "key": "deliveryNote/printOutboundReturn",
+   "classification": "LIVE",
+   "evidence": "grails-app/controllers/org/pih/warehouse/requisition/DeliveryNoteController.groovy:26 (controller action (convention))"
+  },
+  {
+   "gsp": "grails-app/views/doc4j/download.gsp",
+   "key": "doc4j/download",
+   "classification": "DEAD",
+   "evidence": "no controller action, URL mapping, menu, render, or link reference found"
+  },
+  {
+   "gsp": "grails-app/views/document/_preview.gsp",
+   "key": "document/_preview",
+   "classification": "TEMPLATE",
+   "evidence": "grails-app/controllers/org/pih/warehouse/core/DocumentController.groovy:380 (rendered from controller/taglib)"
+  },
+  {
+   "gsp": "grails-app/views/document/create.gsp",
+   "key": "document/create",
+   "classification": "LIVE",
+   "evidence": "grails-app/controllers/org/pih/warehouse/core/DocumentController.groovy:63 (controller action (convention))"
+  },
+  {
+   "gsp": "grails-app/views/document/edit.gsp",
+   "key": "document/edit",
+   "classification": "LIVE",
+   "evidence": "grails-app/controllers/org/pih/warehouse/core/DocumentController.groovy:107 (controller action (convention))"
+  },
+  {
+   "gsp": "grails-app/views/document/list.gsp",
+   "key": "document/list",
+   "classification": "LIVE",
+   "evidence": "grails-app/controllers/org/pih/warehouse/core/DocumentController.groovy:54 (controller action (convention))"
+  },
+  {
+   "gsp": "grails-app/views/document/show.gsp",
+   "key": "document/show",
+   "classification": "LIVE",
+   "evidence": "grails-app/controllers/org/pih/warehouse/core/DocumentController.groovy:97 (controller action (convention))"
+  },
+  {
+   "gsp": "grails-app/views/document/upload.gsp",
+   "key": "document/upload",
+   "classification": "LIVE",
+   "evidence": "grails-app/controllers/org/pih/warehouse/core/DocumentController.groovy:316 (controller action (convention))"
+  },
+  {
+   "gsp": "grails-app/views/email/_applicationError.gsp",
+   "key": "email/_applicationError",
+   "classification": "TEMPLATE",
+   "evidence": "grails-app/services/org/pih/warehouse/report/NotificationService.groovy:219 (rendered from controller/taglib)"
+  },
+  {
+   "gsp": "grails-app/views/email/_approvalsAlert.gsp",
+   "key": "email/_approvalsAlert",
+   "classification": "TEMPLATE",
+   "evidence": "grails-app/services/org/pih/warehouse/report/NotificationService.groovy:284 (template path string literal)"
+  },
+  {
+   "gsp": "grails-app/views/email/_approvalsStatusChanged.gsp",
+   "key": "email/_approvalsStatusChanged",
+   "classification": "TEMPLATE",
+   "evidence": "grails-app/services/org/pih/warehouse/report/NotificationService.groovy:300 (template path string literal)"
+  },
+  {
+   "gsp": "grails-app/views/email/_emailTemplate.gsp",
+   "key": "email/_emailTemplate",
+   "classification": "DEAD",
+   "evidence": "template/layout not included by any live page"
+  },
+  {
+   "gsp": "grails-app/views/email/_errorReport.gsp",
+   "key": "email/_errorReport",
+   "classification": "TEMPLATE",
+   "evidence": "grails-app/controllers/org/pih/warehouse/core/ErrorsController.groovy:180 (rendered from controller/taglib)"
+  },
+  {
+   "gsp": "grails-app/views/email/_expiryAlerts.gsp",
+   "key": "email/_expiryAlerts",
+   "classification": "TEMPLATE",
+   "evidence": "grails-app/services/org/pih/warehouse/report/NotificationService.groovy:98 (template path string literal)"
+  },
+  {
+   "gsp": "grails-app/views/email/_footer.gsp",
+   "key": "email/_footer",
+   "classification": "DEAD",
+   "evidence": "template/layout not included by any live page"
+  },
+  {
+   "gsp": "grails-app/views/email/_fulfillmentAlert.gsp",
+   "key": "email/_fulfillmentAlert",
+   "classification": "TEMPLATE",
+   "evidence": "grails-app/services/org/pih/warehouse/report/NotificationService.groovy:308 (template path string literal)"
+  },
+  {
+   "gsp": "grails-app/views/email/_goodsDeliveryNote.gsp",
+   "key": "email/_goodsDeliveryNote",
+   "classification": "TEMPLATE",
+   "evidence": "grails-app/services/org/pih/warehouse/report/NotificationService.groovy:192 (rendered from controller/taglib)"
+  },
+  {
+   "gsp": "grails-app/views/email/_header.gsp",
+   "key": "email/_header",
+   "classification": "TEMPLATE",
+   "evidence": "grails-app/views/email/_approvalsAlert.gsp:10 (included by live page)"
+  },
+  {
+   "gsp": "grails-app/views/email/_inventoryItemTable.gsp",
+   "key": "email/_inventoryItemTable",
+   "classification": "TEMPLATE",
+   "evidence": "grails-app/views/email/_expiryAlerts.gsp:11 (included by live page)"
+  },
+  {
+   "gsp": "grails-app/views/email/_productCreated.gsp",
+   "key": "email/_productCreated",
+   "classification": "TEMPLATE",
+   "evidence": "grails-app/controllers/org/pih/warehouse/product/ProductController.groovy:867 (rendered from controller/taglib)"
+  },
+  {
+   "gsp": "grails-app/views/email/_productTable.gsp",
+   "key": "email/_productTable",
+   "classification": "TEMPLATE",
+   "evidence": "grails-app/views/email/_stockAlerts.gsp:8 (included by live page)"
+  },
+  {
+   "gsp": "grails-app/views/email/_shipmentItemReceived.gsp",
+   "key": "email/_shipmentItemReceived",
+   "classification": "TEMPLATE",
+   "evidence": "grails-app/services/org/pih/warehouse/report/NotificationService.groovy:186 (rendered from controller/taglib)"
+  },
+  {
+   "gsp": "grails-app/views/email/_shipmentItemShipped.gsp",
+   "key": "email/_shipmentItemShipped",
+   "classification": "TEMPLATE",
+   "evidence": "grails-app/services/org/pih/warehouse/report/NotificationService.groovy:165 (rendered from controller/taglib)"
+  },
+  {
+   "gsp": "grails-app/views/email/_shipmentReceived.gsp",
+   "key": "email/_shipmentReceived",
+   "classification": "TEMPLATE",
+   "evidence": "grails-app/controllers/org/pih/warehouse/shipping/ShipmentController.groovy:636 (rendered from controller/taglib)"
+  },
+  {
+   "gsp": "grails-app/views/email/_shipmentShipped.gsp",
+   "key": "email/_shipmentShipped",
+   "classification": "TEMPLATE",
+   "evidence": "grails-app/controllers/org/pih/warehouse/shipping/CreateShipmentWorkflowController.groovy:1436 (rendered from controller/taglib)"
+  },
+  {
+   "gsp": "grails-app/views/email/_stockAlerts.gsp",
+   "key": "email/_stockAlerts",
+   "classification": "TEMPLATE",
+   "evidence": "grails-app/services/org/pih/warehouse/report/NotificationService.groovy:113 (template path string literal)"
+  },
+  {
+   "gsp": "grails-app/views/email/_userAccountActivated.gsp",
+   "key": "email/_userAccountActivated",
+   "classification": "TEMPLATE",
+   "evidence": "grails-app/controllers/org/pih/warehouse/user/UserController.groovy:521 (rendered from controller/taglib)"
+  },
+  {
+   "gsp": "grails-app/views/email/_userAccountChanged.gsp",
+   "key": "email/_userAccountChanged",
+   "classification": "DEAD",
+   "evidence": "template/layout not included by any live page"
+  },
+  {
+   "gsp": "grails-app/views/email/_userAccountConfirmed.gsp",
+   "key": "email/_userAccountConfirmed",
+   "classification": "TEMPLATE",
+   "evidence": "grails-app/controllers/org/pih/warehouse/user/AuthController.groovy:226 (rendered from controller/taglib)"
+  },
+  {
+   "gsp": "grails-app/views/email/_userAccountCreated.gsp",
+   "key": "email/_userAccountCreated",
+   "classification": "TEMPLATE",
+   "evidence": "grails-app/controllers/org/pih/warehouse/user/AuthController.groovy:221 (rendered from controller/taglib)"
+  },
+  {
+   "gsp": "grails-app/views/email/_userAccountPending.gsp",
+   "key": "email/_userAccountPending",
+   "classification": "DEAD",
+   "evidence": "template/layout not included by any live page"
+  },
+  {
+   "gsp": "grails-app/views/email/_userCanReceiveEmail.gsp",
+   "key": "email/_userCanReceiveEmail",
+   "classification": "TEMPLATE",
+   "evidence": "grails-app/controllers/org/pih/warehouse/user/UserController.groovy:98 (rendered from controller/taglib)"
+  },
+  {
+   "gsp": "grails-app/views/email/_userPhotoChanged.gsp",
+   "key": "email/_userPhotoChanged",
+   "classification": "TEMPLATE",
+   "evidence": "grails-app/controllers/org/pih/warehouse/user/UserController.groovy:540 (rendered from controller/taglib)"
+  },
+  {
+   "gsp": "grails-app/views/error.gsp",
+   "key": "error",
+   "classification": "LIVE",
+   "evidence": "grails-app/controllers/org/pih/warehouse/UrlMappings.groovy:0 (error handler mapping)"
+  },
+  {
+   "gsp": "grails-app/views/errors/accessDenied.gsp",
+   "key": "errors/accessDenied",
+   "classification": "LIVE",
+   "evidence": "grails-app/controllers/org/pih/warehouse/core/ErrorsController.groovy:79 (explicit render(view:))"
+  },
+  {
+   "gsp": "grails-app/views/errors/dataAccess.gsp",
+   "key": "errors/dataAccess",
+   "classification": "LIVE",
+   "evidence": "grails-app/controllers/org/pih/warehouse/core/ErrorsController.groovy:88 (explicit render(view:))"
+  },
+  {
+   "gsp": "grails-app/views/errors/methodNotAllowed.gsp",
+   "key": "errors/methodNotAllowed",
+   "classification": "LIVE",
+   "evidence": "grails-app/controllers/org/pih/warehouse/core/ErrorsController.groovy:97 (explicit render(view:))"
+  },
+  {
+   "gsp": "grails-app/views/errors/notFound.gsp",
+   "key": "errors/notFound",
+   "classification": "LIVE",
+   "evidence": "grails-app/controllers/org/pih/warehouse/core/ErrorsController.groovy:59 (explicit render(view:))"
+  },
+  {
+   "gsp": "grails-app/views/eventType/create.gsp",
+   "key": "eventType/create",
+   "classification": "LIVE",
+   "evidence": "grails-app/controllers/org/pih/warehouse/core/EventTypeController.groovy:27 (controller action (convention))"
+  },
+  {
+   "gsp": "grails-app/views/eventType/edit.gsp",
+   "key": "eventType/edit",
+   "classification": "LIVE",
+   "evidence": "grails-app/controllers/org/pih/warehouse/core/EventTypeController.groovy:53 (controller action (convention))"
+  },
+  {
+   "gsp": "grails-app/views/eventType/list.gsp",
+   "key": "eventType/list",
+   "classification": "LIVE",
+   "evidence": "grails-app/controllers/org/pih/warehouse/core/EventTypeController.groovy:22 (controller action (convention))"
+  },
+  {
+   "gsp": "grails-app/views/eventType/show.gsp",
+   "key": "eventType/show",
+   "classification": "LIVE",
+   "evidence": "grails-app/controllers/org/pih/warehouse/core/EventTypeController.groovy:43 (controller action (convention))"
+  },
+  {
+   "gsp": "grails-app/views/exception.gsp",
+   "key": "exception",
+   "classification": "LIVE",
+   "evidence": "grails-app/controllers/org/pih/warehouse/UrlMappings.groovy:0 (exception handler)"
+  },
+  {
+   "gsp": "grails-app/views/glAccount/create.gsp",
+   "key": "glAccount/create",
+   "classification": "LIVE",
+   "evidence": "grails-app/controllers/org/pih/warehouse/core/GlAccountController.groovy:24 (controller action (convention))"
+  },
+  {
+   "gsp": "grails-app/views/glAccount/edit.gsp",
+   "key": "glAccount/edit",
+   "classification": "LIVE",
+   "evidence": "grails-app/controllers/org/pih/warehouse/core/GlAccountController.groovy:30 (controller action (convention))"
+  },
+  {
+   "gsp": "grails-app/views/glAccount/list.gsp",
+   "key": "glAccount/list",
+   "classification": "LIVE",
+   "evidence": "grails-app/controllers/org/pih/warehouse/core/GlAccountController.groovy:19 (controller action (convention))"
+  },
+  {
+   "gsp": "grails-app/views/glAccountType/create.gsp",
+   "key": "glAccountType/create",
+   "classification": "LIVE",
+   "evidence": "grails-app/controllers/org/pih/warehouse/core/GlAccountTypeController.groovy:24 (controller action (convention))"
+  },
+  {
+   "gsp": "grails-app/views/glAccountType/edit.gsp",
+   "key": "glAccountType/edit",
+   "classification": "LIVE",
+   "evidence": "grails-app/controllers/org/pih/warehouse/core/GlAccountTypeController.groovy:30 (controller action (convention))"
+  },
+  {
+   "gsp": "grails-app/views/glAccountType/list.gsp",
+   "key": "glAccountType/list",
+   "classification": "LIVE",
+   "evidence": "grails-app/controllers/org/pih/warehouse/core/GlAccountTypeController.groovy:19 (controller action (convention))"
+  },
+  {
+   "gsp": "grails-app/views/goodsReceiptNote/_body.gsp",
+   "key": "goodsReceiptNote/_body",
+   "classification": "TEMPLATE",
+   "evidence": "grails-app/views/goodsReceiptNote/print.gsp:54 (included by live page)"
+  },
+  {
+   "gsp": "grails-app/views/goodsReceiptNote/_header.gsp",
+   "key": "goodsReceiptNote/_header",
+   "classification": "TEMPLATE",
+   "evidence": "grails-app/views/goodsReceiptNote/print.gsp:49 (included by live page)"
+  },
+  {
+   "gsp": "grails-app/views/goodsReceiptNote/_signature.gsp",
+   "key": "goodsReceiptNote/_signature",
+   "classification": "TEMPLATE",
+   "evidence": "grails-app/views/goodsReceiptNote/print.gsp:58 (included by live page)"
+  },
+  {
+   "gsp": "grails-app/views/goodsReceiptNote/print.gsp",
+   "key": "goodsReceiptNote/print",
+   "classification": "LIVE",
+   "evidence": "grails-app/controllers/org/pih/warehouse/reporting/GoodsReceiptNoteController.groovy:21 (controller action (convention))"
+  },
+  {
+   "gsp": "grails-app/views/index.gsp",
+   "key": "index",
+   "classification": "LIVE",
+   "evidence": "grails-app/controllers/org/pih/warehouse/UrlMappings.groovy:0 (root URL mapping)"
+  },
+  {
+   "gsp": "grails-app/views/inventory/_actions.gsp",
+   "key": "inventory/_actions",
+   "classification": "DEAD",
+   "evidence": "template/layout not included by any live page"
+  },
+  {
+   "gsp": "grails-app/views/inventory/_browseProduct.gsp",
+   "key": "inventory/_browseProduct",
+   "classification": "DEAD",
+   "evidence": "template/layout not included by any live page"
+  },
+  {
+   "gsp": "grails-app/views/inventory/_browseProductGroup.gsp",
+   "key": "inventory/_browseProductGroup",
+   "classification": "DEAD",
+   "evidence": "template/layout not included by any live page"
+  },
+  {
+   "gsp": "grails-app/views/inventory/_categoryActions.gsp",
+   "key": "inventory/_categoryActions",
+   "classification": "DEAD",
+   "evidence": "template/layout not included by any live page"
+  },
+  {
+   "gsp": "grails-app/views/inventory/_filters.gsp",
+   "key": "inventory/_filters",
+   "classification": "TEMPLATE",
+   "evidence": "grails-app/views/inventory/browse.gsp:32 (included by live page)"
+  },
+  {
+   "gsp": "grails-app/views/inventory/_incomingTransfer.gsp",
+   "key": "inventory/_incomingTransfer",
+   "classification": "TEMPLATE",
+   "evidence": "grails-app/views/inventory/createTransaction.gsp:52 (included by live page)"
+  },
+  {
+   "gsp": "grails-app/views/inventory/_inventoryAdjustment.gsp",
+   "key": "inventory/_inventoryAdjustment",
+   "classification": "TEMPLATE",
+   "evidence": "grails-app/views/inventory/createTransaction.gsp:55 (included by live page)"
+  },
+  {
+   "gsp": "grails-app/views/inventory/_inventoryConsumed.gsp",
+   "key": "inventory/_inventoryConsumed",
+   "classification": "TEMPLATE",
+   "evidence": "grails-app/views/inventory/createTransaction.gsp:58 (included by live page)"
+  },
+  {
+   "gsp": "grails-app/views/inventory/_inventoryDamaged.gsp",
+   "key": "inventory/_inventoryDamaged",
+   "classification": "DEAD",
+   "evidence": "template/layout not included by any live page"
+  },
+  {
+   "gsp": "grails-app/views/inventory/_inventoryExpired.gsp",
+   "key": "inventory/_inventoryExpired",
+   "classification": "DEAD",
+   "evidence": "template/layout not included by any live page"
+  },
+  {
+   "gsp": "grails-app/views/inventory/_outgoingTransfer.gsp",
+   "key": "inventory/_outgoingTransfer",
+   "classification": "TEMPLATE",
+   "evidence": "grails-app/views/inventory/createTransaction.gsp:49 (included by live page)"
+  },
+  {
+   "gsp": "grails-app/views/inventory/_summary.gsp",
+   "key": "inventory/_summary",
+   "classification": "TEMPLATE",
+   "evidence": "grails-app/views/inventory/browse.gsp:22 (included by live page)"
+  },
+  {
+   "gsp": "grails-app/views/inventory/browse.gsp",
+   "key": "inventory/browse",
+   "classification": "LIVE",
+   "evidence": "grails-app/controllers/org/pih/warehouse/inventory/InventoryController.groovy:143 (controller action (convention))"
+  },
+  {
+   "gsp": "grails-app/views/inventory/createTransaction.gsp",
+   "key": "inventory/createTransaction",
+   "classification": "LIVE",
+   "evidence": "grails-app/controllers/org/pih/warehouse/inventory/InventoryController.groovy:827 (controller action (convention))"
+  },
+  {
+   "gsp": "grails-app/views/inventory/editBinLocation.gsp",
+   "key": "inventory/editBinLocation",
+   "classification": "LIVE",
+   "evidence": "grails-app/controllers/org/pih/warehouse/inventory/InventoryController.groovy:89 (controller action (convention))"
+  },
+  {
+   "gsp": "grails-app/views/inventory/editTransaction.gsp",
+   "key": "inventory/editTransaction",
+   "classification": "LIVE",
+   "evidence": "grails-app/controllers/org/pih/warehouse/inventory/InventoryController.groovy:1128 (controller action (convention))"
+  },
+  {
+   "gsp": "grails-app/views/inventory/list.gsp",
+   "key": "inventory/list",
+   "classification": "LIVE",
+   "evidence": "grails-app/controllers/org/pih/warehouse/inventory/InventoryController.groovy:463 (controller action (convention))"
+  },
+  {
+   "gsp": "grails-app/views/inventory/listDailyTransactions.gsp",
+   "key": "inventory/listDailyTransactions",
+   "classification": "LIVE",
+   "evidence": "grails-app/controllers/org/pih/warehouse/inventory/InventoryController.groovy:421 (controller action (convention))"
+  },
+  {
+   "gsp": "grails-app/views/inventory/listExpiredStock.gsp",
+   "key": "inventory/listExpiredStock",
+   "classification": "LIVE",
+   "evidence": "grails-app/controllers/org/pih/warehouse/inventory/InventoryController.groovy:518 (controller action (convention))"
+  },
+  {
+   "gsp": "grails-app/views/inventory/listExpiringStock.gsp",
+   "key": "inventory/listExpiringStock",
+   "classification": "LIVE",
+   "evidence": "grails-app/controllers/org/pih/warehouse/inventory/InventoryController.groovy:548 (controller action (convention))"
+  },
+  {
+   "gsp": "grails-app/views/inventory/listLowStock.gsp",
+   "key": "inventory/listLowStock",
+   "classification": "LIVE",
+   "evidence": "grails-app/controllers/org/pih/warehouse/inventory/InventoryController.groovy:479 (controller action (convention))"
+  },
+  {
+   "gsp": "grails-app/views/inventory/listReorderStock.gsp",
+   "key": "inventory/listReorderStock",
+   "classification": "LIVE",
+   "evidence": "grails-app/controllers/org/pih/warehouse/inventory/InventoryController.groovy:483 (controller action (convention))"
+  },
+  {
+   "gsp": "grails-app/views/inventory/listTransactions.gsp",
+   "key": "inventory/listTransactions",
+   "classification": "LIVE",
+   "evidence": "grails-app/controllers/org/pih/warehouse/inventory/InventoryController.groovy:619 (controller action (convention))"
+  },
+  {
+   "gsp": "grails-app/views/inventory/manage.gsp",
+   "key": "inventory/manage",
+   "classification": "LIVE",
+   "evidence": "grails-app/controllers/org/pih/warehouse/inventory/InventoryController.groovy:60 (controller action (convention))"
+  },
+  {
+   "gsp": "grails-app/views/inventory/showProducts.gsp",
+   "key": "inventory/showProducts",
+   "classification": "LIVE",
+   "evidence": "grails-app/controllers/org/pih/warehouse/inventory/InventoryController.groovy:612 (controller action (convention))"
+  },
+  {
+   "gsp": "grails-app/views/inventory/showTransaction.gsp",
+   "key": "inventory/showTransaction",
+   "classification": "LIVE",
+   "evidence": "grails-app/controllers/org/pih/warehouse/inventory/InventoryController.groovy:732 (controller action (convention))"
+  },
+  {
+   "gsp": "grails-app/views/inventory/upload.gsp",
+   "key": "inventory/upload",
+   "classification": "LIVE",
+   "evidence": "grails-app/controllers/org/pih/warehouse/inventory/InventoryController.groovy:1192 (controller action (convention))"
+  },
+  {
+   "gsp": "grails-app/views/inventoryBrowser/_sidebar.gsp",
+   "key": "inventoryBrowser/_sidebar",
+   "classification": "DEAD",
+   "evidence": "template/layout not included by any live page"
+  },
+  {
+   "gsp": "grails-app/views/inventoryBrowser/list.gsp",
+   "key": "inventoryBrowser/list",
+   "classification": "LIVE",
+   "evidence": "grails-app/controllers/org/pih/warehouse/inventory/InventoryBrowserController.groovy:17 (controller action (convention))"
+  },
+  {
+   "gsp": "grails-app/views/inventoryItem/_actions.gsp",
+   "key": "inventoryItem/_actions",
+   "classification": "DEAD",
+   "evidence": "template/layout not included by any live page"
+  },
+  {
+   "gsp": "grails-app/views/inventoryItem/_actionsCurrentStock.gsp",
+   "key": "inventoryItem/_actionsCurrentStock",
+   "classification": "TEMPLATE",
+   "evidence": "grails-app/views/inventoryItem/_showCurrentStock.gsp:41 (included by live page)"
+  },
+  {
+   "gsp": "grails-app/views/inventoryItem/_addToShipment.gsp",
+   "key": "inventoryItem/_addToShipment",
+   "classification": "DEAD",
+   "evidence": "template/layout not included by any live page"
+  },
+  {
+   "gsp": "grails-app/views/inventoryItem/_adjustStock.gsp",
+   "key": "inventoryItem/_adjustStock",
+   "classification": "DEAD",
+   "evidence": "template/layout not included by any live page"
+  },
+  {
+   "gsp": "grails-app/views/inventoryItem/_editItemDialog.gsp",
+   "key": "inventoryItem/_editItemDialog",
+   "classification": "DEAD",
+   "evidence": "template/layout not included by any live page"
+  },
+  {
+   "gsp": "grails-app/views/inventoryItem/_printStockHistory.gsp",
+   "key": "inventoryItem/_printStockHistory",
+   "classification": "TEMPLATE",
+   "evidence": "grails-app/controllers/org/pih/warehouse/inventory/InventoryItemController.groovy:178 (rendered from controller/taglib)"
+  },
+  {
+   "gsp": "grails-app/views/inventoryItem/_productDetails.gsp",
+   "key": "inventoryItem/_productDetails",
+   "classification": "DEAD",
+   "evidence": "template/layout not included by any live page"
+  },
+  {
+   "gsp": "grails-app/views/inventoryItem/_returnStock.gsp",
+   "key": "inventoryItem/_returnStock",
+   "classification": "DEAD",
+   "evidence": "template/layout not included by any live page"
+  },
+  {
+   "gsp": "grails-app/views/inventoryItem/_showCurrentStock.gsp",
+   "key": "inventoryItem/_showCurrentStock",
+   "classification": "TEMPLATE",
+   "evidence": "grails-app/controllers/org/pih/warehouse/inventory/InventoryItemController.groovy:88 (rendered from controller/taglib)"
+  },
+  {
+   "gsp": "grails-app/views/inventoryItem/_showCurrentStockAllLocations.gsp",
+   "key": "inventoryItem/_showCurrentStockAllLocations",
+   "classification": "TEMPLATE",
+   "evidence": "grails-app/controllers/org/pih/warehouse/inventory/InventoryItemController.groovy:137 (rendered from controller/taglib)"
+  },
+  {
+   "gsp": "grails-app/views/inventoryItem/_showDemand.gsp",
+   "key": "inventoryItem/_showDemand",
+   "classification": "TEMPLATE",
+   "evidence": "grails-app/controllers/org/pih/warehouse/inventory/InventoryItemController.groovy:335 (rendered from controller/taglib)"
+  },
+  {
+   "gsp": "grails-app/views/inventoryItem/_showDocuments.gsp",
+   "key": "inventoryItem/_showDocuments",
+   "classification": "TEMPLATE",
+   "evidence": "grails-app/controllers/org/pih/warehouse/inventory/InventoryItemController.groovy:372 (rendered from controller/taglib)"
+  },
+  {
+   "gsp": "grails-app/views/inventoryItem/_showGraph.gsp",
+   "key": "inventoryItem/_showGraph",
+   "classification": "TEMPLATE",
+   "evidence": "grails-app/views/inventoryItem/showGraph.gsp:13 (included by live page)"
+  },
+  {
+   "gsp": "grails-app/views/inventoryItem/_showInventorySnapshot.gsp",
+   "key": "inventoryItem/_showInventorySnapshot",
+   "classification": "TEMPLATE",
+   "evidence": "grails-app/controllers/org/pih/warehouse/inventory/InventoryItemController.groovy:365 (rendered from controller/taglib)"
+  },
+  {
+   "gsp": "grails-app/views/inventoryItem/_showLotNumbers.gsp",
+   "key": "inventoryItem/_showLotNumbers",
+   "classification": "TEMPLATE",
+   "evidence": "grails-app/views/inventoryItem/showLotNumbers.gsp:12 (included by live page)"
+  },
+  {
+   "gsp": "grails-app/views/inventoryItem/_showPendingInboundStock.gsp",
+   "key": "inventoryItem/_showPendingInboundStock",
+   "classification": "TEMPLATE",
+   "evidence": "grails-app/controllers/org/pih/warehouse/inventory/InventoryItemController.groovy:247 (rendered from controller/taglib)"
+  },
+  {
+   "gsp": "grails-app/views/inventoryItem/_showPendingOutboundStock.gsp",
+   "key": "inventoryItem/_showPendingOutboundStock",
+   "classification": "TEMPLATE",
+   "evidence": "grails-app/controllers/org/pih/warehouse/inventory/InventoryItemController.groovy:269 (rendered from controller/taglib)"
+  },
+  {
+   "gsp": "grails-app/views/inventoryItem/_showProductAssociations.gsp",
+   "key": "inventoryItem/_showProductAssociations",
+   "classification": "TEMPLATE",
+   "evidence": "grails-app/controllers/org/pih/warehouse/inventory/InventoryItemController.groovy:158 (rendered from controller/taglib)"
+  },
+  {
+   "gsp": "grails-app/views/inventoryItem/_showProductDemand.gsp",
+   "key": "inventoryItem/_showProductDemand",
+   "classification": "TEMPLATE",
+   "evidence": "grails-app/controllers/org/pih/warehouse/inventory/InventoryItemController.groovy:357 (rendered from controller/taglib)"
+  },
+  {
+   "gsp": "grails-app/views/inventoryItem/_showRecordInventory.gsp",
+   "key": "inventoryItem/_showRecordInventory",
+   "classification": "TEMPLATE",
+   "evidence": "grails-app/views/inventoryItem/showRecordInventory.gsp:13 (included by live page)"
+  },
+  {
+   "gsp": "grails-app/views/inventoryItem/_showRecordInventory2.gsp",
+   "key": "inventoryItem/_showRecordInventory2",
+   "classification": "DEAD",
+   "evidence": "template/layout not included by any live page"
+  },
+  {
+   "gsp": "grails-app/views/inventoryItem/_showStockCard.gsp",
+   "key": "inventoryItem/_showStockCard",
+   "classification": "TEMPLATE",
+   "evidence": "grails-app/views/inventoryItem/showStockCard.gsp:13 (included by live page)"
+  },
+  {
+   "gsp": "grails-app/views/inventoryItem/_showStockCardMenuItems.gsp",
+   "key": "inventoryItem/_showStockCardMenuItems",
+   "classification": "TEMPLATE",
+   "evidence": "grails-app/views/inventoryItem/editInventoryLevel.gsp:37 (included by live page)"
+  },
+  {
+   "gsp": "grails-app/views/inventoryItem/_showStockHistory.gsp",
+   "key": "inventoryItem/_showStockHistory",
+   "classification": "TEMPLATE",
+   "evidence": "grails-app/controllers/org/pih/warehouse/inventory/InventoryItemController.groovy:188 (rendered from controller/taglib)"
+  },
+  {
+   "gsp": "grails-app/views/inventoryItem/_showStockHistoryPrintable.gsp",
+   "key": "inventoryItem/_showStockHistoryPrintable",
+   "classification": "TEMPLATE",
+   "evidence": "grails-app/views/inventoryItem/_printStockHistory.gsp:77 (included by live page)"
+  },
+  {
+   "gsp": "grails-app/views/inventoryItem/_showSuppliers.gsp",
+   "key": "inventoryItem/_showSuppliers",
+   "classification": "TEMPLATE",
+   "evidence": "grails-app/controllers/org/pih/warehouse/inventory/InventoryItemController.groovy:207 (rendered from controller/taglib)"
+  },
+  {
+   "gsp": "grails-app/views/inventoryItem/_showTransactionLog.gsp",
+   "key": "inventoryItem/_showTransactionLog",
+   "classification": "TEMPLATE",
+   "evidence": "grails-app/views/inventoryItem/showTransactionLog.gsp:12 (included by live page)"
+  },
+  {
+   "gsp": "grails-app/views/inventoryItem/_transferStock.gsp",
+   "key": "inventoryItem/_transferStock",
+   "classification": "DEAD",
+   "evidence": "template/layout not included by any live page"
+  },
+  {
+   "gsp": "grails-app/views/inventoryItem/editInventoryLevel.gsp",
+   "key": "inventoryItem/editInventoryLevel",
+   "classification": "LIVE",
+   "evidence": "grails-app/controllers/org/pih/warehouse/inventory/InventoryItemController.groovy:584 (controller action (convention))"
+  },
+  {
+   "gsp": "grails-app/views/inventoryItem/recordInventory.gsp",
+   "key": "inventoryItem/recordInventory",
+   "classification": "DEAD",
+   "evidence": "no controller action, URL mapping, menu, render, or link reference found"
+  },
+  {
+   "gsp": "grails-app/views/inventoryItem/showGraph.gsp",
+   "key": "inventoryItem/showGraph",
+   "classification": "LIVE",
+   "evidence": "grails-app/controllers/org/pih/warehouse/inventory/InventoryItemController.groovy:407 (controller action (convention))"
+  },
+  {
+   "gsp": "grails-app/views/inventoryItem/showLotNumbers.gsp",
+   "key": "inventoryItem/showLotNumbers",
+   "classification": "LIVE",
+   "evidence": "grails-app/controllers/org/pih/warehouse/inventory/InventoryItemController.groovy:379 (controller action (convention))"
+  },
+  {
+   "gsp": "grails-app/views/inventoryItem/showRecordInventory.gsp",
+   "key": "inventoryItem/showRecordInventory",
+   "classification": "LIVE",
+   "evidence": "grails-app/controllers/org/pih/warehouse/inventory/InventoryItemController.groovy:421 (controller action (convention))"
+  },
+  {
+   "gsp": "grails-app/views/inventoryItem/showStockCard.gsp",
+   "key": "inventoryItem/showStockCard",
+   "classification": "LIVE",
+   "evidence": "grails-app/controllers/org/pih/warehouse/inventory/InventoryItemController.groovy:66 (controller action (convention))"
+  },
+  {
+   "gsp": "grails-app/views/inventoryItem/showTransactionLog.gsp",
+   "key": "inventoryItem/showTransactionLog",
+   "classification": "LIVE",
+   "evidence": "grails-app/controllers/org/pih/warehouse/inventory/InventoryItemController.groovy:393 (controller action (convention))"
+  },
+  {
+   "gsp": "grails-app/views/inventoryLevel/_form.gsp",
+   "key": "inventoryLevel/_form",
+   "classification": "TEMPLATE",
+   "evidence": "grails-app/views/inventoryLevel/create.gsp:26 (included by live page)"
+  },
+  {
+   "gsp": "grails-app/views/inventoryLevel/create.gsp",
+   "key": "inventoryLevel/create",
+   "classification": "LIVE",
+   "evidence": "grails-app/controllers/org/pih/warehouse/inventory/InventoryLevelController.groovy:70 (controller action (convention))"
+  },
+  {
+   "gsp": "grails-app/views/inventoryLevel/edit.gsp",
+   "key": "inventoryLevel/edit",
+   "classification": "LIVE",
+   "evidence": "grails-app/controllers/org/pih/warehouse/inventory/InventoryLevelController.groovy:116 (controller action (convention))"
+  },
+  {
+   "gsp": "grails-app/views/inventoryLevel/list.gsp",
+   "key": "inventoryLevel/list",
+   "classification": "LIVE",
+   "evidence": "grails-app/controllers/org/pih/warehouse/inventory/InventoryLevelController.groovy:36 (controller action (convention))"
+  },
+  {
+   "gsp": "grails-app/views/inventoryLevel/show.gsp",
+   "key": "inventoryLevel/show",
+   "classification": "LIVE",
+   "evidence": "grails-app/controllers/org/pih/warehouse/inventory/InventoryLevelController.groovy:106 (controller action (convention))"
+  },
+  {
+   "gsp": "grails-app/views/inventorySnapshot/_sidebar.gsp",
+   "key": "inventorySnapshot/_sidebar",
+   "classification": "DEAD",
+   "evidence": "template/layout not included by any live page"
+  },
+  {
+   "gsp": "grails-app/views/inventorySnapshot/edit.gsp",
+   "key": "inventorySnapshot/edit",
+   "classification": "LIVE",
+   "evidence": "grails-app/controllers/org/pih/warehouse/inventory/InventorySnapshotController.groovy:36 (controller action (convention))"
+  },
+  {
+   "gsp": "grails-app/views/inventorySnapshot/list.gsp",
+   "key": "inventorySnapshot/list",
+   "classification": "LIVE",
+   "evidence": "grails-app/controllers/org/pih/warehouse/inventory/InventorySnapshotController.groovy:32 (controller action (convention))"
+  },
+  {
+   "gsp": "grails-app/views/inventorySnapshot/show.gsp",
+   "key": "inventorySnapshot/show",
+   "classification": "LIVE",
+   "evidence": "grails-app/controllers/org/pih/warehouse/inventory/InventorySnapshotController.groovy:34 (controller action (convention))"
+  },
+  {
+   "gsp": "grails-app/views/invoice/_actions.gsp",
+   "key": "invoice/_actions",
+   "classification": "TEMPLATE",
+   "evidence": "grails-app/views/invoice/_summary.gsp:7 (included by live page)"
+  },
+  {
+   "gsp": "grails-app/views/invoice/_documents.gsp",
+   "key": "invoice/_documents",
+   "classification": "TEMPLATE",
+   "evidence": "grails-app/views/invoice/show.gsp:188 (included by live page)"
+  },
+  {
+   "gsp": "grails-app/views/invoice/_filters.gsp",
+   "key": "invoice/_filters",
+   "classification": "DEAD",
+   "evidence": "template/layout not included by any live page"
+  },
+  {
+   "gsp": "grails-app/views/invoice/_invoiceItems.gsp",
+   "key": "invoice/_invoiceItems",
+   "classification": "TEMPLATE",
+   "evidence": "grails-app/views/invoice/show.gsp:185 (included by live page)"
+  },
+  {
+   "gsp": "grails-app/views/invoice/_summary.gsp",
+   "key": "invoice/_summary",
+   "classification": "TEMPLATE",
+   "evidence": "grails-app/views/invoice/addDocument.gsp:23 (included by live page)"
+  },
+  {
+   "gsp": "grails-app/views/invoice/addDocument.gsp",
+   "key": "invoice/addDocument",
+   "classification": "LIVE",
+   "evidence": "grails-app/controllers/org/pih/warehouse/invoice/InvoiceController.groovy:121 (controller action (convention))"
+  },
+  {
+   "gsp": "grails-app/views/invoice/list.gsp",
+   "key": "invoice/list",
+   "classification": "SUPERSEDED",
+   "evidence": "src/js/components/Router.jsx:272 (React SPA route **/invoice/list)"
+  },
+  {
+   "gsp": "grails-app/views/invoice/show.gsp",
+   "key": "invoice/show",
+   "classification": "LIVE",
+   "evidence": "grails-app/controllers/org/pih/warehouse/invoice/InvoiceController.groovy:42 (controller action (convention))"
+  },
+  {
+   "gsp": "grails-app/views/jobs/show.gsp",
+   "key": "jobs/show",
+   "classification": "LIVE",
+   "evidence": "grails-app/controllers/org/pih/warehouse/jobs/JobsController.groovy:49 (controller action (convention))"
+  },
+  {
+   "gsp": "grails-app/views/json/_searchResults.gsp",
+   "key": "json/_searchResults",
+   "classification": "DEAD",
+   "evidence": "template/layout not included by any live page"
+  },
+  {
+   "gsp": "grails-app/views/json/createPerson.gsp",
+   "key": "json/createPerson",
+   "classification": "LIVE",
+   "evidence": "grails-app/controllers/org/pih/warehouse/JsonController.groovy:729 (controller action (convention))"
+  },
+  {
+   "gsp": "grails-app/views/layouts/analytics.gsp",
+   "key": "layouts/analytics",
+   "classification": "TEMPLATE",
+   "evidence": "grails-app/views/inventoryBrowser/list.gsp:4 (included by live page)"
+  },
+  {
+   "gsp": "grails-app/views/layouts/bootstrap.gsp",
+   "key": "layouts/bootstrap",
+   "classification": "DEAD",
+   "evidence": "template/layout not included by any live page"
+  },
+  {
+   "gsp": "grails-app/views/layouts/custom.gsp",
+   "key": "layouts/custom",
+   "classification": "TEMPLATE",
+   "evidence": "grails-app/views/admin/cache.gsp:7 (included by live page)"
+  },
+  {
+   "gsp": "grails-app/views/layouts/email.gsp",
+   "key": "layouts/email",
+   "classification": "TEMPLATE",
+   "evidence": "grails-app/views/email/_productCreated.gsp:2 (included by live page)"
+  },
+  {
+   "gsp": "grails-app/views/layouts/main.gsp",
+   "key": "layouts/main",
+   "classification": "TEMPLATE",
+   "evidence": "grails-app/views/product/show.gsp:5 (included by live page)"
+  },
+  {
+   "gsp": "grails-app/views/layouts/mobile.gsp",
+   "key": "layouts/mobile",
+   "classification": "TEMPLATE",
+   "evidence": "grails-app/views/mobile/chooseLocation.gsp:5 (included by live page)"
+  },
+  {
+   "gsp": "grails-app/views/layouts/print.gsp",
+   "key": "layouts/print",
+   "classification": "TEMPLATE",
+   "evidence": "grails-app/views/goodsReceiptNote/print.gsp:5 (included by live page)"
+  },
+  {
+   "gsp": "grails-app/views/layouts/react.gsp",
+   "key": "layouts/react",
+   "classification": "TEMPLATE",
+   "evidence": "grails-app/controllers/org/pih/warehouse/putaway/PutAwayController.groovy:25 (React SPA shell, render(view: \"/common/react\"))"
+  },
+  {
+   "gsp": "grails-app/views/layouts/stockCard.gsp",
+   "key": "layouts/stockCard",
+   "classification": "TEMPLATE",
+   "evidence": "grails-app/views/inventoryItem/showGraph.gsp:1 (included by live page)"
+  },
+  {
+   "gsp": "grails-app/views/localization/_crowdin.gsp",
+   "key": "localization/_crowdin",
+   "classification": "TEMPLATE",
+   "evidence": "grails-app/views/layouts/custom.gsp:31 (included by live page)"
+  },
+  {
+   "gsp": "grails-app/views/localization/create.gsp",
+   "key": "localization/create",
+   "classification": "LIVE",
+   "evidence": "grails-app/controllers/org/pih/warehouse/core/LocalizationController.groovy:52 (controller action (convention))"
+  },
+  {
+   "gsp": "grails-app/views/localization/edit.gsp",
+   "key": "localization/edit",
+   "classification": "LIVE",
+   "evidence": "grails-app/controllers/org/pih/warehouse/core/LocalizationController.groovy:101 (controller action (convention))"
+  },
+  {
+   "gsp": "grails-app/views/localization/list.gsp",
+   "key": "localization/list",
+   "classification": "LIVE",
+   "evidence": "grails-app/controllers/org/pih/warehouse/core/LocalizationController.groovy:26 (controller action (convention))"
+  },
+  {
+   "gsp": "grails-app/views/localization/show.gsp",
+   "key": "localization/show",
+   "classification": "LIVE",
+   "evidence": "grails-app/controllers/org/pih/warehouse/core/LocalizationController.groovy:91 (controller action (convention))"
+  },
+  {
+   "gsp": "grails-app/views/location/_actions.gsp",
+   "key": "location/_actions",
+   "classification": "TEMPLATE",
+   "evidence": "grails-app/views/location/list.gsp:109 (included by live page)"
+  },
+  {
+   "gsp": "grails-app/views/location/_form.gsp",
+   "key": "location/_form",
+   "classification": "DEAD",
+   "evidence": "template/layout not included by any live page"
+  },
+  {
+   "gsp": "grails-app/views/location/_summary.gsp",
+   "key": "location/_summary",
+   "classification": "TEMPLATE",
+   "evidence": "grails-app/views/location/edit.gsp:32 (included by live page)"
+  },
+  {
+   "gsp": "grails-app/views/location/edit.gsp",
+   "key": "location/edit",
+   "classification": "LIVE",
+   "evidence": "grails-app/controllers/org/pih/warehouse/core/LocationController.groovy:57 (controller action (convention))"
+  },
+  {
+   "gsp": "grails-app/views/location/list.gsp",
+   "key": "location/list",
+   "classification": "LIVE",
+   "evidence": "grails-app/controllers/org/pih/warehouse/core/LocationController.groovy:39 (controller action (convention))"
+  },
+  {
+   "gsp": "grails-app/views/location/showBinLocations.gsp",
+   "key": "location/showBinLocations",
+   "classification": "LIVE",
+   "evidence": "grails-app/controllers/org/pih/warehouse/core/LocationController.groovy:339 (controller action (convention))"
+  },
+  {
+   "gsp": "grails-app/views/location/showContents.gsp",
+   "key": "location/showContents",
+   "classification": "LIVE",
+   "evidence": "grails-app/controllers/org/pih/warehouse/core/LocationController.groovy:203 (controller action (convention))"
+  },
+  {
+   "gsp": "grails-app/views/location/showZoneLocations.gsp",
+   "key": "location/showZoneLocations",
+   "classification": "LIVE",
+   "evidence": "grails-app/controllers/org/pih/warehouse/core/LocationController.groovy:355 (controller action (convention))"
+  },
+  {
+   "gsp": "grails-app/views/location/uploadLogo.gsp",
+   "key": "location/uploadLogo",
+   "classification": "LIVE",
+   "evidence": "grails-app/controllers/org/pih/warehouse/core/LocationController.groovy:241 (controller action (convention))"
+  },
+  {
+   "gsp": "grails-app/views/locationGroup/_summary.gsp",
+   "key": "locationGroup/_summary",
+   "classification": "TEMPLATE",
+   "evidence": "grails-app/views/locationGroup/create.gsp:21 (included by live page)"
+  },
+  {
+   "gsp": "grails-app/views/locationGroup/create.gsp",
+   "key": "locationGroup/create",
+   "classification": "LIVE",
+   "evidence": "grails-app/controllers/org/pih/warehouse/core/LocationGroupController.groovy:30 (controller action (convention))"
+  },
+  {
+   "gsp": "grails-app/views/locationGroup/edit.gsp",
+   "key": "locationGroup/edit",
+   "classification": "LIVE",
+   "evidence": "grails-app/controllers/org/pih/warehouse/core/LocationGroupController.groovy:55 (controller action (convention))"
+  },
+  {
+   "gsp": "grails-app/views/locationGroup/list.gsp",
+   "key": "locationGroup/list",
+   "classification": "LIVE",
+   "evidence": "grails-app/controllers/org/pih/warehouse/core/LocationGroupController.groovy:25 (controller action (convention))"
+  },
+  {
+   "gsp": "grails-app/views/locationGroup/show.gsp",
+   "key": "locationGroup/show",
+   "classification": "LIVE",
+   "evidence": "grails-app/controllers/org/pih/warehouse/core/LocationGroupController.groovy:46 (controller action (convention))"
+  },
+  {
+   "gsp": "grails-app/views/locationRole/_form.gsp",
+   "key": "locationRole/_form",
+   "classification": "TEMPLATE",
+   "evidence": "grails-app/controllers/org/pih/warehouse/user/UserController.groovy:472 (rendered from controller/taglib)"
+  },
+  {
+   "gsp": "grails-app/views/locationRole/create.gsp",
+   "key": "locationRole/create",
+   "classification": "DEAD",
+   "evidence": "no controller action, URL mapping, menu, render, or link reference found"
+  },
+  {
+   "gsp": "grails-app/views/locationRole/edit.gsp",
+   "key": "locationRole/edit",
+   "classification": "DEAD",
+   "evidence": "no controller action, URL mapping, menu, render, or link reference found"
+  },
+  {
+   "gsp": "grails-app/views/locationRole/list.gsp",
+   "key": "locationRole/list",
+   "classification": "DEAD",
+   "evidence": "no controller action, URL mapping, menu, render, or link reference found"
+  },
+  {
+   "gsp": "grails-app/views/locationRole/show.gsp",
+   "key": "locationRole/show",
+   "classification": "DEAD",
+   "evidence": "no controller action, URL mapping, menu, render, or link reference found"
+  },
+  {
+   "gsp": "grails-app/views/locationType/create.gsp",
+   "key": "locationType/create",
+   "classification": "LIVE",
+   "evidence": "grails-app/controllers/org/pih/warehouse/core/LocationTypeController.groovy:26 (controller action (convention))"
+  },
+  {
+   "gsp": "grails-app/views/locationType/edit.gsp",
+   "key": "locationType/edit",
+   "classification": "LIVE",
+   "evidence": "grails-app/controllers/org/pih/warehouse/core/LocationTypeController.groovy:54 (controller action (convention))"
+  },
+  {
+   "gsp": "grails-app/views/locationType/list.gsp",
+   "key": "locationType/list",
+   "classification": "LIVE",
+   "evidence": "grails-app/controllers/org/pih/warehouse/core/LocationTypeController.groovy:21 (controller action (convention))"
+  },
+  {
+   "gsp": "grails-app/views/locationType/show.gsp",
+   "key": "locationType/show",
+   "classification": "LIVE",
+   "evidence": "grails-app/controllers/org/pih/warehouse/core/LocationTypeController.groovy:43 (controller action (convention))"
+  },
+  {
+   "gsp": "grails-app/views/migration/_status.gsp",
+   "key": "migration/_status",
+   "classification": "TEMPLATE",
+   "evidence": "grails-app/controllers/org/pih/warehouse/data/MigrationController.groovy:440 (rendered from controller/taglib)"
+  },
+  {
+   "gsp": "grails-app/views/migration/dataMigration.gsp",
+   "key": "migration/dataMigration",
+   "classification": "LIVE",
+   "evidence": "grails-app/controllers/org/pih/warehouse/data/MigrationController.groovy:53 (controller action (convention))"
+  },
+  {
+   "gsp": "grails-app/views/migration/dataQuality.gsp",
+   "key": "migration/dataQuality",
+   "classification": "LIVE",
+   "evidence": "grails-app/controllers/org/pih/warehouse/data/MigrationController.groovy:48 (controller action (convention))"
+  },
+  {
+   "gsp": "grails-app/views/migration/dimensionTables.gsp",
+   "key": "migration/dimensionTables",
+   "classification": "LIVE",
+   "evidence": "grails-app/controllers/org/pih/warehouse/data/MigrationController.groovy:88 (controller action (convention))"
+  },
+  {
+   "gsp": "grails-app/views/migration/factTables.gsp",
+   "key": "migration/factTables",
+   "classification": "LIVE",
+   "evidence": "grails-app/controllers/org/pih/warehouse/data/MigrationController.groovy:97 (controller action (convention))"
+  },
+  {
+   "gsp": "grails-app/views/migration/index.gsp",
+   "key": "migration/index",
+   "classification": "LIVE",
+   "evidence": "grails-app/controllers/org/pih/warehouse/data/MigrationController.groovy:44 (controller action (convention))"
+  },
+  {
+   "gsp": "grails-app/views/migration/materializedViews.gsp",
+   "key": "migration/materializedViews",
+   "classification": "LIVE",
+   "evidence": "grails-app/controllers/org/pih/warehouse/data/MigrationController.groovy:106 (controller action (convention))"
+  },
+  {
+   "gsp": "grails-app/views/migration/productAvailability.gsp",
+   "key": "migration/productAvailability",
+   "classification": "LIVE",
+   "evidence": "grails-app/controllers/org/pih/warehouse/data/MigrationController.groovy:162 (controller action (convention))"
+  },
+  {
+   "gsp": "grails-app/views/mobile/chooseLocation.gsp",
+   "key": "mobile/chooseLocation",
+   "classification": "LIVE",
+   "evidence": "grails-app/controllers/org/pih/warehouse/MobileController.groovy:69 (controller action (convention))"
+  },
+  {
+   "gsp": "grails-app/views/mobile/error.gsp",
+   "key": "mobile/error",
+   "classification": "LIVE",
+   "evidence": "grails-app/controllers/org/pih/warehouse/core/ErrorsController.groovy:38 (explicit render(view:))"
+  },
+  {
+   "gsp": "grails-app/views/mobile/index.gsp",
+   "key": "mobile/index",
+   "classification": "LIVE",
+   "evidence": "grails-app/controllers/org/pih/warehouse/MobileController.groovy:31 (controller action (convention))"
+  },
+  {
+   "gsp": "grails-app/views/mobile/login.gsp",
+   "key": "mobile/login",
+   "classification": "LIVE",
+   "evidence": "grails-app/controllers/org/pih/warehouse/MobileController.groovy:57 (controller action (convention))"
+  },
+  {
+   "gsp": "grails-app/views/mobile/menu.gsp",
+   "key": "mobile/menu",
+   "classification": "LIVE",
+   "evidence": "grails-app/controllers/org/pih/warehouse/MobileController.groovy:61 (controller action (convention))"
+  },
+  {
+   "gsp": "grails-app/views/mobile/outboundList.gsp",
+   "key": "mobile/outboundList",
+   "classification": "LIVE",
+   "evidence": "grails-app/controllers/org/pih/warehouse/MobileController.groovy:99 (controller action (convention))"
+  },
+  {
+   "gsp": "grails-app/views/mobile/productDetails.gsp",
+   "key": "mobile/productDetails",
+   "classification": "LIVE",
+   "evidence": "grails-app/controllers/org/pih/warehouse/MobileController.groovy:86 (controller action (convention))"
+  },
+  {
+   "gsp": "grails-app/views/mobile/productList.gsp",
+   "key": "mobile/productList",
+   "classification": "LIVE",
+   "evidence": "grails-app/controllers/org/pih/warehouse/MobileController.groovy:76 (controller action (convention))"
+  },
+  {
+   "gsp": "grails-app/views/order/_actions.gsp",
+   "key": "order/_actions",
+   "classification": "TEMPLATE",
+   "evidence": "grails-app/views/order/list.gsp:96 (included by live page)"
+  },
+  {
+   "gsp": "grails-app/views/order/_filters.gsp",
+   "key": "order/_filters",
+   "classification": "TEMPLATE",
+   "evidence": "grails-app/views/order/list.gsp:40 (included by live page)"
+  },
+  {
+   "gsp": "grails-app/views/order/_itemDetails.gsp",
+   "key": "order/_itemDetails",
+   "classification": "TEMPLATE",
+   "evidence": "grails-app/controllers/org/pih/warehouse/order/OrderController.groovy:1141 (rendered from controller/taglib)"
+  },
+  {
+   "gsp": "grails-app/views/order/_itemStatus.gsp",
+   "key": "order/_itemStatus",
+   "classification": "TEMPLATE",
+   "evidence": "grails-app/controllers/org/pih/warehouse/order/OrderController.groovy:1136 (rendered from controller/taglib)"
+  },
+  {
+   "gsp": "grails-app/views/order/_orderAdjustments.gsp",
+   "key": "order/_orderAdjustments",
+   "classification": "TEMPLATE",
+   "evidence": "grails-app/controllers/org/pih/warehouse/order/OrderController.groovy:1146 (rendered from controller/taglib)"
+  },
+  {
+   "gsp": "grails-app/views/order/_orderComments.gsp",
+   "key": "order/_orderComments",
+   "classification": "TEMPLATE",
+   "evidence": "grails-app/controllers/org/pih/warehouse/order/OrderController.groovy:1166 (rendered from controller/taglib)"
+  },
+  {
+   "gsp": "grails-app/views/order/_orderDocuments.gsp",
+   "key": "order/_orderDocuments",
+   "classification": "TEMPLATE",
+   "evidence": "grails-app/controllers/org/pih/warehouse/order/OrderController.groovy:1161 (rendered from controller/taglib)"
+  },
+  {
+   "gsp": "grails-app/views/order/_orderInvoices.gsp",
+   "key": "order/_orderInvoices",
+   "classification": "TEMPLATE",
+   "evidence": "grails-app/controllers/org/pih/warehouse/order/OrderController.groovy:1156 (rendered from controller/taglib)"
+  },
+  {
+   "gsp": "grails-app/views/order/_orderItemForm.gsp",
+   "key": "order/_orderItemForm",
+   "classification": "TEMPLATE",
+   "evidence": "grails-app/views/purchaseOrder/_showOrderItems.gsp:119 (included by live page)"
+  },
+  {
+   "gsp": "grails-app/views/order/_orderItemFormDialog.gsp",
+   "key": "order/_orderItemFormDialog",
+   "classification": "TEMPLATE",
+   "evidence": "grails-app/controllers/org/pih/warehouse/order/OrderController.groovy:688 (rendered from controller/taglib)"
+  },
+  {
+   "gsp": "grails-app/views/order/_orderItemSummaryFilters.gsp",
+   "key": "order/_orderItemSummaryFilters",
+   "classification": "TEMPLATE",
+   "evidence": "grails-app/views/order/orderItemSummaryList.gsp:13 (included by live page)"
+  },
+  {
+   "gsp": "grails-app/views/order/_orderShipments.gsp",
+   "key": "order/_orderShipments",
+   "classification": "TEMPLATE",
+   "evidence": "grails-app/controllers/org/pih/warehouse/order/OrderController.groovy:1151 (rendered from controller/taglib)"
+  },
+  {
+   "gsp": "grails-app/views/order/_orderStatusFilters.gsp",
+   "key": "order/_orderStatusFilters",
+   "classification": "TEMPLATE",
+   "evidence": "grails-app/views/order/orderSummaryList.gsp:13 (included by live page)"
+  },
+  {
+   "gsp": "grails-app/views/order/_orderSummary.gsp",
+   "key": "order/_orderSummary",
+   "classification": "TEMPLATE",
+   "evidence": "grails-app/controllers/org/pih/warehouse/order/OrderController.groovy:1132 (rendered from controller/taglib)"
+  },
+  {
+   "gsp": "grails-app/views/order/_productSourceFormDialog.gsp",
+   "key": "order/_productSourceFormDialog",
+   "classification": "TEMPLATE",
+   "evidence": "grails-app/controllers/org/pih/warehouse/order/OrderController.groovy:695 (rendered from controller/taglib)"
+  },
+  {
+   "gsp": "grails-app/views/order/_summary.gsp",
+   "key": "order/_summary",
+   "classification": "TEMPLATE",
+   "evidence": "grails-app/views/order/addComment.gsp:29 (included by live page)"
+  },
+  {
+   "gsp": "grails-app/views/order/addComment.gsp",
+   "key": "order/addComment",
+   "classification": "LIVE",
+   "evidence": "grails-app/controllers/org/pih/warehouse/order/OrderController.groovy:423 (controller action (convention))"
+  },
+  {
+   "gsp": "grails-app/views/order/addDocument.gsp",
+   "key": "order/addDocument",
+   "classification": "LIVE",
+   "evidence": "grails-app/controllers/org/pih/warehouse/order/OrderController.groovy:505 (controller action (convention))"
+  },
+  {
+   "gsp": "grails-app/views/order/editAdjustment.gsp",
+   "key": "order/editAdjustment",
+   "classification": "LIVE",
+   "evidence": "grails-app/controllers/org/pih/warehouse/order/OrderController.groovy:341 (controller action (convention))"
+  },
+  {
+   "gsp": "grails-app/views/order/list.gsp",
+   "key": "order/list",
+   "classification": "LIVE",
+   "evidence": "grails-app/controllers/org/pih/warehouse/order/OrderController.groovy:52 (controller action (convention))"
+  },
+  {
+   "gsp": "grails-app/views/order/listOrderItems.gsp",
+   "key": "order/listOrderItems",
+   "classification": "LIVE",
+   "evidence": "grails-app/controllers/org/pih/warehouse/order/OrderController.groovy:216 (controller action (convention))"
+  },
+  {
+   "gsp": "grails-app/views/order/orderItemSummaryList.gsp",
+   "key": "order/orderItemSummaryList",
+   "classification": "LIVE",
+   "evidence": "grails-app/controllers/org/pih/warehouse/order/OrderController.groovy:1182 (explicit render(view:))"
+  },
+  {
+   "gsp": "grails-app/views/order/orderSummaryList.gsp",
+   "key": "order/orderSummaryList",
+   "classification": "LIVE",
+   "evidence": "grails-app/controllers/org/pih/warehouse/order/OrderController.groovy:1170 (controller action (convention))"
+  },
+  {
+   "gsp": "grails-app/views/order/print.gsp",
+   "key": "order/print",
+   "classification": "LIVE",
+   "evidence": "grails-app/controllers/org/pih/warehouse/order/OrderController.groovy:935 (controller action (convention))"
+  },
+  {
+   "gsp": "grails-app/views/order/show.gsp",
+   "key": "order/show",
+   "classification": "LIVE",
+   "evidence": "grails-app/controllers/org/pih/warehouse/order/OrderController.groovy:236 (controller action (convention))"
+  },
+  {
+   "gsp": "grails-app/views/orderAdjustmentType/create.gsp",
+   "key": "orderAdjustmentType/create",
+   "classification": "LIVE",
+   "evidence": "grails-app/controllers/org/pih/warehouse/order/OrderAdjustmentTypeController.groovy:25 (controller action (convention))"
+  },
+  {
+   "gsp": "grails-app/views/orderAdjustmentType/edit.gsp",
+   "key": "orderAdjustmentType/edit",
+   "classification": "LIVE",
+   "evidence": "grails-app/controllers/org/pih/warehouse/order/OrderAdjustmentTypeController.groovy:32 (controller action (convention))"
+  },
+  {
+   "gsp": "grails-app/views/orderAdjustmentType/list.gsp",
+   "key": "orderAdjustmentType/list",
+   "classification": "LIVE",
+   "evidence": "grails-app/controllers/org/pih/warehouse/order/OrderAdjustmentTypeController.groovy:20 (controller action (convention))"
+  },
+  {
+   "gsp": "grails-app/views/organization/_filters.gsp",
+   "key": "organization/_filters",
+   "classification": "TEMPLATE",
+   "evidence": "grails-app/views/organization/list.gsp:28 (included by live page)"
+  },
+  {
+   "gsp": "grails-app/views/organization/create.gsp",
+   "key": "organization/create",
+   "classification": "LIVE",
+   "evidence": "grails-app/controllers/org/pih/warehouse/core/OrganizationController.groovy:60 (controller action (convention))"
+  },
+  {
+   "gsp": "grails-app/views/organization/edit.gsp",
+   "key": "organization/edit",
+   "classification": "LIVE",
+   "evidence": "grails-app/controllers/org/pih/warehouse/core/OrganizationController.groovy:127 (controller action (convention))"
+  },
+  {
+   "gsp": "grails-app/views/organization/list.gsp",
+   "key": "organization/list",
+   "classification": "LIVE",
+   "evidence": "grails-app/controllers/org/pih/warehouse/core/OrganizationController.groovy:55 (controller action (convention))"
+  },
+  {
+   "gsp": "grails-app/views/organization/show.gsp",
+   "key": "organization/show",
+   "classification": "LIVE",
+   "evidence": "grails-app/controllers/org/pih/warehouse/core/OrganizationController.groovy:114 (controller action (convention))"
+  },
+  {
+   "gsp": "grails-app/views/party/create.gsp",
+   "key": "party/create",
+   "classification": "LIVE",
+   "evidence": "grails-app/controllers/org/pih/warehouse/core/PartyController.groovy:27 (controller action (convention))"
+  },
+  {
+   "gsp": "grails-app/views/party/edit.gsp",
+   "key": "party/edit",
+   "classification": "LIVE",
+   "evidence": "grails-app/controllers/org/pih/warehouse/core/PartyController.groovy:53 (controller action (convention))"
+  },
+  {
+   "gsp": "grails-app/views/party/list.gsp",
+   "key": "party/list",
+   "classification": "LIVE",
+   "evidence": "grails-app/controllers/org/pih/warehouse/core/PartyController.groovy:22 (controller action (convention))"
+  },
+  {
+   "gsp": "grails-app/views/party/show.gsp",
+   "key": "party/show",
+   "classification": "LIVE",
+   "evidence": "grails-app/controllers/org/pih/warehouse/core/PartyController.groovy:43 (controller action (convention))"
+  },
+  {
+   "gsp": "grails-app/views/partyRole/create.gsp",
+   "key": "partyRole/create",
+   "classification": "LIVE",
+   "evidence": "grails-app/controllers/org/pih/warehouse/core/PartyRoleController.groovy:27 (controller action (convention))"
+  },
+  {
+   "gsp": "grails-app/views/partyRole/edit.gsp",
+   "key": "partyRole/edit",
+   "classification": "LIVE",
+   "evidence": "grails-app/controllers/org/pih/warehouse/core/PartyRoleController.groovy:53 (controller action (convention))"
+  },
+  {
+   "gsp": "grails-app/views/partyRole/list.gsp",
+   "key": "partyRole/list",
+   "classification": "LIVE",
+   "evidence": "grails-app/controllers/org/pih/warehouse/core/PartyRoleController.groovy:22 (controller action (convention))"
+  },
+  {
+   "gsp": "grails-app/views/partyRole/show.gsp",
+   "key": "partyRole/show",
+   "classification": "LIVE",
+   "evidence": "grails-app/controllers/org/pih/warehouse/core/PartyRoleController.groovy:43 (controller action (convention))"
+  },
+  {
+   "gsp": "grails-app/views/partyType/create.gsp",
+   "key": "partyType/create",
+   "classification": "LIVE",
+   "evidence": "grails-app/controllers/org/pih/warehouse/core/PartyTypeController.groovy:27 (controller action (convention))"
+  },
+  {
+   "gsp": "grails-app/views/partyType/edit.gsp",
+   "key": "partyType/edit",
+   "classification": "LIVE",
+   "evidence": "grails-app/controllers/org/pih/warehouse/core/PartyTypeController.groovy:53 (controller action (convention))"
+  },
+  {
+   "gsp": "grails-app/views/partyType/list.gsp",
+   "key": "partyType/list",
+   "classification": "LIVE",
+   "evidence": "grails-app/controllers/org/pih/warehouse/core/PartyTypeController.groovy:22 (controller action (convention))"
+  },
+  {
+   "gsp": "grails-app/views/partyType/show.gsp",
+   "key": "partyType/show",
+   "classification": "LIVE",
+   "evidence": "grails-app/controllers/org/pih/warehouse/core/PartyTypeController.groovy:43 (controller action (convention))"
+  },
+  {
+   "gsp": "grails-app/views/paymentTerm/create.gsp",
+   "key": "paymentTerm/create",
+   "classification": "LIVE",
+   "evidence": "grails-app/controllers/org/pih/warehouse/core/PaymentTermController.groovy:20 (controller action (convention))"
+  },
+  {
+   "gsp": "grails-app/views/paymentTerm/edit.gsp",
+   "key": "paymentTerm/edit",
+   "classification": "LIVE",
+   "evidence": "grails-app/controllers/org/pih/warehouse/core/PaymentTermController.groovy:26 (controller action (convention))"
+  },
+  {
+   "gsp": "grails-app/views/paymentTerm/list.gsp",
+   "key": "paymentTerm/list",
+   "classification": "LIVE",
+   "evidence": "grails-app/controllers/org/pih/warehouse/core/PaymentTermController.groovy:15 (controller action (convention))"
+  },
+  {
+   "gsp": "grails-app/views/person/create.gsp",
+   "key": "person/create",
+   "classification": "LIVE",
+   "evidence": "grails-app/controllers/org/pih/warehouse/core/PersonController.groovy:48 (controller action (convention))"
+  },
+  {
+   "gsp": "grails-app/views/person/edit.gsp",
+   "key": "person/edit",
+   "classification": "LIVE",
+   "evidence": "grails-app/controllers/org/pih/warehouse/core/PersonController.groovy:76 (controller action (convention))"
+  },
+  {
+   "gsp": "grails-app/views/person/list.gsp",
+   "key": "person/list",
+   "classification": "LIVE",
+   "evidence": "grails-app/controllers/org/pih/warehouse/core/PersonController.groovy:28 (controller action (convention))"
+  },
+  {
+   "gsp": "grails-app/views/person/show.gsp",
+   "key": "person/show",
+   "classification": "LIVE",
+   "evidence": "grails-app/controllers/org/pih/warehouse/core/PersonController.groovy:65 (controller action (convention))"
+  },
+  {
+   "gsp": "grails-app/views/picklist/_page.gsp",
+   "key": "picklist/_page",
+   "classification": "TEMPLATE",
+   "evidence": "grails-app/views/picklist/_print.gsp:280 (included by live page)"
+  },
+  {
+   "gsp": "grails-app/views/picklist/_print.gsp",
+   "key": "picklist/_print",
+   "classification": "TEMPLATE",
+   "evidence": "grails-app/controllers/org/pih/warehouse/picklist/PicklistController.groovy:62 (rendered from controller/taglib)"
+  },
+  {
+   "gsp": "grails-app/views/picklist/_printPage.gsp",
+   "key": "picklist/_printPage",
+   "classification": "TEMPLATE",
+   "evidence": "grails-app/views/picklist/print.gsp:168 (included by live page)"
+  },
+  {
+   "gsp": "grails-app/views/picklist/_returnPage.gsp",
+   "key": "picklist/_returnPage",
+   "classification": "TEMPLATE",
+   "evidence": "grails-app/views/picklist/_returnPrint.gsp:224 (included by live page)"
+  },
+  {
+   "gsp": "grails-app/views/picklist/_returnPrint.gsp",
+   "key": "picklist/_returnPrint",
+   "classification": "TEMPLATE",
+   "evidence": "grails-app/controllers/org/pih/warehouse/picklist/PicklistController.groovy:74 (rendered from controller/taglib)"
+  },
+  {
+   "gsp": "grails-app/views/picklist/_returnPrintPage.gsp",
+   "key": "picklist/_returnPrintPage",
+   "classification": "TEMPLATE",
+   "evidence": "grails-app/views/picklist/returnPrint.gsp:129 (included by live page)"
+  },
+  {
+   "gsp": "grails-app/views/picklist/print.gsp",
+   "key": "picklist/print",
+   "classification": "LIVE",
+   "evidence": "grails-app/controllers/org/pih/warehouse/picklist/PicklistController.groovy:40 (controller action (convention))"
+  },
+  {
+   "gsp": "grails-app/views/picklist/returnPrint.gsp",
+   "key": "picklist/returnPrint",
+   "classification": "LIVE",
+   "evidence": "grails-app/controllers/org/pih/warehouse/picklist/PicklistController.groovy:49 (controller action (convention))"
+  },
+  {
+   "gsp": "grails-app/views/preferenceType/create.gsp",
+   "key": "preferenceType/create",
+   "classification": "LIVE",
+   "evidence": "grails-app/controllers/org/pih/warehouse/core/PreferenceTypeController.groovy:24 (controller action (convention))"
+  },
+  {
+   "gsp": "grails-app/views/preferenceType/edit.gsp",
+   "key": "preferenceType/edit",
+   "classification": "LIVE",
+   "evidence": "grails-app/controllers/org/pih/warehouse/core/PreferenceTypeController.groovy:30 (controller action (convention))"
+  },
+  {
+   "gsp": "grails-app/views/preferenceType/list.gsp",
+   "key": "preferenceType/list",
+   "classification": "LIVE",
+   "evidence": "grails-app/controllers/org/pih/warehouse/core/PreferenceTypeController.groovy:19 (controller action (convention))"
+  },
+  {
+   "gsp": "grails-app/views/product/_actions.gsp",
+   "key": "product/_actions",
+   "classification": "TEMPLATE",
+   "evidence": "grails-app/views/product/_summary.gsp:75 (included by live page)"
+  },
+  {
+   "gsp": "grails-app/views/product/_actionsBatch.gsp",
+   "key": "product/_actionsBatch",
+   "classification": "TEMPLATE",
+   "evidence": "grails-app/views/product/batchEdit.gsp:173 (included by live page)"
+  },
+  {
+   "gsp": "grails-app/views/product/_attributes.gsp",
+   "key": "product/_attributes",
+   "classification": "DEAD",
+   "evidence": "template/layout not included by any live page"
+  },
+  {
+   "gsp": "grails-app/views/product/_categories.gsp",
+   "key": "product/_categories",
+   "classification": "DEAD",
+   "evidence": "template/layout not included by any live page"
+  },
+  {
+   "gsp": "grails-app/views/product/_category.gsp",
+   "key": "product/_category",
+   "classification": "DEAD",
+   "evidence": "template/layout not included by any live page"
+  },
+  {
+   "gsp": "grails-app/views/product/_documents.gsp",
+   "key": "product/_documents",
+   "classification": "TEMPLATE",
+   "evidence": "grails-app/views/product/edit.gsp:75 (included by live page)"
+  },
+  {
+   "gsp": "grails-app/views/product/_inventoryLevels.gsp",
+   "key": "product/_inventoryLevels",
+   "classification": "TEMPLATE",
+   "evidence": "grails-app/views/product/edit.gsp:70 (included by live page)"
+  },
+  {
+   "gsp": "grails-app/views/product/_manufacturers.gsp",
+   "key": "product/_manufacturers",
+   "classification": "DEAD",
+   "evidence": "template/layout not included by any live page"
+  },
+  {
+   "gsp": "grails-app/views/product/_mergeProductConfirmationDialog.gsp",
+   "key": "product/_mergeProductConfirmationDialog",
+   "classification": "DEAD",
+   "evidence": "template/layout not included by any live page"
+  },
+  {
+   "gsp": "grails-app/views/product/_mergeProducts.gsp",
+   "key": "product/_mergeProducts",
+   "classification": "DEAD",
+   "evidence": "template/layout not included by any live page"
+  },
+  {
+   "gsp": "grails-app/views/product/_productAssociations.gsp",
+   "key": "product/_productAssociations",
+   "classification": "TEMPLATE",
+   "evidence": "grails-app/views/product/edit.gsp:80 (included by live page)"
+  },
+  {
+   "gsp": "grails-app/views/product/_productCatalogs.gsp",
+   "key": "product/_productCatalogs",
+   "classification": "TEMPLATE",
+   "evidence": "grails-app/views/product/edit.gsp:90 (included by live page)"
+  },
+  {
+   "gsp": "grails-app/views/product/_productComponents.gsp",
+   "key": "product/_productComponents",
+   "classification": "TEMPLATE",
+   "evidence": "grails-app/views/product/edit.gsp:106 (included by live page)"
+  },
+  {
+   "gsp": "grails-app/views/product/_productDetails.gsp",
+   "key": "product/_productDetails",
+   "classification": "TEMPLATE",
+   "evidence": "grails-app/views/product/edit.gsp:58 (included by live page)"
+  },
+  {
+   "gsp": "grails-app/views/product/_productGroups.gsp",
+   "key": "product/_productGroups",
+   "classification": "TEMPLATE",
+   "evidence": "grails-app/views/product/edit.gsp:95 (included by live page)"
+  },
+  {
+   "gsp": "grails-app/views/product/_productMergeLogsFilters.gsp",
+   "key": "product/_productMergeLogsFilters",
+   "classification": "TEMPLATE",
+   "evidence": "grails-app/views/product/productMergeLogs.gsp:13 (included by live page)"
+  },
+  {
+   "gsp": "grails-app/views/product/_productPackageDialog.gsp",
+   "key": "product/_productPackageDialog",
+   "classification": "TEMPLATE",
+   "evidence": "grails-app/views/product/_productPackages.gsp:114 (included by live page)"
+  },
+  {
+   "gsp": "grails-app/views/product/_productPackages.gsp",
+   "key": "product/_productPackages",
+   "classification": "TEMPLATE",
+   "evidence": "grails-app/views/product/edit.gsp:85 (included by live page)"
+  },
+  {
+   "gsp": "grails-app/views/product/_productSuppliers.gsp",
+   "key": "product/_productSuppliers",
+   "classification": "TEMPLATE",
+   "evidence": "grails-app/views/product/edit.gsp:65 (included by live page)"
+  },
+  {
+   "gsp": "grails-app/views/product/_productSynonyms.gsp",
+   "key": "product/_productSynonyms",
+   "classification": "TEMPLATE",
+   "evidence": "grails-app/views/product/edit.gsp:100 (included by live page)"
+  },
+  {
+   "gsp": "grails-app/views/product/_productSynonymsEdit.gsp",
+   "key": "product/_productSynonymsEdit",
+   "classification": "TEMPLATE",
+   "evidence": "grails-app/controllers/org/pih/warehouse/product/ProductController.groovy:841 (rendered from controller/taglib)"
+  },
+  {
+   "gsp": "grails-app/views/product/_status.gsp",
+   "key": "product/_status",
+   "classification": "DEAD",
+   "evidence": "template/layout not included by any live page"
+  },
+  {
+   "gsp": "grails-app/views/product/_summary.gsp",
+   "key": "product/_summary",
+   "classification": "TEMPLATE",
+   "evidence": "grails-app/views/product/edit.gsp:52 (included by live page)"
+  },
+  {
+   "gsp": "grails-app/views/product/_summaryDialog.gsp",
+   "key": "product/_summaryDialog",
+   "classification": "TEMPLATE",
+   "evidence": "grails-app/views/inventoryLevel/_form.gsp:11 (included by live page)"
+  },
+  {
+   "gsp": "grails-app/views/product/_tags.gsp",
+   "key": "product/_tags",
+   "classification": "DEAD",
+   "evidence": "template/layout not included by any live page"
+  },
+  {
+   "gsp": "grails-app/views/product/_uomClassDialog.gsp",
+   "key": "product/_uomClassDialog",
+   "classification": "TEMPLATE",
+   "evidence": "grails-app/views/product/_productPackages.gsp:118 (included by live page)"
+  },
+  {
+   "gsp": "grails-app/views/product/_uomDialog.gsp",
+   "key": "product/_uomDialog",
+   "classification": "TEMPLATE",
+   "evidence": "grails-app/views/product/_productPackages.gsp:121 (included by live page)"
+  },
+  {
+   "gsp": "grails-app/views/product/_uploadFile.gsp",
+   "key": "product/_uploadFile",
+   "classification": "DEAD",
+   "evidence": "template/layout not included by any live page"
+  },
+  {
+   "gsp": "grails-app/views/product/addDocument.gsp",
+   "key": "product/addDocument",
+   "classification": "LIVE",
+   "evidence": "grails-app/controllers/org/pih/warehouse/product/ProductController.groovy:1015 (controller action (convention))"
+  },
+  {
+   "gsp": "grails-app/views/product/batchEdit.gsp",
+   "key": "product/batchEdit",
+   "classification": "LIVE",
+   "evidence": "grails-app/controllers/org/pih/warehouse/product/ProductController.groovy:74 (controller action (convention))"
+  },
+  {
+   "gsp": "grails-app/views/product/batchEditProperties.gsp",
+   "key": "product/batchEditProperties",
+   "classification": "LIVE",
+   "evidence": "grails-app/controllers/org/pih/warehouse/product/ProductController.groovy:95 (controller action (convention))"
+  },
+  {
+   "gsp": "grails-app/views/product/edit.gsp",
+   "key": "product/edit",
+   "classification": "LIVE",
+   "evidence": "grails-app/controllers/org/pih/warehouse/product/ProductController.groovy:204 (controller action (convention))"
+  },
+  {
+   "gsp": "grails-app/views/product/importAsCsv.gsp",
+   "key": "product/importAsCsv",
+   "classification": "LIVE",
+   "evidence": "grails-app/controllers/org/pih/warehouse/product/ProductController.groovy:618 (controller action (convention))"
+  },
+  {
+   "gsp": "grails-app/views/product/list.gsp",
+   "key": "product/list",
+   "classification": "SUPERSEDED",
+   "evidence": "src/js/components/Router.jsx:289 (React SPA route **/product/list)"
+  },
+  {
+   "gsp": "grails-app/views/product/productMergeLogs.gsp",
+   "key": "product/productMergeLogs",
+   "classification": "LIVE",
+   "evidence": "grails-app/controllers/org/pih/warehouse/product/ProductController.groovy:1106 (controller action (convention))"
+  },
+  {
+   "gsp": "grails-app/views/product/search.gsp",
+   "key": "product/search",
+   "classification": "LIVE",
+   "evidence": "grails-app/controllers/org/pih/warehouse/product/ProductController.groovy:428 (controller action (convention))"
+  },
+  {
+   "gsp": "grails-app/views/product/show.gsp",
+   "key": "product/show",
+   "classification": "LIVE",
+   "evidence": "grails-app/controllers/org/pih/warehouse/product/ProductController.groovy:201 (controller action (convention))"
+  },
+  {
+   "gsp": "grails-app/views/product/upnDatabase.gsp",
+   "key": "product/upnDatabase",
+   "classification": "LIVE",
+   "evidence": "grails-app/controllers/org/pih/warehouse/product/ProductController.groovy:466 (controller action (convention))"
+  },
+  {
+   "gsp": "grails-app/views/productAssociation/_dialog.gsp",
+   "key": "productAssociation/_dialog",
+   "classification": "TEMPLATE",
+   "evidence": "grails-app/controllers/org/pih/warehouse/product/ProductAssociationController.groovy:243 (rendered from controller/taglib)"
+  },
+  {
+   "gsp": "grails-app/views/productAssociation/_productAssociationDeleteDialog.gsp",
+   "key": "productAssociation/_productAssociationDeleteDialog",
+   "classification": "TEMPLATE",
+   "evidence": "grails-app/views/productAssociation/edit.gsp:124 (included by live page)"
+  },
+  {
+   "gsp": "grails-app/views/productAssociation/create.gsp",
+   "key": "productAssociation/create",
+   "classification": "LIVE",
+   "evidence": "grails-app/controllers/org/pih/warehouse/product/ProductAssociationController.groovy:79 (controller action (convention))"
+  },
+  {
+   "gsp": "grails-app/views/productAssociation/edit.gsp",
+   "key": "productAssociation/edit",
+   "classification": "LIVE",
+   "evidence": "grails-app/controllers/org/pih/warehouse/product/ProductAssociationController.groovy:124 (controller action (convention))"
+  },
+  {
+   "gsp": "grails-app/views/productAssociation/list.gsp",
+   "key": "productAssociation/list",
+   "classification": "LIVE",
+   "evidence": "grails-app/controllers/org/pih/warehouse/product/ProductAssociationController.groovy:26 (controller action (convention))"
+  },
+  {
+   "gsp": "grails-app/views/productAssociation/show.gsp",
+   "key": "productAssociation/show",
+   "classification": "LIVE",
+   "evidence": "grails-app/controllers/org/pih/warehouse/product/ProductAssociationController.groovy:114 (controller action (convention))"
+  },
+  {
+   "gsp": "grails-app/views/productCatalog/_productCatalogItems.gsp",
+   "key": "productCatalog/_productCatalogItems",
+   "classification": "TEMPLATE",
+   "evidence": "grails-app/views/productCatalog/edit.gsp:145 (included by live page)"
+  },
+  {
+   "gsp": "grails-app/views/productCatalog/_summary.gsp",
+   "key": "productCatalog/_summary",
+   "classification": "TEMPLATE",
+   "evidence": "grails-app/views/productCatalog/edit.gsp:26 (included by live page)"
+  },
+  {
+   "gsp": "grails-app/views/productCatalog/create.gsp",
+   "key": "productCatalog/create",
+   "classification": "LIVE",
+   "evidence": "grails-app/controllers/org/pih/warehouse/product/ProductCatalogController.groovy:36 (controller action (convention))"
+  },
+  {
+   "gsp": "grails-app/views/productCatalog/edit.gsp",
+   "key": "productCatalog/edit",
+   "classification": "LIVE",
+   "evidence": "grails-app/controllers/org/pih/warehouse/product/ProductCatalogController.groovy:63 (controller action (convention))"
+  },
+  {
+   "gsp": "grails-app/views/productCatalog/list.gsp",
+   "key": "productCatalog/list",
+   "classification": "LIVE",
+   "evidence": "grails-app/controllers/org/pih/warehouse/product/ProductCatalogController.groovy:31 (controller action (convention))"
+  },
+  {
+   "gsp": "grails-app/views/productCatalog/show.gsp",
+   "key": "productCatalog/show",
+   "classification": "LIVE",
+   "evidence": "grails-app/controllers/org/pih/warehouse/product/ProductCatalogController.groovy:53 (controller action (convention))"
+  },
+  {
+   "gsp": "grails-app/views/productComponent/index.gsp",
+   "key": "productComponent/index",
+   "classification": "DEAD",
+   "evidence": "no controller action, URL mapping, menu, render, or link reference found"
+  },
+  {
+   "gsp": "grails-app/views/productGroup/_products.gsp",
+   "key": "productGroup/_products",
+   "classification": "TEMPLATE",
+   "evidence": "grails-app/views/productGroup/edit.gsp:111 (included by live page)"
+  },
+  {
+   "gsp": "grails-app/views/productGroup/create.gsp",
+   "key": "productGroup/create",
+   "classification": "LIVE",
+   "evidence": "grails-app/controllers/org/pih/warehouse/product/ProductGroupController.groovy:42 (controller action (convention))"
+  },
+  {
+   "gsp": "grails-app/views/productGroup/edit.gsp",
+   "key": "productGroup/edit",
+   "classification": "LIVE",
+   "evidence": "grails-app/controllers/org/pih/warehouse/product/ProductGroupController.groovy:79 (controller action (convention))"
+  },
+  {
+   "gsp": "grails-app/views/productGroup/list.gsp",
+   "key": "productGroup/list",
+   "classification": "LIVE",
+   "evidence": "grails-app/controllers/org/pih/warehouse/product/ProductGroupController.groovy:25 (controller action (convention))"
+  },
+  {
+   "gsp": "grails-app/views/productGroup/show.gsp",
+   "key": "productGroup/show",
+   "classification": "LIVE",
+   "evidence": "grails-app/controllers/org/pih/warehouse/product/ProductGroupController.groovy:69 (controller action (convention))"
+  },
+  {
+   "gsp": "grails-app/views/productSupplier/_dialog.gsp",
+   "key": "productSupplier/_dialog",
+   "classification": "TEMPLATE",
+   "evidence": "grails-app/controllers/org/pih/warehouse/product/ProductSupplierController.groovy:279 (rendered from controller/taglib)"
+  },
+  {
+   "gsp": "grails-app/views/productSupplier/create.gsp",
+   "key": "productSupplier/create",
+   "classification": "SUPERSEDED",
+   "evidence": "src/js/components/Router.jsx:292 (React SPA route **/productSupplier/create)"
+  },
+  {
+   "gsp": "grails-app/views/productSupplier/edit.gsp",
+   "key": "productSupplier/edit",
+   "classification": "LIVE",
+   "evidence": "grails-app/controllers/org/pih/warehouse/product/ProductSupplierController.groovy:127 (controller action (convention))"
+  },
+  {
+   "gsp": "grails-app/views/productSupplier/list.gsp",
+   "key": "productSupplier/list",
+   "classification": "SUPERSEDED",
+   "evidence": "src/js/components/Router.jsx:291 (React SPA route **/productSupplier/list)"
+  },
+  {
+   "gsp": "grails-app/views/productSupplier/show.gsp",
+   "key": "productSupplier/show",
+   "classification": "LIVE",
+   "evidence": "grails-app/controllers/org/pih/warehouse/product/ProductSupplierController.groovy:117 (controller action (convention))"
+  },
+  {
+   "gsp": "grails-app/views/productType/create.gsp",
+   "key": "productType/create",
+   "classification": "LIVE",
+   "evidence": "grails-app/controllers/org/pih/warehouse/product/ProductTypeController.groovy:29 (controller action (convention))"
+  },
+  {
+   "gsp": "grails-app/views/productType/edit.gsp",
+   "key": "productType/edit",
+   "classification": "LIVE",
+   "evidence": "grails-app/controllers/org/pih/warehouse/product/ProductTypeController.groovy:73 (controller action (convention))"
+  },
+  {
+   "gsp": "grails-app/views/productType/list.gsp",
+   "key": "productType/list",
+   "classification": "LIVE",
+   "evidence": "grails-app/controllers/org/pih/warehouse/product/ProductTypeController.groovy:24 (controller action (convention))"
+  },
+  {
+   "gsp": "grails-app/views/productType/show.gsp",
+   "key": "productType/show",
+   "classification": "LIVE",
+   "evidence": "grails-app/controllers/org/pih/warehouse/product/ProductTypeController.groovy:62 (controller action (convention))"
+  },
+  {
+   "gsp": "grails-app/views/purchaseOrder/_enterOrderDetails.gsp",
+   "key": "purchaseOrder/_enterOrderDetails",
+   "classification": "TEMPLATE",
+   "evidence": "grails-app/controllers/org/pih/warehouse/order/PurchaseOrderController.groovy:39 (rendered from controller/taglib)"
+  },
+  {
+   "gsp": "grails-app/views/purchaseOrder/_showOrderItems.gsp",
+   "key": "purchaseOrder/_showOrderItems",
+   "classification": "TEMPLATE",
+   "evidence": "grails-app/controllers/org/pih/warehouse/order/PurchaseOrderController.groovy:101 (rendered from controller/taglib)"
+  },
+  {
+   "gsp": "grails-app/views/purchaseOrder/handleError.gsp",
+   "key": "purchaseOrder/handleError",
+   "classification": "DEAD",
+   "evidence": "no controller action, URL mapping, menu, render, or link reference found"
+  },
+  {
+   "gsp": "grails-app/views/purchaseOrder/placeOrder.gsp",
+   "key": "purchaseOrder/placeOrder",
+   "classification": "DEAD",
+   "evidence": "no controller action, URL mapping, menu, render, or link reference found"
+  },
+  {
+   "gsp": "grails-app/views/putAway/_print.gsp",
+   "key": "putAway/_print",
+   "classification": "TEMPLATE",
+   "evidence": "grails-app/controllers/org/pih/warehouse/putaway/PutAwayController.groovy:49 (rendered from controller/taglib)"
+  },
+  {
+   "gsp": "grails-app/views/quartz/list.gsp",
+   "key": "quartz/list",
+   "classification": "LIVE",
+   "evidence": "grails-app/views/jobs/show.gsp:17 (g:link/redirect reference)"
+  },
+  {
+   "gsp": "grails-app/views/receiveOrderWorkflow/_progressBar.gsp",
+   "key": "receiveOrderWorkflow/_progressBar",
+   "classification": "TEMPLATE",
+   "evidence": "grails-app/views/receiveOrderWorkflow/receiveOrder/handleError.gsp:28 (included by live page)"
+  },
+  {
+   "gsp": "grails-app/views/receiveOrderWorkflow/receiveOrder/confirmOrderReceipt.gsp",
+   "key": "receiveOrderWorkflow/receiveOrder/confirmOrderReceipt",
+   "classification": "LIVE",
+   "evidence": "grails-app/controllers/org/pih/warehouse/order/ReceiveOrderWorkflowController.groovy:26 (webflow state view)"
+  },
+  {
+   "gsp": "grails-app/views/receiveOrderWorkflow/receiveOrder/enterShipmentDetails.gsp",
+   "key": "receiveOrderWorkflow/receiveOrder/enterShipmentDetails",
+   "classification": "LIVE",
+   "evidence": "grails-app/controllers/org/pih/warehouse/order/ReceiveOrderWorkflowController.groovy:26 (webflow state view)"
+  },
+  {
+   "gsp": "grails-app/views/receiveOrderWorkflow/receiveOrder/handleError.gsp",
+   "key": "receiveOrderWorkflow/receiveOrder/handleError",
+   "classification": "LIVE",
+   "evidence": "grails-app/controllers/org/pih/warehouse/order/ReceiveOrderWorkflowController.groovy:26 (webflow state view)"
+  },
+  {
+   "gsp": "grails-app/views/receiveOrderWorkflow/receiveOrder/processOrderItems.gsp",
+   "key": "receiveOrderWorkflow/receiveOrder/processOrderItems",
+   "classification": "LIVE",
+   "evidence": "grails-app/controllers/org/pih/warehouse/order/ReceiveOrderWorkflowController.groovy:26 (webflow state view)"
+  },
+  {
+   "gsp": "grails-app/views/referenceNumberType/_local.gsp",
+   "key": "referenceNumberType/_local",
+   "classification": "DEAD",
+   "evidence": "template/layout not included by any live page"
+  },
+  {
+   "gsp": "grails-app/views/replenishment/_printPage.gsp",
+   "key": "replenishment/_printPage",
+   "classification": "TEMPLATE",
+   "evidence": "grails-app/views/replenishment/print.gsp:81 (included by live page)"
+  },
+  {
+   "gsp": "grails-app/views/replenishment/print.gsp",
+   "key": "replenishment/print",
+   "classification": "LIVE",
+   "evidence": "grails-app/controllers/org/pih/warehouse/inventory/ReplenishmentController.groovy:24 (controller action (convention))"
+  },
+  {
+   "gsp": "grails-app/views/report/_dataTableDialog.gsp",
+   "key": "report/_dataTableDialog",
+   "classification": "TEMPLATE",
+   "evidence": "grails-app/controllers/org/pih/warehouse/reporting/ReportController.groovy:309 (rendered from controller/taglib)"
+  },
+  {
+   "gsp": "grails-app/views/report/_showTransactionReportMetadata.gsp",
+   "key": "report/_showTransactionReportMetadata",
+   "classification": "TEMPLATE",
+   "evidence": "grails-app/views/report/showTransactionReport.gsp:159 (included by live page)"
+  },
+  {
+   "gsp": "grails-app/views/report/printPaginatedPackingListReport.gsp",
+   "key": "report/printPaginatedPackingListReport",
+   "classification": "LIVE",
+   "evidence": "grails-app/controllers/org/pih/warehouse/reporting/ReportController.groovy:337 (controller action (convention))"
+  },
+  {
+   "gsp": "grails-app/views/report/printPickListReport.gsp",
+   "key": "report/printPickListReport",
+   "classification": "LIVE",
+   "evidence": "grails-app/controllers/org/pih/warehouse/reporting/ReportController.groovy:327 (controller action (convention))"
+  },
+  {
+   "gsp": "grails-app/views/report/printShippingReport.gsp",
+   "key": "report/printShippingReport",
+   "classification": "LIVE",
+   "evidence": "grails-app/controllers/org/pih/warehouse/reporting/ReportController.groovy:319 (controller action (convention))"
+  },
+  {
+   "gsp": "grails-app/views/report/showBinLocationReport.gsp",
+   "key": "report/showBinLocationReport",
+   "classification": "LIVE",
+   "evidence": "grails-app/controllers/org/pih/warehouse/reporting/ReportController.groovy:425 (controller action (convention))"
+  },
+  {
+   "gsp": "grails-app/views/report/showCycleCountReport.gsp",
+   "key": "report/showCycleCountReport",
+   "classification": "LIVE",
+   "evidence": "grails-app/controllers/org/pih/warehouse/reporting/ReportController.groovy:649 (controller action (convention))"
+  },
+  {
+   "gsp": "grails-app/views/report/showForecastReport.gsp",
+   "key": "report/showForecastReport",
+   "classification": "LIVE",
+   "evidence": "grails-app/controllers/org/pih/warehouse/reporting/ReportController.groovy:704 (controller action (convention))"
+  },
+  {
+   "gsp": "grails-app/views/report/showInventoryByLocationReport.gsp",
+   "key": "report/showInventoryByLocationReport",
+   "classification": "LIVE",
+   "evidence": "grails-app/controllers/org/pih/warehouse/reporting/ReportController.groovy:564 (controller action (convention))"
+  },
+  {
+   "gsp": "grails-app/views/report/showInventoryReport.gsp",
+   "key": "report/showInventoryReport",
+   "classification": "LIVE",
+   "evidence": "grails-app/controllers/org/pih/warehouse/reporting/ReportController.groovy:230 (controller action (convention))"
+  },
+  {
+   "gsp": "grails-app/views/report/showOnOrderReport.gsp",
+   "key": "report/showOnOrderReport",
+   "classification": "LIVE",
+   "evidence": "grails-app/controllers/org/pih/warehouse/reporting/ReportController.groovy:479 (controller action (convention))"
+  },
+  {
+   "gsp": "grails-app/views/report/showPaginatedPackingListReport.gsp",
+   "key": "report/showPaginatedPackingListReport",
+   "classification": "LIVE",
+   "evidence": "grails-app/controllers/org/pih/warehouse/reporting/ReportController.groovy:311 (controller action (convention))"
+  },
+  {
+   "gsp": "grails-app/views/report/showRequestDetailReport.gsp",
+   "key": "report/showRequestDetailReport",
+   "classification": "LIVE",
+   "evidence": "grails-app/controllers/org/pih/warehouse/reporting/ReportController.groovy:639 (controller action (convention))"
+  },
+  {
+   "gsp": "grails-app/views/report/showTransactionReport.gsp",
+   "key": "report/showTransactionReport",
+   "classification": "LIVE",
+   "evidence": "grails-app/controllers/org/pih/warehouse/reporting/ReportController.groovy:283 (controller action (convention))"
+  },
+  {
+   "gsp": "grails-app/views/requisition/_actions.gsp",
+   "key": "requisition/_actions",
+   "classification": "TEMPLATE",
+   "evidence": "grails-app/views/requisition/list.gsp:221 (included by live page)"
+  },
+  {
+   "gsp": "grails-app/views/requisition/_buttons.gsp",
+   "key": "requisition/_buttons",
+   "classification": "DEAD",
+   "evidence": "template/layout not included by any live page"
+  },
+  {
+   "gsp": "grails-app/views/requisition/_cancelQuantity.gsp",
+   "key": "requisition/_cancelQuantity",
+   "classification": "DEAD",
+   "evidence": "template/layout not included by any live page"
+  },
+  {
+   "gsp": "grails-app/views/requisition/_changePackageSize.gsp",
+   "key": "requisition/_changePackageSize",
+   "classification": "DEAD",
+   "evidence": "template/layout not included by any live page"
+  },
+  {
+   "gsp": "grails-app/views/requisition/_changeQuantity.gsp",
+   "key": "requisition/_changeQuantity",
+   "classification": "DEAD",
+   "evidence": "template/layout not included by any live page"
+  },
+  {
+   "gsp": "grails-app/views/requisition/_chooseSubstitute.gsp",
+   "key": "requisition/_chooseSubstitute",
+   "classification": "DEAD",
+   "evidence": "template/layout not included by any live page"
+  },
+  {
+   "gsp": "grails-app/views/requisition/_editRequisitionItem.gsp",
+   "key": "requisition/_editRequisitionItem",
+   "classification": "TEMPLATE",
+   "evidence": "grails-app/controllers/org/pih/warehouse/requisition/RequisitionController.groovy:640 (rendered from controller/taglib)"
+  },
+  {
+   "gsp": "grails-app/views/requisition/_flowHeader.gsp",
+   "key": "requisition/_flowHeader",
+   "classification": "DEAD",
+   "evidence": "template/layout not included by any live page"
+  },
+  {
+   "gsp": "grails-app/views/requisition/_header.gsp",
+   "key": "requisition/_header",
+   "classification": "TEMPLATE",
+   "evidence": "grails-app/views/requisition/confirm.gsp:24 (included by live page)"
+  },
+  {
+   "gsp": "grails-app/views/requisition/_list.gsp",
+   "key": "requisition/_list",
+   "classification": "TEMPLATE",
+   "evidence": "grails-app/views/requisition/list.gsp:169 (included by live page)"
+  },
+  {
+   "gsp": "grails-app/views/requisition/_menu.gsp",
+   "key": "requisition/_menu",
+   "classification": "DEAD",
+   "evidence": "template/layout not included by any live page"
+  },
+  {
+   "gsp": "grails-app/views/requisition/_modifyRequisitionItem.gsp",
+   "key": "requisition/_modifyRequisitionItem",
+   "classification": "DEAD",
+   "evidence": "template/layout not included by any live page"
+  },
+  {
+   "gsp": "grails-app/views/requisition/_pickRequisitionItem.gsp",
+   "key": "requisition/_pickRequisitionItem",
+   "classification": "DEAD",
+   "evidence": "template/layout not included by any live page"
+  },
+  {
+   "gsp": "grails-app/views/requisition/_picklistItems.gsp",
+   "key": "requisition/_picklistItems",
+   "classification": "TEMPLATE",
+   "evidence": "grails-app/controllers/org/pih/warehouse/requisition/RequisitionController.groovy:363 (rendered from controller/taglib)"
+  },
+  {
+   "gsp": "grails-app/views/requisition/_requisitionItems.gsp",
+   "key": "requisition/_requisitionItems",
+   "classification": "DEAD",
+   "evidence": "template/layout not included by any live page"
+  },
+  {
+   "gsp": "grails-app/views/requisition/_requisitionItems2.gsp",
+   "key": "requisition/_requisitionItems2",
+   "classification": "TEMPLATE",
+   "evidence": "grails-app/views/requisition/review.gsp:29 (included by live page)"
+  },
+  {
+   "gsp": "grails-app/views/requisition/_reviewRequisitionItem.gsp",
+   "key": "requisition/_reviewRequisitionItem",
+   "classification": "DEAD",
+   "evidence": "template/layout not included by any live page"
+  },
+  {
+   "gsp": "grails-app/views/requisition/_showRequisitionItem.gsp",
+   "key": "requisition/_showRequisitionItem",
+   "classification": "TEMPLATE",
+   "evidence": "grails-app/views/requisition/show.gsp:51 (included by live page)"
+  },
+  {
+   "gsp": "grails-app/views/requisition/_summary.gsp",
+   "key": "requisition/_summary",
+   "classification": "TEMPLATE",
+   "evidence": "grails-app/views/requisition/addDocument.gsp:25 (included by live page)"
+  },
+  {
+   "gsp": "grails-app/views/requisition/_supplementProduct.gsp",
+   "key": "requisition/_supplementProduct",
+   "classification": "DEAD",
+   "evidence": "template/layout not included by any live page"
+  },
+  {
+   "gsp": "grails-app/views/requisition/addComment.gsp",
+   "key": "requisition/addComment",
+   "classification": "DEAD",
+   "evidence": "no controller action, URL mapping, menu, render, or link reference found"
+  },
+  {
+   "gsp": "grails-app/views/requisition/addDocument.gsp",
+   "key": "requisition/addDocument",
+   "classification": "LIVE",
+   "evidence": "grails-app/controllers/org/pih/warehouse/core/DocumentController.groovy:251 (g:link/redirect reference)"
+  },
+  {
+   "gsp": "grails-app/views/requisition/chooseTemplate.gsp",
+   "key": "requisition/chooseTemplate",
+   "classification": "LIVE",
+   "evidence": "grails-app/controllers/org/pih/warehouse/requisition/RequisitionController.groovy:57 (controller action (convention))"
+  },
+  {
+   "gsp": "grails-app/views/requisition/confirm.gsp",
+   "key": "requisition/confirm",
+   "classification": "LIVE",
+   "evidence": "grails-app/controllers/org/pih/warehouse/requisition/RequisitionController.groovy:254 (controller action (convention))"
+  },
+  {
+   "gsp": "grails-app/views/requisition/create.gsp",
+   "key": "requisition/create",
+   "classification": "LIVE",
+   "evidence": "grails-app/controllers/org/pih/warehouse/requisition/RequisitionController.groovy:90 (controller action (convention))"
+  },
+  {
+   "gsp": "grails-app/views/requisition/createNonStock.gsp",
+   "key": "requisition/createNonStock",
+   "classification": "LIVE",
+   "evidence": "grails-app/controllers/org/pih/warehouse/requisition/RequisitionController.groovy:94 (explicit render(view:))"
+  },
+  {
+   "gsp": "grails-app/views/requisition/createStock.gsp",
+   "key": "requisition/createStock",
+   "classification": "LIVE",
+   "evidence": "grails-app/controllers/org/pih/warehouse/requisition/RequisitionController.groovy:88 (explicit render(view:))"
+  },
+  {
+   "gsp": "grails-app/views/requisition/edit.gsp",
+   "key": "requisition/edit",
+   "classification": "LIVE",
+   "evidence": "grails-app/controllers/org/pih/warehouse/requisition/RequisitionController.groovy:128 (controller action (convention))"
+  },
+  {
+   "gsp": "grails-app/views/requisition/editHeader.gsp",
+   "key": "requisition/editHeader",
+   "classification": "LIVE",
+   "evidence": "grails-app/controllers/org/pih/warehouse/requisition/RequisitionController.groovy:149 (controller action (convention))"
+  },
+  {
+   "gsp": "grails-app/views/requisition/fulfill.gsp",
+   "key": "requisition/fulfill",
+   "classification": "DEAD",
+   "evidence": "no controller action, URL mapping, menu, render, or link reference found"
+  },
+  {
+   "gsp": "grails-app/views/requisition/fulfillItem.gsp",
+   "key": "requisition/fulfillItem",
+   "classification": "DEAD",
+   "evidence": "no controller action, URL mapping, menu, render, or link reference found"
+  },
+  {
+   "gsp": "grails-app/views/requisition/list.gsp",
+   "key": "requisition/list",
+   "classification": "LIVE",
+   "evidence": "grails-app/controllers/org/pih/warehouse/requisition/RequisitionController.groovy:43 (controller action (convention))"
+  },
+  {
+   "gsp": "grails-app/views/requisition/pick.gsp",
+   "key": "requisition/pick",
+   "classification": "LIVE",
+   "evidence": "grails-app/controllers/org/pih/warehouse/requisition/RequisitionController.groovy:288 (controller action (convention))"
+  },
+  {
+   "gsp": "grails-app/views/requisition/printDraft.gsp",
+   "key": "requisition/printDraft",
+   "classification": "LIVE",
+   "evidence": "grails-app/controllers/org/pih/warehouse/requisition/RequisitionController.groovy:539 (controller action (convention))"
+  },
+  {
+   "gsp": "grails-app/views/requisition/process.gsp",
+   "key": "requisition/process",
+   "classification": "LIVE",
+   "evidence": "grails-app/controllers/org/pih/warehouse/requisition/RequisitionController.groovy:406 (controller action (convention))"
+  },
+  {
+   "gsp": "grails-app/views/requisition/review.gsp",
+   "key": "requisition/review",
+   "classification": "LIVE",
+   "evidence": "grails-app/controllers/org/pih/warehouse/requisition/RequisitionController.groovy:188 (controller action (convention))"
+  },
+  {
+   "gsp": "grails-app/views/requisition/show.gsp",
+   "key": "requisition/show",
+   "classification": "LIVE",
+   "evidence": "grails-app/controllers/org/pih/warehouse/requisition/RequisitionController.groovy:506 (controller action (convention))"
+  },
+  {
+   "gsp": "grails-app/views/requisition/showPicklist.gsp",
+   "key": "requisition/showPicklist",
+   "classification": "DEAD",
+   "evidence": "no controller action, URL mapping, menu, render, or link reference found"
+  },
+  {
+   "gsp": "grails-app/views/requisition/substitute.gsp",
+   "key": "requisition/substitute",
+   "classification": "DEAD",
+   "evidence": "no controller action, URL mapping, menu, render, or link reference found"
+  },
+  {
+   "gsp": "grails-app/views/requisition/transfer.gsp",
+   "key": "requisition/transfer",
+   "classification": "LIVE",
+   "evidence": "grails-app/controllers/org/pih/warehouse/requisition/RequisitionController.groovy:430 (controller action (convention))"
+  },
+  {
+   "gsp": "grails-app/views/requisitionItem/_actions.gsp",
+   "key": "requisitionItem/_actions",
+   "classification": "DEAD",
+   "evidence": "template/layout not included by any live page"
+  },
+  {
+   "gsp": "grails-app/views/requisitionItem/change.gsp",
+   "key": "requisitionItem/change",
+   "classification": "LIVE",
+   "evidence": "grails-app/controllers/org/pih/warehouse/requisition/RequisitionItemController.groovy:99 (controller action (convention))"
+  },
+  {
+   "gsp": "grails-app/views/requisitionItem/list.gsp",
+   "key": "requisitionItem/list",
+   "classification": "LIVE",
+   "evidence": "grails-app/controllers/org/pih/warehouse/requisition/RequisitionItemController.groovy:32 (controller action (convention))"
+  },
+  {
+   "gsp": "grails-app/views/requisitionTemplate/_actions.gsp",
+   "key": "requisitionTemplate/_actions",
+   "classification": "TEMPLATE",
+   "evidence": "grails-app/views/requisitionTemplate/_summary.gsp:8 (included by live page)"
+  },
+  {
+   "gsp": "grails-app/views/requisitionTemplate/_header.gsp",
+   "key": "requisitionTemplate/_header",
+   "classification": "TEMPLATE",
+   "evidence": "grails-app/views/requisitionTemplate/batch.gsp:50 (included by live page)"
+  },
+  {
+   "gsp": "grails-app/views/requisitionTemplate/_list.gsp",
+   "key": "requisitionTemplate/_list",
+   "classification": "TEMPLATE",
+   "evidence": "grails-app/conf/runtime.groovy:402 (template path string literal)"
+  },
+  {
+   "gsp": "grails-app/views/requisitionTemplate/_printPage.gsp",
+   "key": "requisitionTemplate/_printPage",
+   "classification": "DEAD",
+   "evidence": "template/layout not included by any live page"
+  },
+  {
+   "gsp": "grails-app/views/requisitionTemplate/_summary.gsp",
+   "key": "requisitionTemplate/_summary",
+   "classification": "TEMPLATE",
+   "evidence": "grails-app/views/requisitionTemplate/batch.gsp:43 (included by live page)"
+  },
+  {
+   "gsp": "grails-app/views/requisitionTemplate/batch.gsp",
+   "key": "requisitionTemplate/batch",
+   "classification": "LIVE",
+   "evidence": "grails-app/controllers/org/pih/warehouse/requisition/RequisitionTemplateController.groovy:343 (controller action (convention))"
+  },
+  {
+   "gsp": "grails-app/views/requisitionTemplate/create.gsp",
+   "key": "requisitionTemplate/create",
+   "classification": "LIVE",
+   "evidence": "grails-app/controllers/org/pih/warehouse/requisition/RequisitionTemplateController.groovy:36 (controller action (convention))"
+  },
+  {
+   "gsp": "grails-app/views/requisitionTemplate/edit.gsp",
+   "key": "requisitionTemplate/edit",
+   "classification": "LIVE",
+   "evidence": "grails-app/controllers/org/pih/warehouse/requisition/RequisitionTemplateController.groovy:45 (controller action (convention))"
+  },
+  {
+   "gsp": "grails-app/views/requisitionTemplate/editHeader.gsp",
+   "key": "requisitionTemplate/editHeader",
+   "classification": "LIVE",
+   "evidence": "grails-app/controllers/org/pih/warehouse/requisition/RequisitionTemplateController.groovy:55 (controller action (convention))"
+  },
+  {
+   "gsp": "grails-app/views/requisitionTemplate/list.gsp",
+   "key": "requisitionTemplate/list",
+   "classification": "SUPERSEDED",
+   "evidence": "src/js/components/Router.jsx:288 (React SPA route **/requisitionTemplate/list)"
+  },
+  {
+   "gsp": "grails-app/views/requisitionTemplate/print.gsp",
+   "key": "requisitionTemplate/print",
+   "classification": "DEAD",
+   "evidence": "no controller action, URL mapping, menu, render, or link reference found"
+  },
+  {
+   "gsp": "grails-app/views/requisitionTemplate/sendMail.gsp",
+   "key": "requisitionTemplate/sendMail",
+   "classification": "LIVE",
+   "evidence": "grails-app/controllers/org/pih/warehouse/requisition/RequisitionTemplateController.groovy:65 (controller action (convention))"
+  },
+  {
+   "gsp": "grails-app/views/requisitionTemplate/show.gsp",
+   "key": "requisitionTemplate/show",
+   "classification": "LIVE",
+   "evidence": "grails-app/controllers/org/pih/warehouse/requisition/RequisitionTemplateController.groovy:154 (controller action (convention))"
+  },
+  {
+   "gsp": "grails-app/views/returns/show.gsp",
+   "key": "returns/show",
+   "classification": "LIVE",
+   "evidence": "grails-app/controllers/org/pih/warehouse/inventory/StockMovementController.groovy:173 (explicit render(view:))"
+  },
+  {
+   "gsp": "grails-app/views/role/create.gsp",
+   "key": "role/create",
+   "classification": "DEAD",
+   "evidence": "no controller action, URL mapping, menu, render, or link reference found"
+  },
+  {
+   "gsp": "grails-app/views/role/edit.gsp",
+   "key": "role/edit",
+   "classification": "DEAD",
+   "evidence": "no controller action, URL mapping, menu, render, or link reference found"
+  },
+  {
+   "gsp": "grails-app/views/role/index.gsp",
+   "key": "role/index",
+   "classification": "DEAD",
+   "evidence": "no controller action, URL mapping, menu, render, or link reference found"
+  },
+  {
+   "gsp": "grails-app/views/role/show.gsp",
+   "key": "role/show",
+   "classification": "LIVE",
+   "evidence": "grails-app/views/locationRole/show.gsp:44 (g:link/redirect reference)"
+  },
+  {
+   "gsp": "grails-app/views/shipment/_actions.gsp",
+   "key": "shipment/_actions",
+   "classification": "TEMPLATE",
+   "evidence": "grails-app/views/shipment/_summary.gsp:18 (included by live page)"
+  },
+  {
+   "gsp": "grails-app/views/shipment/_barcodeLabel.gsp",
+   "key": "shipment/_barcodeLabel",
+   "classification": "TEMPLATE",
+   "evidence": "grails-app/controllers/org/pih/warehouse/shipping/ShipmentController.groovy:454 (rendered from controller/taglib)"
+  },
+  {
+   "gsp": "grails-app/views/shipment/_buttons.gsp",
+   "key": "shipment/_buttons",
+   "classification": "TEMPLATE",
+   "evidence": "grails-app/views/shipment/deleteShipment.gsp:28 (included by live page)"
+  },
+  {
+   "gsp": "grails-app/views/shipment/_container.gsp",
+   "key": "shipment/_container",
+   "classification": "TEMPLATE",
+   "evidence": "grails-app/views/report/printPaginatedPackingListReport.gsp:119 (included by live page)"
+  },
+  {
+   "gsp": "grails-app/views/shipment/_filters.gsp",
+   "key": "shipment/_filters",
+   "classification": "TEMPLATE",
+   "evidence": "grails-app/views/shipment/list.gsp:24 (included by live page)"
+  },
+  {
+   "gsp": "grails-app/views/shipment/_list.gsp",
+   "key": "shipment/_list",
+   "classification": "TEMPLATE",
+   "evidence": "grails-app/views/shipment/list.gsp:48 (included by live page)"
+  },
+  {
+   "gsp": "grails-app/views/shipment/_listShippingMenuItems.gsp",
+   "key": "shipment/_listShippingMenuItems",
+   "classification": "DEAD",
+   "evidence": "template/layout not included by any live page"
+  },
+  {
+   "gsp": "grails-app/views/shipment/_showPutawayLocations.gsp",
+   "key": "shipment/_showPutawayLocations",
+   "classification": "TEMPLATE",
+   "evidence": "grails-app/controllers/org/pih/warehouse/shipping/ShipmentController.groovy:464 (rendered from controller/taglib)"
+  },
+  {
+   "gsp": "grails-app/views/shipment/_showTracking.gsp",
+   "key": "shipment/_showTracking",
+   "classification": "TEMPLATE",
+   "evidence": "grails-app/controllers/org/pih/warehouse/shipping/ShipmentController.groovy:257 (rendered from controller/taglib)"
+  },
+  {
+   "gsp": "grails-app/views/shipment/_showTransactions.gsp",
+   "key": "shipment/_showTransactions",
+   "classification": "TEMPLATE",
+   "evidence": "grails-app/controllers/org/pih/warehouse/shipping/ShipmentController.groovy:262 (rendered from controller/taglib)"
+  },
+  {
+   "gsp": "grails-app/views/shipment/_sidebar.gsp",
+   "key": "shipment/_sidebar",
+   "classification": "DEAD",
+   "evidence": "template/layout not included by any live page"
+  },
+  {
+   "gsp": "grails-app/views/shipment/_summary.gsp",
+   "key": "shipment/_summary",
+   "classification": "TEMPLATE",
+   "evidence": "grails-app/views/createShipmentWorkflow/createShipment/enterContainerDetails.gsp:59 (included by live page)"
+  },
+  {
+   "gsp": "grails-app/views/shipment/addComment.gsp",
+   "key": "shipment/addComment",
+   "classification": "LIVE",
+   "evidence": "grails-app/controllers/org/pih/warehouse/shipping/ShipmentController.groovy:854 (controller action (convention))"
+  },
+  {
+   "gsp": "grails-app/views/shipment/addDocument.gsp",
+   "key": "shipment/addDocument",
+   "classification": "LIVE",
+   "evidence": "grails-app/controllers/org/pih/warehouse/shipping/ShipmentController.groovy:814 (controller action (convention))"
+  },
+  {
+   "gsp": "grails-app/views/shipment/addToShipment.gsp",
+   "key": "shipment/addToShipment",
+   "classification": "LIVE",
+   "evidence": "grails-app/controllers/org/pih/warehouse/shipping/ShipmentController.groovy:1101 (controller action (convention))"
+  },
+  {
+   "gsp": "grails-app/views/shipment/deleteShipment.gsp",
+   "key": "shipment/deleteShipment",
+   "classification": "LIVE",
+   "evidence": "grails-app/controllers/org/pih/warehouse/shipping/ShipmentController.groovy:341 (controller action (convention))"
+  },
+  {
+   "gsp": "grails-app/views/shipment/editEvent.gsp",
+   "key": "shipment/editEvent",
+   "classification": "LIVE",
+   "evidence": "grails-app/controllers/org/pih/warehouse/shipping/ShipmentController.groovy:995 (controller action (convention))"
+  },
+  {
+   "gsp": "grails-app/views/shipment/list.gsp",
+   "key": "shipment/list",
+   "classification": "LIVE",
+   "evidence": "grails-app/controllers/org/pih/warehouse/shipping/ShipmentController.groovy:56 (controller action (convention))"
+  },
+  {
+   "gsp": "grails-app/views/shipment/receiveShipment.gsp",
+   "key": "shipment/receiveShipment",
+   "classification": "LIVE",
+   "evidence": "grails-app/controllers/org/pih/warehouse/shipping/ShipmentController.groovy:521 (controller action (convention))"
+  },
+  {
+   "gsp": "grails-app/views/shipment/sendShipment.gsp",
+   "key": "shipment/sendShipment",
+   "classification": "LIVE",
+   "evidence": "grails-app/controllers/org/pih/warehouse/shipping/ShipmentController.groovy:281 (controller action (convention))"
+  },
+  {
+   "gsp": "grails-app/views/shipment/showDetails.gsp",
+   "key": "shipment/showDetails",
+   "classification": "LIVE",
+   "evidence": "grails-app/controllers/org/pih/warehouse/shipping/ShipmentController.groovy:225 (controller action (convention))"
+  },
+  {
+   "gsp": "grails-app/views/shipment/showPackingList.gsp",
+   "key": "shipment/showPackingList",
+   "classification": "LIVE",
+   "evidence": "grails-app/controllers/org/pih/warehouse/shipping/ShipmentController.groovy:659 (controller action (convention))"
+  },
+  {
+   "gsp": "grails-app/views/shipmentItem/create.gsp",
+   "key": "shipmentItem/create",
+   "classification": "LIVE",
+   "evidence": "grails-app/controllers/org/pih/warehouse/shipping/ShipmentItemController.groovy:32 (controller action (convention))"
+  },
+  {
+   "gsp": "grails-app/views/shipmentItem/edit.gsp",
+   "key": "shipmentItem/edit",
+   "classification": "LIVE",
+   "evidence": "grails-app/controllers/org/pih/warehouse/shipping/ShipmentItemController.groovy:58 (controller action (convention))"
+  },
+  {
+   "gsp": "grails-app/views/shipmentItem/list.gsp",
+   "key": "shipmentItem/list",
+   "classification": "LIVE",
+   "evidence": "grails-app/controllers/org/pih/warehouse/shipping/ShipmentItemController.groovy:27 (controller action (convention))"
+  },
+  {
+   "gsp": "grails-app/views/shipmentItem/pick.gsp",
+   "key": "shipmentItem/pick",
+   "classification": "LIVE",
+   "evidence": "grails-app/controllers/org/pih/warehouse/shipping/ShipmentItemController.groovy:111 (controller action (convention))"
+  },
+  {
+   "gsp": "grails-app/views/shipmentItem/show.gsp",
+   "key": "shipmentItem/show",
+   "classification": "LIVE",
+   "evidence": "grails-app/controllers/org/pih/warehouse/shipping/ShipmentItemController.groovy:48 (controller action (convention))"
+  },
+  {
+   "gsp": "grails-app/views/shipmentItem/split.gsp",
+   "key": "shipmentItem/split",
+   "classification": "LIVE",
+   "evidence": "grails-app/controllers/org/pih/warehouse/shipping/ShipmentItemController.groovy:126 (controller action (convention))"
+  },
+  {
+   "gsp": "grails-app/views/shipmentWorkflow/create.gsp",
+   "key": "shipmentWorkflow/create",
+   "classification": "LIVE",
+   "evidence": "grails-app/controllers/org/pih/warehouse/shipping/ShipmentWorkflowController.groovy:30 (controller action (convention))"
+  },
+  {
+   "gsp": "grails-app/views/shipmentWorkflow/edit.gsp",
+   "key": "shipmentWorkflow/edit",
+   "classification": "LIVE",
+   "evidence": "grails-app/controllers/org/pih/warehouse/shipping/ShipmentWorkflowController.groovy:56 (controller action (convention))"
+  },
+  {
+   "gsp": "grails-app/views/shipmentWorkflow/list.gsp",
+   "key": "shipmentWorkflow/list",
+   "classification": "LIVE",
+   "evidence": "grails-app/controllers/org/pih/warehouse/shipping/ShipmentWorkflowController.groovy:25 (controller action (convention))"
+  },
+  {
+   "gsp": "grails-app/views/shipmentWorkflow/show.gsp",
+   "key": "shipmentWorkflow/show",
+   "classification": "LIVE",
+   "evidence": "grails-app/controllers/org/pih/warehouse/shipping/ShipmentWorkflowController.groovy:46 (controller action (convention))"
+  },
+  {
+   "gsp": "grails-app/views/stockMovement/_actions.gsp",
+   "key": "stockMovement/_actions",
+   "classification": "DEAD",
+   "evidence": "template/layout not included by any live page"
+  },
+  {
+   "gsp": "grails-app/views/stockMovement/_comments.gsp",
+   "key": "stockMovement/_comments",
+   "classification": "TEMPLATE",
+   "evidence": "grails-app/controllers/org/pih/warehouse/inventory/StockMovementController.groovy:370 (rendered from controller/taglib)"
+  },
+  {
+   "gsp": "grails-app/views/stockMovement/_documents.gsp",
+   "key": "stockMovement/_documents",
+   "classification": "TEMPLATE",
+   "evidence": "grails-app/controllers/org/pih/warehouse/inventory/StockMovementController.groovy:365 (rendered from controller/taglib)"
+  },
+  {
+   "gsp": "grails-app/views/stockMovement/_events.gsp",
+   "key": "stockMovement/_events",
+   "classification": "TEMPLATE",
+   "evidence": "grails-app/controllers/org/pih/warehouse/inventory/StockMovementController.groovy:472 (rendered from controller/taglib)"
+  },
+  {
+   "gsp": "grails-app/views/stockMovement/_list.gsp",
+   "key": "stockMovement/_list",
+   "classification": "DEAD",
+   "evidence": "template/layout not included by any live page"
+  },
+  {
+   "gsp": "grails-app/views/stockMovement/_packingList.gsp",
+   "key": "stockMovement/_packingList",
+   "classification": "TEMPLATE",
+   "evidence": "grails-app/controllers/org/pih/warehouse/inventory/StockMovementController.groovy:459 (rendered from controller/taglib)"
+  },
+  {
+   "gsp": "grails-app/views/stockMovement/_receipts.gsp",
+   "key": "stockMovement/_receipts",
+   "classification": "TEMPLATE",
+   "evidence": "grails-app/controllers/org/pih/warehouse/inventory/StockMovementController.groovy:465 (rendered from controller/taglib)"
+  },
+  {
+   "gsp": "grails-app/views/stockMovement/_requisition.gsp",
+   "key": "stockMovement/_requisition",
+   "classification": "TEMPLATE",
+   "evidence": "grails-app/controllers/org/pih/warehouse/inventory/StockMovementController.groovy:314 (rendered from controller/taglib)"
+  },
+  {
+   "gsp": "grails-app/views/stockMovement/_summary.gsp",
+   "key": "stockMovement/_summary",
+   "classification": "TEMPLATE",
+   "evidence": "grails-app/views/returns/show.gsp:21 (included by live page)"
+  },
+  {
+   "gsp": "grails-app/views/stockMovement/_synchronizeDialog.gsp",
+   "key": "stockMovement/_synchronizeDialog",
+   "classification": "TEMPLATE",
+   "evidence": "grails-app/controllers/org/pih/warehouse/inventory/StockMovementController.groovy:227 (rendered from controller/taglib)"
+  },
+  {
+   "gsp": "grails-app/views/stockMovement/addComment.gsp",
+   "key": "stockMovement/addComment",
+   "classification": "LIVE",
+   "evidence": "grails-app/controllers/org/pih/warehouse/inventory/StockMovementController.groovy:372 (controller action (convention))"
+  },
+  {
+   "gsp": "grails-app/views/stockMovement/addDocument.gsp",
+   "key": "stockMovement/addDocument",
+   "classification": "LIVE",
+   "evidence": "grails-app/controllers/org/pih/warehouse/inventory/StockMovementController.groovy:506 (controller action (convention))"
+  },
+  {
+   "gsp": "grails-app/views/stockMovement/list.gsp",
+   "key": "stockMovement/list",
+   "classification": "SUPERSEDED",
+   "evidence": "src/js/components/Router.jsx:255 (React SPA route **/stockMovement/list)"
+  },
+  {
+   "gsp": "grails-app/views/stockMovement/show.gsp",
+   "key": "stockMovement/show",
+   "classification": "LIVE",
+   "evidence": "grails-app/controllers/org/pih/warehouse/inventory/StockMovementController.groovy:154 (controller action (convention))"
+  },
+  {
+   "gsp": "grails-app/views/stockTransfer/_filters.gsp",
+   "key": "stockTransfer/_filters",
+   "classification": "DEAD",
+   "evidence": "template/layout not included by any live page"
+  },
+  {
+   "gsp": "grails-app/views/stockTransfer/_orderSummary.gsp",
+   "key": "stockTransfer/_orderSummary",
+   "classification": "TEMPLATE",
+   "evidence": "grails-app/views/stockTransfer/show.gsp:104 (included by live page)"
+  },
+  {
+   "gsp": "grails-app/views/stockTransfer/_printPage.gsp",
+   "key": "stockTransfer/_printPage",
+   "classification": "TEMPLATE",
+   "evidence": "grails-app/views/stockTransfer/print.gsp:100 (included by live page)"
+  },
+  {
+   "gsp": "grails-app/views/stockTransfer/_summary.gsp",
+   "key": "stockTransfer/_summary",
+   "classification": "TEMPLATE",
+   "evidence": "grails-app/views/stockTransfer/show.gsp:16 (included by live page)"
+  },
+  {
+   "gsp": "grails-app/views/stockTransfer/list.gsp",
+   "key": "stockTransfer/list",
+   "classification": "SUPERSEDED",
+   "evidence": "src/js/components/Router.jsx:290 (React SPA route **/stockTransfer/list)"
+  },
+  {
+   "gsp": "grails-app/views/stockTransfer/print.gsp",
+   "key": "stockTransfer/print",
+   "classification": "LIVE",
+   "evidence": "grails-app/controllers/org/pih/warehouse/inventory/StockTransferController.groovy:73 (controller action (convention))"
+  },
+  {
+   "gsp": "grails-app/views/stockTransfer/show.gsp",
+   "key": "stockTransfer/show",
+   "classification": "LIVE",
+   "evidence": "grails-app/controllers/org/pih/warehouse/inventory/StockTransferController.groovy:63 (controller action (convention))"
+  },
+  {
+   "gsp": "grails-app/views/stocklist/_itemList.gsp",
+   "key": "stocklist/_itemList",
+   "classification": "TEMPLATE",
+   "evidence": "grails-app/views/stocklist/_print.gsp:196 (included by live page)"
+  },
+  {
+   "gsp": "grails-app/views/stocklist/_print.gsp",
+   "key": "stocklist/_print",
+   "classification": "TEMPLATE",
+   "evidence": "grails-app/controllers/org/pih/warehouse/stocklist/StocklistController.groovy:35 (rendered from controller/taglib)"
+  },
+  {
+   "gsp": "grails-app/views/stocklist/show.gsp",
+   "key": "stocklist/show",
+   "classification": "LIVE",
+   "evidence": "grails-app/controllers/org/pih/warehouse/stocklist/StocklistController.groovy:23 (controller action (convention))"
+  },
+  {
+   "gsp": "grails-app/views/supplier/_documents.gsp",
+   "key": "supplier/_documents",
+   "classification": "TEMPLATE",
+   "evidence": "grails-app/views/supplier/show.gsp:38 (included by live page)"
+  },
+  {
+   "gsp": "grails-app/views/supplier/_priceHistory.gsp",
+   "key": "supplier/_priceHistory",
+   "classification": "TEMPLATE",
+   "evidence": "grails-app/views/supplier/show.gsp:35 (included by live page)"
+  },
+  {
+   "gsp": "grails-app/views/supplier/list.gsp",
+   "key": "supplier/list",
+   "classification": "LIVE",
+   "evidence": "grails-app/controllers/org/pih/warehouse/core/SupplierController.groovy:21 (controller action (convention))"
+  },
+  {
+   "gsp": "grails-app/views/supplier/show.gsp",
+   "key": "supplier/show",
+   "classification": "LIVE",
+   "evidence": "grails-app/controllers/org/pih/warehouse/core/SupplierController.groovy:30 (controller action (convention))"
+  },
+  {
+   "gsp": "grails-app/views/tag/_summary.gsp",
+   "key": "tag/_summary",
+   "classification": "TEMPLATE",
+   "evidence": "grails-app/views/tag/create.gsp:22 (included by live page)"
+  },
+  {
+   "gsp": "grails-app/views/tag/create.gsp",
+   "key": "tag/create",
+   "classification": "LIVE",
+   "evidence": "grails-app/controllers/org/pih/warehouse/core/TagController.groovy:38 (controller action (convention))"
+  },
+  {
+   "gsp": "grails-app/views/tag/edit.gsp",
+   "key": "tag/edit",
+   "classification": "LIVE",
+   "evidence": "grails-app/controllers/org/pih/warehouse/core/TagController.groovy:65 (controller action (convention))"
+  },
+  {
+   "gsp": "grails-app/views/tag/list.gsp",
+   "key": "tag/list",
+   "classification": "LIVE",
+   "evidence": "grails-app/controllers/org/pih/warehouse/core/TagController.groovy:26 (controller action (convention))"
+  },
+  {
+   "gsp": "grails-app/views/tag/show.gsp",
+   "key": "tag/show",
+   "classification": "LIVE",
+   "evidence": "grails-app/controllers/org/pih/warehouse/core/TagController.groovy:55 (controller action (convention))"
+  },
+  {
+   "gsp": "grails-app/views/taglib/_autoSuggest.gsp",
+   "key": "taglib/_autoSuggest",
+   "classification": "TEMPLATE",
+   "evidence": "grails-app/taglib/org/pih/warehouse/AutoSuggestTagLib.groovy:48 (rendered from controller/taglib)"
+  },
+  {
+   "gsp": "grails-app/views/taglib/_autoSuggestSearchable.gsp",
+   "key": "taglib/_autoSuggestSearchable",
+   "classification": "TEMPLATE",
+   "evidence": "grails-app/taglib/org/pih/warehouse/AutoSuggestSearchableTagLib.groovy:26 (rendered from controller/taglib)"
+  },
+  {
+   "gsp": "grails-app/views/taglib/_autoSuggestString.gsp",
+   "key": "taglib/_autoSuggestString",
+   "classification": "TEMPLATE",
+   "evidence": "grails-app/taglib/org/pih/warehouse/AutoSuggestStringTagLib.groovy:15 (rendered from controller/taglib)"
+  },
+  {
+   "gsp": "grails-app/views/taglib/_chooseSubstitute.gsp",
+   "key": "taglib/_chooseSubstitute",
+   "classification": "TEMPLATE",
+   "evidence": "grails-app/taglib/org/pih/warehouse/AutoSuggestTagLib.groovy:27 (rendered from controller/taglib)"
+  },
+  {
+   "gsp": "grails-app/views/taglib/_comboBox.gsp",
+   "key": "taglib/_comboBox",
+   "classification": "TEMPLATE",
+   "evidence": "grails-app/taglib/org/pih/warehouse/ComboBoxTagLib.groovy:18 (rendered from controller/taglib)"
+  },
+  {
+   "gsp": "grails-app/views/taglib/_createLocation.gsp",
+   "key": "taglib/_createLocation",
+   "classification": "DEAD",
+   "evidence": "template/layout not included by any live page"
+  },
+  {
+   "gsp": "grails-app/views/taglib/_decimalFormatField.gsp",
+   "key": "taglib/_decimalFormatField",
+   "classification": "TEMPLATE",
+   "evidence": "grails-app/taglib/org/pih/warehouse/DecimalNumberFieldTagLib.groovy:22 (rendered from controller/taglib)"
+  },
+  {
+   "gsp": "grails-app/views/taglib/_displayBarcode.gsp",
+   "key": "taglib/_displayBarcode",
+   "classification": "TEMPLATE",
+   "evidence": "grails-app/taglib/org/pih/warehouse/ImageTagLib.groovy:82 (rendered from controller/taglib)"
+  },
+  {
+   "gsp": "grails-app/views/taglib/_displayLogo.gsp",
+   "key": "taglib/_displayLogo",
+   "classification": "TEMPLATE",
+   "evidence": "grails-app/taglib/org/pih/warehouse/ImageTagLib.groovy:35 (rendered from controller/taglib)"
+  },
+  {
+   "gsp": "grails-app/views/taglib/_expirationDate.gsp",
+   "key": "taglib/_expirationDate",
+   "classification": "TEMPLATE",
+   "evidence": "grails-app/taglib/org/pih/warehouse/DateTagLib.groovy:112 (rendered from controller/taglib)"
+  },
+  {
+   "gsp": "grails-app/views/taglib/_globalSearch.gsp",
+   "key": "taglib/_globalSearch",
+   "classification": "TEMPLATE",
+   "evidence": "grails-app/taglib/org/pih/warehouse/GlobalSearchTagLib.groovy:27 (rendered from controller/taglib)"
+  },
+  {
+   "gsp": "grails-app/views/taglib/_globalSearchStatic.gsp",
+   "key": "taglib/_globalSearchStatic",
+   "classification": "TEMPLATE",
+   "evidence": "grails-app/taglib/org/pih/warehouse/GlobalSearchTagLib.groovy:29 (rendered from controller/taglib)"
+  },
+  {
+   "gsp": "grails-app/views/taglib/_productDisplayName.gsp",
+   "key": "taglib/_productDisplayName",
+   "classification": "TEMPLATE",
+   "evidence": "grails-app/taglib/org/pih/warehouse/FormatTagLib.groovy:115 (rendered from controller/taglib)"
+  },
+  {
+   "gsp": "grails-app/views/taglib/_productStatus.gsp",
+   "key": "taglib/_productStatus",
+   "classification": "TEMPLATE",
+   "evidence": "grails-app/taglib/org/pih/warehouse/InventoryTagLib.groovy:26 (rendered from controller/taglib)"
+  },
+  {
+   "gsp": "grails-app/views/taglib/_searchProduct.gsp",
+   "key": "taglib/_searchProduct",
+   "classification": "TEMPLATE",
+   "evidence": "grails-app/taglib/org/pih/warehouse/SearchProductTagLib.groovy:15 (rendered from controller/taglib)"
+  },
+  {
+   "gsp": "grails-app/views/taglib/_selectCategories.gsp",
+   "key": "taglib/_selectCategories",
+   "classification": "DEAD",
+   "evidence": "template/layout not included by any live page"
+  },
+  {
+   "gsp": "grails-app/views/taglib/_selectContainer.gsp",
+   "key": "taglib/_selectContainer",
+   "classification": "TEMPLATE",
+   "evidence": "grails-app/taglib/org/pih/warehouse/SelectTagLib.groovy:493 (rendered from controller/taglib)"
+  },
+  {
+   "gsp": "grails-app/views/taglib/_selectPerson.gsp",
+   "key": "taglib/_selectPerson",
+   "classification": "DEAD",
+   "evidence": "template/layout not included by any live page"
+  },
+  {
+   "gsp": "grails-app/views/taglib/_selectProducts.gsp",
+   "key": "taglib/_selectProducts",
+   "classification": "DEAD",
+   "evidence": "template/layout not included by any live page"
+  },
+  {
+   "gsp": "grails-app/views/taglib/_userPhoto.gsp",
+   "key": "taglib/_userPhoto",
+   "classification": "TEMPLATE",
+   "evidence": "grails-app/taglib/org/pih/warehouse/AuthTagLib.groovy:119 (rendered from controller/taglib)"
+  },
+  {
+   "gsp": "grails-app/views/transaction/_actions.gsp",
+   "key": "transaction/_actions",
+   "classification": "TEMPLATE",
+   "evidence": "grails-app/views/transaction/_summary.gsp:4 (included by live page)"
+  },
+  {
+   "gsp": "grails-app/views/transaction/_details.gsp",
+   "key": "transaction/_details",
+   "classification": "TEMPLATE",
+   "evidence": "grails-app/views/inventory/editTransaction.gsp:38 (included by live page)"
+  },
+  {
+   "gsp": "grails-app/views/transaction/_entries.gsp",
+   "key": "transaction/_entries",
+   "classification": "TEMPLATE",
+   "evidence": "grails-app/views/inventory/showTransaction.gsp:30 (included by live page)"
+  },
+  {
+   "gsp": "grails-app/views/transaction/_summary.gsp",
+   "key": "transaction/_summary",
+   "classification": "TEMPLATE",
+   "evidence": "grails-app/views/inventory/editTransaction.gsp:34 (included by live page)"
+  },
+  {
+   "gsp": "grails-app/views/transactionEntry/create.gsp",
+   "key": "transactionEntry/create",
+   "classification": "DEAD",
+   "evidence": "no controller action, URL mapping, menu, render, or link reference found"
+  },
+  {
+   "gsp": "grails-app/views/transactionEntry/edit.gsp",
+   "key": "transactionEntry/edit",
+   "classification": "LIVE",
+   "evidence": "grails-app/views/transaction/_entries.gsp:34 (g:link/redirect reference)"
+  },
+  {
+   "gsp": "grails-app/views/transactionEntry/list.gsp",
+   "key": "transactionEntry/list",
+   "classification": "DEAD",
+   "evidence": "no controller action, URL mapping, menu, render, or link reference found"
+  },
+  {
+   "gsp": "grails-app/views/transactionEntry/show.gsp",
+   "key": "transactionEntry/show",
+   "classification": "DEAD",
+   "evidence": "no controller action, URL mapping, menu, render, or link reference found"
+  },
+  {
+   "gsp": "grails-app/views/unitOfMeasureConversion/create.gsp",
+   "key": "unitOfMeasureConversion/create",
+   "classification": "LIVE",
+   "evidence": "grails-app/controllers/org/pih/warehouse/core/UnitOfMeasureConversionController.groovy:24 (controller action (convention))"
+  },
+  {
+   "gsp": "grails-app/views/unitOfMeasureConversion/edit.gsp",
+   "key": "unitOfMeasureConversion/edit",
+   "classification": "LIVE",
+   "evidence": "grails-app/controllers/org/pih/warehouse/core/UnitOfMeasureConversionController.groovy:30 (controller action (convention))"
+  },
+  {
+   "gsp": "grails-app/views/unitOfMeasureConversion/list.gsp",
+   "key": "unitOfMeasureConversion/list",
+   "classification": "LIVE",
+   "evidence": "grails-app/controllers/org/pih/warehouse/core/UnitOfMeasureConversionController.groovy:19 (controller action (convention))"
+  },
+  {
+   "gsp": "grails-app/views/unsupported.gsp",
+   "key": "unsupported",
+   "classification": "DEAD",
+   "evidence": "no controller action, URL mapping, menu, render, or link reference found"
+  },
+  {
+   "gsp": "grails-app/views/user/_actions.gsp",
+   "key": "user/_actions",
+   "classification": "TEMPLATE",
+   "evidence": "grails-app/views/user/_summary.gsp:6 (included by live page)"
+  },
+  {
+   "gsp": "grails-app/views/user/_summary.gsp",
+   "key": "user/_summary",
+   "classification": "TEMPLATE",
+   "evidence": "grails-app/views/user/changePhoto.gsp:27 (included by live page)"
+  },
+  {
+   "gsp": "grails-app/views/user/changePhoto.gsp",
+   "key": "user/changePhoto",
+   "classification": "LIVE",
+   "evidence": "grails-app/controllers/org/pih/warehouse/user/UserController.groovy:188 (controller action (convention))"
+  },
+  {
+   "gsp": "grails-app/views/user/create.gsp",
+   "key": "user/create",
+   "classification": "LIVE",
+   "evidence": "grails-app/controllers/org/pih/warehouse/user/UserController.groovy:114 (controller action (convention))"
+  },
+  {
+   "gsp": "grails-app/views/user/cropPhoto.gsp",
+   "key": "user/cropPhoto",
+   "classification": "LIVE",
+   "evidence": "grails-app/controllers/org/pih/warehouse/user/UserController.groovy:198 (controller action (convention))"
+  },
+  {
+   "gsp": "grails-app/views/user/edit.gsp",
+   "key": "user/edit",
+   "classification": "LIVE",
+   "evidence": "grails-app/controllers/org/pih/warehouse/user/UserController.groovy:222 (controller action (convention))"
+  },
+  {
+   "gsp": "grails-app/views/user/list.gsp",
+   "key": "user/list",
+   "classification": "LIVE",
+   "evidence": "grails-app/controllers/org/pih/warehouse/user/UserController.groovy:56 (controller action (convention))"
+  },
+  {
+   "gsp": "grails-app/views/user/show.gsp",
+   "key": "user/show",
+   "classification": "LIVE",
+   "evidence": "grails-app/controllers/org/pih/warehouse/user/UserController.groovy:175 (controller action (convention))"
+  }
+ ]
+}
