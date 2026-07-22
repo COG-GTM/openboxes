@@ -238,6 +238,19 @@ export const REQUISITION_CONFIRM = (id) => `${REQUISITION_BY_ID(id)}/confirm`;
 export const REQUISITION_DETAILS = (id) => `${REQUISITION_BY_ID(id)}/details`;
 export const REQUISITION_DOCUMENTS = (id) => `${REQUISITION_BY_ID(id)}/documents`;
 export const REQUISITION_DOCUMENT_TYPES = `${REQUISITION_API}/documentTypes`;
+export const REQUISITION_REVIEW = (id) => `${REQUISITION_BY_ID(id)}/review`;
+export const REQUISITION_PROCESS = (id) => `${REQUISITION_BY_ID(id)}/process`;
+export const REQUISITION_ISSUE = (id) => `${REQUISITION_BY_ID(id)}/issue`;
+export const REQUISITION_PRINT_DRAFT = (id) => `${REQUISITION_BY_ID(id)}/printDraft`;
+export const PICKLIST_SAVE = `${API}/picklists`;
+
+// REQUISITION ITEM (classic requisition flow)
+export const REQUISITION_ITEM_API = `${API}/requisitionItems`;
+export const REQUISITION_ITEM_BY_ID = (id) => `${REQUISITION_ITEM_API}/${id}`;
+export const REQUISITION_ITEM_CHANGE_QUANTITY = (id) => `${REQUISITION_ITEM_BY_ID(id)}/changeQuantity`;
+export const REQUISITION_ITEM_SUBSTITUTE = (id) => `${REQUISITION_ITEM_BY_ID(id)}/substitute`;
+export const REQUISITION_ITEM_CANCEL = (id) => `${REQUISITION_ITEM_BY_ID(id)}/cancel`;
+export const REQUISITION_ITEM_UNDO_CHANGES = (id) => `${REQUISITION_ITEM_BY_ID(id)}/undoChanges`;
 export const REQUISITION_EDIT = (id) => `${REQUISITION_BY_ID(id)}/edit`;
 export const REQUISITION_HEADER = (id) => `${REQUISITION_BY_ID(id)}/header`;
 export const REQUISITION_ITEMS = (id) => `${REQUISITION_BY_ID(id)}/items`;

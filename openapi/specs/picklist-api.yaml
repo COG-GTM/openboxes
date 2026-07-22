@@ -7,9 +7,10 @@ info:
     (DELETE -> clearPicklist) plus the print-screen data endpoints
     "/api/picklists/print/$id" (GET -> print) and
     "/api/picklists/returnPrint/$id" (GET -> returnPrint) added for the
-    migrated React picklist print screens. The controller extends
-    BaseDomainApiController but only these actions are reachable through
-    URL mappings.
+    migrated React picklist print screens, and "/api/picklists"
+    (POST -> save) added for the migrated requisition/process screen. The
+    controller extends BaseDomainApiController but only these actions are
+    reachable through URL mappings.
   version: 0.1.0
 servers:
   - url: http://localhost:8080/openboxes
@@ -17,6 +18,99 @@ servers:
 security:
   - cookieAuth: []
 paths:
+  /api/picklists:
+    post:
+      operationId: savePicklist
+      summary: Create or update a picklist and its items
+      description: >
+        Mirrors the legacy PicklistController.save JSON endpoint, delegating
+        to PicklistService.save. Creates the picklist when no id is given,
+        updates/creates the given picklist items, and deletes any existing
+        picklist items missing from the request. Resets the requisition
+        status to CREATED (legacy parity quirk).
+      requestBody:
+        required: true
+        content:
+          application/json:
+            schema:
+              type: object
+              required: [requisition, picklistItems]
+              properties:
+                id:
+                  type: string
+                  nullable: true
+                  description: Existing picklist id (omit or null to create).
+                requisition:
+                  type: object
+                  required: [id]
+                  properties:
+                    id:
+                      $ref: '../components/common.yaml#/components/schemas/Id'
+                picklistItems:
+                  type: array
+                  items:
+                    type: object
+                    required: [requisitionItem, inventoryItem, quantity]
+                    properties:
+                      id:
+                        type: string
+                        nullable: true
+                      requisitionItem:
+                        type: object
+                        required: [id]
+                        properties:
+                          id:
+                            $ref: '../components/common.yaml#/components/schemas/Id'
+                      inventoryItem:
+                        type: object
+                        required: [id]
+                        properties:
+                          id:
+                            $ref: '../components/common.yaml#/components/schemas/Id'
+                      quantity:
+                        type: integer
+      responses:
+        '200':
+          description: Saved picklist (Picklist.toJson rendering).
+          content:
+            application/json:
+              schema:
+                type: object
+                required: [data]
+                properties:
+                  data:
+                    type: object
+                    description: Picklist.toJson rendering.
+                    additionalProperties: true
+                    properties:
+                      id:
+                        $ref: '../components/common.yaml#/components/schemas/Id'
+                      name:
+                        type: string
+                        nullable: true
+                      picklistItems:
+                        type: array
+                        items:
+                          type: object
+                          additionalProperties: true
+        '400':
+          description: Validation errors.
+          content:
+            application/json:
+              schema:
+                type: object
+                required: [errorCode, errorMessage]
+                properties:
+                  errorCode:
+                    type: integer
+                    enum: [400]
+                  errorMessage:
+                    type: string
+                  errors:
+                    type: array
+                    items:
+                      type: string
+
   /api/picklists/{id}/items:
     delete:
       operationId: clearPicklist

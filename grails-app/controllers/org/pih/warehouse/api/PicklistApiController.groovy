@@ -18,6 +18,22 @@ class PicklistApiController extends BaseDomainApiController {
     }
 
     /**
+     * Mirrors the legacy PicklistController.save JSON endpoint (used by the
+     * migrated requisition/process screen to save the picklist).
+     */
+    def save() {
+        def jsonRequest = request.JSON
+        def picklist = picklistService.save(jsonRequest)
+        if (!picklist || picklist.hasErrors()) {
+            response.status = 400
+            render([errorCode: 400, errorMessage: "Validation errors",
+                    errors: picklist?.errors?.allErrors?.collect { it.toString() } ?: []] as JSON)
+            return
+        }
+        render([data: picklist.toJson()] as JSON)
+    }
+
+    /**
      * Data backing the migrated picklist print screen (legacy picklist/print GSP).
      */
     def print() {

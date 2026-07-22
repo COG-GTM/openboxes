@@ -1,0 +1,332 @@
+openapi: 3.0.3
+info:
+  title: OpenBoxes - RequisitionItemApiController
+  description: >
+    Requisition item endpoints handled by
+    org.pih.warehouse.api.RequisitionItemApiController, added for the React
+    migration of the legacy requisitionItem/change screen. Routed via the
+    "/api/requisitionItems/..." URL mappings.
+  version: 0.1.0
+servers:
+  - url: http://localhost:8080/openboxes
+    description: Local Docker baseline (docs/migration/RUNNING_LOCALLY.md)
+security:
+  - cookieAuth: []
+paths:
+  /api/requisitionItems/{id}:
+    get:
+      operationId: readRequisitionItem
+      summary: Read requisition item details for the change screen
+      description: >
+        Mirrors the data of the legacy RequisitionItemController.change
+        action - item details plus quantity on hand and quantity available
+        to promise at the session warehouse, and the product's packages.
+      parameters:
+        - $ref: '#/components/parameters/requisitionItemId'
+      responses:
+        '200':
+          description: Requisition item details.
+          content:
+            application/json:
+              schema:
+                type: object
+                required: [data]
+                properties:
+                  data:
+                    allOf:
+                      - $ref: '#/components/schemas/RequisitionItemDetails'
+                      - type: object
+                        required: [quantityOnHand, quantityAvailableToPromise, productPackages]
+                        properties:
+                          quantityOnHand:
+                            type: integer
+                          quantityAvailableToPromise:
+                            type: integer
+                          productPackages:
+                            type: array
+                            items:
+                              type: object
+                              properties:
+                                id:
+                                  $ref: '../components/common.yaml#/components/schemas/Id'
+                                uomCode:
+                                  type: string
+                                  nullable: true
+                                quantity:
+                                  type: integer
+                                  nullable: true
+        '404':
+          $ref: '#/components/responses/ControllerNotFound'
+
+  /api/requisitionItems/{id}/changeQuantity:
+    post:
+      operationId: changeRequisitionItemQuantity
+      summary: Change the quantity of a requisition item
+      description: >
+        Mirrors the legacy RequisitionItemController.changeQuantity action -
+        cancels the original quantity and creates a modification item.
+        Validation errors return 400.
+      parameters:
+        - $ref: '#/components/parameters/requisitionItemId'
+      requestBody:
+        required: true
+        content:
+          application/json:
+            schema:
+              type: object
+              required: [quantity]
+              properties:
+                quantity:
+                  type: integer
+                productPackageId:
+                  type: string
+                  nullable: true
+                reasonCode:
+                  type: string
+                  nullable: true
+                comments:
+                  type: string
+                  nullable: true
+      responses:
+        '200':
+          $ref: '#/components/responses/RequisitionItemDetails'
+        '400':
+          $ref: '#/components/responses/ValidationError'
+        '404':
+          $ref: '#/components/responses/ControllerNotFound'
+
+  /api/requisitionItems/{id}/substitute:
+    post:
+      operationId: substituteRequisitionItem
+      summary: Substitute another product for a requisition item
+      description: >
+        Mirrors the legacy RequisitionItemController.chooseSubstitute action -
+        cancels the original quantity and creates a substitution item for the
+        given product. Missing productId returns 400.
+      parameters:
+        - $ref: '#/components/parameters/requisitionItemId'
+      requestBody:
+        required: true
+        content:
+          application/json:
+            schema:
+              type: object
+              required: [productId, quantity]
+              properties:
+                productId:
+                  type: string
+                quantity:
+                  type: integer
+                productPackageId:
+                  type: string
+                  nullable: true
+                reasonCode:
+                  type: string
+                  nullable: true
+                comments:
+                  type: string
+                  nullable: true
+      responses:
+        '200':
+          $ref: '#/components/responses/RequisitionItemDetails'
+        '400':
+          $ref: '#/components/responses/ValidationError'
+        '404':
+          $ref: '#/components/responses/ControllerNotFound'
+
+  /api/requisitionItems/{id}/cancel:
+    post:
+      operationId: cancelRequisitionItem
+      summary: Cancel a requisition item
+      description: >
+        Mirrors the legacy RequisitionItemController.cancelQuantity action.
+        Validation errors (e.g. missing reason code) return 400.
+      parameters:
+        - $ref: '#/components/parameters/requisitionItemId'
+      requestBody:
+        required: true
+        content:
+          application/json:
+            schema:
+              type: object
+              properties:
+                reasonCode:
+                  type: string
+                  nullable: true
+                comments:
+                  type: string
+                  nullable: true
+      responses:
+        '200':
+          $ref: '#/components/responses/RequisitionItemDetails'
+        '400':
+          $ref: '#/components/responses/ValidationError'
+        '404':
+          $ref: '#/components/responses/ControllerNotFound'
+
+  /api/requisitionItems/{id}/undoChanges:
+    post:
+      operationId: undoRequisitionItemChanges
+      summary: Undo changes made to a requisition item
+      description: >
+        Mirrors the legacy RequisitionItemController.undoChanges action -
+        removes modification/substitution items and restores the original
+        quantity.
+      parameters:
+        - $ref: '#/components/parameters/requisitionItemId'
+      responses:
+        '200':
+          $ref: '#/components/responses/RequisitionItemDetails'
+        '404':
+          $ref: '#/components/responses/ControllerNotFound'
+components:
+  securitySchemes:
+    cookieAuth:
+      $ref: '../components/common.yaml#/components/securitySchemes/cookieAuth'
+
+  parameters:
+    requisitionItemId:
+      name: id
+      in: path
+      required: true
+      schema:
+        $ref: '../components/common.yaml#/components/schemas/Id'
+      description: Requisition item id.
+
+  responses:
+    ControllerNotFound:
+      description: >
+        Unknown requisition item id. Rendered directly by the controller
+        with errorCode and errorMessage.
+      content:
+        application/json:
+          schema:
+            type: object
+            required: [errorCode, errorMessage]
+            properties:
+              errorCode:
+                type: integer
+                enum: [404]
+              errorMessage:
+                type: string
+
+    ValidationError:
+      description: Validation errors.
+      content:
+        application/json:
+          schema:
+            type: object
+            required: [errorCode, errorMessage]
+            properties:
+              errorCode:
+                type: integer
+                enum: [400]
+              errorMessage:
+                type: string
+              errors:
+                type: array
+                items:
+                  type: string
+
+    RequisitionItemDetails:
+      description: Requisition item details.
+      content:
+        application/json:
+          schema:
+            type: object
+            required: [data]
+            properties:
+              data:
+                $ref: '#/components/schemas/RequisitionItemDetails'
+
+  schemas:
+    RequisitionItemDetails:
+      type: object
+      required: [id, quantity, product, requisition]
+      properties:
+        id:
+          $ref: '../components/common.yaml#/components/schemas/Id'
+        status:
+          type: string
+          nullable: true
+        quantity:
+          type: integer
+        quantityApproved:
+          type: integer
+        quantityCanceled:
+          type: integer
+        cancelReasonCode:
+          type: string
+          nullable: true
+        cancelComments:
+          type: string
+          nullable: true
+        isChanged:
+          type: boolean
+        isSubstituted:
+          type: boolean
+        isCanceled:
+          type: boolean
+        product:
+          type: object
+          properties:
+            id:
+              $ref: '../components/common.yaml#/components/schemas/Id'
+            productCode:
+              type: string
+              nullable: true
+            name:
+              type: string
+              nullable: true
+            unitOfMeasure:
+              type: string
+              nullable: true
+        productPackage:
+          type: object
+          nullable: true
+          properties:
+            id:
+              $ref: '../components/common.yaml#/components/schemas/Id'
+            uomCode:
+              type: string
+              nullable: true
+            quantity:
+              type: integer
+              nullable: true
+        requisition:
+          type: object
+          properties:
+            id:
+              $ref: '../components/common.yaml#/components/schemas/Id'
+            requestNumber:
+              type: string
+              nullable: true
+            name:
+              type: string
+              nullable: true
+            status:
+              type: string
+              nullable: true
+        requisitionItems:
+          type: array
+          items:
+            type: object
+            properties:
+              id:
+                $ref: '../components/common.yaml#/components/schemas/Id'
+              quantity:
+                type: integer
+              product:
+                type: object
+                properties:
+                  id:
+                    $ref: '../components/common.yaml#/components/schemas/Id'
+                  productCode:
+                    type: string
+                    nullable: true
+                  name:
+                    type: string
+                    nullable: true
+                  unitOfMeasure:
+                    type: string
+                    nullable: true

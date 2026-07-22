@@ -122,6 +122,68 @@ def test_upload_document(client, requisition_id):
     assert data["filename"] == "zz-contract.txt"
 
 
+def test_save_details_verified_by(client, requisition_id):
+    resp = check(client, spec, "POST", "/api/requisitions/{id}/details",
+                 path=f"/api/requisitions/{requisition_id}/details", json={
+                     "verifiedById": "1",
+                     "dateVerified": "2026-07-02",
+                 })
+    assert resp.status_code == 200
+    data = resp.json()["data"]
+    assert data["verifiedBy"]["id"] == "1"
+    assert data["dateVerified"] == "2026-07-02"
+
+
+def test_review_requisition(client, requisition_id):
+    resp = check(client, spec, "POST", "/api/requisitions/{id}/review",
+                 path=f"/api/requisitions/{requisition_id}/review")
+    assert resp.status_code == 200
+    data = resp.json()["data"]
+    assert data["status"] == "VERIFYING"
+    assert isinstance(data["quantityOnHandMap"], dict)
+
+
+def test_review_requisition_unknown(client):
+    resp = check(client, spec, "POST", "/api/requisitions/{id}/review",
+                 path="/api/requisitions/doesnotexist0000/review")
+    assert resp.status_code == 404
+
+
+def test_process_requisition(client, requisition_id):
+    resp = check(client, spec, "GET", "/api/requisitions/{id}/process",
+                 path=f"/api/requisitions/{requisition_id}/process")
+    assert resp.status_code == 200
+    data = resp.json()["data"]
+    assert isinstance(data["productInventoryItemsMap"], dict)
+
+
+def test_process_requisition_unknown(client):
+    resp = check(client, spec, "GET", "/api/requisitions/{id}/process",
+                 path="/api/requisitions/doesnotexist0000/process")
+    assert resp.status_code == 404
+
+
+def test_issue_requisition_unknown(client):
+    resp = check(client, spec, "POST", "/api/requisitions/{id}/issue",
+                 path="/api/requisitions/doesnotexist0000/issue", json={})
+    assert resp.status_code == 404
+
+
+def test_print_draft(client, requisition_id):
+    resp = check(client, spec, "GET", "/api/requisitions/{id}/printDraft",
+                 path=f"/api/requisitions/{requisition_id}/printDraft")
+    assert resp.status_code == 200
+    data = resp.json()["data"]
+    assert data["id"] == requisition_id
+    assert isinstance(data["requisitionItems"], list)
+
+
+def test_print_draft_unknown(client):
+    resp = check(client, spec, "GET", "/api/requisitions/{id}/printDraft",
+                 path="/api/requisitions/doesnotexist0000/printDraft")
+    assert resp.status_code == 404
+
+
 def test_upload_document_empty(client, requisition_id):
     resp = check(client, spec, "POST", "/api/requisitions/{id}/documents",
                  path=f"/api/requisitions/{requisition_id}/documents",

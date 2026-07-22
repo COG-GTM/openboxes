@@ -564,6 +564,11 @@ class UrlMappings {
             action = [GET: "returnPrint"]
         }
 
+        "/api/picklists"(parseRequest: true) {
+            controller = "picklistApi"
+            action = [POST: "save"]
+        }
+
         // Requisition API (classic requisition flow screens migrated to React)
 
         "/api/requisitions"(parseRequest: true) {
@@ -629,6 +634,53 @@ class UrlMappings {
         "/api/requisitions/documentTypes" {
             controller = "requisitionApi"
             action = [GET: "documentTypes"]
+        }
+
+        "/api/requisitions/$id/review"(parseRequest: true) {
+            controller = "requisitionApi"
+            action = [POST: "review"]
+        }
+
+        "/api/requisitions/$id/process" {
+            controller = "requisitionApi"
+            action = [GET: "process"]
+        }
+
+        "/api/requisitions/$id/issue"(parseRequest: true) {
+            controller = "requisitionApi"
+            action = [POST: "issue"]
+        }
+
+        "/api/requisitions/$id/printDraft" {
+            controller = "requisitionApi"
+            action = [GET: "printDraft"]
+        }
+
+        // Requisition Item API (requisitionItem/change screen migrated to React)
+
+        "/api/requisitionItems/$id" {
+            controller = "requisitionItemApi"
+            action = [GET: "read"]
+        }
+
+        "/api/requisitionItems/$id/changeQuantity"(parseRequest: true) {
+            controller = "requisitionItemApi"
+            action = [POST: "changeQuantity"]
+        }
+
+        "/api/requisitionItems/$id/substitute"(parseRequest: true) {
+            controller = "requisitionItemApi"
+            action = [POST: "substitute"]
+        }
+
+        "/api/requisitionItems/$id/cancel"(parseRequest: true) {
+            controller = "requisitionItemApi"
+            action = [POST: "cancel"]
+        }
+
+        "/api/requisitionItems/$id/undoChanges"(parseRequest: true) {
+            controller = "requisitionItemApi"
+            action = [POST: "undoChanges"]
         }
 
         // Partial Receiving API

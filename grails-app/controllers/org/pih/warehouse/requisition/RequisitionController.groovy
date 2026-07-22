@@ -146,36 +146,7 @@ class RequisitionController {
 
 
     def review() {
-        def requisition = Requisition.get(params.id)
-
-        if (requisition.status < RequisitionStatus.VERIFYING) {
-            requisition.status = RequisitionStatus.VERIFYING
-            requisition.save(flush: true)
-        }
-
-        if (!requisition) {
-            flash.message = "${warehouse.message(code: 'default.not.found.message', args: [warehouse.message(code: 'request.label', default: 'Request'), params.id])}"
-            redirect(action: "list")
-        } else {
-
-            def location = Location.get(session.warehouse.id)
-            def quantityAvailableToPromiseMap = [:]
-            def quantityOnHandMap = [:]
-
-            def products = requisition.requisitionItems.collect { it.product }
-            def quantityProductMap = inventoryService.getQuantityByProductMap(location.inventory, products)
-
-            requisition?.requisitionItems?.each { requisitionItem ->
-                quantityOnHandMap[requisitionItem?.product?.id] = quantityProductMap[requisitionItem?.product] ?: 0
-            }
-
-            def requisitionItem = RequisitionItem.get(params?.requisitionItem?.id)
-
-            println "Requisition Status: " + requisition.id + " [" + requisition.status + "]"
-            [requisition            : requisition,
-             quantityOnHandMap      : quantityOnHandMap,
-             selectedRequisitionItem: requisitionItem]
-        }
+        render(view: "/common/react")
     }
 
 
@@ -297,33 +268,11 @@ class RequisitionController {
 
 
     def process() {
-        def requisition = Requisition.get(params?.id)
-        if (requisition) {
-            def currentInventory = Location.get(session.warehouse.id).inventory
-            def picklist = Picklist.findByRequisition(requisition) ?: new Picklist()
-            def productInventoryItemsMap = [:]
-            def productInventoryItems = inventoryService.getInventoryItemsWithQuantity(requisition.requisitionItems?.collect {
-                it.product
-            }, currentInventory)
-            productInventoryItems.keySet().each { product ->
-                productInventoryItemsMap[product.id] = productInventoryItems[product].collect {
-                    it.toJson()
-                }
-            }
-
-
-            String jsonString = [requisition: requisition.toJson(), productInventoryItemsMap: productInventoryItemsMap, picklist: picklist.toJson()] as JSON
-            return [data: jsonString, requisitionId: requisition.id, requisition: requisition]
-        } else {
-            response.sendError(404)
-        }
+        render(view: "/common/react")
     }
 
     def transfer() {
-        def requisition = Requisition.get(params.id)
-        def picklist = Picklist.findByRequisition(requisition)
-
-        [requisition: requisition, picklist: picklist]
+        render(view: "/common/react")
     }
 
     def complete() {
@@ -408,7 +357,7 @@ class RequisitionController {
                 return
             }
 
-            return [requisition: requisition]
+            render(view: "/common/react")
         }
     }
 
@@ -429,11 +378,7 @@ class RequisitionController {
     }
 
     def printDraft() {
-        println "print draft " + params
-        def requisition = Requisition.get(params.id)
-        def picklist = Picklist.findByRequisition(requisition)
-        def location = Location.get(session.warehouse.id)
-        [requisition: requisition, picklist: picklist, location: location]
+        render(view: "/common/react")
     }
 
 

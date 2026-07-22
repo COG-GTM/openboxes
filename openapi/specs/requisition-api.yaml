@@ -5,8 +5,8 @@ info:
     Classic requisition flow endpoints handled by
     org.pih.warehouse.api.RequisitionApiController, added for the React
     migration of the legacy requisition screens (create, chooseTemplate,
-    confirm, addDocument). Routed via the "/api/requisitions/..." URL
-    mappings.
+    confirm, addDocument, show, review, process, transfer, printDraft).
+    Routed via the "/api/requisitions/..." URL mappings.
   version: 0.1.0
 servers:
   - url: http://localhost:8080/openboxes
@@ -316,10 +316,11 @@ paths:
   /api/requisitions/{id}/details:
     post:
       operationId: saveRequisitionDetails
-      summary: Save checked-by details from the confirm screen
+      summary: Save checked-by / verified-by details
       description: >
-        Mirrors the legacy RequisitionController.saveDetails action. Only the
-        keys present in the body are updated.
+        Mirrors the legacy RequisitionController.saveDetails action (confirm
+        screen checked-by, review screen verified-by). Only the keys present
+        in the body are updated.
       parameters:
         - $ref: '#/components/parameters/requisitionId'
       requestBody:
@@ -333,6 +334,13 @@ paths:
                   type: string
                   nullable: true
                 dateChecked:
+                  type: string
+                  nullable: true
+                  description: yyyy-MM-dd
+                verifiedById:
+                  type: string
+                  nullable: true
+                dateVerified:
                   type: string
                   nullable: true
                   description: yyyy-MM-dd
@@ -356,6 +364,266 @@ paths:
                       dateChecked:
                         type: string
                         nullable: true
+                      verifiedBy:
+                        $ref: '#/components/schemas/NullableNamedReference'
+                      dateVerified:
+                        type: string
+                        nullable: true
+        '404':
+          $ref: '#/components/responses/ControllerNotFound'
+
+  /api/requisitions/{id}/review:
+    post:
+      operationId: reviewRequisition
+      summary: Move a requisition to VERIFYING and return review-screen data
+      description: >
+        Mirrors the legacy RequisitionController.review action - transitions
+        the requisition status to VERIFYING when it has not reached that
+        status yet, then returns the details needed by the review screen,
+        including quantity on hand per product at the session warehouse.
+      parameters:
+        - $ref: '#/components/parameters/requisitionId'
+      responses:
+        '200':
+          description: Requisition review details.
+          content:
+            application/json:
+              schema:
+                type: object
+                required: [data]
+                properties:
+                  data:
+                    allOf:
+                      - $ref: '#/components/schemas/RequisitionDetails'
+                      - type: object
+                        required: [quantityOnHandMap]
+                        properties:
+                          quantityOnHandMap:
+                            type: object
+                            description: Quantity on hand keyed by product id.
+                            additionalProperties:
+                              type: integer
+        '404':
+          $ref: '#/components/responses/ControllerNotFound'
+
+  /api/requisitions/{id}/process:
+    get:
+      operationId: processRequisition
+      summary: Read process-screen data (picklist + inventory items)
+      description: >
+        Mirrors the data the legacy RequisitionController.process action fed
+        to the Knockout picking screen - the requisition details plus the
+        inventory items with quantity for each requested product at the
+        session warehouse and the current picklist.
+      parameters:
+        - $ref: '#/components/parameters/requisitionId'
+      responses:
+        '200':
+          description: Requisition process details.
+          content:
+            application/json:
+              schema:
+                type: object
+                required: [data]
+                properties:
+                  data:
+                    allOf:
+                      - $ref: '#/components/schemas/RequisitionDetails'
+                      - type: object
+                        required: [productInventoryItemsMap, picklist]
+                        properties:
+                          productInventoryItemsMap:
+                            type: object
+                            description: Inventory items keyed by product id.
+                            additionalProperties:
+                              type: array
+                              items:
+                                type: object
+                                description: InventoryItem.toJson rendering.
+                                additionalProperties: true
+                                properties:
+                                  inventoryItemId:
+                                    $ref: '../components/common.yaml#/components/schemas/Id'
+                                  lotNumber:
+                                    type: string
+                                    nullable: true
+                                  expirationDate:
+                                    type: string
+                                    nullable: true
+                                    description: MM/dd/yyyy
+                                  quantityOnHand:
+                                    type: integer
+                          picklist:
+                            type: object
+                            nullable: true
+                            required: [id, picklistItems]
+                            properties:
+                              id:
+                                $ref: '../components/common.yaml#/components/schemas/Id'
+                              picklistItems:
+                                type: array
+                                items:
+                                  type: object
+                                  required: [id, quantity]
+                                  properties:
+                                    id:
+                                      $ref: '../components/common.yaml#/components/schemas/Id'
+                                    quantity:
+                                      type: integer
+                                    lotNumber:
+                                      type: string
+                                      nullable: true
+                                    inventoryItem:
+                                      type: object
+                                      nullable: true
+                                      properties:
+                                        id:
+                                          $ref: '../components/common.yaml#/components/schemas/Id'
+                                    requisitionItem:
+                                      type: object
+                                      nullable: true
+                                      properties:
+                                        id:
+                                          $ref: '../components/common.yaml#/components/schemas/Id'
+        '404':
+          $ref: '#/components/responses/ControllerNotFound'
+
+  /api/requisitions/{id}/issue:
+    post:
+      operationId: issueRequisition
+      summary: Issue a requisition (transfer screen Finish)
+      description: >
+        Mirrors the legacy RequisitionController.complete action - issues the
+        requisition via RequisitionService.issueRequisition. Validation
+        errors (e.g. nothing picked) return 400.
+      parameters:
+        - $ref: '#/components/parameters/requisitionId'
+      requestBody:
+        required: true
+        content:
+          application/json:
+            schema:
+              type: object
+              properties:
+                issuedById:
+                  type: string
+                  nullable: true
+                deliveredById:
+                  type: string
+                  nullable: true
+                comments:
+                  type: string
+                  nullable: true
+      responses:
+        '200':
+          description: Requisition issued.
+          content:
+            application/json:
+              schema:
+                type: object
+                required: [data]
+                properties:
+                  data:
+                    type: object
+                    required: [id, status]
+                    properties:
+                      id:
+                        $ref: '../components/common.yaml#/components/schemas/Id'
+                      requestNumber:
+                        type: string
+                        nullable: true
+                      status:
+                        type: string
+        '400':
+          $ref: '#/components/responses/ValidationError'
+        '404':
+          $ref: '#/components/responses/ControllerNotFound'
+
+  /api/requisitions/{id}/printDraft:
+    get:
+      operationId: printDraftRequisition
+      summary: Read print-draft data for a requisition
+      description: >
+        Data backing the migrated requisition/printDraft screen - requisition
+        header fields plus the requested items with their picklist rows and
+        the bin location from the session warehouse's inventory level.
+      parameters:
+        - $ref: '#/components/parameters/requisitionId'
+      responses:
+        '200':
+          description: Print draft data.
+          content:
+            application/json:
+              schema:
+                type: object
+                required: [data]
+                properties:
+                  data:
+                    type: object
+                    required: [id, requestNumber, requisitionItems, hasPicklist]
+                    properties:
+                      id:
+                        $ref: '../components/common.yaml#/components/schemas/Id'
+                      requestNumber:
+                        type: string
+                      name:
+                        type: string
+                        nullable: true
+                      status:
+                        type: string
+                      origin:
+                        $ref: '#/components/schemas/NullableNamedReference'
+                      destination:
+                        $ref: '#/components/schemas/NullableNamedReference'
+                      dateRequested:
+                        type: string
+                        nullable: true
+                      requestedBy:
+                        $ref: '#/components/schemas/NullableNamedReference'
+                      hasPicklist:
+                        type: boolean
+                      requisitionItems:
+                        type: array
+                        items:
+                          type: object
+                          required: [id, quantity, product, picklistItems]
+                          properties:
+                            id:
+                              $ref: '../components/common.yaml#/components/schemas/Id'
+                            quantity:
+                              type: integer
+                            product:
+                              type: object
+                              properties:
+                                id:
+                                  $ref: '../components/common.yaml#/components/schemas/Id'
+                                productCode:
+                                  type: string
+                                name:
+                                  type: string
+                                  nullable: true
+                                unitOfMeasure:
+                                  type: string
+                                  nullable: true
+                            binLocation:
+                              type: string
+                              nullable: true
+                            picklistItems:
+                              type: array
+                              items:
+                                type: object
+                                required: [id, quantity]
+                                properties:
+                                  id:
+                                    $ref: '../components/common.yaml#/components/schemas/Id'
+                                  quantity:
+                                    type: integer
+                                  lotNumber:
+                                    type: string
+                                    nullable: true
+                                  expirationDate:
+                                    type: string
+                                    nullable: true
         '404':
           $ref: '#/components/responses/ControllerNotFound'
 
@@ -802,6 +1070,8 @@ components:
                     nullable: true
               quantity:
                 type: integer
+              quantityApproved:
+                type: integer
               quantityCanceled:
                 type: integer
               quantityPicked:
@@ -814,6 +1084,34 @@ components:
               cancelComments:
                 type: string
                 nullable: true
+              isOriginal:
+                type: boolean
+              isSubstitution:
+                type: boolean
+              isSubstituted:
+                type: boolean
+              isChanged:
+                type: boolean
+              isCanceled:
+                type: boolean
+              isPending:
+                type: boolean
+              isApproved:
+                type: boolean
+              canEdit:
+                type: boolean
+              canUndoChanges:
+                type: boolean
+              parentRequisitionItem:
+                type: object
+                nullable: true
+                properties:
+                  id:
+                    $ref: '../components/common.yaml#/components/schemas/Id'
+              substitutionItem:
+                $ref: '#/components/schemas/RelatedRequisitionItem'
+              modificationItem:
+                $ref: '#/components/schemas/RelatedRequisitionItem'
               picklistItems:
                 type: array
                 items:
@@ -848,3 +1146,28 @@ components:
                         unitOfMeasure:
                           type: string
                           nullable: true
+
+    RelatedRequisitionItem:
+      type: object
+      nullable: true
+      properties:
+        id:
+          $ref: '../components/common.yaml#/components/schemas/Id'
+        quantity:
+          type: integer
+        quantityApproved:
+          type: integer
+        product:
+          type: object
+          properties:
+            id:
+              $ref: '../components/common.yaml#/components/schemas/Id'
+            productCode:
+              type: string
+              nullable: true
+            name:
+              type: string
+              nullable: true
+            unitOfMeasure:
+              type: string
+              nullable: true

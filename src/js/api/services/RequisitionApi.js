@@ -1,6 +1,7 @@
 import {
   PICKLIST_PRINT,
   PICKLIST_RETURN_PRINT,
+  PICKLIST_SAVE,
   REQUISITION_API,
   REQUISITION_BY_ID,
   REQUISITION_CONFIRM,
@@ -9,10 +10,19 @@ import {
   REQUISITION_DOCUMENTS,
   REQUISITION_EDIT,
   REQUISITION_HEADER,
+  REQUISITION_ISSUE,
+  REQUISITION_ITEM_BY_ID,
+  REQUISITION_ITEM_CANCEL,
+  REQUISITION_ITEM_CHANGE_QUANTITY,
+  REQUISITION_ITEM_SUBSTITUTE,
+  REQUISITION_ITEM_UNDO_CHANGES,
   REQUISITION_ITEMS,
   REQUISITION_PICK,
   REQUISITION_PICKLIST,
   REQUISITION_PICKLIST_ITEMS,
+  REQUISITION_PRINT_DRAFT,
+  REQUISITION_PROCESS,
+  REQUISITION_REVIEW,
   REQUISITION_TEMPLATES,
 } from 'api/urls';
 import apiClient from 'utils/apiClient';
@@ -36,4 +46,16 @@ export default {
   }),
   getPicklistPrint: (id) => apiClient.get(PICKLIST_PRINT(id)),
   getPicklistReturnPrint: (id) => apiClient.get(PICKLIST_RETURN_PRINT(id)),
+  reviewRequisition: (id) => apiClient.post(REQUISITION_REVIEW(id)),
+  getRequisitionProcess: (id) => apiClient.get(REQUISITION_PROCESS(id)),
+  issueRequisition: (id, payload) => apiClient.post(REQUISITION_ISSUE(id), payload),
+  getRequisitionPrintDraft: (id) => apiClient.get(REQUISITION_PRINT_DRAFT(id)),
+  savePicklist: (payload) => apiClient.post(PICKLIST_SAVE, payload),
+  getRequisitionItem: (id) => apiClient.get(REQUISITION_ITEM_BY_ID(id)),
+  changeRequisitionItemQuantity: (id, payload) =>
+    apiClient.post(REQUISITION_ITEM_CHANGE_QUANTITY(id), payload),
+  substituteRequisitionItem: (id, payload) =>
+    apiClient.post(REQUISITION_ITEM_SUBSTITUTE(id), payload),
+  cancelRequisitionItem: (id, payload) => apiClient.post(REQUISITION_ITEM_CANCEL(id), payload),
+  undoRequisitionItemChanges: (id) => apiClient.post(REQUISITION_ITEM_UNDO_CHANGES(id)),
 };

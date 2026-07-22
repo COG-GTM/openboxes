@@ -551,6 +551,36 @@ const AsyncRequisitionAddDocument = Loadable({
   loading: Loading,
 });
 
+const AsyncRequisitionShow = Loadable({
+  loader: () => import('components/requisition/RequisitionShow'),
+  loading: Loading,
+});
+
+const AsyncRequisitionReview = Loadable({
+  loader: () => import('components/requisition/RequisitionReview'),
+  loading: Loading,
+});
+
+const AsyncRequisitionProcess = Loadable({
+  loader: () => import('components/requisition/RequisitionProcess'),
+  loading: Loading,
+});
+
+const AsyncRequisitionTransfer = Loadable({
+  loader: () => import('components/requisition/RequisitionTransfer'),
+  loading: Loading,
+});
+
+const AsyncRequisitionPrintDraft = Loadable({
+  loader: () => import('components/requisition/RequisitionPrintDraft'),
+  loading: Loading,
+});
+
+const AsyncRequisitionItemChange = Loadable({
+  loader: () => import('components/requisition/RequisitionItemChange'),
+  loading: Loading,
+});
+
 const AsyncPicklistPrint = Loadable({
   loader: () => import('components/requisition/PicklistPrint'),
   loading: Loading,
@@ -684,6 +714,12 @@ const Router = () => {
             <MainLayoutRoute path="**/requisition/chooseTemplate" component={AsyncRequisitionChooseTemplate} />
             <MainLayoutRoute path="**/requisition/confirm/:requisitionId" component={AsyncRequisitionConfirm} />
             <MainLayoutRoute path="**/requisition/addDocument/:requisitionId" component={AsyncRequisitionAddDocument} />
+            <MainLayoutRoute path="**/requisition/show/:requisitionId" component={AsyncRequisitionShow} />
+            <MainLayoutRoute path="**/requisition/review/:requisitionId" component={AsyncRequisitionReview} />
+            <MainLayoutRoute path="**/requisition/process/:requisitionId" component={AsyncRequisitionProcess} />
+            <MainLayoutRoute path="**/requisition/transfer/:requisitionId" component={AsyncRequisitionTransfer} />
+            <MainLayoutRoute path="**/requisition/printDraft/:requisitionId" component={AsyncRequisitionPrintDraft} />
+            <MainLayoutRoute path="**/requisitionItem/change/:requisitionItemId" component={AsyncRequisitionItemChange} />
             <MainLayoutRoute path="**/picklist/print/:requisitionId" component={AsyncPicklistPrint} />
             <MainLayoutRoute path="**/picklist/returnPrint/:orderId" component={AsyncPicklistReturnPrint} />
             <MainLayoutRoute path="**/purchaseOrder/list" component={AsyncPurchaseOrderList} />
