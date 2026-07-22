@@ -944,6 +944,50 @@ class UrlMappings {
             action = [GET: "getReorderReport"]
         }
 
+        "/api/facilities/$facilityId/inventories/summary" {
+            controller = { "inventoryApi" }
+            action = [GET: "getInventorySummary"]
+        }
+
+        "/api/facilities/$facilityId/inventories/expiredStock" {
+            controller = { "inventoryApi" }
+            action = [GET: "getExpiredStock"]
+        }
+
+        "/api/facilities/$facilityId/inventories/expiringStock" {
+            controller = { "inventoryApi" }
+            action = [GET: "getExpiringStock"]
+        }
+
+        /**
+         * Transaction API endpoints
+         */
+
+        "/api/transactions/daily" {
+            controller = { "transactionApi" }
+            action = [GET: "listDaily"]
+        }
+
+        "/api/transactions/types" {
+            controller = { "transactionApi" }
+            action = [GET: "transactionTypes"]
+        }
+
+        "/api/transactions/locationOptions" {
+            controller = { "transactionApi" }
+            action = [GET: "locationOptions"]
+        }
+
+        "/api/transactions/$id"(parseRequest: false) {
+            controller = { "transactionApi" }
+            action = [GET: "read", PUT: "update"]
+        }
+
+        "/api/transactions/$id/entries/$entryId"(parseRequest: false) {
+            controller = { "transactionApi" }
+            action = [DELETE: "deleteEntry"]
+        }
+
         /**
         * Purchase Orders API endpoints
         */

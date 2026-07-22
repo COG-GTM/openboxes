@@ -1,0 +1,374 @@
+openapi: 3.0.3
+info:
+  title: OpenBoxes - TransactionApiController
+  description: >
+    Transaction read/edit endpoints handled by
+    org.pih.warehouse.api.TransactionApiController, routed via the explicit
+    "/api/transactions/daily" (GET -> listDaily), "/api/transactions/types"
+    (GET -> transactionTypes), "/api/transactions/locationOptions"
+    (GET -> locationOptions), "/api/transactions/$id" (GET -> read,
+    PUT -> update) and "/api/transactions/$id/entries/$entryId"
+    (DELETE -> deleteEntry) mappings. Added for the React migration of the
+    inventory/listDailyTransactions and inventory/editTransaction screens.
+  version: 0.1.0
+servers:
+  - url: http://localhost:8080/openboxes
+    description: Local Docker baseline (docs/migration/RUNNING_LOCALLY.md)
+security:
+  - cookieAuth: []
+paths:
+  /api/transactions/daily:
+    get:
+      operationId: listDailyTransactions
+      summary: All transaction dates with counts plus the selected day's transactions
+      description: >
+        Groups every transaction (across all locations, matching the legacy
+        listDailyTransactions screen) by calendar day. Returns the date list
+        (newest first) and the transactions whose transactionDate falls on
+        the selected day. Parity note - the legacy screen matched
+        transactions by exact timestamp equality with midnight, which showed
+        an empty list for most days; this endpoint deliberately matches the
+        whole selected day.
+      parameters:
+        - name: date
+          in: query
+          required: false
+          schema:
+            type: string
+          description: Selected day as yyyy-MM-dd. Defaults to today.
+      responses:
+        '200':
+          description: Dates with counts and the selected day's transactions.
+          content:
+            application/json:
+              schema:
+                type: object
+                required: [data]
+                properties:
+                  data:
+                    type: object
+                    required: [dateSelected, dates, transactions]
+                    properties:
+                      dateSelected:
+                        type: string
+                      dates:
+                        type: array
+                        items:
+                          type: object
+                          properties:
+                            date:
+                              type: string
+                            count:
+                              type: integer
+                      transactions:
+                        type: array
+                        items:
+                          $ref: '#/components/schemas/Transaction'
+  /api/transactions/types:
+    get:
+      operationId: listTransactionTypes
+      summary: All transaction types
+      responses:
+        '200':
+          description: Transaction type options.
+          content:
+            application/json:
+              schema:
+                type: object
+                required: [data]
+                properties:
+                  data:
+                    type: array
+                    items:
+                      type: object
+                      properties:
+                        id:
+                          type: string
+                        name:
+                          type: string
+                          nullable: true
+                        transactionCode:
+                          type: string
+                          nullable: true
+  /api/transactions/locationOptions:
+    get:
+      operationId: listTransactionLocationOptions
+      summary: Source/destination options for the transaction edit screen
+      description: >
+        Top-level locations (parentLocation is null), matching the options
+        the legacy editTransaction screen offered for source/destination.
+      responses:
+        '200':
+          description: Location options sorted by name.
+          content:
+            application/json:
+              schema:
+                type: object
+                required: [data]
+                properties:
+                  data:
+                    type: array
+                    items:
+                      type: object
+                      properties:
+                        id:
+                          type: string
+                        name:
+                          type: string
+                          nullable: true
+  /api/transactions/{id}:
+    get:
+      operationId: readTransaction
+      summary: Transaction details for the edit screen
+      description: >
+        The transaction with its entries plus inventoryItemsByProduct - all
+        inventory items (lot candidates) for each product present in the
+        entries, matching the legacy editTransaction model.
+      parameters:
+        - $ref: '#/components/parameters/transactionId'
+      responses:
+        '200':
+          description: Transaction details.
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/TransactionDetailResponse'
+        '404':
+          $ref: '#/components/responses/TransactionNotFound'
+    put:
+      operationId: updateTransaction
+      summary: Update transaction header fields and entries
+      description: >
+        Updates transactionDate, transactionType, source, destination,
+        comment and per-entry inventoryItem/quantity. Only keys present in
+        the JSON body are bound. Validation failures raise
+        ValidationException (500 via the global error handler).
+      parameters:
+        - $ref: '#/components/parameters/transactionId'
+      requestBody:
+        required: true
+        content:
+          application/json:
+            schema:
+              type: object
+              properties:
+                transactionDate:
+                  type: string
+                  nullable: true
+                  description: '"yyyy-MM-dd HH:mm:ss"'
+                transactionType:
+                  type: object
+                  nullable: true
+                  properties:
+                    id:
+                      type: string
+                source:
+                  type: object
+                  nullable: true
+                  properties:
+                    id:
+                      type: string
+                destination:
+                  type: object
+                  nullable: true
+                  properties:
+                    id:
+                      type: string
+                comment:
+                  type: string
+                  nullable: true
+                transactionEntries:
+                  type: array
+                  items:
+                    type: object
+                    properties:
+                      id:
+                        type: string
+                      inventoryItem:
+                        type: object
+                        properties:
+                          id:
+                            type: string
+                      quantity:
+                        type: integer
+      responses:
+        '200':
+          description: Updated transaction details.
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/TransactionDetailResponse'
+        '404':
+          $ref: '#/components/responses/TransactionNotFound'
+        '500':
+          $ref: '../components/common.yaml#/components/responses/ServerError'
+  /api/transactions/{id}/entries/{entryId}:
+    delete:
+      operationId: deleteTransactionEntry
+      summary: Delete a single transaction entry
+      parameters:
+        - $ref: '#/components/parameters/transactionId'
+        - name: entryId
+          in: path
+          required: true
+          schema:
+            $ref: '../components/common.yaml#/components/schemas/Id'
+          description: Transaction entry id.
+      responses:
+        '200':
+          description: Updated transaction details after the delete.
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/TransactionDetailResponse'
+        '404':
+          $ref: '#/components/responses/TransactionNotFound'
+components:
+  securitySchemes:
+    cookieAuth:
+      $ref: '../components/common.yaml#/components/securitySchemes/cookieAuth'
+  parameters:
+    transactionId:
+      name: id
+      in: path
+      required: true
+      schema:
+        $ref: '../components/common.yaml#/components/schemas/Id'
+      description: Transaction id.
+  responses:
+    TransactionNotFound:
+      description: No transaction (or entry) with the given id.
+      content:
+        application/json:
+          schema:
+            type: object
+            properties:
+              errorMessage:
+                type: string
+  schemas:
+    Transaction:
+      type: object
+      description: Transaction rendering shared by listDaily and read.
+      properties:
+        id:
+          type: string
+        transactionNumber:
+          type: string
+          nullable: true
+        transactionDate:
+          type: string
+          nullable: true
+        dateCreated:
+          type: string
+          nullable: true
+        transactionType:
+          type: object
+          nullable: true
+          properties:
+            id:
+              type: string
+              nullable: true
+            name:
+              type: string
+              nullable: true
+        source:
+          type: object
+          nullable: true
+          properties:
+            id:
+              type: string
+            name:
+              type: string
+              nullable: true
+        destination:
+          type: object
+          nullable: true
+          properties:
+            id:
+              type: string
+            name:
+              type: string
+              nullable: true
+        comment:
+          type: string
+          nullable: true
+        transactionEntries:
+          type: array
+          items:
+            type: object
+            properties:
+              id:
+                type: string
+              quantity:
+                type: integer
+                nullable: true
+              binLocation:
+                type: object
+                nullable: true
+                properties:
+                  id:
+                    type: string
+                  name:
+                    type: string
+                    nullable: true
+              inventoryItem:
+                type: object
+                properties:
+                  id:
+                    type: string
+                    nullable: true
+                  lotNumber:
+                    type: string
+                    nullable: true
+                  expirationDate:
+                    type: string
+                    nullable: true
+              product:
+                type: object
+                properties:
+                  id:
+                    type: string
+                    nullable: true
+                  productCode:
+                    type: string
+                    nullable: true
+                  name:
+                    type: string
+                    nullable: true
+    TransactionDetailResponse:
+      type: object
+      required: [data]
+      properties:
+        data:
+          allOf:
+            - $ref: '#/components/schemas/Transaction'
+            - type: object
+              properties:
+                confirmed:
+                  type: boolean
+                  nullable: true
+                inventory:
+                  type: object
+                  nullable: true
+                  properties:
+                    id:
+                      type: string
+                      nullable: true
+                    name:
+                      type: string
+                      nullable: true
+                inventoryItemsByProduct:
+                  type: object
+                  additionalProperties:
+                    type: array
+                    items:
+                      type: object
+                      properties:
+                        id:
+                          type: string
+                        lotNumber:
+                          type: string
+                          nullable: true
+                        expirationDate:
+                          type: string
+                          nullable: true

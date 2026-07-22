@@ -56,6 +56,16 @@ jobs:
         working-directory: docker
         run: ./load-demo-data.sh
 
+      - uses: actions/setup-python@v5
+        with:
+          python-version: '3.12'
+
+      # Only the contract tests for endpoints that exist solely in source
+      # builds run here; the rest of the suite encodes the behavior of the
+      # pinned baseline image and runs in characterization-tests.yml.
+      - name: Run OpenAPI contract tests (source-build-only endpoints)
+        run: ./characterization/contract/run.sh test_inventory_api_contract.py test_transaction_api_contract.py
+
       - name: Set up Node
         uses: actions/setup-node@v4
         with:

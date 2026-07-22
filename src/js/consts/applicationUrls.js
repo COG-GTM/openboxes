@@ -121,6 +121,15 @@ const INVENTORY_ITEM_URL = {
 const INVENTORY_URL = {
   base: `${CONTEXT_PATH}/inventory`,
   showTransaction: (id) => `${INVENTORY_URL.base}/showTransaction/${id}`,
+  list: () => `${INVENTORY_URL.base}/list`,
+  listLowStock: () => `${INVENTORY_URL.base}/listLowStock`,
+  listExpiredStock: () => `${INVENTORY_URL.base}/listExpiredStock`,
+  listExpiringStock: () => `${INVENTORY_URL.base}/listExpiringStock`,
+  listDailyTransactions: () => `${INVENTORY_URL.base}/listDailyTransactions`,
+  listTransactions: () => `${INVENTORY_URL.base}/listTransactions`,
+  editTransaction: (id) => `${INVENTORY_URL.base}/editTransaction/${id}`,
+  browse: () => `${INVENTORY_URL.base}/browse`,
+  createTransaction: () => `${INVENTORY_URL.base}/create`,
 };
 
 const REQUISITION_TEMPLATE_URL = {

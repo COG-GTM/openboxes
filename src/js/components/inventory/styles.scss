@@ -1,0 +1,37 @@
+.inventory-list-page {
+  background-color: white;
+
+  .list-page-header {
+    border-bottom: 1px solid #dee2e6;
+  }
+
+  .list-page-filters {
+    flex-wrap: wrap;
+    border-bottom: 1px solid #dee2e6;
+  }
+
+  .inventory-filter-select {
+    min-width: 250px;
+  }
+
+  .daily-transactions-layout {
+    align-items: flex-start;
+
+    .daily-transactions-dates {
+      min-width: 220px;
+      max-height: 70vh;
+      overflow-y: auto;
+      border-right: 1px solid #dee2e6;
+    }
+  }
+
+  &.edit-transaction-page {
+    .edit-transaction-lot-select {
+      min-width: 220px;
+    }
+
+    .edit-transaction-quantity {
+      max-width: 120px;
+    }
+  }
+}

@@ -6,8 +6,14 @@ info:
     org.pih.warehouse.api.InventoryApiController, routed via the explicit
     "/api/facilities/$facilityId/inventories/import" (importCsv),
     "/api/facilities/$facilityId/inventories/reorderReport"
-    (GET -> getReorderReport) and "/api/inventories/expirationHistoryReport"
-    (GET -> getExpirationHistoryReport) mappings.
+    (GET -> getReorderReport), "/api/inventories/expirationHistoryReport"
+    (GET -> getExpirationHistoryReport),
+    "/api/facilities/$facilityId/inventories/summary"
+    (GET -> getInventorySummary),
+    "/api/facilities/$facilityId/inventories/expiredStock"
+    (GET -> getExpiredStock) and
+    "/api/facilities/$facilityId/inventories/expiringStock"
+    (GET -> getExpiringStock) mappings.
   version: 0.1.0
 servers:
   - url: http://localhost:8080/openboxes
@@ -42,6 +48,157 @@ paths:
           description: Import applied. Empty body.
         '500':
           $ref: '../components/common.yaml#/components/responses/ServerError'
+  /api/facilities/{facilityId}/inventories/summary:
+    get:
+      operationId: getInventorySummary
+      summary: Inventory summary rows for the facility (all products or low stock)
+      description: >
+        Backs the React inventory/list and inventory/listLowStock screens.
+        Returns one row per stocked product with quantities, inventory-level
+        thresholds and pricing. With status=lowStock only rows below their
+        minimum/reorder levels are returned (legacy getLowStock behavior).
+        Parity quirk - if the facilityId cannot be resolved and there is no
+        session warehouse the endpoint responds 400 with an errorMessage.
+      parameters:
+        - $ref: '#/components/parameters/facilityId'
+        - name: categories
+          in: query
+          required: false
+          schema:
+            type: string
+          description: Repeatable category ids to filter by.
+        - name: includeSubcategories
+          in: query
+          required: false
+          schema:
+            type: boolean
+          description: Defaults to true (explode selected categories).
+        - name: status
+          in: query
+          required: false
+          schema:
+            type: string
+            enum: [lowStock]
+          description: When lowStock, only rows below minimum/reorder level.
+      responses:
+        '200':
+          description: Inventory summary rows.
+          content:
+            application/json:
+              schema:
+                type: object
+                required: [data, totalCount]
+                properties:
+                  data:
+                    type: array
+                    items:
+                      $ref: '#/components/schemas/InventorySummaryItem'
+                  totalCount:
+                    type: integer
+        '400':
+          description: No location could be resolved.
+          content:
+            application/json:
+              schema:
+                type: object
+                properties:
+                  errorMessage:
+                    type: string
+  /api/facilities/{facilityId}/inventories/expiredStock:
+    get:
+      operationId: getExpiredStock
+      summary: Expired inventory items with quantity on hand
+      description: >
+        Backs the React inventory/listExpiredStock screen. Returns expired
+        inventory items (dashboardService.getExpiredStock) with quantity on
+        hand plus the distinct categories present in the result set.
+      parameters:
+        - $ref: '#/components/parameters/facilityId'
+        - name: category.id
+          in: query
+          required: false
+          schema:
+            type: string
+          description: Category id bound onto the InventoryReportCommand.
+        - name: startDate
+          in: query
+          required: false
+          schema:
+            type: string
+          description: ISO LocalDate bound (yyyy-MM-dd, e.g. "2024-12-31").
+        - name: endDate
+          in: query
+          required: false
+          schema:
+            type: string
+          description: ISO LocalDate bound (yyyy-MM-dd, e.g. "2024-12-31").
+      responses:
+        '200':
+          description: Expired stock rows.
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/ExpirationStockResponse'
+        '400':
+          description: No location could be resolved.
+          content:
+            application/json:
+              schema:
+                type: object
+                properties:
+                  errorMessage:
+                    type: string
+  /api/facilities/{facilityId}/inventories/expiringStock:
+    get:
+      operationId: getExpiringStock
+      summary: Expiring inventory items with quantity on hand
+      description: >
+        Backs the React inventory/listExpiringStock screen. Returns expiring
+        (not yet expired) inventory items (dashboardService.getExpiringStock)
+        with quantity on hand plus the distinct categories in the result set.
+      parameters:
+        - $ref: '#/components/parameters/facilityId'
+        - name: category.id
+          in: query
+          required: false
+          schema:
+            type: string
+          description: Category id bound onto the InventoryReportCommand.
+        - name: status
+          in: query
+          required: false
+          schema:
+            type: string
+            enum: [within30Days, within90Days, within180Days, within365Days, greaterThan365Days]
+          description: Expiration window filter.
+        - name: startDate
+          in: query
+          required: false
+          schema:
+            type: string
+          description: ISO LocalDate bound (yyyy-MM-dd, e.g. "2024-12-31").
+        - name: endDate
+          in: query
+          required: false
+          schema:
+            type: string
+          description: ISO LocalDate bound (yyyy-MM-dd, e.g. "2024-12-31").
+      responses:
+        '200':
+          description: Expiring stock rows.
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/ExpirationStockResponse'
+        '400':
+          description: No location could be resolved.
+          content:
+            application/json:
+              schema:
+                type: object
+                properties:
+                  errorMessage:
+                    type: string
   /api/facilities/{facilityId}/inventories/reorderReport:
     get:
       operationId: getReorderReport
@@ -217,6 +374,113 @@ components:
         $ref: '../components/common.yaml#/components/schemas/Id'
       description: Facility (warehouse) id.
   schemas:
+    InventorySummaryItem:
+      type: object
+      description: One inventory summary row (getInventorySummary rendering).
+      properties:
+        status:
+          type: string
+          nullable: true
+        product:
+          type: object
+          properties:
+            id:
+              type: string
+            productCode:
+              type: string
+              nullable: true
+            name:
+              type: string
+              nullable: true
+            productFamily:
+              type: string
+              nullable: true
+            category:
+              type: string
+              nullable: true
+            unitOfMeasure:
+              type: string
+              nullable: true
+        abcClass:
+          type: string
+          nullable: true
+        minQuantity:
+          type: number
+          nullable: true
+        reorderQuantity:
+          type: number
+          nullable: true
+        maxQuantity:
+          type: number
+          nullable: true
+        quantityOnHand:
+          type: number
+          nullable: true
+        quantityAvailableToPromise:
+          type: number
+          nullable: true
+        unitPrice:
+          type: number
+          nullable: true
+          description: Null unless the user has the finance role.
+        totalValue:
+          type: number
+          nullable: true
+          description: Null unless the user has the finance role.
+    ExpirationStockResponse:
+      type: object
+      required: [data]
+      properties:
+        data:
+          type: object
+          required: [items, categories, totalCount]
+          properties:
+            items:
+              type: array
+              items:
+                type: object
+                properties:
+                  inventoryItem:
+                    type: object
+                    properties:
+                      id:
+                        type: string
+                      lotNumber:
+                        type: string
+                        nullable: true
+                      expirationDate:
+                        type: string
+                        nullable: true
+                  product:
+                    type: object
+                    properties:
+                      id:
+                        type: string
+                      productCode:
+                        type: string
+                        nullable: true
+                      name:
+                        type: string
+                        nullable: true
+                      category:
+                        type: string
+                        nullable: true
+                      unitOfMeasure:
+                        type: string
+                        nullable: true
+                  quantity:
+                    type: number
+            categories:
+              type: array
+              items:
+                type: object
+                properties:
+                  id:
+                    type: string
+                  name:
+                    type: string
+            totalCount:
+              type: integer
     ReorderReportItem:
       type: object
       description: >
