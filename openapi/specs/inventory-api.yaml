@@ -1,0 +1,256 @@
+openapi: 3.0.3
+info:
+  title: OpenBoxes - InventoryApiController
+  description: >
+    Inventory import and inventory reports handled by
+    org.pih.warehouse.api.InventoryApiController, routed via the explicit
+    "/api/facilities/$facilityId/inventories/import" (importCsv),
+    "/api/facilities/$facilityId/inventories/reorderReport"
+    (GET -> getReorderReport) and "/api/inventories/expirationHistoryReport"
+    (GET -> getExpirationHistoryReport) mappings.
+  version: 0.1.0
+servers:
+  - url: http://localhost:8080/openboxes
+    description: Local Docker baseline (docs/migration/RUNNING_LOCALLY.md)
+security:
+  - cookieAuth: []
+paths:
+  /api/facilities/{facilityId}/inventories/import:
+    post:
+      operationId: importInventoryCsv
+      summary: Import inventory quantities from a raw CSV body
+      description: >
+        Reads the raw request body as CSV (not multipart) and applies the
+        inventory differences as adjustment transactions for the facility.
+        Parity quirks - the mapping declares no HTTP method, so any verb
+        routes to importCsv; a successful import responds 200 with an empty
+        body; an empty body or a Content-Type other than text/csv raises
+        IllegalArgumentException (500).
+      parameters:
+        - $ref: '#/components/parameters/facilityId'
+      requestBody:
+        required: true
+        content:
+          text/csv:
+            schema:
+              type: string
+              description: >
+                CSV with the inventory import columns (product code, lot
+                number, expiration date, bin location, quantity, ...).
+      responses:
+        '200':
+          description: Import applied. Empty body.
+        '500':
+          $ref: '../components/common.yaml#/components/responses/ServerError'
+  /api/facilities/{facilityId}/inventories/reorderReport:
+    get:
+      operationId: getReorderReport
+      summary: Reorder report for products below their reorder levels
+      description: >
+        Products whose available quantity is at or below the inventory-level
+        minimum/reorder quantity. With format=csv the report is returned as a
+        text/csv attachment instead of JSON. Parity quirk - the facility is
+        taken from the session warehouse plus the additionalLocations filter;
+        the facilityId path segment is not bound by the command.
+      parameters:
+        - $ref: '#/components/parameters/facilityId'
+        - name: format
+          in: query
+          required: false
+          schema:
+            type: string
+            enum: [csv]
+          description: Return the report as a CSV attachment.
+        - name: additionalLocations
+          in: query
+          required: false
+          schema:
+            type: string
+          description: >
+            Repeatable ids of additional MANAGE_INVENTORY locations to
+            include. A location without that activity fails command
+            validation (400).
+        - name: inventoryLevelStatus
+          in: query
+          required: false
+          schema:
+            type: string
+            enum: [ALL_PRODUCTS, BELOW_MINIMUM, BELOW_REORDER]
+          description: Defaults to ALL_PRODUCTS.
+        - name: expiration
+          in: query
+          required: false
+          schema:
+            type: string
+            enum: [INCLUDE_EXPIRED_STOCK, SUBTRACT_EXPIRED_STOCK]
+          description: Defaults to SUBTRACT_EXPIRED_STOCK.
+        - name: categories
+          in: query
+          required: false
+          schema:
+            type: string
+          description: Repeatable category ids to filter by.
+        - name: tags
+          in: query
+          required: false
+          schema:
+            type: string
+          description: Repeatable tag ids to filter by.
+      responses:
+        '200':
+          description: Reorder report rows (no totalCount is rendered).
+          content:
+            application/json:
+              schema:
+                type: object
+                required: [data]
+                properties:
+                  data:
+                    type: array
+                    items:
+                      $ref: '#/components/schemas/ReorderReportItem'
+            text/csv:
+              schema:
+                type: string
+        '400':
+          $ref: '../components/common.yaml#/components/responses/ValidationError'
+  /api/inventories/expirationHistoryReport:
+    get:
+      operationId: getExpirationHistoryReport
+      summary: Report of quantity/value lost to expiry over a date range
+      description: >
+        Expiration history for the session warehouse. With format=csv the
+        report is returned as a CSV attachment instead of JSON. Parity
+        quirk - the csv branch sets response.contentType before render(),
+        which resets it, so the CSV attachment is served with a text/html
+        Content-Type header.
+      parameters:
+        - name: startDate
+          in: query
+          required: true
+          schema:
+            type: string
+          description: >
+            Start of the reporting range, bound by Grails date binding
+            (e.g. "MM/dd/yyyy HH:mm:ss Z"). Missing dates fail command
+            validation (400).
+        - name: endDate
+          in: query
+          required: true
+          schema:
+            type: string
+          description: >
+            End of the reporting range, bound by Grails date binding
+            (e.g. "MM/dd/yyyy HH:mm:ss Z"). Missing dates fail command
+            validation (400).
+        - name: searchTerm
+          in: query
+          required: false
+          schema:
+            type: string
+          description: Filters rows by product name/code.
+        - name: format
+          in: query
+          required: false
+          schema:
+            type: string
+            enum: [csv]
+          description: Return the report as a CSV attachment.
+        - name: paginationParams.max
+          in: query
+          required: false
+          schema:
+            type: integer
+          description: Page size (defaults from PaginationParams).
+        - name: paginationParams.offset
+          in: query
+          required: false
+          schema:
+            type: integer
+          description: Zero-based offset (defaults from PaginationParams).
+      responses:
+        '200':
+          description: Expiration history rows plus report totals.
+          content:
+            application/json:
+              schema:
+                type: object
+                required: [data, totalCount, totalQuantityLostToExpiry, totalValueLostToExpiry]
+                properties:
+                  data:
+                    type: array
+                    items:
+                      type: object
+                      additionalProperties: true
+                      description: >
+                        ExpirationHistoryReportRow rendering (product, lot,
+                        expiration date, quantity/value lost). The demo
+                        dataset has no expired-stock removals, so the exact
+                        row shape is not pinned.
+                  totalCount:
+                    type: integer
+                    nullable: true
+                  totalQuantityLostToExpiry:
+                    type: number
+                    nullable: true
+                  totalValueLostToExpiry:
+                    type: number
+                    nullable: true
+            text/html:
+              schema:
+                type: string
+                description: >
+                  CSV attachment body (mislabelled text/html, see the
+                  operation description).
+        '400':
+          $ref: '../components/common.yaml#/components/responses/ValidationError'
+components:
+  securitySchemes:
+    cookieAuth:
+      $ref: '../components/common.yaml#/components/securitySchemes/cookieAuth'
+  parameters:
+    facilityId:
+      name: facilityId
+      in: path
+      required: true
+      schema:
+        $ref: '../components/common.yaml#/components/schemas/Id'
+      description: Facility (warehouse) id.
+  schemas:
+    ReorderReportItem:
+      type: object
+      description: >
+        org.pih.warehouse.inventory.ReorderReportItemDto default rendering.
+      properties:
+        product:
+          type: object
+          additionalProperties: true
+        inventoryLevel:
+          type: object
+          nullable: true
+          additionalProperties: true
+        inventoryStatus:
+          type: string
+          nullable: true
+        monthlyDemand:
+          type: number
+          nullable: true
+        quantityToOrder:
+          type: number
+          nullable: true
+        expectedReorderCost:
+          type: number
+          nullable: true
+        expiredQuantityAvailableToPromise:
+          type: number
+          nullable: true
+        finalQuantityAvailableToPromise:
+          type: number
+          nullable: true
+        tags:
+          type: array
+          nullable: true
+          items:
+            type: object
+            additionalProperties: true
+      additionalProperties: true

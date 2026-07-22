@@ -1,0 +1,58 @@
+openapi: 3.0.3
+info:
+  title: OpenBoxes - HelpScoutApiController
+  description: >
+    HelpScout Beacon widget configuration handled by
+    org.pih.warehouse.api.HelpScoutApiController, routed via the explicit
+    "/api/helpscout/configuration" mapping (GET -> configuration).
+  version: 0.1.0
+servers:
+  - url: http://localhost:8080/openboxes
+    description: Local Docker baseline (docs/migration/RUNNING_LOCALLY.md)
+security:
+  - cookieAuth: []
+paths:
+  /api/helpscout/configuration:
+    get:
+      operationId: getHelpScoutConfiguration
+      summary: Get localized HelpScout Beacon configuration
+      description: >
+        Renders a fixed configuration map for the HelpScout Beacon widget.
+        color comes from the openboxes.helpscout.widget.color config entry,
+        localizedHelpScoutKey is resolved per the session locale, and both
+        labels are always rendered as null.
+      responses:
+        '200':
+          description: HelpScout Beacon configuration.
+          content:
+            application/json:
+              schema:
+                type: object
+                required: [color, enableFabAnimation, labels, localizedHelpScoutKey]
+                properties:
+                  color:
+                    type: string
+                    description: Hex color from application config (e.g. "#3AB4B1").
+                  enableFabAnimation:
+                    type: boolean
+                    description: Always false.
+                  labels:
+                    type: object
+                    required: [noTimeToWaitAround, responseTime]
+                    properties:
+                      noTimeToWaitAround:
+                        type: string
+                        nullable: true
+                        description: Always null.
+                      responseTime:
+                        type: string
+                        nullable: true
+                        description: Always null.
+                  localizedHelpScoutKey:
+                    type: string
+                    nullable: true
+                    description: HelpScout Beacon key for the session locale.
+components:
+  securitySchemes:
+    cookieAuth:
+      $ref: '../components/common.yaml#/components/securitySchemes/cookieAuth'

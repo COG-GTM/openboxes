@@ -1,0 +1,197 @@
+openapi: 3.0.3
+info:
+  title: OpenBoxes - InventoryTransactionSummaryApiController
+  description: >
+    Inventory transactions summary report handled by
+    org.pih.warehouse.api.InventoryTransactionSummaryApiController, routed
+    via the explicit "/api/reports/inventory-transactions-summary(.$format)?"
+    mapping (GET -> getInventoryTransactionsSummary).
+  version: 0.1.0
+servers:
+  - url: http://localhost:8080/openboxes
+    description: Local Docker baseline (docs/migration/RUNNING_LOCALLY.md)
+security:
+  - cookieAuth: []
+paths:
+  /api/reports/inventory-transactions-summary:
+    get:
+      operationId: getInventoryTransactionsSummary
+      summary: Paginated summary of inventory-count transactions
+      description: >
+        One row per (transaction, product) for cycle counts, adjustments,
+        record-stock and inventory imports at the facility. A missing
+        facility fails command validation (400). Parity quirk - the format
+        parameter is only bound from the .csv URL extension declared in the
+        mapping; a format=csv query parameter is ignored and JSON is
+        returned.
+      parameters:
+        - name: facility
+          in: query
+          required: true
+          schema:
+            $ref: '../components/common.yaml#/components/schemas/Id'
+          description: Facility (warehouse) id. Required by the command.
+        - name: products
+          in: query
+          required: false
+          schema:
+            type: string
+          description: Repeatable product ids to filter by.
+        - name: startDate
+          in: query
+          required: false
+          schema:
+            type: string
+          description: >
+            Start of the reporting range, bound by Grails date binding
+            (e.g. "MM/dd/yyyy HH:mm:ss Z").
+        - name: endDate
+          in: query
+          required: false
+          schema:
+            type: string
+          description: >
+            End of the reporting range, bound by Grails date binding
+            (e.g. "MM/dd/yyyy HH:mm:ss Z").
+        - $ref: '../components/common.yaml#/components/parameters/max'
+        - $ref: '../components/common.yaml#/components/parameters/offset'
+      responses:
+        '200':
+          description: Transaction summary rows plus totalCount.
+          content:
+            application/json:
+              schema:
+                type: object
+                required: [data, totalCount]
+                properties:
+                  data:
+                    type: array
+                    items:
+                      $ref: '#/components/schemas/InventoryTransactionsSummary'
+                  totalCount:
+                    type: integer
+        '400':
+          $ref: '../components/common.yaml#/components/responses/ValidationError'
+  /api/reports/inventory-transactions-summary.csv:
+    get:
+      operationId: getInventoryTransactionsSummaryCsv
+      summary: Full inventory transactions summary as a CSV attachment
+      description: >
+        Same report as the extensionless path, but pagination is disabled
+        (max is forced to -1) and the full report is returned as a text/csv
+        attachment with a UTF-8 BOM prepended. Parity quirk - the generated
+        filename ends in ".csv.csv".
+      parameters:
+        - name: facility
+          in: query
+          required: true
+          schema:
+            $ref: '../components/common.yaml#/components/schemas/Id'
+          description: Facility (warehouse) id. Required by the command.
+        - name: products
+          in: query
+          required: false
+          schema:
+            type: string
+          description: Repeatable product ids to filter by.
+        - name: startDate
+          in: query
+          required: false
+          schema:
+            type: string
+          description: >
+            Start of the reporting range, bound by Grails date binding
+            (e.g. "MM/dd/yyyy HH:mm:ss Z").
+        - name: endDate
+          in: query
+          required: false
+          schema:
+            type: string
+          description: >
+            End of the reporting range, bound by Grails date binding
+            (e.g. "MM/dd/yyyy HH:mm:ss Z").
+      responses:
+        '200':
+          description: Full report as a CSV attachment.
+          content:
+            text/csv:
+              schema:
+                type: string
+        '400':
+          $ref: '../components/common.yaml#/components/responses/ValidationError'
+components:
+  securitySchemes:
+    cookieAuth:
+      $ref: '../components/common.yaml#/components/securitySchemes/cookieAuth'
+  schemas:
+    InventoryTransactionsSummary:
+      type: object
+      description: >
+        org.pih.warehouse.inventory.InventoryTransactionsSummary.toJson()
+        rendering. The seeded demo dataset contains no inventory-count
+        transactions, so this shape is pinned from the source, not from a
+        live payload.
+      properties:
+        transaction:
+          type: object
+          properties:
+            transactionNumber:
+              type: string
+              nullable: true
+          additionalProperties: true
+        product:
+          type: object
+          properties:
+            id:
+              $ref: '../components/common.yaml#/components/schemas/Id'
+            name:
+              type: string
+              nullable: true
+            productCode:
+              type: string
+              nullable: true
+            displayName:
+              type: string
+              nullable: true
+          additionalProperties: true
+        facility:
+          type: object
+          description: Location.toBaseJson() rendering.
+          additionalProperties: true
+        quantityBefore:
+          type: integer
+          nullable: true
+        quantityAfter:
+          type: integer
+          nullable: true
+        quantityDifference:
+          type: integer
+          nullable: true
+        dateRecorded:
+          type: string
+          nullable: true
+        recordedBy:
+          type: object
+          properties:
+            name:
+              type: string
+              nullable: true
+          additionalProperties: true
+        rootCauses:
+          type: array
+          nullable: true
+          items:
+            type: string
+        comments:
+          type: array
+          nullable: true
+          items:
+            type: string
+        varianceTypeCode:
+          type: string
+          nullable: true
+          enum: [MORE, LESS, EQUAL, null]
+        transactionAction:
+          type: string
+          nullable: true
+      additionalProperties: true

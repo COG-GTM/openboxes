@@ -1,0 +1,146 @@
+openapi: 3.0.3
+info:
+  title: OpenBoxes - InventoryLevelApiController
+  description: >
+    Facility inventory-level listing handled by
+    org.pih.warehouse.api.InventoryLevelApiController, routed via the
+    explicit "/api/facilities/$facilityId/inventory-levels(.$format)?"
+    mapping (GET -> list). The optional .csv / .xls extension switches the
+    response to a CSV or Excel attachment.
+  version: 0.1.0
+servers:
+  - url: http://localhost:8080/openboxes
+    description: Local Docker baseline (docs/migration/RUNNING_LOCALLY.md)
+security:
+  - cookieAuth: []
+paths:
+  /api/facilities/{facilityId}/inventory-levels:
+    get:
+      operationId: listInventoryLevels
+      summary: List facility-wide inventory levels
+      description: >
+        Inventory levels of the facility's inventory with no internal
+        location (facility-wide levels only). Parity quirks - an unknown
+        facility id raises IllegalArgumentException (500); the JSON items are
+        the default Grails InventoryLevel rendering.
+      parameters:
+        - name: facilityId
+          in: path
+          required: true
+          schema:
+            $ref: '../components/common.yaml#/components/schemas/Id'
+          description: Facility (warehouse) id.
+        - name: format
+          in: query
+          required: false
+          schema:
+            type: string
+            enum: [csv, xls]
+          description: >
+            Also selectable via the .csv/.xls URL extension. csv returns a
+            text/csv attachment. Parity quirk - the xls branch streams an
+            Excel workbook directly to the output stream without setting a
+            Content-Type header (and its Content-Disposition header is set
+            too late to take effect), so the xls response cannot be described
+            with an OpenAPI media type and is not validated by the contract
+            tests.
+      responses:
+        '200':
+          description: Inventory levels of the facility.
+          content:
+            application/json:
+              schema:
+                type: object
+                required: [data]
+                properties:
+                  data:
+                    type: array
+                    items:
+                      $ref: '#/components/schemas/InventoryLevel'
+            text/csv:
+              schema:
+                type: string
+        '500':
+          $ref: '../components/common.yaml#/components/responses/ServerError'
+components:
+  securitySchemes:
+    cookieAuth:
+      $ref: '../components/common.yaml#/components/securitySchemes/cookieAuth'
+  schemas:
+    InventoryLevel:
+      type: object
+      description: >
+        Default Grails JSON rendering of
+        org.pih.warehouse.inventory.InventoryLevel. Associations (inventory,
+        product, preferredBinLocation, ...) are rendered as shallow {"id"}
+        references.
+      properties:
+        id:
+          $ref: '../components/common.yaml#/components/schemas/Id'
+        inventory:
+          type: object
+          nullable: true
+          additionalProperties: true
+        product:
+          type: object
+          nullable: true
+          additionalProperties: true
+        internalLocation:
+          type: object
+          nullable: true
+          additionalProperties: true
+        binLocation:
+          type: object
+          nullable: true
+          additionalProperties: true
+        preferredBinLocation:
+          type: object
+          nullable: true
+          additionalProperties: true
+        replenishmentLocation:
+          type: object
+          nullable: true
+          additionalProperties: true
+        preferred:
+          type: boolean
+          nullable: true
+        abcClass:
+          type: string
+          nullable: true
+        status:
+          type: string
+          nullable: true
+        comments:
+          type: string
+          nullable: true
+        minQuantity:
+          type: number
+          nullable: true
+        maxQuantity:
+          type: number
+          nullable: true
+        reorderQuantity:
+          type: number
+          nullable: true
+        forecastQuantity:
+          type: number
+          nullable: true
+        forecastPeriodDays:
+          type: number
+          nullable: true
+        demandTimePeriodDays:
+          type: number
+          nullable: true
+        expectedLeadTimeDays:
+          type: number
+          nullable: true
+        replenishmentPeriodDays:
+          type: number
+          nullable: true
+        dateCreated:
+          type: string
+          nullable: true
+        lastUpdated:
+          type: string
+          nullable: true
+      additionalProperties: true

@@ -1,0 +1,136 @@
+openapi: 3.0.3
+info:
+  title: OpenBoxes - IndicatorApiController
+  description: >
+    Inventory indicator tiles handled by
+    org.pih.warehouse.reporting.IndicatorApiController, routed via the
+    explicit "/api/reports/indicators/productsInventoried",
+    "/api/reports/indicators/inventoryAccuracy" and
+    "/api/reports/indicators/inventoryShrinkage" mappings (GET only). The
+    controller also declares an evaluate() action, but no URL mapping routes
+    to it, so it is not specified here.
+  version: 0.1.0
+servers:
+  - url: http://localhost:8080/openboxes
+    description: Local Docker baseline (docs/migration/RUNNING_LOCALLY.md)
+security:
+  - cookieAuth: []
+paths:
+  /api/reports/indicators/productsInventoried:
+    get:
+      operationId: getProductsInventoried
+      summary: Count of distinct products inventoried in a date range
+      parameters:
+        - $ref: '#/components/parameters/facility'
+        - $ref: '#/components/parameters/startDate'
+        - $ref: '#/components/parameters/endDate'
+      responses:
+        '200':
+          description: Single-value indicator tile.
+          content:
+            application/json:
+              schema:
+                type: object
+                required: [data]
+                properties:
+                  data:
+                    type: object
+                    required: [name, value, type]
+                    properties:
+                      name:
+                        type: string
+                        enum: [productsInventoried]
+                      value:
+                        type: integer
+                        description: Distinct products inventoried (0 when none).
+                      type:
+                        type: string
+                        enum: [SINGLE]
+  /api/reports/indicators/inventoryAccuracy:
+    get:
+      operationId: getInventoryAccuracy
+      summary: Percentage of cycle counts with no quantity variance
+      parameters:
+        - $ref: '#/components/parameters/facility'
+        - $ref: '#/components/parameters/startDate'
+        - $ref: '#/components/parameters/endDate'
+      responses:
+        '200':
+          description: Double-value indicator tile.
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/DoubleIndicatorResponse'
+  /api/reports/indicators/inventoryShrinkage:
+    get:
+      operationId: getInventoryShrinkage
+      summary: Product count and total value lost to negative inventory adjustments
+      parameters:
+        - $ref: '#/components/parameters/facility'
+        - $ref: '#/components/parameters/startDate'
+        - $ref: '#/components/parameters/endDate'
+      responses:
+        '200':
+          description: Double-value indicator tile.
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/DoubleIndicatorResponse'
+components:
+  securitySchemes:
+    cookieAuth:
+      $ref: '../components/common.yaml#/components/securitySchemes/cookieAuth'
+  parameters:
+    facility:
+      name: facility
+      in: query
+      required: false
+      schema:
+        $ref: '../components/common.yaml#/components/schemas/Id'
+      description: >
+        Facility (warehouse) id the indicator is computed for. Not validated
+        by the command object; when missing or unresolvable the queries match
+        nothing and the tile renders with zero values.
+    startDate:
+      name: startDate
+      in: query
+      required: false
+      schema:
+        type: string
+      description: >
+        Start of the reporting range, bound by Grails date binding
+        (e.g. "MM/dd/yyyy HH:mm:ss Z"). Unbounded when omitted.
+    endDate:
+      name: endDate
+      in: query
+      required: false
+      schema:
+        type: string
+      description: >
+        End of the reporting range, bound by Grails date binding
+        (e.g. "MM/dd/yyyy HH:mm:ss Z"). Unbounded when omitted.
+  schemas:
+    DoubleIndicatorResponse:
+      type: object
+      required: [data]
+      properties:
+        data:
+          type: object
+          required: [name, firstValue, secondValue, type]
+          properties:
+            name:
+              type: string
+              enum: [inventoryAccuracy, inventoryShrinkage]
+            firstValue:
+              type: number
+              description: >
+                Accuracy percentage (inventoryAccuracy) or count of products
+                with negative adjustments (inventoryShrinkage).
+            secondValue:
+              type: number
+              description: >
+                Total counts considered (inventoryAccuracy) or total value
+                lost (inventoryShrinkage).
+            type:
+              type: string
+              enum: [DOUBLE]

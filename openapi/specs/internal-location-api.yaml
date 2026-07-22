@@ -1,0 +1,167 @@
+openapi: 3.0.3
+info:
+  title: OpenBoxes - InternalLocationApiController
+  description: >
+    Internal (bin/zone) location listing handled by
+    org.pih.warehouse.api.InternalLocationApiController. Routed via the
+    explicit "/api/internalLocations/receiving" (GET -> listReceiving) and
+    "/api/internalLocations/search" (GET -> search) mappings, plus the
+    standard "/api/${resource}s" REST mappings for list() and read(). The
+    controller defines no create/update/delete actions.
+  version: 0.1.0
+servers:
+  - url: http://localhost:8080/openboxes
+    description: Local Docker baseline (docs/migration/RUNNING_LOCALLY.md)
+security:
+  - cookieAuth: []
+paths:
+  /api/internalLocations:
+    get:
+      operationId: listInternalLocations
+      summary: List internal locations of a facility (summary rendering)
+      description: >
+        Lists internal locations (bins, zones, ...) of the facility given by
+        location.id, defaulting to the session warehouse. Renders a slim
+        summary shape (id/name/zoneId/zoneName), unlike search which renders
+        full Location objects.
+      parameters:
+        - $ref: '#/components/parameters/facilityId'
+        - $ref: '#/components/parameters/locationTypeCode'
+      responses:
+        '200':
+          description: Internal locations of the facility.
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/InternalLocationSummaryList'
+  /api/internalLocations/search:
+    get:
+      operationId: searchInternalLocations
+      summary: Search internal locations across facilities (full rendering)
+      description: >
+        Paginated search over internal locations, rendered as full default
+        Grails Location objects plus a totalCount.
+      parameters:
+        - $ref: '../components/common.yaml#/components/parameters/max'
+        - $ref: '../components/common.yaml#/components/parameters/offset'
+        - $ref: '#/components/parameters/locationTypeCode'
+      responses:
+        '200':
+          description: Matching internal locations.
+          content:
+            application/json:
+              schema:
+                type: object
+                required: [data, totalCount]
+                properties:
+                  data:
+                    type: array
+                    items:
+                      $ref: '../components/common.yaml#/components/schemas/Location'
+                  totalCount:
+                    type: integer
+                    nullable: true
+  /api/internalLocations/receiving:
+    get:
+      operationId: listReceivingInternalLocations
+      summary: List receiving bin locations for a shipment
+      description: >
+        Same summary rendering as list, but restricted to bin locations plus
+        the receiving bins named after the given shipment number
+        ("Receiving <shipmentNumber>"), ignoring RECEIVE_STOCK activity by
+        default.
+      parameters:
+        - $ref: '#/components/parameters/facilityId'
+        - name: shipmentNumber
+          in: query
+          required: false
+          schema:
+            type: string
+          description: Shipment number whose receiving bins should be included.
+        - $ref: '#/components/parameters/locationTypeCode'
+      responses:
+        '200':
+          description: Receiving/bin locations of the facility.
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/InternalLocationSummaryList'
+  /api/internalLocations/{id}:
+    get:
+      operationId: readInternalLocation
+      summary: Read a single internal location
+      description: >
+        Renders the default Grails Location object. Parity quirk - an unknown
+        id is not a 404; the controller renders 200 with {"data": null}.
+      parameters:
+        - name: id
+          in: path
+          required: true
+          schema:
+            $ref: '../components/common.yaml#/components/schemas/Id'
+      responses:
+        '200':
+          description: 'Internal location, or {"data": null} for an unknown id.'
+          content:
+            application/json:
+              schema:
+                type: object
+                required: [data]
+                properties:
+                  data:
+                    type: object
+                    nullable: true
+                    additionalProperties: true
+                    description: >
+                      Default Grails Location rendering (see
+                      common.yaml#/components/schemas/Location); null when the
+                      id is unknown, so the shape is kept loose here.
+components:
+  securitySchemes:
+    cookieAuth:
+      $ref: '../components/common.yaml#/components/securitySchemes/cookieAuth'
+  parameters:
+    facilityId:
+      name: location.id
+      in: query
+      required: false
+      schema:
+        $ref: '../components/common.yaml#/components/schemas/Id'
+      description: >
+        Facility whose internal locations are listed; defaults to the session
+        warehouse. When neither is resolvable the controller throws
+        IllegalArgumentException (500).
+    locationTypeCode:
+      name: locationTypeCode
+      in: query
+      required: false
+      schema:
+        type: string
+        enum: [INTERNAL, BIN_LOCATION, ZONE]
+      description: >
+        Repeatable location type filter. Defaults per action - internal type
+        codes for list, INTERNAL+BIN_LOCATION for search, BIN_LOCATION for
+        receiving.
+  schemas:
+    InternalLocationSummaryList:
+      type: object
+      required: [data]
+      properties:
+        data:
+          type: array
+          items:
+            type: object
+            required: [id, name, zoneId, zoneName]
+            properties:
+              id:
+                $ref: '../components/common.yaml#/components/schemas/Id'
+              name:
+                type: string
+                nullable: true
+              zoneId:
+                type: string
+                nullable: true
+                description: Id of the containing zone location, if any.
+              zoneName:
+                type: string
+                nullable: true
