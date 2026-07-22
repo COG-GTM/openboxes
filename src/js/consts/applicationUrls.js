@@ -96,6 +96,32 @@ const STOCK_MOVEMENT_URL = {
   importCsv: (id) => `${STOCK_MOVEMENT_URL.base}/importCsv/${id}`,
   exportCsv: (id) => `${STOCK_MOVEMENT_URL.base}/exportCsv/${id}`,
   uploadDocuments: (id) => `${STOCK_MOVEMENT_URL.base}/uploadDocuments/${id}`,
+  addComment: (id) => `${STOCK_MOVEMENT_URL.base}/addComment/${id}`,
+  addDocument: (id) => `${STOCK_MOVEMENT_URL.base}/addDocument/${id}`,
+  rollback: (id) => `${STOCK_MOVEMENT_URL.base}/rollback/${id}`,
+  remove: (id) => `${STOCK_MOVEMENT_URL.base}/remove/${id}?show=true`,
+  updateStatus: (id, status) => `${STOCK_MOVEMENT_URL.base}/updateStatus/${id}?status=${status}`,
+};
+
+const STOCK_REQUEST_URL = {
+  base: `${CONTEXT_PATH}/stockRequest`,
+  remove: (id) => `${STOCK_REQUEST_URL.base}/remove/${id}?show=true`,
+  reject: (id) => `${STOCK_REQUEST_URL.base}/reject/${id}`,
+  rollbackApproval: (id) => `${STOCK_REQUEST_URL.base}/rollbackApproval/${id}`,
+};
+
+const RECEIVING_URL = {
+  base: `${CONTEXT_PATH}/partialReceiving`,
+  createPartialReceiving: (shipmentId) => `${RECEIVING_URL.base}/create/${shipmentId}`,
+  rollbackLastReceipt: (shipmentId) => `${RECEIVING_URL.base}/rollbackLastReceipt/${shipmentId}`,
+};
+
+const SHIPMENT_WORKFLOW_URL = {
+  base: `${CONTEXT_PATH}/shipmentWorkflow`,
+  list: () => `${SHIPMENT_WORKFLOW_URL.base}/list`,
+  show: (id) => `${SHIPMENT_WORKFLOW_URL.base}/show/${id}`,
+  edit: (id) => `${SHIPMENT_WORKFLOW_URL.base}/edit/${id}`,
+  create: () => `${SHIPMENT_WORKFLOW_URL.base}/create`,
 };
 
 const INVOICE_URL = {
@@ -522,12 +548,6 @@ const SHIPMENT_ITEM_URL = {
   split: (id) => `${SHIPMENT_ITEM_URL.base}/split/${id}`,
 };
 
-const SHIPMENT_WORKFLOW_URL = {
-  base: `${CONTEXT_PATH}/shipmentWorkflow`,
-  list: () => `${SHIPMENT_WORKFLOW_URL.base}/list`,
-  create: () => `${SHIPMENT_WORKFLOW_URL.base}/create`,
-};
-
 const DELIVERY_NOTE_URL = {
   base: `${CONTEXT_PATH}/deliveryNote`,
   print: (id) => `${DELIVERY_NOTE_URL.base}/print/${id}`,
@@ -602,6 +622,7 @@ export {
   PURCHASE_ORDER_URL,
   PUTAWAY_URL,
   RECEIVE_ORDER_URL,
+  RECEIVING_URL,
   REPLENISHMENT_URL,
   REPORT_URL,
   REQUISITION_ITEM_URL,
@@ -611,6 +632,7 @@ export {
   SHIPMENT_SHOW_URL,
   SHIPMENT_WORKFLOW_URL,
   STOCK_MOVEMENT_URL,
+  STOCK_REQUEST_URL,
   STOCK_TRANSFER_URL,
   STOCKLIST_URL,
   SUPPLIER_URL,

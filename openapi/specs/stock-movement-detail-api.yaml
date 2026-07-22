@@ -1,0 +1,324 @@
+openapi: 3.0.3
+info:
+  title: OpenBoxes - StockMovementDetailApiController
+  description: >
+    Read/tab/comment/document endpoints for the migrated stockMovement
+    show/addComment/addDocument screens, handled by
+    org.pih.warehouse.api.StockMovementDetailApiController and routed via
+    "/api/stockMovements/{id}/details", ".../packingList", ".../receiptItems",
+    ".../events", ".../comments", ".../uploadDocument" and
+    "/api/stockMovements/documentTypes". Added in Phase 2 (Batch 24).
+  version: 0.1.0
+servers:
+  - url: http://localhost:8080/openboxes
+    description: Local Docker baseline (docs/migration/RUNNING_LOCALLY.md)
+security:
+  - cookieAuth: []
+paths:
+  /api/stockMovements/documentTypes:
+    get:
+      operationId: listDocumentTypes
+      summary: Non-template document types for the add document screen
+      responses:
+        '200':
+          description: Document type options sorted by name.
+          content:
+            application/json:
+              schema:
+                type: object
+                required: [data]
+                properties:
+                  data:
+                    type: array
+                    items:
+                      type: object
+                      required: [id, value, label]
+                      properties:
+                        id:
+                          $ref: '../components/common.yaml#/components/schemas/Id'
+                        value:
+                          $ref: '../components/common.yaml#/components/schemas/Id'
+                        label:
+                          type: string
+  /api/stockMovements/{id}/details:
+    parameters:
+      - $ref: '#/components/parameters/stockMovementId'
+    get:
+      operationId: getStockMovementDetails
+      summary: Header/details/auditing data for the migrated show screen
+      description: >
+        Mirrors the legacy StockMovementController show.gsp model plus the
+        permission checks previously done by GSP taglibs.
+      responses:
+        '200':
+          description: Stock movement details.
+          content:
+            application/json:
+              schema:
+                type: object
+                required: [data]
+                properties:
+                  data:
+                    $ref: '#/components/schemas/StockMovementDetails'
+        '404':
+          $ref: '#/components/responses/StockMovementNotFound'
+  /api/stockMovements/{id}/packingList:
+    parameters:
+      - $ref: '#/components/parameters/stockMovementId'
+    get:
+      operationId: getStockMovementPackingList
+      summary: Packing list tab (mirrors the legacy _packingList.gsp)
+      responses:
+        '200':
+          description: Packing list rows.
+          content:
+            application/json:
+              schema:
+                type: object
+                required: [data]
+                properties:
+                  data:
+                    type: object
+                    required: [isFromPurchaseOrder, wasReceived, shipmentItems]
+                    properties:
+                      isFromPurchaseOrder:
+                        type: boolean
+                      wasReceived:
+                        type: boolean
+                        nullable: true
+                      shipmentItems:
+                        type: array
+                        items:
+                          type: object
+                          additionalProperties: true
+        '404':
+          $ref: '#/components/responses/StockMovementNotFound'
+  /api/stockMovements/{id}/receiptItems:
+    parameters:
+      - $ref: '#/components/parameters/stockMovementId'
+    get:
+      operationId: getStockMovementReceiptItems
+      summary: Receipts tab (mirrors the legacy _receipts.gsp)
+      responses:
+        '200':
+          description: Receipt item rows.
+          content:
+            application/json:
+              schema:
+                type: object
+                required: [data]
+                properties:
+                  data:
+                    type: array
+                    items:
+                      type: object
+                      additionalProperties: true
+        '404':
+          $ref: '#/components/responses/StockMovementNotFound'
+  /api/stockMovements/{id}/events:
+    parameters:
+      - $ref: '#/components/parameters/stockMovementId'
+    get:
+      operationId: getStockMovementEvents
+      summary: Events tab (mirrors the legacy _events.gsp history table)
+      responses:
+        '200':
+          description: History items.
+          content:
+            application/json:
+              schema:
+                type: object
+                required: [data]
+                properties:
+                  data:
+                    type: array
+                    items:
+                      type: object
+                      additionalProperties: true
+        '404':
+          $ref: '#/components/responses/StockMovementNotFound'
+  /api/stockMovements/{id}/comments:
+    parameters:
+      - $ref: '#/components/parameters/stockMovementId'
+    get:
+      operationId: listStockMovementComments
+      summary: Comments tab (mirrors the legacy _comments.gsp)
+      responses:
+        '200':
+          description: Comments on the requisition (or shipment).
+          content:
+            application/json:
+              schema:
+                type: object
+                required: [data]
+                properties:
+                  data:
+                    type: array
+                    items:
+                      $ref: '#/components/schemas/Comment'
+        '404':
+          $ref: '#/components/responses/StockMovementNotFound'
+    post:
+      operationId: createStockMovementComment
+      summary: Add a comment (mirrors the legacy saveComment action)
+      requestBody:
+        required: true
+        content:
+          application/json:
+            schema:
+              type: object
+              required: [comment]
+              properties:
+                comment:
+                  type: string
+                recipient:
+                  type: object
+                  nullable: true
+                  properties:
+                    id:
+                      $ref: '../components/common.yaml#/components/schemas/Id'
+      responses:
+        '201':
+          description: Created comment.
+          content:
+            application/json:
+              schema:
+                type: object
+                required: [data]
+                properties:
+                  data:
+                    $ref: '#/components/schemas/Comment'
+        '400':
+          description: Validation errors (e.g. blank comment).
+          content:
+            application/json:
+              schema:
+                $ref: '../components/common.yaml#/components/schemas/ErrorResponse'
+        '404':
+          $ref: '#/components/responses/StockMovementNotFound'
+  /api/stockMovements/{id}/uploadDocument:
+    parameters:
+      - $ref: '#/components/parameters/stockMovementId'
+    post:
+      operationId: uploadStockMovementDocument
+      summary: Attach a document to the stock movement's shipment
+      description: >
+        Accepts either an uploaded file ("fileContents" multipart part) or a
+        URL ("fileUri"), like the legacy add document form. Template document
+        types are rejected.
+      requestBody:
+        required: true
+        content:
+          multipart/form-data:
+            schema:
+              type: object
+              properties:
+                fileContents:
+                  type: string
+                  format: binary
+                name:
+                  type: string
+                typeId:
+                  type: string
+                fileUri:
+                  type: string
+      responses:
+        '201':
+          description: Created document.
+          content:
+            application/json:
+              schema:
+                type: object
+                required: [data]
+                properties:
+                  data:
+                    type: object
+                    additionalProperties: true
+        '400':
+          description: >
+            Missing file/URL, disallowed file type, file too large, template
+            document type, or no shipment to attach documents to.
+          content:
+            application/json:
+              schema:
+                $ref: '../components/common.yaml#/components/schemas/ErrorResponse'
+        '404':
+          $ref: '#/components/responses/StockMovementNotFound'
+components:
+  parameters:
+    stockMovementId:
+      name: id
+      in: path
+      required: true
+      schema:
+        $ref: '../components/common.yaml#/components/schemas/Id'
+      description: Stock movement (requisition or shipment) id.
+  responses:
+    StockMovementNotFound:
+      description: Unknown stock movement id.
+      content:
+        application/json:
+          schema:
+            $ref: '../components/common.yaml#/components/schemas/ErrorResponse'
+  schemas:
+    Comment:
+      type: object
+      required: [id, comment]
+      properties:
+        id:
+          $ref: '../components/common.yaml#/components/schemas/Id'
+        comment:
+          type: string
+        sender:
+          type: object
+          nullable: true
+          additionalProperties: true
+        recipient:
+          type: object
+          nullable: true
+          additionalProperties: true
+        lastUpdated:
+          type: string
+          nullable: true
+      additionalProperties: true
+    StockMovementDetails:
+      type: object
+      required: [id, identifier]
+      properties:
+        id:
+          $ref: '../components/common.yaml#/components/schemas/Id'
+        identifier:
+          type: string
+        name:
+          type: string
+          nullable: true
+        displayStatus:
+          type: string
+          nullable: true
+        statusCode:
+          type: string
+          nullable: true
+        origin:
+          type: object
+          additionalProperties: true
+        destination:
+          type: object
+          additionalProperties: true
+        direction:
+          type: string
+          enum: [INBOUND, OUTBOUND]
+        lineItemCount:
+          type: integer
+        auditing:
+          type: object
+          additionalProperties: true
+        permissions:
+          type: object
+          additionalProperties: true
+        flags:
+          type: object
+          additionalProperties: true
+      additionalProperties: true
+  securitySchemes:
+    cookieAuth:
+      $ref: '../components/common.yaml#/components/securitySchemes/cookieAuth'

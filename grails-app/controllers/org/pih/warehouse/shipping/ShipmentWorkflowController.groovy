@@ -24,8 +24,7 @@ class ShipmentWorkflowController {
     }
 
     def list() {
-        params.max = Math.min(params.max ? params.int('max') : 10, 100)
-        [shipmentWorkflowInstanceList: ShipmentWorkflow.list(params), shipmentWorkflowInstanceTotal: ShipmentWorkflow.count()]
+        render(view: "/common/react", params: params)
     }
 
     def create() {
@@ -33,23 +32,11 @@ class ShipmentWorkflowController {
     }
 
     def show() {
-        def shipmentWorkflowInstance = ShipmentWorkflow.get(params.id)
-        if (!shipmentWorkflowInstance) {
-            flash.message = "${warehouse.message(code: 'default.not.found.message', args: [warehouse.message(code: 'shipmentWorkflow.label', default: 'ShipmentWorkflow'), params.id])}"
-            redirect(action: "list")
-        } else {
-            [shipmentWorkflowInstance: shipmentWorkflowInstance]
-        }
+        render(view: "/common/react", params: params)
     }
 
     def edit() {
-        def shipmentWorkflowInstance = ShipmentWorkflow.get(params.id)
-        if (!shipmentWorkflowInstance) {
-            flash.message = "${warehouse.message(code: 'default.not.found.message', args: [warehouse.message(code: 'shipmentWorkflow.label', default: 'ShipmentWorkflow'), params.id])}"
-            redirect(action: "list")
-        } else {
-            return [shipmentWorkflowInstance: shipmentWorkflowInstance, documentTemplates: documentTemplates]
-        }
+        render(view: "/common/react", params: params)
     }
 
     def update() {
@@ -60,7 +47,8 @@ class ShipmentWorkflowController {
                 if (shipmentWorkflowInstance.version > version) {
 
                     shipmentWorkflowInstance.errors.rejectValue("version", "default.optimistic.locking.failure", [warehouse.message(code: 'shipmentWorkflow.label', default: 'ShipmentWorkflow')] as Object[], "Another user has updated this ShipmentWorkflow while you were editing")
-                    render(view: "edit", model: [shipmentWorkflowInstance: shipmentWorkflowInstance, documentTemplates: documentTemplates])
+                    flash.message = "${warehouse.message(code: 'default.optimistic.locking.failure', default: 'Another user has updated this ShipmentWorkflow while you were editing')}"
+                    redirect(action: "edit", id: params.id)
                     return
                 }
             }
@@ -69,7 +57,7 @@ class ShipmentWorkflowController {
                 flash.message = "${warehouse.message(code: 'default.updated.message', args: [warehouse.message(code: 'shipmentWorkflow.label', default: 'ShipmentWorkflow'), shipmentWorkflowInstance.id])}"
                 redirect(action: "list", id: shipmentWorkflowInstance.id)
             } else {
-                render(view: "edit", model: [shipmentWorkflowInstance: shipmentWorkflowInstance, documentTemplates: documentTemplates])
+                redirect(action: "edit", id: params.id)
             }
         } else {
             flash.message = "${warehouse.message(code: 'default.not.found.message', args: [warehouse.message(code: 'shipmentWorkflow.label', default: 'ShipmentWorkflow'), params.id])}"

@@ -2,9 +2,11 @@ openapi: 3.0.3
 info:
   title: OpenBoxes - ShipmentWorkflowApiController
   description: >
-    REST endpoints for the migrated shipmentWorkflow/create screen handled by
+    Endpoints for shipment workflow configuration handled by
     org.pih.warehouse.api.ShipmentWorkflowApiController, routed via
-    "/api/shipmentWorkflows". Added in Phase 2 (Batch 23).
+    "/api/shipmentWorkflows", "/api/shipmentWorkflows/options" and
+    "/api/shipmentWorkflows/{id}". Added in Phase 2 (Batch 24) for the
+    migrated shipmentWorkflow list/show/edit screens.
   version: 0.1.0
 servers:
   - url: http://localhost:8080/openboxes
@@ -19,9 +21,18 @@ paths:
       parameters:
         - $ref: '../components/common.yaml#/components/parameters/max'
         - $ref: '../components/common.yaml#/components/parameters/offset'
+        - name: sort
+          in: query
+          schema:
+            type: string
+        - name: order
+          in: query
+          schema:
+            type: string
+            enum: [asc, desc]
       responses:
         '200':
-          description: Paginated shipment workflows ordered by dateCreated.
+          description: Paginated shipment workflows.
           content:
             application/json:
               schema:
@@ -42,7 +53,7 @@ paths:
         content:
           application/json:
             schema:
-              $ref: '#/components/schemas/ShipmentWorkflowRequest'
+              $ref: '#/components/schemas/CreateShipmentWorkflowRequest'
       responses:
         '201':
           description: Created shipment workflow.
@@ -60,42 +71,162 @@ paths:
             application/json:
               schema:
                 $ref: '../components/common.yaml#/components/schemas/ErrorResponse'
+  /api/shipmentWorkflows/options:
+    get:
+      operationId: getShipmentWorkflowOptions
+      summary: Option lists for the shipment workflow edit form
+      description: >
+        Shipment types, reference number types, container types and the
+        shipping/invoice template documents (mirrors the legacy
+        ShipmentWorkflowController.getDocumentTemplates helper).
+      responses:
+        '200':
+          description: Option lists.
+          content:
+            application/json:
+              schema:
+                type: object
+                required: [data]
+                properties:
+                  data:
+                    type: object
+                    required:
+                      - shipmentTypes
+                      - referenceNumberTypes
+                      - containerTypes
+                      - documentTemplates
+                    properties:
+                      shipmentTypes:
+                        type: array
+                        items:
+                          $ref: '#/components/schemas/Option'
+                      referenceNumberTypes:
+                        type: array
+                        items:
+                          $ref: '#/components/schemas/Option'
+                      containerTypes:
+                        type: array
+                        items:
+                          $ref: '#/components/schemas/Option'
+                      documentTemplates:
+                        type: array
+                        items:
+                          $ref: '#/components/schemas/Option'
+  /api/shipmentWorkflows/{id}:
+    parameters:
+      - name: id
+        in: path
+        required: true
+        schema:
+          $ref: '../components/common.yaml#/components/schemas/Id'
+        description: Shipment workflow id.
+    get:
+      operationId: readShipmentWorkflow
+      summary: Read a shipment workflow
+      responses:
+        '200':
+          description: The shipment workflow.
+          content:
+            application/json:
+              schema:
+                type: object
+                required: [data]
+                properties:
+                  data:
+                    $ref: '#/components/schemas/ShipmentWorkflow'
+        '404':
+          description: Unknown shipment workflow id.
+          content:
+            application/json:
+              schema:
+                $ref: '../components/common.yaml#/components/schemas/ErrorResponse'
+    put:
+      operationId: updateShipmentWorkflow
+      summary: Update a shipment workflow
+      description: >
+        Mirrors the legacy ShipmentWorkflowController.update action, including
+        the optimistic locking (version) check which returns 409.
+      requestBody:
+        required: true
+        content:
+          application/json:
+            schema:
+              $ref: '#/components/schemas/ShipmentWorkflowRequest'
+      responses:
+        '200':
+          description: Updated shipment workflow.
+          content:
+            application/json:
+              schema:
+                type: object
+                required: [data]
+                properties:
+                  data:
+                    $ref: '#/components/schemas/ShipmentWorkflow'
+        '400':
+          description: Validation errors (e.g. blank name).
+          content:
+            application/json:
+              schema:
+                $ref: '../components/common.yaml#/components/schemas/ErrorResponse'
+        '404':
+          description: Unknown shipment workflow id.
+          content:
+            application/json:
+              schema:
+                $ref: '../components/common.yaml#/components/schemas/ErrorResponse'
+        '409':
+          description: Optimistic locking failure (stale version).
+          content:
+            application/json:
+              schema:
+                $ref: '../components/common.yaml#/components/schemas/ErrorResponse'
+    delete:
+      operationId: deleteShipmentWorkflow
+      summary: Delete a shipment workflow
+      responses:
+        '204':
+          description: Deleted.
+        '400':
+          description: Data integrity violation (workflow still referenced).
+          content:
+            application/json:
+              schema:
+                $ref: '../components/common.yaml#/components/schemas/ErrorResponse'
+        '404':
+          description: Unknown shipment workflow id.
+          content:
+            application/json:
+              schema:
+                $ref: '../components/common.yaml#/components/schemas/ErrorResponse'
 components:
   schemas:
-    ShipmentType:
+    Option:
       type: object
-      nullable: true
+      required: [id, value, label]
+      properties:
+        id:
+          $ref: '../components/common.yaml#/components/schemas/Id'
+        value:
+          $ref: '../components/common.yaml#/components/schemas/Id'
+        label:
+          type: string
+    NamedReference:
+      type: object
+      required: [id, name]
       properties:
         id:
           $ref: '../components/common.yaml#/components/schemas/Id'
         name:
           type: string
           nullable: true
-    ShipmentWorkflow:
+    IdReference:
       type: object
       required: [id]
       properties:
         id:
           $ref: '../components/common.yaml#/components/schemas/Id'
-        name:
-          type: string
-          nullable: true
-        shipmentType:
-          $ref: '#/components/schemas/ShipmentType'
-        excludedFields:
-          type: string
-          nullable: true
-        documentTemplate:
-          type: string
-          nullable: true
-        dateCreated:
-          type: string
-          nullable: true
-        lastUpdated:
-          type: string
-          nullable: true
-      additionalProperties: true
-    ShipmentWorkflowRequest:
+    CreateShipmentWorkflowRequest:
       type: object
       properties:
         name:
@@ -110,6 +241,77 @@ components:
         documentTemplate:
           type: string
           nullable: true
+    ShipmentWorkflowRequest:
+      type: object
+      properties:
+        version:
+          type: integer
+          nullable: true
+        name:
+          type: string
+        shipmentType:
+          type: object
+          nullable: true
+          properties:
+            id:
+              $ref: '../components/common.yaml#/components/schemas/Id'
+        excludedFields:
+          type: string
+          nullable: true
+        documentTemplate:
+          type: string
+          nullable: true
+        referenceNumberTypes:
+          type: array
+          items:
+            $ref: '#/components/schemas/IdReference'
+        containerTypes:
+          type: array
+          items:
+            $ref: '#/components/schemas/IdReference'
+        documentTemplates:
+          type: array
+          items:
+            $ref: '#/components/schemas/IdReference'
+    ShipmentWorkflow:
+      type: object
+      required: [id, name]
+      properties:
+        id:
+          $ref: '../components/common.yaml#/components/schemas/Id'
+        version:
+          type: integer
+        name:
+          type: string
+        shipmentType:
+          type: object
+          nullable: true
+          additionalProperties: true
+        excludedFields:
+          type: string
+          nullable: true
+        documentTemplate:
+          type: string
+          nullable: true
+        dateCreated:
+          type: string
+          nullable: true
+        lastUpdated:
+          type: string
+          nullable: true
+        referenceNumberTypes:
+          type: array
+          items:
+            $ref: '#/components/schemas/NamedReference'
+        containerTypes:
+          type: array
+          items:
+            $ref: '#/components/schemas/NamedReference'
+        documentTemplates:
+          type: array
+          items:
+            $ref: '#/components/schemas/NamedReference'
+      additionalProperties: true
   securitySchemes:
     cookieAuth:
       $ref: '../components/common.yaml#/components/securitySchemes/cookieAuth'
