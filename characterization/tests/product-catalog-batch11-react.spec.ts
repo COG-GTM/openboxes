@@ -97,8 +97,13 @@ test.describe('product catalog batch 11 React screens', () => {
       .locator(`.react-select__option:has-text("${PRODUCT_NAME}")`)
       .first()
       .click();
-    await page.click('button:has-text("Add Product")');
-    await page.waitForLoadState('networkidle');
+    // waitForLoadState('networkidle') is a no-op after the initial page load,
+    // so wait for the mutation responses explicitly before asserting via API.
+    await Promise.all([
+      page.waitForResponse((r) => r.url().includes(`/api/productGroups/${groupId}/products`)
+        && r.request().method() === 'POST' && r.ok()),
+      page.click('button:has-text("Add Product")'),
+    ]);
     await expect(page.getByTestId('product-group-products'))
       .toContainText(PRODUCT_NAME);
     await captureStep(page, FLOW, 'product-added');
@@ -110,16 +115,22 @@ test.describe('product catalog batch 11 React screens', () => {
     expect(api.data.products[0].name).toBe(PRODUCT_NAME);
 
     // Remove it again.
-    await page.getByTestId('product-group-products')
-      .locator('button:has-text("Delete")').click();
-    await page.waitForLoadState('networkidle');
+    await Promise.all([
+      page.waitForResponse((r) => r.url().includes(`/api/productGroups/${groupId}/products/`)
+        && r.request().method() === 'DELETE' && r.ok()),
+      page.getByTestId('product-group-products')
+        .locator('button:has-text("Delete")').click(),
+    ]);
     await expect(page.getByTestId('product-group-products'))
       .not.toContainText(PRODUCT_NAME);
 
     // Update the name.
     await page.fill('input[name="name"]', `${GROUP_NAME} renamed`);
-    await page.click('button:has-text("Update")');
-    await page.waitForLoadState('networkidle');
+    await Promise.all([
+      page.waitForResponse((r) => r.url().includes(`/api/productGroups/${groupId}`)
+        && r.request().method() === 'PUT' && r.ok()),
+      page.click('button:has-text("Update")'),
+    ]);
     const updated = await page.request
       .get(url(`/api/productGroups/${groupId}`))
       .then((r) => r.json());

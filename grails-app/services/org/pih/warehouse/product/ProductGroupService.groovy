@@ -27,6 +27,9 @@ class ProductGroupService {
                 throw new IllegalArgumentException(g.message(code: "productGroup.productFamily.duplicate.error", default: "This product already has a product family"))
             }
             isProductFamily ? productGroup.addToSiblings(product) : productGroup.addToProducts(product)
+            // Flush so the association (and the cascaded product updates) hit the
+            // database before the API response is rendered, like removeProduct/update do.
+            productGroup.save(flush: true)
         }
         return productGroup
     }
