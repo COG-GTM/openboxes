@@ -9,7 +9,6 @@
  * */
 package org.pih.warehouse.inventory
 
-import grails.test.mixin.Mock
 import grails.testing.services.ServiceUnitTest
 import org.hibernate.SessionFactory
 import spock.lang.Ignore
@@ -29,7 +28,6 @@ import testutils.DbHelper
 import static org.junit.Assert.*;
 
 @Ignore('Fix these tests and move them to InventoryServiceSpec or convert them to API tests')
-@Mock([InventoryImportDataService])
 class InventoryServiceTests extends Specification implements ServiceUnitTest<InventoryService>  {
 
 //    def service

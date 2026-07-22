@@ -9,7 +9,6 @@
  **/
 package org.pih.warehouse.shipping
 
-import grails.test.mixin.Mock
 import grails.testing.gorm.DataTest
 import grails.testing.services.ServiceUnitTest
 import spock.lang.Ignore
@@ -27,7 +26,6 @@ import spock.lang.Specification
 import static org.junit.Assert.*
 
 import grails.converters.JSON
-import grails.test.*
 import grails.validation.ValidationException
 
 import testutils.DbHelper
@@ -38,8 +36,11 @@ import org.pih.warehouse.product.Category
 import org.pih.warehouse.product.Product
 
 @Ignore('Fix these tests and move them to ShipmentServiceSpec or convert them to API tests')
-@Mock([Category, Product, ShipmentType, Location, ContainerType, Shipment, ShipmentItem, IdentifierService])
 class ShipmentServiceTests extends Specification implements ServiceUnitTest<ShipmentService>, DataTest {
+
+    Class[] getDomainClassesToMock() {
+        [Category, Product, ShipmentType, Location, ContainerType, Shipment, ShipmentItem]
+    }
 
     protected void setup() {
         new Category(name: "Category").save(flush: true)

@@ -1,7 +1,6 @@
 package org.pih.warehouse.core.identification
 
 import groovy.util.logging.Slf4j
-import org.grails.datastore.gorm.GormEntity
 
 /**
  * Handles generating identifiers for all instances of an entity that don't yet have one.
@@ -13,7 +12,9 @@ import org.grails.datastore.gorm.GormEntity
  * not called by the AssignIdentifierJob.
  */
 @Slf4j
-trait BlankIdentifierResolver<T extends GormEntity> {
+// T is a GORM entity; the GormEntity trait is applied to domain classes during
+// the same compilation unit, so it cannot be used as an explicit bound here.
+trait BlankIdentifierResolver<T> {
 
     /**
      * @return the domain-specific name/keyword that is used in identifier properties.

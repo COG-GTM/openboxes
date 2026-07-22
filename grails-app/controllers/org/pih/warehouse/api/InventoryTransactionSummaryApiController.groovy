@@ -23,14 +23,19 @@ class InventoryTransactionSummaryApiController {
             throw new ValidationException("Invalid params", command.errors)
         }
 
+        // CSV is only selectable via the .csv URL extension; a format=csv query
+        // parameter is ignored (the URL mapping's optional (.$format)? variable
+        // took precedence over the query string in Grails 3)
+        boolean csvRequested = request.forwardURI?.endsWith('.csv')
+
         // If we specify a format=csv we want to download everything
-        if (params.format == 'csv') {
+        if (csvRequested) {
             command.max = -1
         }
 
         PaginatedList<InventoryTransactionsSummary> inventoryTransactions = inventoryTransactionSummaryService.getInventoryTransactionsSummary(command)
 
-        if (params.format == 'csv') {
+        if (csvRequested) {
             String text = dataService.generateCsv(inventoryTransactionsSummaryFormatter.toCsv(inventoryTransactions))
             String fileName = "inventory-transaction-summary-${command.facility}-${dateFormatter.formatCurrentDateForFileName()}.csv"
             response.setHeader("Content-disposition", "attachment; filename=\"${fileName}.csv\"")

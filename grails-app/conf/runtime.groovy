@@ -587,7 +587,6 @@ openboxes {
             mainDashboard {
                 personal {
                     name = "My Dashboard"
-                    filters {}
                     widgets = [
                         [
                             widgetId: "inventoryByLotAndBin",
@@ -634,7 +633,6 @@ openboxes {
                 }
                 warehouse {
                     name = "Warehouse Management"
-                    filters {}
                     widgets = [
                         [
                             widgetId: "inventoryByLotAndBin",
@@ -681,7 +679,6 @@ openboxes {
                 }
                 inventory {
                     name = "Inventory Management"
-                    filters {}
                     widgets = [
                         [
                             widgetId: "receivingBin",
@@ -720,7 +717,6 @@ openboxes {
                 }
                 transaction {
                     name = "Transaction Management"
-                    filters {}
                     widgets = [
                         [
                             widgetId: "fillRateSnapshot",

@@ -45,7 +45,7 @@ class ConfigHelper {
     }
 
     static getContextPath() {
-        String contextPath = Holders.grailsApplication.config.server.contextPath
+        String contextPath = Holders.grailsApplication.config.server.servlet.'context-path'
         return (contextPath != '/') ? contextPath : ''
     }
 

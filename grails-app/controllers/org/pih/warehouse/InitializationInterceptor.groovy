@@ -27,7 +27,7 @@ class InitializationInterceptor {
     @Autowired
     LocaleManager localeManager
 
-    @Value('${server.session.timeout}')
+    @Value('${server.servlet.session.timeout}')
     Integer sessionTimeoutInterval
 
     int order = HIGHEST_PRECEDENCE

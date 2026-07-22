@@ -1,15 +1,17 @@
 package org.pih.warehouse.product
 
-import grails.test.mixin.Mock
-import grails.test.mixin.TestFor
+import grails.testing.gorm.DataTest
+import grails.testing.web.controllers.ControllerUnitTest
 import org.junit.Ignore
 import org.pih.warehouse.PaginatedList
 import spock.lang.Specification
 
 @Ignore("FIX these tests")
-@TestFor(ProductController)
-@Mock([Product, Category, ProductService])
-class ProductControllerTests extends Specification {
+class ProductControllerTests extends Specification implements ControllerUnitTest<ProductController>, DataTest {
+
+    Class[] getDomainClassesToMock() {
+        [Product, Category]
+    }
 
     void setup() {
 		def currentDate = new Date()

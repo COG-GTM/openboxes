@@ -31,7 +31,11 @@ class InventoryTransactionSummaryService {
             query.setParameterList("products", command.products.id)
         }
         if (paginate) {
-            query.setFirstResult(command.offset).setMaxResults(command.max)
+            query.setFirstResult(command.offset)
+            // Hibernate 5.4 rejects negative max-results; a negative max means "no limit"
+            if (command.max >= 0) {
+                query.setMaxResults(command.max)
+            }
         }
 
         return query

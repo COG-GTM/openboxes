@@ -38,7 +38,7 @@ buildscript {
         classpath "org.grails.plugins:database-migration:${databaseMigrationVersion}"
         classpath "org.grails.plugins:views-gradle:${grailsViewsVersion}"
         classpath "org.owasp:dependency-check-gradle:${owaspVersion}"
-        classpath "org.grails.plugins:hibernate5:${gormVersion - '.RELEASE'}"
+        classpath "org.grails.plugins:hibernate5:${gormHibernateVersion}"
     }
     repositories {
         mavenCentral()
@@ -54,8 +54,8 @@ plugins {
     id 'groovy'
     id 'idea'
 
-    // expose `pom` object, https://docs.gradle.org/4.10.3/userguide/maven_plugin.html
-    id 'maven'
+    // the legacy `maven` plugin was removed in Gradle 7; use maven-publish
+    id 'maven-publish'
 
     // enable `grails gradle dependencyReport`, etc.
     id 'project-report'
@@ -102,8 +102,8 @@ apply plugin: 'org.owasp.dependencycheck'
 
 group 'com.openboxes'
 mainClassName = 'org.pih.warehouse.Application'
-sourceCompatibility = 1.8
-targetCompatibility = 1.8
+sourceCompatibility = 11
+targetCompatibility = 11
 
 /*
  * From the asset-pipeline manual: "If you want settings to apply to
@@ -128,7 +128,7 @@ assets {
 }
 
 bootRun {
-    addResources = true
+    sourceResources sourceSets.main
     jvmArgs = [
         '-Dspring.output.ansi.enabled=never',
         '-Xdebug',
@@ -226,8 +226,8 @@ configurations {
                 if (details.requested.group.startsWith('com.fasterxml.jackson')) {
                     details.because 'enforce consistent Jackson versioning'
                     if (details.requested.name == 'jackson-databind') {
-                        // one module has a series of 8(!) security hotfixes
-                        details.useVersion(jacksonVersion + '.8')
+                        // databind hotfix releases carry a fourth digit
+                        details.useVersion(jacksonDatabindVersion)
                     } else {
                         details.useVersion(jacksonVersion)
                     }
@@ -308,6 +308,12 @@ configurations {
              * consume their API's directly.
              */
             force 'com.google.errorprone:error_prone_annotations:2.19.1'  // use consistent version
+            force 'io.micronaut:micronaut-aop:1.3.7'  // use the version from grails-bom 4.1.4
+            force 'org.apache.ant:ant:1.9.15'  // use consistent version
+            force 'org.apache.ant:ant-junit:1.9.15'  // use consistent version
+            force 'org.apache.ant:ant-launcher:1.9.15'  // use consistent version
+            force 'com.squareup.okio:okio:1.17.2'  // use consistent version
+            force 'org.javassist:javassist:3.27.0-GA'  // use consistent version
             force 'com.google.protobuf:protobuf-java:3.21.12'  // security patch
             force 'commons-io:commons-io:2.15.1'  // security patch
             force 'commons-validator:commons-validator:1.7'  // security patch
@@ -384,7 +390,7 @@ processResources {
 repositories {
     mavenCentral()
     maven { url 'https://repo.grails.org/grails/core' }
-    // deprecated; only used to fetch code-coverage plugin
+    // legacy plugin portal; still hosts full poms for csv, excel-import, etc.
     maven { url 'https://repo.grails.org/grails/plugins' }
     maven { url 'https://jitpack.io' }
 }
@@ -404,12 +410,18 @@ sourceSets {
 
 springBoot {
     buildInfo()
-    mainClass = 'org.pih.warehouse.Application'
-    executable = true
+    mainClassName = 'org.pih.warehouse.Application'
+}
+
+// In Boot 2 the executable archive is built by `bootWar`; keep the same
+// artifact name and launch-script behavior the Boot 1.5 `war` task produced.
+bootWar {
+    archiveFileName = 'openboxes.war'
+    launchScript()
 }
 
 war {
-    archiveName = 'openboxes.war'
+    archiveFileName = 'openboxes-plain.war'
     zip64 = true
 }
 
@@ -540,6 +552,9 @@ dependencies {
     // enable `import groovyx.gpars.GParsPool`, but consider grails-async-gpars?
     implementation 'org.codehaus.gpars:gpars:1.2.1'
 
+    // restore Date.format()/plus()/minus(); Groovy 2.5 moved them out of groovy core
+    implementation 'org.codehaus.groovy:groovy-dateutil'
+
     // enable `import groovy.sql.Sql`
     implementation 'org.codehaus.groovy:groovy-sql'
 
@@ -570,24 +585,6 @@ dependencies {
 
     // prevent Grails from thinking services are broken Domain objects
     compile 'org.grails:grails-plugin-services'
-
-    /*
-     * Deprecated: use https://github.com/grails/grails-testing-support
-     *
-     * FIXME Refactor instances of, e.g., `import grails.test.mixin`.
-     *
-     * See https://testing.grails.org/latest/guide/index.html#upgrading
-     */
-    testCompile('org.grails:grails-test-mixins:3.3.0') {
-        /*
-         * Old; relocated to `org.ow2.asm:asm`, which we pull in
-         * via `org.springframework.boot:spring-boot-starter-test`.
-         */
-        exclude group: 'asm', module: 'asm'
-        // prevent requests for ancient versions of sub-dependencies
-        exclude group: 'org.grails', module: 'grails-web-jsp'
-        exclude group: 'org.objenesis', module: 'objenesis'
-    }
 
     compile 'org.grails:grails-web-boot'
 
@@ -620,19 +617,12 @@ dependencies {
 
     // enable `import grails.plugin.cache.Cacheable`
     implementation 'org.grails.plugins:cache:4.0.3'
-    compile 'org.grails.plugins:cache-ehcache:3.0.0'
-
-    // enable `grails test-app -coverage`
-    testImplementation('org.grails.plugins:code-coverage:2.0.3-3') {
-        // last updated in 2016, this plugin pulls in 10+year-old dependencies
-        exclude group: 'org.apache.ant'  // not needed for gradle builds
-        exclude group: 'org.mortbay.jetty'  // superseded by org.eclipse.jetty
-        exclude group: 'xalan'
-        exclude group: 'xerces'
-    }
 
     // FIXME use commons-csv instead
     implementation 'org.grails.plugins:csv:1.0.1'
+    // the csv plugin pom declares opencsv as runtime-scope, but we import it directly;
+    // Gradle 5+ no longer leaks pom runtime deps onto the compile classpath
+    implementation 'net.sf.opencsv:opencsv:2.3'
 
     // enable liquibase migrations
     compile("org.grails.plugins:database-migration:${databaseMigrationVersion}") {
@@ -643,19 +633,21 @@ dependencies {
     implementation 'org.grails.plugins:excel-import:3.0.2'
 
     // load config via files listed in application.yml::grails.config.locations
-    implementation 'org.grails.plugins:external-config:1.4.0'
+    implementation 'org.grails.plugins:external-config:2.0.0'
 
     // enable `import geb.*`
     testCompile 'org.grails.plugins:geb'
 
     // enable prettytime.display(), which we use only three times
     implementation 'org.grails.plugins:grails-pretty-time:4.0.0'
+    // runtime-scope dep of grails-pretty-time that DateTagLib imports directly
+    implementation 'org.ocpsoft.prettytime:prettytime:4.0.0.Final'
 
     // enable `import org.grails.plugins.web.taglib.*`
     compile 'org.grails.plugins:gsp'
 
     // prevent `No GORM implementations configured. Ensure GORM has been initialized correctly`
-    compile("org.grails.plugins:hibernate5:${gormVersion-'.RELEASE'}") {
+    compile("org.grails.plugins:hibernate5:${gormHibernateVersion}") {
         exclude group: 'com.h2database', module: 'h2'
     }
 
@@ -665,12 +657,6 @@ dependencies {
     // enable `import grails.plugins.quartz.Job*`
     compile('org.grails.plugins:quartz:2.0.13') {
         transitive = false  // we pull in quartz-scheduler directly, below
-    }
-
-    // list all scheduled jobs at e.g. http://localhost:8080/openboxes/quartz
-    compile('org.grails.plugins:quartz-monitor:1.3') {
-        // will pull in old asset-pipeline and quartz dependencies otherwise
-        transitive = false
     }
 
     /*
@@ -742,12 +728,16 @@ dependencies {
      *
      * N.B., these libraries needlessly duplicate Grails' imports.
      */
-    testCompile('org.spockframework:spock-core:1.3-groovy-2.4') {
+    testCompile('org.spockframework:spock-core:1.3-groovy-2.5') {
         exclude group: 'org.codehaus.groovy', module: 'groovy-all'
     }
-    testCompile('org.spockframework:spock-spring:1.3-groovy-2.4') {
+    testCompile('org.spockframework:spock-spring:1.3-groovy-2.5') {
         exclude group: 'org.codehaus.groovy', module: 'groovy-all'
     }
+
+    // enable `import org.json.JSONArray` (previously leaked onto the test
+    // classpath from a plugin pom's runtime scope; Gradle 5+ stopped that)
+    testCompile 'org.json:json:20230618'
 
     // enable `import org.springframework.orm.hibernate5.*`
     implementation 'org.springframework:spring-orm'
@@ -782,7 +772,7 @@ dependencies {
     testCompile "org.testcontainers:spock:${testContainersVersion}"
     testCompile 'org.springframework:spring-test'
     testCompile 'io.rest-assured:rest-assured:3.2.0'
-    testCompile "org.grails.plugins:build-test-data:3.3.1"
+    testCompile "org.grails.plugins:build-test-data:4.0.0"
 }
 
 /*
@@ -859,11 +849,23 @@ task prepareDocker(type: Copy, dependsOn: assemble) {
     into mkdir("${buildDir}/docker")
 }
 
-task writePom {
+publishing {
+    publications {
+        maven(MavenPublication) {
+            from components.web
+        }
+    }
+}
+
+task writePom(dependsOn: 'generatePomFileForMavenPublication') {
     description = 'Derive a Maven-compatible pom.xml file for downstream analysis'
     group = 'Reporting'
     doLast {
-        pom {}.writeTo('pom.xml')
+        copy {
+            from "${buildDir}/publications/maven/pom-default.xml"
+            into projectDir
+            rename { 'pom.xml' }
+        }
     }
 }
 
@@ -899,11 +901,18 @@ jacocoTestReport {
         // Our source code builds to both "build/classes/groovy" and "build/classes/java" so we need to filter one of
         // the two class paths out to avoid "Can't add different class with same name" errors. It's dirty to do this
         // in the "doFirst" block, but it's the only way to tell Jacoco to ONLY use this path.
-        classDirectories = files(files("build/classes/groovy/main").collect {
+        classDirectories.setFrom(files("build/classes/groovy/main").collect {
             // Then also exclude any packages from the report that we didn't actually generate any coverage % for.
             fileTree(dir: it, exclude: jacocoExcludes)
         })
     }
+}
+
+// groovyc needs a lot of heap to compile the full test suite in one pass, so run
+// it in its own forked JVM rather than inflating the Gradle daemon's heap
+tasks.withType(GroovyCompile) {
+    groovyOptions.fork = true
+    groovyOptions.forkOptions.memoryMaximumSize = '4g'
 }
 
 // Configuration for both "test" and "integrationTest" tasks.
