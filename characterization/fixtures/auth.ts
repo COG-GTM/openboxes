@@ -8,9 +8,9 @@ import { ADMIN, LOCATIONS, url } from './constants';
 export async function login(
   page: Page,
   {
-    username = ADMIN.username,
-    password = ADMIN.password,
-    location = LOCATIONS.mainWarehouse.name,
+    username = ADMIN.username as string,
+    password = ADMIN.password as string,
+    location = LOCATIONS.mainWarehouse.name as string,
   } = {},
 ): Promise<void> {
   await page.goto(url('/auth/login'));

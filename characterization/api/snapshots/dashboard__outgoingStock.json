@@ -3,7 +3,7 @@
     "data": {
       "first": {
         "color": null,
-        "link": "/openboxes/stockMovement/list?direction=OUTBOUND&requisitionStatusCode=CREATED&requisitionStatusCode=EDITING&requisitionStatusCode=VERIFYING&requisitionStatusCode=PICKING&requisitionStatusCode=PICKED&requisitionStatusCode=CHECKING&createdAfter=07/17/2026",
+        "link": "/openboxes/stockMovement/list?direction=OUTBOUND&requisitionStatusCode=CREATED&requisitionStatusCode=EDITING&requisitionStatusCode=VERIFYING&requisitionStatusCode=PICKING&requisitionStatusCode=PICKED&requisitionStatusCode=CHECKING&createdAfter=<date>",
         "order": null,
         "subtitle": "Created < 4 days ago",
         "value": 0,
@@ -12,7 +12,7 @@
       "fourth": null,
       "second": {
         "color": null,
-        "link": "/openboxes/stockMovement/list?direction=OUTBOUND&requisitionStatusCode=CREATED&requisitionStatusCode=EDITING&requisitionStatusCode=VERIFYING&requisitionStatusCode=PICKING&requisitionStatusCode=PICKED&requisitionStatusCode=CHECKING&createdAfter=07/14/2026&createdBefore=07/17/2026",
+        "link": "/openboxes/stockMovement/list?direction=OUTBOUND&requisitionStatusCode=CREATED&requisitionStatusCode=EDITING&requisitionStatusCode=VERIFYING&requisitionStatusCode=PICKING&requisitionStatusCode=PICKED&requisitionStatusCode=CHECKING&createdAfter=<date>&createdBefore=<date>",
         "order": null,
         "subtitle": "Created > 4 days ago",
         "value": 0,
@@ -20,7 +20,7 @@
       },
       "third": {
         "color": null,
-        "link": "/openboxes/stockMovement/list?direction=OUTBOUND&requisitionStatusCode=CREATED&requisitionStatusCode=EDITING&requisitionStatusCode=VERIFYING&requisitionStatusCode=PICKING&requisitionStatusCode=PICKED&requisitionStatusCode=CHECKING&createdBefore=07/14/2026",
+        "link": "/openboxes/stockMovement/list?direction=OUTBOUND&requisitionStatusCode=CREATED&requisitionStatusCode=EDITING&requisitionStatusCode=VERIFYING&requisitionStatusCode=PICKING&requisitionStatusCode=PICKED&requisitionStatusCode=CHECKING&createdBefore=<date>",
         "order": null,
         "subtitle": "Created > 7 days ago",
         "value": 0,

@@ -25,6 +25,9 @@ HEX_ID_RE = re.compile(r"^[0-9a-f]{32}$")
 HEX_ID_INLINE_RE = re.compile(r"[0-9a-f]{32}")
 UUID_RE = re.compile(r"^[0-9a-f]{8}-[0-9a-f]{4}-[0-9a-f]{4}-[0-9a-f]{4}-[0-9a-f]{12}$")
 UUID_INLINE_RE = re.compile(r"[0-9a-f]{8}-[0-9a-f]{4}-[0-9a-f]{4}-[0-9a-f]{4}-[0-9a-f]{12}")
+# dates embedded inside longer strings (e.g. dashboard links carrying
+# createdAfter=07/17/2026 computed relative to "today")
+DATE_SLASH_INLINE_RE = re.compile(r"\d{2}/\d{2}/\d{4}")
 # ISO-8601 timestamps and common date formats rendered by the app
 TIMESTAMP_RE = re.compile(r"^\d{4}-\d{2}-\d{2}T\d{2}:\d{2}(:\d{2})?(\.\d+)?(Z|[+-]\d{2}:?\d{2})?$")
 DATE_SLASH_RE = re.compile(r"^\d{2}/\d{2}/\d{4}( \d{2}:\d{2}(:\d{2})?)?$")
@@ -71,6 +74,8 @@ def mask_scalar(value):
             value = UUID_INLINE_RE.sub("<id>", value)
         if HEX_ID_INLINE_RE.search(value):
             value = HEX_ID_INLINE_RE.sub("<id>", value)
+        if DATE_SLASH_INLINE_RE.search(value):
+            value = DATE_SLASH_INLINE_RE.sub("<date>", value)
     return value
 
 

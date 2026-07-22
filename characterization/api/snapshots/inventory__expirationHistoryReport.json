@@ -9,9 +9,9 @@
   "request": {
     "method": "GET",
     "params": {
-      "endDate": "01/01/2011 00:00:00 Z",
+      "endDate": "<date> 00:00:00 Z",
       "facilityId": "1",
-      "startDate": "01/01/2010 00:00:00 Z"
+      "startDate": "<date> 00:00:00 Z"
     },
     "path": "/api/inventories/expirationHistoryReport"
   },

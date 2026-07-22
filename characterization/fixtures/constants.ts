@@ -14,9 +14,15 @@ export const url = (path: string): string => `${BASE_URL.replace(/\/$/, '')}${pa
 
 export const ADMIN = { username: 'admin', password: 'password' } as const;
 
+/**
+ * Demo user with ROLE_INVOICE (admin does not have it). Demo users are seeded
+ * with password == username and INACTIVE; ensureUserActive() activates it.
+ */
+export const SUPERUSER = { username: 'superuser', password: 'superuser' } as const;
+
 export const LOCATIONS = {
   /** Depot the suite logs into; id 1 is created by the install migrations. */
-  mainWarehouse: { id: '1', name: 'Main Warehouse' },
+  mainWarehouse: { id: '1', name: 'Main Warehouse', organizationId: '1' },
   /** Demo depot used as an outbound destination. */
   bostonWarehouse: { name: 'Boston Warehouse' },
   /** Demo supplier used as the inbound origin. */
@@ -26,6 +32,13 @@ export const LOCATIONS = {
 export const PRODUCTS = {
   /** Demo product (lot & expiry controlled). Referenced by name, not code. */
   lamivudine: { name: 'Lamivudine 150mg tablet' },
+  /**
+   * Demo product used by the cycle-count flow. Deliberately different from the
+   * one the receive/requisition flows touch: a cycle count writes an inventory
+   * baseline transaction that supersedes any receipt recorded in the same
+   * minute (receipt transaction dates are truncated to the minute).
+   */
+  morphineTablet: { name: 'Morphine 10mg immediate release tablet' },
 } as const;
 
 /** MM/DD/YYYY, as expected by the app's date pickers. */
