@@ -1,0 +1,238 @@
+openapi: 3.0.3
+info:
+  title: OpenBoxes - UnitOfMeasureApiController
+  description: >
+    Unit-of-measure endpoints handled by
+    org.pih.warehouse.api.UnitOfMeasureApiController. CRUD is inherited from
+    BaseDomainApiController (forwarded to GenericApiController) via the
+    standard "/api/${resource}s" REST mappings; the explicit
+    "/api/unitOfMeasure/currencies" (note: singular) and
+    "/api/unitOfMeasures/options" mappings route to currencies() and
+    uomOptions(). Parity quirks pinned here - create() responds 201; read()
+    of an unknown id 404s via ObjectNotFoundException (Hibernate proxy);
+    options without a valid "type" responds 500 (enum valueOf failure).
+  version: 0.1.0
+servers:
+  - url: http://localhost:8080/openboxes
+    description: Local Docker baseline (docs/migration/RUNNING_LOCALLY.md)
+security:
+  - cookieAuth: []
+paths:
+  /api/unitOfMeasures:
+    get:
+      operationId: listUnitsOfMeasure
+      summary: List all units of measure
+      parameters:
+        - $ref: '../components/common.yaml#/components/parameters/max'
+        - $ref: '../components/common.yaml#/components/parameters/offset'
+      responses:
+        '200':
+          description: All units of measure (default Grails domain rendering).
+          content:
+            application/json:
+              schema:
+                type: object
+                required: [data]
+                properties:
+                  data:
+                    type: array
+                    items:
+                      $ref: '#/components/schemas/UnitOfMeasure'
+    post:
+      operationId: createUnitOfMeasure
+      summary: Create a unit of measure
+      description: Responds 201 with the created unit of measure.
+      requestBody:
+        $ref: '#/components/requestBodies/UnitOfMeasureBody'
+      responses:
+        '201':
+          $ref: '#/components/responses/UnitOfMeasureOk'
+        '500':
+          $ref: '../components/common.yaml#/components/responses/ServerError'
+  /api/unitOfMeasures/{id}:
+    get:
+      operationId: readUnitOfMeasure
+      summary: Read a unit of measure
+      parameters:
+        - $ref: '#/components/parameters/uomId'
+      responses:
+        '200':
+          $ref: '#/components/responses/UnitOfMeasureOk'
+        '404':
+          $ref: '../components/common.yaml#/components/responses/NotFound'
+    post:
+      operationId: updateUnitOfMeasurePost
+      summary: Update a unit of measure (POST variant)
+      parameters:
+        - $ref: '#/components/parameters/uomId'
+      requestBody:
+        $ref: '#/components/requestBodies/UnitOfMeasureBody'
+      responses:
+        '200':
+          $ref: '#/components/responses/UnitOfMeasureOk'
+        '500':
+          $ref: '../components/common.yaml#/components/responses/ServerError'
+    put:
+      operationId: updateUnitOfMeasurePut
+      summary: Update a unit of measure (PUT variant)
+      parameters:
+        - $ref: '#/components/parameters/uomId'
+      requestBody:
+        $ref: '#/components/requestBodies/UnitOfMeasureBody'
+      responses:
+        '200':
+          $ref: '#/components/responses/UnitOfMeasureOk'
+        '500':
+          $ref: '../components/common.yaml#/components/responses/ServerError'
+    delete:
+      operationId: deleteUnitOfMeasure
+      summary: Delete a unit of measure
+      parameters:
+        - $ref: '#/components/parameters/uomId'
+      responses:
+        '204':
+          description: Unit of measure deleted (empty body).
+        '500':
+          $ref: '../components/common.yaml#/components/responses/ServerError'
+  /api/unitOfMeasures/options:
+    get:
+      operationId: getUomOptions
+      summary: List unit-of-measure options of a given type
+      description: >
+        "type" must be a UnitOfMeasureType enum name (QUANTITY, CURRENCY,
+        ...); a missing or invalid value throws in Enum.valueOf and responds
+        500.
+      parameters:
+        - name: type
+          in: query
+          required: true
+          schema:
+            type: string
+            enum: [AREA, CURRENCY, LENGTH, MASS, PACKAGE, QUANTITY, VOLUME]
+      responses:
+        '200':
+          description: Dropdown options for units of measure of the given type.
+          content:
+            application/json:
+              schema:
+                type: object
+                required: [data]
+                properties:
+                  data:
+                    type: array
+                    items:
+                      type: object
+                      required: [id, value, label]
+                      properties:
+                        id:
+                          $ref: '../components/common.yaml#/components/schemas/Id'
+                        value:
+                          type: string
+                        label:
+                          type: string
+        '500':
+          $ref: '../components/common.yaml#/components/responses/ServerError'
+  /api/unitOfMeasure/currencies:
+    get:
+      operationId: listCurrencies
+      summary: List currency units of measure
+      description: Note the singular "unitOfMeasure" in the mapped URL.
+      responses:
+        '200':
+          description: Units of measure whose class type is CURRENCY.
+          content:
+            application/json:
+              schema:
+                type: object
+                required: [data]
+                properties:
+                  data:
+                    type: array
+                    items:
+                      $ref: '#/components/schemas/UnitOfMeasure'
+components:
+  parameters:
+    uomId:
+      name: id
+      in: path
+      required: true
+      schema:
+        $ref: '../components/common.yaml#/components/schemas/Id'
+  requestBodies:
+    UnitOfMeasureBody:
+      required: true
+      content:
+        application/json:
+          schema:
+            type: object
+            properties:
+              name:
+                type: string
+              code:
+                type: string
+              description:
+                type: string
+              uomClass:
+                type: object
+                properties:
+                  id:
+                    $ref: '../components/common.yaml#/components/schemas/Id'
+            additionalProperties: true
+  responses:
+    UnitOfMeasureOk:
+      description: >
+        The unit of measure (default Grails domain rendering) in a "data"
+        envelope.
+      content:
+        application/json:
+          schema:
+            type: object
+            required: [data]
+            properties:
+              data:
+                $ref: '#/components/schemas/UnitOfMeasure'
+  schemas:
+    UnitOfMeasure:
+      type: object
+      description: >
+        Default Grails JSON rendering of org.pih.warehouse.core.UnitOfMeasure.
+        Associations (uomClass, createdBy, updatedBy) render as shallow
+        {"id"} references.
+      required: [id, name, code]
+      properties:
+        id:
+          $ref: '../components/common.yaml#/components/schemas/Id'
+        name:
+          type: string
+        code:
+          type: string
+        description:
+          type: string
+          nullable: true
+        dateCreated:
+          type: string
+          nullable: true
+          description: ISO-8601 timestamp.
+        lastUpdated:
+          type: string
+          nullable: true
+          description: ISO-8601 timestamp.
+        uomClass:
+          type: object
+          nullable: true
+          properties:
+            id:
+              $ref: '../components/common.yaml#/components/schemas/Id'
+          additionalProperties: true
+        createdBy:
+          type: object
+          nullable: true
+          additionalProperties: true
+        updatedBy:
+          type: object
+          nullable: true
+          additionalProperties: true
+      additionalProperties: true
+  securitySchemes:
+    cookieAuth:
+      $ref: '../components/common.yaml#/components/securitySchemes/cookieAuth'

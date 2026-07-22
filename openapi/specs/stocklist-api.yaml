@@ -1,0 +1,367 @@
+openapi: 3.0.3
+info:
+  title: OpenBoxes - StocklistApiController
+  description: >
+    Stock list (requisition template) endpoints handled by
+    org.pih.warehouse.api.StocklistApiController, routed via the standard
+    "/api/${resource}s" REST mappings plus the explicit
+    "/api/stocklists/sendMail/{id}", "/api/stocklists/{id}/export",
+    "/api/stocklists/{id}/clone", "/api/stocklists/{id}/publish",
+    "/api/stocklists/{id}/unpublish" and "/api/stocklists/{id}/clear"
+    mappings. Parity quirks pinned here - list() and read() render different
+    shapes; the export/clone/publish/unpublish/clear actions "return 404" for
+    unknown ids, which Grails renders as an empty 200; delete() of an unknown
+    id throws IllegalArgumentException (500), while read() of an unknown id
+    404s via ObjectNotFoundException.
+  version: 0.1.0
+servers:
+  - url: http://localhost:8080/openboxes
+    description: Local Docker baseline (docs/migration/RUNNING_LOCALLY.md)
+security:
+  - cookieAuth: []
+paths:
+  /api/stocklists:
+    get:
+      operationId: listStocklists
+      summary: List stock lists
+      description: >
+        Renders Requisition.toStocklistJson() summaries with a totalCount.
+        With format=csv responds with a CSV export of all stocklist items
+        instead. isPublished defaults to true.
+      parameters:
+        - name: isPublished
+          in: query
+          required: false
+          schema:
+            type: boolean
+        - name: origin
+          in: query
+          required: false
+          description: Origin location id (repeatable).
+          schema:
+            $ref: '../components/common.yaml#/components/schemas/Id'
+        - name: destination
+          in: query
+          required: false
+          description: Destination location id (repeatable).
+          schema:
+            $ref: '../components/common.yaml#/components/schemas/Id'
+        - name: format
+          in: query
+          required: false
+          description: Set to "csv" for the CSV export.
+          schema:
+            type: string
+        - $ref: '../components/common.yaml#/components/parameters/max'
+        - $ref: '../components/common.yaml#/components/parameters/offset'
+      responses:
+        '200':
+          description: Stock list summaries (JSON) or the CSV export (format=csv).
+          content:
+            application/json:
+              schema:
+                type: object
+                required: [data, totalCount]
+                properties:
+                  data:
+                    type: array
+                    items:
+                      $ref: '#/components/schemas/StocklistSummary'
+                  totalCount:
+                    type: integer
+            text/csv:
+              schema:
+                type: string
+    post:
+      operationId: createStocklist
+      summary: Create a stock list
+      description: Responds 201 with the created stock list.
+      requestBody:
+        $ref: '#/components/requestBodies/StocklistBody'
+      responses:
+        '201':
+          $ref: '#/components/responses/StocklistOk'
+        '500':
+          $ref: '../components/common.yaml#/components/responses/ServerError'
+  /api/stocklists/{id}:
+    get:
+      operationId: readStocklist
+      summary: Read a stock list
+      parameters:
+        - $ref: '#/components/parameters/stocklistId'
+      responses:
+        '200':
+          $ref: '#/components/responses/StocklistOk'
+        '404':
+          $ref: '../components/common.yaml#/components/responses/NotFound'
+    post:
+      operationId: updateStocklistPost
+      summary: Update a stock list (POST variant)
+      description: >
+        Unknown ids are NOT rejected - update() instantiates a fresh stock
+        list and responds 200, silently creating a new record.
+      parameters:
+        - $ref: '#/components/parameters/stocklistId'
+      requestBody:
+        $ref: '#/components/requestBodies/StocklistBody'
+      responses:
+        '200':
+          $ref: '#/components/responses/StocklistOk'
+        '500':
+          $ref: '../components/common.yaml#/components/responses/ServerError'
+    put:
+      operationId: updateStocklistPut
+      summary: Update a stock list (PUT variant)
+      description: Same behavior (and create-on-unknown-id quirk) as the POST variant.
+      parameters:
+        - $ref: '#/components/parameters/stocklistId'
+      requestBody:
+        $ref: '#/components/requestBodies/StocklistBody'
+      responses:
+        '200':
+          $ref: '#/components/responses/StocklistOk'
+        '500':
+          $ref: '../components/common.yaml#/components/responses/ServerError'
+    delete:
+      operationId: deleteStocklist
+      summary: Delete a stock list
+      description: >
+        Unknown ids throw IllegalArgumentException (500, not 404). A
+        DataIntegrityViolationException responds 400 with {"errorMessages"}.
+      parameters:
+        - $ref: '#/components/parameters/stocklistId'
+      responses:
+        '204':
+          description: Stock list deleted (empty body).
+        '400':
+          description: Deletion blocked by an existing association.
+          content:
+            application/json:
+              schema:
+                type: object
+                required: [errorMessages]
+                properties:
+                  errorMessages:
+                    type: array
+                    items:
+                      type: string
+                additionalProperties: false
+        '500':
+          $ref: '../components/common.yaml#/components/responses/ServerError'
+  /api/stocklists/sendMail/{id}:
+    post:
+      operationId: sendStocklistMail
+      summary: Email a stock list to recipients
+      description: >
+        Responds 200 with an empty body. Note the id sits after the action in
+        the mapped URL.
+      parameters:
+        - $ref: '#/components/parameters/stocklistId'
+      requestBody:
+        required: true
+        content:
+          application/json:
+            schema:
+              type: object
+              properties:
+                subject:
+                  type: string
+                text:
+                  type: string
+                recipients:
+                  type: array
+                  items:
+                    type: string
+                includePdf:
+                  type: boolean
+                includeXls:
+                  type: boolean
+              additionalProperties: true
+      responses:
+        '200':
+          description: Mail sent (empty body).
+        '500':
+          $ref: '../components/common.yaml#/components/responses/ServerError'
+  /api/stocklists/{id}/export:
+    get:
+      operationId: exportStocklist
+      summary: Export a stock list as CSV
+      description: >
+        Unit/total cost columns appear only for finance-role users. Unknown
+        ids respond 200 with an EMPTY body (the action's "return 404" is not
+        rendered as a status).
+      parameters:
+        - $ref: '#/components/parameters/stocklistId'
+      responses:
+        '200':
+          description: >
+            CSV of the stock list items, or an empty body for unknown ids.
+          content:
+            text/csv:
+              schema:
+                type: string
+  /api/stocklists/{id}/clone:
+    post:
+      operationId: cloneStocklist
+      summary: Clone a stock list
+      description: >
+        Responds 200 with an empty body; unknown ids also respond 200 empty
+        (the action's "return 404" is not rendered as a status).
+      parameters:
+        - $ref: '#/components/parameters/stocklistId'
+      responses:
+        '200':
+          description: Stock list cloned (empty body).
+  /api/stocklists/{id}/publish:
+    post:
+      operationId: publishStocklist
+      summary: Publish a stock list
+      description: >
+        Responds 200 with an empty body; unknown ids also respond 200 empty.
+      parameters:
+        - $ref: '#/components/parameters/stocklistId'
+      responses:
+        '200':
+          description: Stock list published (empty body).
+  /api/stocklists/{id}/unpublish:
+    post:
+      operationId: unpublishStocklist
+      summary: Unpublish a stock list
+      description: >
+        Responds 200 with an empty body; unknown ids also respond 200 empty.
+      parameters:
+        - $ref: '#/components/parameters/stocklistId'
+      responses:
+        '200':
+          description: Stock list unpublished (empty body).
+  /api/stocklists/{id}/clear:
+    post:
+      operationId: clearStocklist
+      summary: Remove all items from a stock list
+      description: >
+        Responds 200 with an empty body; unknown ids also respond 200 empty.
+      parameters:
+        - $ref: '#/components/parameters/stocklistId'
+      responses:
+        '200':
+          description: Stock list cleared (empty body).
+components:
+  parameters:
+    stocklistId:
+      name: id
+      in: path
+      required: true
+      description: Requisition (template) id backing the stock list.
+      schema:
+        $ref: '../components/common.yaml#/components/schemas/Id'
+  requestBodies:
+    StocklistBody:
+      required: true
+      content:
+        application/json:
+          schema:
+            type: object
+            properties:
+              name:
+                type: string
+              origin:
+                type: object
+                properties:
+                  id:
+                    $ref: '../components/common.yaml#/components/schemas/Id'
+              destination:
+                type: object
+                properties:
+                  id:
+                    $ref: '../components/common.yaml#/components/schemas/Id'
+              requestedBy:
+                type: object
+                properties:
+                  id:
+                    $ref: '../components/common.yaml#/components/schemas/Id'
+            additionalProperties: true
+  responses:
+    StocklistOk:
+      description: The stock list as rendered by Stocklist.toJson(), in a "data" envelope.
+      content:
+        application/json:
+          schema:
+            type: object
+            required: [data]
+            properties:
+              data:
+                $ref: '#/components/schemas/Stocklist'
+  schemas:
+    Stocklist:
+      type: object
+      description: Stocklist.toJson() rendering (flat dotted keys).
+      required:
+        - requisition.id
+      properties:
+        requisition.id:
+          $ref: '../components/common.yaml#/components/schemas/Id'
+        name:
+          type: string
+          nullable: true
+        destination.id:
+          type: string
+          nullable: true
+        destination.name:
+          type: string
+          nullable: true
+        origin.id:
+          type: string
+          nullable: true
+        origin.name:
+          type: string
+          nullable: true
+        requestedBy.id:
+          type: string
+          nullable: true
+        requestedBy.name:
+          type: string
+          nullable: true
+      additionalProperties: true
+    StocklistSummary:
+      type: object
+      description: Requisition.toStocklistJson() rendering used by list().
+      required: [id]
+      properties:
+        id:
+          $ref: '../components/common.yaml#/components/schemas/Id'
+        name:
+          type: string
+          nullable: true
+        origin:
+          type: string
+          nullable: true
+        destination:
+          type: string
+          nullable: true
+        requisitionItemCount:
+          type: integer
+          nullable: true
+        requestedBy:
+          type: string
+          nullable: true
+        createdBy:
+          type: string
+          nullable: true
+        updatedBy:
+          type: string
+          nullable: true
+        dateCreated:
+          type: string
+          nullable: true
+          description: '"MMM dd, yyyy" display format.'
+        lastUpdated:
+          type: string
+          nullable: true
+          description: '"MMM dd, yyyy" display format.'
+        isPublished:
+          type: boolean
+          nullable: true
+      additionalProperties: true
+  securitySchemes:
+    cookieAuth:
+      $ref: '../components/common.yaml#/components/securitySchemes/cookieAuth'

@@ -1,0 +1,299 @@
+openapi: 3.0.3
+info:
+  title: OpenBoxes - StocklistItemApiController
+  description: >
+    Stock list item (requisition template item) endpoints handled by
+    org.pih.warehouse.api.StocklistItemApiController. The collection URL
+    "/api/stocklistItems" routes via the standard "/api/${resource}s"
+    mapping (GET list, POST create); the item URL "/api/stocklistItems/{id}"
+    is explicitly mapped GET:read, PUT:update, DELETE:remove, POST:save -
+    but no save() action exists, so POST responds 500. Parity quirks pinned
+    here - list() requires "product.id" (500 otherwise); list() renders SQL
+    rows keyed by "id" while read/create/update render
+    StocklistItem.toJson() keyed by "requisitionItem.id"; remove() of an
+    unknown id throws IllegalArgumentException (500), while read() 404s.
+  version: 0.1.0
+servers:
+  - url: http://localhost:8080/openboxes
+    description: Local Docker baseline (docs/migration/RUNNING_LOCALLY.md)
+security:
+  - cookieAuth: []
+paths:
+  /api/stocklistItems:
+    get:
+      operationId: listStocklistItems
+      summary: List stock list items for a product
+      description: >
+        Requires the "product.id" query parameter; missing it throws
+        IllegalArgumentException (500). Rows come from the
+        stocklist_item_list SQL view.
+      parameters:
+        - $ref: '#/components/parameters/productIdQuery'
+      responses:
+        '200':
+          description: Stock list items containing the product.
+          content:
+            application/json:
+              schema:
+                type: object
+                required: [data]
+                properties:
+                  data:
+                    type: array
+                    items:
+                      $ref: '#/components/schemas/StocklistItemRow'
+        '500':
+          $ref: '../components/common.yaml#/components/responses/ServerError'
+    post:
+      operationId: createStocklistItem
+      summary: Add a product to a stock list
+      description: >
+        Requires the "product.id" query parameter and a body carrying
+        stocklistId and maxQuantity. Responds 201. Missing product.id or an
+        unknown stocklistId throws IllegalArgumentException (500).
+      parameters:
+        - $ref: '#/components/parameters/productIdQuery'
+      requestBody:
+        required: true
+        content:
+          application/json:
+            schema:
+              type: object
+              properties:
+                stocklistId:
+                  $ref: '../components/common.yaml#/components/schemas/Id'
+                maxQuantity:
+                  type: integer
+              additionalProperties: true
+      responses:
+        '201':
+          $ref: '#/components/responses/StocklistItemOk'
+        '500':
+          $ref: '../components/common.yaml#/components/responses/ServerError'
+  /api/stocklistItems/{id}:
+    description: >
+      The URL mapping also declares POST:save, but the controller has no
+      save() action, so any POST to this path responds 500 via
+      ErrorsController.handleException ("Could not resolve view with name
+      'save'"); it is not declared as an operation here since it is not a
+      usable endpoint.
+    get:
+      operationId: readStocklistItem
+      summary: Read a stock list item
+      parameters:
+        - $ref: '#/components/parameters/stocklistItemId'
+      responses:
+        '200':
+          $ref: '#/components/responses/StocklistItemOk'
+        '404':
+          $ref: '../components/common.yaml#/components/responses/NotFound'
+    put:
+      operationId: updateStocklistItem
+      summary: Update a stock list item's quantity
+      description: Unknown ids throw IllegalArgumentException (500, not 404).
+      parameters:
+        - $ref: '#/components/parameters/stocklistItemId'
+      requestBody:
+        required: true
+        content:
+          application/json:
+            schema:
+              type: object
+              properties:
+                maxQuantity:
+                  type: integer
+              additionalProperties: true
+      responses:
+        '200':
+          $ref: '#/components/responses/StocklistItemOk'
+        '500':
+          $ref: '../components/common.yaml#/components/responses/ServerError'
+    delete:
+      operationId: removeStocklistItem
+      summary: Remove a stock list item
+      description: Unknown ids throw IllegalArgumentException (500, not 404).
+      parameters:
+        - $ref: '#/components/parameters/stocklistItemId'
+      responses:
+        '204':
+          description: Stock list item removed (empty body).
+        '500':
+          $ref: '../components/common.yaml#/components/responses/ServerError'
+  /api/stocklistItems/availableStocklists:
+    get:
+      operationId: getAvailableStocklists
+      summary: List all requisition templates (stock lists)
+      responses:
+        '200':
+          description: Available stock lists.
+          content:
+            application/json:
+              schema:
+                type: object
+                required: [data]
+                properties:
+                  data:
+                    type: array
+                    nullable: true
+                    items:
+                      $ref: '#/components/schemas/AvailableStocklist'
+components:
+  parameters:
+    stocklistItemId:
+      name: id
+      in: path
+      required: true
+      description: Requisition item id backing the stock list item.
+      schema:
+        $ref: '../components/common.yaml#/components/schemas/Id'
+    productIdQuery:
+      name: product.id
+      in: query
+      required: true
+      description: Product id (missing values respond 500, not 400).
+      schema:
+        $ref: '../components/common.yaml#/components/schemas/Id'
+  responses:
+    StocklistItemOk:
+      description: >
+        The stock list item as rendered by StocklistItem.toJson(), in a
+        "data" envelope.
+      content:
+        application/json:
+          schema:
+            type: object
+            required: [data]
+            properties:
+              data:
+                $ref: '#/components/schemas/StocklistItem'
+  schemas:
+    StocklistItem:
+      type: object
+      description: StocklistItem.toJson() rendering (flat dotted keys).
+      required:
+        - requisitionItem.id
+      properties:
+        requisitionItem.id:
+          $ref: '../components/common.yaml#/components/schemas/Id'
+        stocklistId:
+          type: string
+          nullable: true
+        name:
+          type: string
+          nullable: true
+        location.id:
+          type: string
+          nullable: true
+        location.name:
+          type: string
+          nullable: true
+        locationGroup.id:
+          type: string
+          nullable: true
+        locationGroup.name:
+          type: string
+          nullable: true
+        manager.id:
+          type: string
+          nullable: true
+        manager.name:
+          type: string
+          nullable: true
+        manager.email:
+          type: string
+          nullable: true
+        uom:
+          type: string
+          nullable: true
+        maxQuantity:
+          type: integer
+          nullable: true
+        replenishmentPeriod:
+          type: integer
+          nullable: true
+        monthlyDemand:
+          type: number
+          nullable: true
+      additionalProperties: true
+    StocklistItemRow:
+      type: object
+      description: >
+        Row from the stocklist_item_list SQL view rendered by list(). Same
+        keys as StocklistItem.toJson() except the requisition item id is
+        under "id" instead of "requisitionItem.id".
+      required: [id]
+      properties:
+        id:
+          $ref: '../components/common.yaml#/components/schemas/Id'
+        stocklistId:
+          type: string
+          nullable: true
+        name:
+          type: string
+          nullable: true
+        location.id:
+          type: string
+          nullable: true
+        location.name:
+          type: string
+          nullable: true
+        locationGroup.id:
+          type: string
+          nullable: true
+        locationGroup.name:
+          type: string
+          nullable: true
+        manager.id:
+          type: string
+          nullable: true
+        manager.name:
+          type: string
+          nullable: true
+        manager.email:
+          type: string
+          nullable: true
+        uom:
+          type: string
+          nullable: true
+        maxQuantity:
+          type: integer
+          nullable: true
+        replenishmentPeriod:
+          type: integer
+          nullable: true
+        monthlyDemand:
+          type: number
+          nullable: true
+      additionalProperties: true
+    AvailableStocklist:
+      type: object
+      description: Summary map rendered by getAvailableStocklists().
+      required: [id]
+      properties:
+        id:
+          $ref: '../components/common.yaml#/components/schemas/Id'
+        name:
+          type: string
+          nullable: true
+        location.id:
+          type: string
+          nullable: true
+        location.name:
+          type: string
+          nullable: true
+        locationGroup.id:
+          type: string
+          nullable: true
+        locationGroup.name:
+          type: string
+          nullable: true
+        manager.id:
+          type: string
+          nullable: true
+        manager.name:
+          type: string
+          nullable: true
+      additionalProperties: true
+  securitySchemes:
+    cookieAuth:
+      $ref: '../components/common.yaml#/components/securitySchemes/cookieAuth'

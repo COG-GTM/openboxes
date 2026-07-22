@@ -1,0 +1,606 @@
+openapi: 3.0.3
+info:
+  title: OpenBoxes - StockTransferApiController
+  description: >
+    Stock transfer (transfer order) endpoints handled by
+    org.pih.warehouse.api.StockTransferApiController, routed via the standard
+    "/api/${resource}s" REST mappings plus the explicit
+    "/api/stockTransfers/statusOptions", "/api/stockTransfers/candidates",
+    "/api/stockTransferItems/{id}/",
+    "/api/stockTransfers/{id}/sendShipment",
+    "/api/stockTransfers/{id}/rollback" and
+    "/api/stockTransfers/{id}/removeAllItems" mappings. Parity quirks pinned
+    here - create() responds 200 (not 201); list() renders a different, flat
+    order summary than read(); unknown ids on read/update throw
+    IllegalArgumentException and respond 500; update() binds the id from the
+    request BODY, so a body without "id" creates a brand-new order.
+  version: 0.1.0
+servers:
+  - url: http://localhost:8080/openboxes
+    description: Local Docker baseline (docs/migration/RUNNING_LOCALLY.md)
+security:
+  - cookieAuth: []
+paths:
+  /api/stockTransfers:
+    get:
+      operationId: listStockTransfers
+      summary: List transfer orders at a location
+      description: >
+        Requires the "location" query parameter (400 with a bare
+        {"errorMessage"} body otherwise). Renders flat order summaries
+        (Order.toJson(orderTypeCode)), not the StockTransfer.toJson() shape
+        used by read().
+      parameters:
+        - name: location
+          in: query
+          required: true
+          description: Location id; matched against BOTH origin and destination.
+          schema:
+            $ref: '../components/common.yaml#/components/schemas/Id'
+        - name: q
+          in: query
+          required: false
+          description: Substring match on name, description or orderNumber.
+          schema:
+            type: string
+        - name: status
+          in: query
+          required: false
+          description: One or more OrderStatus names (repeatable).
+          schema:
+            type: string
+        - name: lastUpdatedStartDate
+          in: query
+          required: false
+          schema:
+            type: string
+          description: MM/dd/yyyy
+        - name: lastUpdatedEndDate
+          in: query
+          required: false
+          schema:
+            type: string
+          description: MM/dd/yyyy
+        - name: orderedBy
+          in: query
+          required: false
+          schema:
+            $ref: '../components/common.yaml#/components/schemas/Id'
+        - name: createdBy
+          in: query
+          required: false
+          schema:
+            $ref: '../components/common.yaml#/components/schemas/Id'
+        - $ref: '../components/common.yaml#/components/parameters/max'
+        - $ref: '../components/common.yaml#/components/parameters/offset'
+      responses:
+        '200':
+          description: Paginated flat order summaries.
+          content:
+            application/json:
+              schema:
+                type: object
+                required: [data, totalCount]
+                properties:
+                  data:
+                    type: array
+                    items:
+                      $ref: '#/components/schemas/StockTransferSummary'
+                  totalCount:
+                    type: integer
+        '400':
+          $ref: '#/components/responses/BareErrorMessage'
+    post:
+      operationId: createStockTransfer
+      summary: Create a transfer order
+      description: Responds 200 (not 201) with the created stock transfer.
+      requestBody:
+        $ref: '#/components/requestBodies/StockTransferBody'
+      responses:
+        '200':
+          $ref: '#/components/responses/StockTransferOk'
+  /api/stockTransfers/{id}:
+    get:
+      operationId: readStockTransfer
+      summary: Read a stock transfer
+      parameters:
+        - $ref: '#/components/parameters/stockTransferId'
+      responses:
+        '200':
+          $ref: '#/components/responses/StockTransferOk'
+        '500':
+          $ref: '../components/common.yaml#/components/responses/ServerError'
+    post:
+      operationId: updateStockTransferPost
+      summary: Update a stock transfer (POST variant)
+      description: >
+        The order id is bound from the request BODY, not the URL - a body
+        without "id" creates a NEW order. Unknown URL ids respond 500.
+      parameters:
+        - $ref: '#/components/parameters/stockTransferId'
+      requestBody:
+        $ref: '#/components/requestBodies/StockTransferBody'
+      responses:
+        '200':
+          $ref: '#/components/responses/StockTransferOk'
+        '500':
+          $ref: '../components/common.yaml#/components/responses/ServerError'
+    put:
+      operationId: updateStockTransferPut
+      summary: Update a stock transfer (PUT variant)
+      description: Same behavior (and body-id quirk) as the POST variant.
+      parameters:
+        - $ref: '#/components/parameters/stockTransferId'
+      requestBody:
+        $ref: '#/components/requestBodies/StockTransferBody'
+      responses:
+        '200':
+          $ref: '#/components/responses/StockTransferOk'
+        '500':
+          $ref: '../components/common.yaml#/components/responses/ServerError'
+    delete:
+      operationId: deleteStockTransfer
+      summary: Delete a transfer order
+      parameters:
+        - $ref: '#/components/parameters/stockTransferId'
+      responses:
+        '204':
+          description: Order deleted (empty body).
+        '400':
+          description: >
+            Order is past APPROVED or is not a TRANSFER_ORDER ("Cannot delete
+            this order").
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/BareErrorMessage'
+        '404':
+          description: Unknown order id ("Order does not exist").
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/BareErrorMessage'
+  /api/stockTransfers/statusOptions:
+    get:
+      operationId: getStockTransferStatusOptions
+      summary: List stock transfer status options
+      responses:
+        '200':
+          description: The OrderStatus values applicable to stock transfers.
+          content:
+            application/json:
+              schema:
+                type: object
+                required: [data]
+                properties:
+                  data:
+                    type: array
+                    items:
+                      type: object
+                      required: [id, value, label]
+                      properties:
+                        id:
+                          type: string
+                        value:
+                          type: string
+                        label:
+                          type: string
+                        variant:
+                          type: string
+                          nullable: true
+  /api/stockTransfers/candidates:
+    get:
+      operationId: getStockTransferCandidates
+      summary: List stock transfer candidate items at a location
+      description: >
+        Uses the session warehouse unless "location.id" is passed. Unknown
+        location ids throw IllegalArgumentException (500).
+      parameters:
+        - name: location.id
+          in: query
+          required: false
+          schema:
+            $ref: '../components/common.yaml#/components/schemas/Id'
+        - name: showExpiredItemsOnly
+          in: query
+          required: false
+          schema:
+            type: boolean
+      responses:
+        '200':
+          $ref: '#/components/responses/StockTransferItemList'
+        '500':
+          $ref: '../components/common.yaml#/components/responses/ServerError'
+    post:
+      operationId: getReturnCandidates
+      summary: List return candidate items for a location
+      description: >
+        Reads "locationId" from the JSON body; unknown/missing location ids
+        throw IllegalArgumentException (500).
+      requestBody:
+        required: true
+        content:
+          application/json:
+            schema:
+              type: object
+              properties:
+                locationId:
+                  $ref: '../components/common.yaml#/components/schemas/Id'
+              additionalProperties: true
+      responses:
+        '200':
+          $ref: '#/components/responses/StockTransferItemList'
+        '500':
+          $ref: '../components/common.yaml#/components/responses/ServerError'
+  /api/stockTransferItems/{id}:
+    delete:
+      operationId: removeStockTransferItem
+      summary: Remove a single stock transfer item
+      description: >
+        Responds 200 with the updated parent stock transfer. The URL mapping
+        is declared with a trailing slash but matches with or without one.
+      parameters:
+        - name: id
+          in: path
+          required: true
+          description: Stock transfer (order) item id.
+          schema:
+            $ref: '../components/common.yaml#/components/schemas/Id'
+      responses:
+        '200':
+          $ref: '#/components/responses/StockTransferOk'
+        '500':
+          $ref: '../components/common.yaml#/components/responses/ServerError'
+  /api/stockTransfers/{id}/removeAllItems:
+    delete:
+      operationId: removeAllStockTransferItems
+      summary: Remove all items from a stock transfer
+      description: Responds 200 with the emptied stock transfer.
+      parameters:
+        - $ref: '#/components/parameters/stockTransferId'
+      responses:
+        '200':
+          $ref: '#/components/responses/StockTransferOk'
+        '500':
+          $ref: '../components/common.yaml#/components/responses/ServerError'
+  /api/stockTransfers/{id}/sendShipment:
+    post:
+      operationId: sendStockTransferShipment
+      summary: Send the shipment for a (return) stock transfer order
+      description: >
+        Responds 200 with an empty body on success. Orders without a shipment
+        (plain transfer orders) throw IllegalArgumentException (500).
+      parameters:
+        - $ref: '#/components/parameters/stockTransferId'
+      responses:
+        '200':
+          description: Shipment sent (empty body).
+        '500':
+          $ref: '../components/common.yaml#/components/responses/ServerError'
+  /api/stockTransfers/{id}/rollback:
+    post:
+      operationId: rollbackStockTransfer
+      summary: Roll back a return order
+      description: >
+        Responds 200 with an empty body on success. Orders without shipments
+        throw NoSuchElementException (500).
+      parameters:
+        - $ref: '#/components/parameters/stockTransferId'
+      responses:
+        '200':
+          description: Order rolled back (empty body).
+        '500':
+          $ref: '../components/common.yaml#/components/responses/ServerError'
+components:
+  parameters:
+    stockTransferId:
+      name: id
+      in: path
+      required: true
+      description: Order id backing the stock transfer.
+      schema:
+        $ref: '../components/common.yaml#/components/schemas/Id'
+  requestBodies:
+    StockTransferBody:
+      required: true
+      content:
+        application/json:
+          schema:
+            type: object
+            properties:
+              id:
+                $ref: '../components/common.yaml#/components/schemas/Id'
+              description:
+                type: string
+              stockTransferNumber:
+                type: string
+              status:
+                type: string
+                description: StockTransferStatus name (PENDING, PLACED, COMPLETED, ...).
+              type:
+                type: string
+                description: OrderType id (e.g. TRANSFER_ORDER, RETURN_ORDER).
+              dateShipped:
+                type: string
+                description: MM/dd/yyyy
+              expectedDeliveryDate:
+                type: string
+                description: MM/dd/yyyy
+              stockTransferItems:
+                type: array
+                items:
+                  type: object
+                  properties:
+                    id:
+                      $ref: '../components/common.yaml#/components/schemas/Id'
+                    productAvailabilityId:
+                      type: string
+                    product:
+                      type: object
+                      properties:
+                        id:
+                          $ref: '../components/common.yaml#/components/schemas/Id'
+                    inventoryItem:
+                      type: object
+                      properties:
+                        id:
+                          $ref: '../components/common.yaml#/components/schemas/Id'
+                    originBinLocation:
+                      type: object
+                      properties:
+                        id:
+                          $ref: '../components/common.yaml#/components/schemas/Id'
+                    destinationBinLocation:
+                      type: object
+                      properties:
+                        id:
+                          $ref: '../components/common.yaml#/components/schemas/Id'
+                    quantity:
+                      type: number
+                    quantityOnHand:
+                      type: integer
+                    quantityNotPicked:
+                      type: integer
+                    splitItems:
+                      type: array
+                      items:
+                        type: object
+                        additionalProperties: true
+                  additionalProperties: true
+            additionalProperties: true
+  responses:
+    StockTransferOk:
+      description: >
+        The stock transfer as rendered by StockTransfer.toJson(), wrapped in a
+        "data" envelope.
+      content:
+        application/json:
+          schema:
+            type: object
+            required: [data]
+            properties:
+              data:
+                $ref: '#/components/schemas/StockTransfer'
+    StockTransferItemList:
+      description: Stock transfer candidate items.
+      content:
+        application/json:
+          schema:
+            type: object
+            required: [data]
+            properties:
+              data:
+                type: array
+                nullable: true
+                items:
+                  $ref: '#/components/schemas/StockTransferItem'
+    BareErrorMessage:
+      description: >
+        Controller-rendered error body - a bare {"errorMessage"} object
+        without the ErrorsController "errorCode" key.
+      content:
+        application/json:
+          schema:
+            $ref: '#/components/schemas/BareErrorMessage'
+  schemas:
+    BareErrorMessage:
+      type: object
+      required: [errorMessage]
+      properties:
+        errorMessage:
+          type: string
+      additionalProperties: false
+    StockTransferSummary:
+      type: object
+      description: Flat order summary rendered by list() (Order.toJson(orderTypeCode)).
+      properties:
+        id:
+          $ref: '../components/common.yaml#/components/schemas/Id'
+        status:
+          type: string
+          nullable: true
+        orderNumber:
+          type: string
+          nullable: true
+        name:
+          type: string
+          nullable: true
+        createdBy:
+          type: string
+          nullable: true
+        dateCreated:
+          type: string
+          nullable: true
+          description: ISO-8601 timestamp.
+        origin:
+          type: string
+          nullable: true
+        destination:
+          type: string
+          nullable: true
+        orderItemsCount:
+          type: integer
+          nullable: true
+      additionalProperties: true
+    StockTransfer:
+      type: object
+      description: >
+        StockTransfer.toJson() rendering. dateShipped, expectedDeliveryDate,
+        shipmentType, trackingNumber, driverName, comments and documents fall
+        back to "" (empty string) when unset, so their types are left open.
+      required:
+        - id
+        - stockTransferNumber
+        - status
+        - stockTransferItems
+      properties:
+        id:
+          $ref: '../components/common.yaml#/components/schemas/Id'
+        description:
+          type: string
+          nullable: true
+        stockTransferNumber:
+          type: string
+        status:
+          type: string
+          description: StockTransferStatus name.
+        dateCreated:
+          type: string
+          nullable: true
+          description: '"MMMM dd, yyyy" display format.'
+        origin.id:
+          type: string
+          nullable: true
+        origin.name:
+          type: string
+          nullable: true
+        destination.id:
+          type: string
+          nullable: true
+        destination.name:
+          type: string
+          nullable: true
+        stockTransferItems:
+          type: array
+          items:
+            $ref: '#/components/schemas/StockTransferItem'
+        orderedBy:
+          type: string
+          nullable: true
+        type:
+          type: string
+          nullable: true
+          description: OrderType code (e.g. TRANSFER_ORDER).
+        dateShipped:
+          description: '"MM/dd/yyyy" or "" when unset.'
+        expectedDeliveryDate:
+          description: '"MM/dd/yyyy" or "" when unset.'
+        shipmentType:
+          description: Default Grails ShipmentType rendering, or "" when unset.
+        trackingNumber:
+          description: String, or "" when unset.
+        driverName:
+          description: String, or "" when unset.
+        comments:
+          description: String, or "" when unset.
+        documents:
+          description: Array of document maps, or "" when unset.
+      additionalProperties: true
+    StockTransferItem:
+      type: object
+      description: StockTransferItem.toJson() rendering.
+      properties:
+        id:
+          type: string
+          nullable: true
+        productAvailabilityId:
+          type: string
+          nullable: true
+        product.id:
+          type: string
+          nullable: true
+        product.productCode:
+          type: string
+          nullable: true
+        product.name:
+          type: string
+          nullable: true
+        product.displayName:
+          type: string
+          nullable: true
+        product.handlingIcons:
+          type: array
+          nullable: true
+          items:
+            type: object
+            additionalProperties: true
+        inventoryItem.id:
+          type: string
+          nullable: true
+        lotNumber:
+          type: string
+          nullable: true
+        expirationDate:
+          type: string
+          nullable: true
+          description: MM/dd/yyyy
+        recalled:
+          type: boolean
+          nullable: true
+        originBinLocation.id:
+          type: string
+          nullable: true
+        originBinLocation.name:
+          type: string
+          nullable: true
+        originZone:
+          type: string
+          nullable: true
+        onHold:
+          type: boolean
+          nullable: true
+        destinationBinLocation.id:
+          type: string
+          nullable: true
+        destinationBinLocation.name:
+          type: string
+          nullable: true
+        destinationZone.id:
+          type: string
+          nullable: true
+        destinationZone.name:
+          type: string
+          nullable: true
+        quantity:
+          type: number
+          nullable: true
+        quantityOnHand:
+          type: integer
+          nullable: true
+        quantityNotPicked:
+          type: integer
+          nullable: true
+        status:
+          type: string
+        recipient:
+          type: object
+          nullable: true
+          allOf:
+            - $ref: '../components/common.yaml#/components/schemas/Person'
+        splitItems:
+          type: array
+          items:
+            type: object
+            additionalProperties: true
+        picklistItems:
+          type: array
+          items:
+            type: object
+            additionalProperties: true
+        sortOrder:
+          type: integer
+          nullable: true
+      additionalProperties: true
+  securitySchemes:
+    cookieAuth:
+      $ref: '../components/common.yaml#/components/securitySchemes/cookieAuth'
