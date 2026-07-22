@@ -1,0 +1,20 @@
+# Test-only overlay: adds a MailHog SMTP sink and points the app's mail
+# config at it via an external config file. Production defaults are unchanged
+# (grails.mail.enabled remains false unless this overlay is used).
+#
+# Usage:
+#   docker compose -f docker-compose.yml -f docker-compose.mail-test.yml up -d
+#
+# MailHog UI: http://localhost:8025  (SMTP sink on mailhog:1025)
+services:
+    app:
+      volumes:
+        - ./mail-test/openboxes-config.properties:/app/.grails/openboxes-config.properties:ro
+      depends_on:
+        - mailhog
+
+    mailhog:
+      image: mailhog/mailhog:v1.0.1
+      container_name: openboxes-mailhog
+      ports:
+        - 8025:8025
