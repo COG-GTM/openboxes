@@ -248,3 +248,15 @@ export const INDICATORS_INVENTORY_ACCURACY = `${INDICATORS_REPORT}/inventoryAccu
 export const INVENTORY_API = (id) => `${API}/facilities/${id}/inventories`;
 export const REORDER_REPORT = (id) => `${INVENTORY_API(id)}/reorderReport`;
 export const EXPIRATION_HISTORY_REPORT = `${API}/inventories/expirationHistoryReport`;
+
+// ATTRIBUTES
+export const ATTRIBUTE_BY_ID = (id) => `${ATTRIBUTES}/${id}`;
+
+// CATEGORIES
+export const CATEGORY_API = `${API}/categories`;
+export const CATEGORY_BY_ID = (id) => `${CATEGORY_API}/${id}`;
+export const CATEGORY_TREE = `${CATEGORY_API}/tree`;
+export const CATEGORY_OPTIONS = `${API}/categoryOptions`;
+export const CATEGORY_DETAILS = (id) => `${CATEGORY_API}/${id}/details`;
+export const CATEGORY_ASSIGNING_PARENT_TO_PRODUCT = `${CATEGORY_API}/assigningParentToProduct`;
+export const UNIT_OF_MEASURE_CLASS_OPTIONS = `${GENERIC_API}/unitOfMeasureClass/`;

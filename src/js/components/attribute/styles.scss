@@ -1,0 +1,30 @@
+.attribute-page {
+  background-color: white;
+  flex: 1;
+
+  .attribute-search-input {
+    max-width: 20rem;
+  }
+
+  .attribute-sortable-column {
+    cursor: pointer;
+    user-select: none;
+    white-space: nowrap;
+  }
+
+  .attribute-form {
+    max-width: 50rem;
+  }
+
+  .attribute-option-input {
+    max-width: 25rem;
+  }
+
+  .attribute-show-table {
+    max-width: 50rem;
+
+    .attribute-show-name {
+      width: 30%;
+    }
+  }
+}

@@ -2,10 +2,13 @@ openapi: 3.0.3
 info:
   title: OpenBoxes - AttributeApiController
   description: >
-    Product/entity attribute listing handled by
+    Product/entity attribute listing and admin CRUD handled by
     org.pih.warehouse.api.AttributeApiController, routed via the standard
-    "/api/${resource}s" REST mapping (only list() is implemented).
-  version: 0.1.0
+    "/api/${resource}s" REST mapping. CRUD operations were added for the
+    React attribute admin screens (Phase 2 Batch 7); like the category API,
+    create/update respond 200 (not 201) with a bare attribute JSON object
+    (no "data" envelope).
+  version: 0.2.0
 servers:
   - url: http://localhost:8080/openboxes
     description: Local Docker baseline (docs/migration/RUNNING_LOCALLY.md)
@@ -15,7 +18,7 @@ paths:
   /api/attributes:
     get:
       operationId: listAttributes
-      summary: List attributes, optionally filtered by entity type
+      summary: List attributes, optionally filtered by entity type or name
       parameters:
         - name: entityType
           in: query
@@ -26,12 +29,29 @@ paths:
           description: >
             EntityTypeCode enum value. Unknown values raise a conversion
             error; when omitted, all attributes are returned.
+        - name: q
+          in: query
+          required: false
+          schema:
+            type: string
+          description: >
+            Name search term (search mode). When q or includeInactive is
+            present the response items use the detailed AttributeDetail
+            shape and include inactive attributes.
+        - name: includeInactive
+          in: query
+          required: false
+          schema:
+            type: boolean
+          description: >
+            When true, switches to search mode (detailed items, inactive
+            attributes included).
       responses:
         '200':
           description: >
-            Attributes (default Grails JSON rendering of the Attribute
-            domain). The seeded demo dataset contains none, so the item shape
-            is only loosely pinned.
+            Attributes. In default mode this is the default Grails JSON
+            rendering of the Attribute domain; in search mode (q or
+            includeInactive present) items use the AttributeDetail shape.
           content:
             application/json:
               schema:
@@ -42,7 +62,114 @@ paths:
                     type: array
                     items:
                       $ref: '#/components/schemas/Attribute'
+    post:
+      operationId: createAttribute
+      summary: Create an attribute
+      requestBody:
+        $ref: '#/components/requestBodies/AttributeBody'
+      responses:
+        '200':
+          $ref: '#/components/responses/AttributeOk'
+        '400':
+          $ref: '../components/common.yaml#/components/responses/ValidationError'
+  /api/attributes/{id}:
+    get:
+      operationId: readAttribute
+      summary: Read an attribute
+      parameters:
+        - $ref: '#/components/parameters/attributeId'
+      responses:
+        '200':
+          $ref: '#/components/responses/AttributeOk'
+        '404':
+          $ref: '../components/common.yaml#/components/responses/NotFound'
+    put:
+      operationId: updateAttribute
+      summary: Update an attribute
+      parameters:
+        - $ref: '#/components/parameters/attributeId'
+      requestBody:
+        $ref: '#/components/requestBodies/AttributeBody'
+      responses:
+        '200':
+          $ref: '#/components/responses/AttributeOk'
+        '400':
+          $ref: '../components/common.yaml#/components/responses/ValidationError'
+        '404':
+          $ref: '../components/common.yaml#/components/responses/NotFound'
+    delete:
+      operationId: deleteAttribute
+      summary: Delete an attribute
+      parameters:
+        - $ref: '#/components/parameters/attributeId'
+      responses:
+        '204':
+          description: Attribute deleted (empty body).
+        '404':
+          $ref: '../components/common.yaml#/components/responses/NotFound'
+        '500':
+          description: >
+            Deletion blocked by an existing association (foreign key
+            constraint), rendered by ErrorsController.handleConstraintViolation.
+          content:
+            application/json:
+              schema:
+                $ref: '../components/common.yaml#/components/schemas/ErrorResponse'
 components:
+  parameters:
+    attributeId:
+      name: id
+      in: path
+      required: true
+      schema:
+        $ref: '../components/common.yaml#/components/schemas/Id'
+  requestBodies:
+    AttributeBody:
+      required: true
+      content:
+        application/json:
+          schema:
+            type: object
+            properties:
+              code:
+                type: string
+                nullable: true
+              name:
+                type: string
+              description:
+                type: string
+                nullable: true
+              entityTypeCode:
+                type: string
+                nullable: true
+                enum: [PRODUCT, PRODUCT_SUPPLIER, null]
+              unitOfMeasureClass:
+                type: object
+                nullable: true
+                properties:
+                  id:
+                    $ref: '../components/common.yaml#/components/schemas/Id'
+              options:
+                type: array
+                items:
+                  type: string
+              active:
+                type: boolean
+              required:
+                type: boolean
+              allowOther:
+                type: boolean
+                nullable: true
+            additionalProperties: true
+  responses:
+    AttributeOk:
+      description: >
+        The attribute in the detailed shape - a bare object with no "data"
+        envelope.
+      content:
+        application/json:
+          schema:
+            $ref: '#/components/schemas/AttributeDetail'
   schemas:
     Attribute:
       type: object
@@ -58,6 +185,67 @@ components:
         active:
           type: boolean
       additionalProperties: true
+    AttributeDetail:
+      type: object
+      description: >
+        Detailed attribute rendering used by read/create/update and search
+        mode. dateCreated/lastUpdated use the "dd/MMM/yyyy hh:mm a" display
+        format and are null on freshly created records within the same
+        request.
+      required:
+        - id
+        - name
+      properties:
+        id:
+          $ref: '../components/common.yaml#/components/schemas/Id'
+        code:
+          type: string
+          nullable: true
+        name:
+          type: string
+        description:
+          type: string
+          nullable: true
+        defaultValue:
+          type: string
+          nullable: true
+        active:
+          type: boolean
+          nullable: true
+        required:
+          type: boolean
+          nullable: true
+        allowOther:
+          type: boolean
+          nullable: true
+        allowMultiple:
+          type: boolean
+          nullable: true
+        exportable:
+          type: boolean
+          nullable: true
+        entityTypeCode:
+          type: string
+          nullable: true
+          enum: [PRODUCT, PRODUCT_SUPPLIER, null]
+        unitOfMeasureClass:
+          type: object
+          nullable: true
+          properties:
+            id:
+              $ref: '../components/common.yaml#/components/schemas/Id'
+            name:
+              type: string
+        options:
+          type: array
+          items:
+            type: string
+        dateCreated:
+          type: string
+          nullable: true
+        lastUpdated:
+          type: string
+          nullable: true
   securitySchemes:
     cookieAuth:
       $ref: '../components/common.yaml#/components/securitySchemes/cookieAuth'

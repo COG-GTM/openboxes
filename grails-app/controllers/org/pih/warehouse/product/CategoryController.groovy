@@ -24,17 +24,7 @@ class CategoryController {
     }
 
     def tree() {
-        long startTime = System.currentTimeMillis()
-        def selectedCategory = Category.get(params.id) ?: productService.getRootCategory()
-
-        println "Category tree: " + (System.currentTimeMillis() - startTime) + " ms"
-        List<Category> categoriesWithoutParent = productService.getCategoriesWithoutParent()
-        boolean assigningParentToProductEnabled = categoryService.isAssigningParentToProductEnabled()
-        [
-            selectedCategory:           selectedCategory,
-            categoriesWithoutParent:    categoriesWithoutParent,
-            assigningParentToProductEnabled: assigningParentToProductEnabled,
-        ]
+        render(view: "/common/react")
     }
 
     def updateAssigningParentToProduct() {
@@ -99,10 +89,7 @@ class CategoryController {
     }
 
     def create() {
-        def categoryInstance = new Category()
-        categoryInstance.properties = params
-
-        return [categoryInstance: categoryInstance, rootCategory: productService.getRootCategory()]
+        render(view: "/common/react")
     }
 
     //  @CacheFlush("selectCategoryCache")
@@ -128,14 +115,7 @@ class CategoryController {
     }
 
     def edit() {
-        def categoryInstance = Category.get(params.id)
-
-        if (!categoryInstance) {
-            flash.message = "${warehouse.message(code: 'default.not.found.message', args: [warehouse.message(code: 'category.label', default: 'Category'), params.id])}"
-            redirect(action: "tree")
-        } else {
-            return [categoryInstance: categoryInstance]
-        }
+        render(view: "/common/react")
     }
 
     //  @CacheFlush("selectCategoryCache")

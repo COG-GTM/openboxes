@@ -14,17 +14,47 @@ import grails.gorm.transactions.Transactional
 import grails.validation.ValidationException
 import org.hibernate.ObjectNotFoundException
 import org.pih.warehouse.product.Category
+import org.pih.warehouse.product.CategoryService
 
 @Transactional
 class CategoryApiController {
 
     def productService
+    CategoryService categoryService
 
     def list() {
         log.debug "List products " + params
         def categories = productService.getCategoryTree()
         categories = categories.collect { it.toJson() }
         render([data: categories] as JSON)
+    }
+
+    def tree() {
+        List<Category> categoriesWithoutParent = productService.getCategoriesWithoutParent()
+        render([
+                data                           : categoriesWithoutParent.collect { it.toJson() },
+                assigningParentToProductEnabled: categoryService.isAssigningParentToProductEnabled(),
+        ] as JSON)
+    }
+
+    def details() {
+        Category category = Category.get(params.id)
+        if (!category) {
+            throw new ObjectNotFoundException(params.id, "Category")
+        }
+        render([data: category.toJson() + [
+                parentCategory: category.parentCategory ?
+                        [id: category.parentCategory.id, name: category.parentCategory.name] : null,
+                products      : category.products?.collect {
+                    [id: it.id, productCode: it.productCode, name: it.name]
+                } ?: [],
+        ]] as JSON)
+    }
+
+    def updateAssigningParentToProduct() {
+        boolean enabled = request.JSON?.enabled ?: false
+        categoryService.updateAssigningParentToProduct(enabled)
+        render([data: [assigningParentToProductEnabled: categoryService.isAssigningParentToProductEnabled()]] as JSON)
     }
 
     def read() {
@@ -35,14 +65,17 @@ class CategoryApiController {
         render category.toJson() as JSON
     }
 
+    // Fields the category create/edit screens are allowed to bind
+    static final List<String> BINDABLE_PROPERTIES =
+            ["name", "description", "sortOrder", "isRoot", "parentCategory"]
+
     def save() {
         log.debug "Save category " + params
         def category = Category.get(params.id)
         if (!category) {
-            category = new Category(request.JSON)
-        } else {
-            category.properties = params
+            category = new Category()
         }
+        bindData(category, request.JSON ?: params, [include: BINDABLE_PROPERTIES])
 
         if (!category.hasErrors() && category.save()) {
             render category.toJson() as JSON

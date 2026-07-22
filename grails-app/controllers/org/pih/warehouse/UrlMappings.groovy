@@ -46,6 +46,18 @@ class UrlMappings {
             controller = { "categoryApi" }
             action = [GET: "list", POST: "save"]
         }
+        "/api/categories/tree"(parseRequest: true) {
+            controller = { "categoryApi" }
+            action = [GET: "tree"]
+        }
+        "/api/categories/assigningParentToProduct"(parseRequest: true) {
+            controller = { "categoryApi" }
+            action = [PUT: "updateAssigningParentToProduct"]
+        }
+        "/api/categories/$id/details"(parseRequest: true) {
+            controller = { "categoryApi" }
+            action = [GET: "details"]
+        }
         "/api/categories/$id"(parseRequest: true) {
             controller = { "categoryApi" }
             action = [GET: "read", POST: "save", PUT: "save", DELETE: "delete"]

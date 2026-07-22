@@ -24,37 +24,19 @@ class AttributeController {
     }
 
     def list() {
-        params.max = Math.min(params.int('max', 10), 100)
-        params.offset = params.int('offset', 0)
-        List<Attribute> attributes =
-                attributeService.searchAttributes(params.q, [max: params.max, offset: params.offset, sort: params.sort, order: params.order])
-        [attributeInstanceList: attributes, attributeInstanceTotal: attributes.totalCount]
+        render(view: "/common/react")
     }
 
     def show() {
-        def attributeInstance = Attribute.get(params.id)
-        if (!attributeInstance) {
-            flash.message = "${warehouse.message(code: 'default.not.found.message', args: [warehouse.message(code: 'attribute.label', default: 'Attribute'), params.id])}"
-            redirect(action: "list")
-        } else {
-            [attributeInstance: attributeInstance]
-        }
+        render(view: "/common/react")
     }
 
     def create() {
-        def attributeInstance = new Attribute()
-        attributeInstance.properties = params
-        render(view: "edit", model: [attributeInstance: attributeInstance])
+        render(view: "/common/react")
     }
 
     def edit() {
-        def attributeInstance = Attribute.get(params.id)
-        if (!attributeInstance) {
-            flash.message = "${warehouse.message(code: 'default.not.found.message', args: [warehouse.message(code: 'attribute.label', default: 'Attribute'), params.id])}"
-            redirect(action: "list")
-        } else {
-            return [attributeInstance: attributeInstance]
-        }
+        render(view: "/common/react")
     }
 
     def save() {

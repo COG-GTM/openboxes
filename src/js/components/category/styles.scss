@@ -1,0 +1,35 @@
+.category-page {
+  background-color: white;
+  flex: 1;
+
+  .category-root-select {
+    width: 15rem;
+  }
+
+  .category-form {
+    max-width: 50rem;
+  }
+
+  .category-sort-order-input {
+    max-width: 10rem;
+  }
+
+  ul.category-tree {
+    list-style: none;
+    margin-left: 2em;
+    padding-left: 0;
+
+    > .category-tree-item {
+      background-color: #f7f7f7;
+      border: 1px dashed lightgrey;
+      padding: .5em;
+      margin: .5em;
+      cursor: move;
+
+      &.category-tree-item-highlight {
+        background-color: #fffae6;
+        border-color: #0c769e;
+      }
+    }
+  }
+}

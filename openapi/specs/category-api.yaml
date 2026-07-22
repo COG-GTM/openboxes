@@ -7,8 +7,11 @@ info:
     "/api/categories" mappings. Note the non-REST quirks pinned here for
     parity: save() responds 200 (not 201) with the bare category JSON (no
     "data" envelope), and both POST and PUT on /api/categories/{id} invoke
-    save().
-  version: 0.1.0
+    save(). Tree/details/assigningParentToProduct endpoints were added for
+    the React category screens (Phase 2 Batch 7), and save() now binds the
+    JSON request body on updates (previously the body was silently ignored
+    and JSON updates were no-ops).
+  version: 0.2.0
 servers:
   - url: http://localhost:8080/openboxes
     description: Local Docker baseline (docs/migration/RUNNING_LOCALLY.md)
@@ -46,6 +49,99 @@ paths:
           $ref: '#/components/responses/CategoryOk'
         '400':
           $ref: '../components/common.yaml#/components/responses/ValidationError'
+  /api/categories/tree:
+    get:
+      operationId: getCategoryTree
+      summary: Get root categories (categories without a parent) with nested children
+      responses:
+        '200':
+          description: Root categories plus the assigningParentToProduct flag.
+          content:
+            application/json:
+              schema:
+                type: object
+                required: [data, assigningParentToProductEnabled]
+                properties:
+                  data:
+                    type: array
+                    items:
+                      $ref: '#/components/schemas/Category'
+                  assigningParentToProductEnabled:
+                    type: boolean
+  /api/categories/assigningParentToProduct:
+    put:
+      operationId: updateAssigningParentToProduct
+      summary: Enable/disable assigning a parent category to products
+      requestBody:
+        required: true
+        content:
+          application/json:
+            schema:
+              type: object
+              properties:
+                enabled:
+                  type: boolean
+      responses:
+        '200':
+          description: The updated flag.
+          content:
+            application/json:
+              schema:
+                type: object
+                required: [data]
+                properties:
+                  data:
+                    type: object
+                    required: [assigningParentToProductEnabled]
+                    properties:
+                      assigningParentToProductEnabled:
+                        type: boolean
+  /api/categories/{id}/details:
+    get:
+      operationId: getCategoryDetails
+      summary: Read a category with its parent and active products
+      parameters:
+        - $ref: '#/components/parameters/categoryId'
+      responses:
+        '200':
+          description: >
+            Category.toJson() plus parentCategory and products, wrapped in a
+            "data" envelope.
+          content:
+            application/json:
+              schema:
+                type: object
+                required: [data]
+                properties:
+                  data:
+                    allOf:
+                      - $ref: '#/components/schemas/Category'
+                      - type: object
+                        required: [products]
+                        properties:
+                          parentCategory:
+                            type: object
+                            nullable: true
+                            properties:
+                              id:
+                                $ref: '../components/common.yaml#/components/schemas/Id'
+                              name:
+                                type: string
+                          products:
+                            type: array
+                            items:
+                              type: object
+                              properties:
+                                id:
+                                  $ref: '../components/common.yaml#/components/schemas/Id'
+                                productCode:
+                                  type: string
+                                  nullable: true
+                                name:
+                                  type: string
+                                  nullable: true
+        '404':
+          $ref: '../components/common.yaml#/components/responses/NotFound'
   /api/categories/{id}:
     get:
       operationId: readCategory

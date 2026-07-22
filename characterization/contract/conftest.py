@@ -20,6 +20,20 @@ def client():
 
 
 @pytest.fixture(scope="session")
+def batch7_api(client):
+    """Skip when the app build predates the Phase 2 Batch 7 endpoints.
+
+    The snapshot/contract CI job runs against the pinned released image,
+    which does not include the attribute CRUD and category tree/details
+    endpoints added by the React product-catalog migration; those tests
+    only run against source builds that include them.
+    """
+    resp = client.request("GET", "/api/categories/tree")
+    if resp.status_code != 200:
+        pytest.skip("Batch 7 endpoints not present in this app build")
+
+
+@pytest.fixture(scope="session")
 def batch14_endpoints(client):
     # The api-snapshot job runs against the pinned released image, which
     # predates the Batch 14 requisition/picklist endpoints. Skip their tests
