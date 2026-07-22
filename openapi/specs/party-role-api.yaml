@@ -6,7 +6,8 @@ info:
     org.pih.warehouse.api.PartyRoleApiController, routed via the standard
     "/api/${resource}s" and "/api/${resource}s/$id" REST mappings
     ("/api/partyRoles") plus the explicit "/api/partyRoles/$id/details"
-    mapping added in Phase 2 (Batch 34) for the React party role screens.
+    mapping added in Phase 2 (Batch 34) for the React party role screens
+    (the paginated GET list was added in Batch 35 for the React list screen).
     Create responds 200 (not 201) with only {"data": {"id": ...}};
     details/update/delete respond 404 for unknown ids.
   version: 0.1.0
@@ -17,6 +18,48 @@ security:
   - cookieAuth: []
 paths:
   /api/partyRoles:
+    get:
+      operationId: listPartyRoles
+      summary: Paginated list of party roles
+      description: >
+        Paginated party role rows for the React partyRole list screen.
+        Added in Phase 2 (Batch 35).
+      parameters:
+        - name: max
+          in: query
+          schema:
+            type: integer
+        - name: offset
+          in: query
+          schema:
+            type: integer
+        - name: sort
+          in: query
+          description: >
+            One of id, roleType, startDate, endDate; anything else falls
+            back to id.
+          schema:
+            type: string
+        - name: order
+          in: query
+          schema:
+            type: string
+            enum: [asc, desc]
+      responses:
+        '200':
+          description: Paginated party roles.
+          content:
+            application/json:
+              schema:
+                type: object
+                required: [data, totalCount]
+                properties:
+                  data:
+                    type: array
+                    items:
+                      $ref: '#/components/schemas/PartyRoleRow'
+                  totalCount:
+                    type: integer
     post:
       operationId: createPartyRole
       summary: Create a party role
@@ -157,6 +200,35 @@ components:
           nullable: true
           description: ISO-8601 instant.
       additionalProperties: true
+    PartyRoleRow:
+      type: object
+      description: Row projection used by the React party role list screen.
+      required: [id]
+      properties:
+        id:
+          $ref: '../components/common.yaml#/components/schemas/Id'
+        party:
+          type: object
+          nullable: true
+          properties:
+            id:
+              $ref: '../components/common.yaml#/components/schemas/Id'
+            partyType:
+              type: string
+              nullable: true
+              description: Party type name.
+        roleType:
+          type: string
+          nullable: true
+          description: RoleType enum name.
+        startDate:
+          type: string
+          nullable: true
+          description: ISO-8601 instant.
+        endDate:
+          type: string
+          nullable: true
+          description: ISO-8601 instant.
     PartyRoleDetails:
       type: object
       description: Detail projection used by the React party role edit screen.

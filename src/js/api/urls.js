@@ -235,6 +235,7 @@ export const ORGANIZATION_BY_ID = (id) => `${ORGANIZATION_API}/${id}`;
 export const ORGANIZATION_SEARCH_API = `${ORGANIZATION_API}/search`;
 export const ORGANIZATION_DETAILS = (id) => `${ORGANIZATION_API}/${id}/details`;
 export const PARTY_TYPE_OPTIONS = `${API}/partyTypeOptions`;
+export const PARTY_TYPE_CODE_OPTIONS = `${API}/partyTypeCodeOptions`;
 export const ORGANIZATION_ROLE_TYPE_OPTIONS = `${API}/organizationRoleTypeOptions`;
 
 // PARTIES
@@ -246,6 +247,8 @@ export const PARTY_ROLE_API = `${API}/partyRoles`;
 export const PARTY_ROLE_BY_ID = (id) => `${PARTY_ROLE_API}/${id}`;
 export const PARTY_ROLE_DETAILS = (id) => `${PARTY_ROLE_API}/${id}/details`;
 export const PARTY_OPTIONS = `${API}/partyOptions`;
+export const PARTY_TYPE_API = `${API}/partyTypes`;
+export const PARTY_TYPE_BY_ID = (id) => `${PARTY_TYPE_API}/${id}`;
 export const ROLE_TYPE_OPTIONS = `${API}/roleTypeOptions`;
 
 // PRODUCT SUPPLIER

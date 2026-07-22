@@ -18,6 +18,7 @@ import org.pih.warehouse.core.BudgetCode
 import org.pih.warehouse.core.LocationTypeCode
 import org.pih.warehouse.core.Party
 import org.pih.warehouse.core.PartyType
+import org.pih.warehouse.core.PartyTypeCode
 import org.pih.warehouse.core.PaymentTerm
 import org.pih.warehouse.core.PreferenceType
 import org.pih.warehouse.core.RatingTypeCode
@@ -69,6 +70,13 @@ class SelectOptionsApiController {
     def glAccountTypeCodeOptions() {
         List<Map> options = GlAccountTypeCode.list().collect {
             [id: it.name(), value: it.name(), label: it.name()]
+        }
+        render([data: options] as JSON)
+    }
+
+    def partyTypeCodeOptions() {
+        List options = PartyTypeCode.values().collect {
+            [id: it.name(), label: it.name()]
         }
         render([data: options] as JSON)
     }

@@ -1,0 +1,212 @@
+openapi: 3.0.3
+info:
+  title: OpenBoxes - PartyTypeApiController
+  description: >
+    CRUD endpoints for party types handled by
+    org.pih.warehouse.api.PartyTypeApiController, routed via the standard
+    "/api/${resource}s" and "/api/${resource}s/$id" REST mappings
+    ("/api/partyTypes"). Added in Phase 2 (Batch 35) for the migrated
+    partyType list/show/create/edit screens. Read/update/delete respond
+    404 for unknown ids; delete responds 400 when the party type is still
+    referenced (data integrity violation).
+  version: 0.1.0
+servers:
+  - url: http://localhost:8080/openboxes
+    description: Local Docker baseline (docs/migration/RUNNING_LOCALLY.md)
+security:
+  - cookieAuth: []
+paths:
+  /api/partyTypes:
+    get:
+      operationId: listPartyTypes
+      summary: Paginated list of party types
+      parameters:
+        - name: max
+          in: query
+          schema:
+            type: integer
+        - name: offset
+          in: query
+          schema:
+            type: integer
+        - name: sort
+          in: query
+          description: >
+            One of id, code, name, description, dateCreated, lastUpdated,
+            partyTypeCode; anything else falls back to id.
+          schema:
+            type: string
+        - name: order
+          in: query
+          schema:
+            type: string
+            enum: [asc, desc]
+        - name: q
+          in: query
+          description: Name prefix filter (legacy list search behavior).
+          schema:
+            type: string
+      responses:
+        '200':
+          description: Paginated party types.
+          content:
+            application/json:
+              schema:
+                type: object
+                required: [data, totalCount]
+                properties:
+                  data:
+                    type: array
+                    items:
+                      $ref: '#/components/schemas/PartyType'
+                  totalCount:
+                    type: integer
+    post:
+      operationId: createPartyType
+      summary: Create a party type
+      requestBody:
+        required: true
+        content:
+          application/json:
+            schema:
+              $ref: '#/components/schemas/PartyTypeRequest'
+      responses:
+        '201':
+          description: Created party type.
+          content:
+            application/json:
+              schema:
+                type: object
+                required: [data]
+                properties:
+                  data:
+                    $ref: '#/components/schemas/PartyType'
+        '400':
+          description: >
+            Validation errors (blank code/name/partyTypeCode, duplicate code)
+            or an unknown partyTypeCode enum name.
+          content:
+            application/json:
+              schema:
+                $ref: '../components/common.yaml#/components/schemas/ErrorResponse'
+  /api/partyTypes/{id}:
+    parameters:
+      - name: id
+        in: path
+        required: true
+        schema:
+          $ref: '../components/common.yaml#/components/schemas/Id'
+        description: Party type id.
+    get:
+      operationId: readPartyType
+      summary: Read a party type
+      responses:
+        '200':
+          description: The party type.
+          content:
+            application/json:
+              schema:
+                type: object
+                required: [data]
+                properties:
+                  data:
+                    $ref: '#/components/schemas/PartyType'
+        '404':
+          $ref: '../components/common.yaml#/components/responses/NotFound'
+    put:
+      operationId: updatePartyType
+      summary: Update a party type
+      description: >
+        Partially updates a party type from the JSON body (only keys present
+        in the body are bound).
+      requestBody:
+        required: true
+        content:
+          application/json:
+            schema:
+              $ref: '#/components/schemas/PartyTypeRequest'
+      responses:
+        '200':
+          description: Updated party type.
+          content:
+            application/json:
+              schema:
+                type: object
+                required: [data]
+                properties:
+                  data:
+                    $ref: '#/components/schemas/PartyType'
+        '400':
+          description: Validation errors or an unknown partyTypeCode enum name.
+          content:
+            application/json:
+              schema:
+                $ref: '../components/common.yaml#/components/schemas/ErrorResponse'
+        '404':
+          $ref: '../components/common.yaml#/components/responses/NotFound'
+    delete:
+      operationId: deletePartyType
+      summary: Delete a party type
+      responses:
+        '204':
+          description: Deleted.
+        '400':
+          description: Party type is still referenced and cannot be deleted.
+          content:
+            application/json:
+              schema:
+                type: object
+                properties:
+                  errorCode:
+                    type: integer
+                  errorMessage:
+                    type: string
+        '404':
+          $ref: '../components/common.yaml#/components/responses/NotFound'
+components:
+  schemas:
+    PartyType:
+      type: object
+      required: [id]
+      properties:
+        id:
+          $ref: '../components/common.yaml#/components/schemas/Id'
+        code:
+          type: string
+          nullable: true
+        name:
+          type: string
+          nullable: true
+        description:
+          type: string
+          nullable: true
+        partyTypeCode:
+          type: string
+          nullable: true
+          description: PartyTypeCode enum name (PERSON or ORGANIZATION).
+        dateCreated:
+          type: string
+          nullable: true
+        lastUpdated:
+          type: string
+          nullable: true
+    PartyTypeRequest:
+      type: object
+      properties:
+        code:
+          type: string
+          nullable: true
+        name:
+          type: string
+          nullable: true
+        description:
+          type: string
+          nullable: true
+        partyTypeCode:
+          type: string
+          nullable: true
+          description: PartyTypeCode enum name (PERSON or ORGANIZATION).
+      additionalProperties: true
+  securitySchemes:
+    cookieAuth:
+      $ref: '../components/common.yaml#/components/securitySchemes/cookieAuth'

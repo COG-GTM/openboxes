@@ -9,8 +9,8 @@ import { captureStep, resetStepCounter } from '../fixtures/screenshots';
  * The legacy /party/(list|create|edit|show) and /partyRole/(create|edit)
  * URLs now render the React SPA, backed by /api/parties/search,
  * /api/parties/{id}/details, /api/partyRoles/{id}/details and the
- * partyOptions/roleTypeOptions select endpoints. partyRole list/show remain
- * legacy GSPs (Batch 35).
+ * partyOptions/roleTypeOptions select endpoints. partyRole list/show and the
+ * partyType screens are covered by partyType.spec.ts (Batch 35).
  */
 
 async function reactTableRowCount(page: Page): Promise<number> {

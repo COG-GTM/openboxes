@@ -143,6 +143,12 @@ class UrlMappings {
             action = [GET: "organizationRoleTypeOptions"]
         }
 
+        // Party type code (enum) options for the party type form
+        "/api/partyTypeCodeOptions"(parseRequest: true) {
+            controller = { "selectOptionsApi" }
+            action = [GET: "partyTypeCodeOptions"]
+        }
+
         // Role type options for the party role form
         "/api/roleTypeOptions"(parseRequest: true) {
             controller = { "selectOptionsApi" }

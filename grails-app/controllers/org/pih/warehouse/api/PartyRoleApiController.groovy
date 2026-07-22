@@ -24,6 +24,26 @@ import org.pih.warehouse.core.RoleType
 
 class PartyRoleApiController {
 
+    def list() {
+        Integer max = Math.min(params.max ? params.int('max') : 10, 100)
+        Integer offset = params.offset ? params.int('offset') : 0
+        String sort = params.sort in ['id', 'roleType', 'startDate', 'endDate'] ? params.sort : 'id'
+        String sortOrder = params.order == 'desc' ? 'desc' : 'asc'
+        def results = PartyRole.createCriteria().list(max: max, offset: offset) {
+            order(sort, sortOrder)
+        }
+        List data = results.collect { PartyRole partyRole ->
+            [
+                    id       : partyRole.id,
+                    party    : partyRole.party ? [id: partyRole.party.id, partyType: partyRole.party.partyType?.name] : null,
+                    roleType : partyRole.roleType?.name(),
+                    startDate: partyRole.startDate?.toString(),
+                    endDate  : partyRole.endDate?.toString(),
+            ]
+        }
+        render([data: data, totalCount: results.totalCount] as JSON)
+    }
+
     def details() {
         PartyRole partyRole = PartyRole.get(params.id)
         if (!partyRole) {

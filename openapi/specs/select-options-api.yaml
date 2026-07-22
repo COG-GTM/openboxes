@@ -11,7 +11,8 @@ info:
     "/api/productTypeOptions", "/api/documentTypeOptions",
     "/api/productAssociationTypeCodeOptions" and
     "/api/stockMovements/shipmentStatusCodes", "/api/glAccountTypeOptions",
-    "/api/locationTypeCodeOptions", "/api/partyTypeOptions",
+    "/api/locationTypeCodeOptions", "/api/partyTypeCodeOptions",
+    "/api/partyTypeOptions",
     "/api/organizationRoleTypeOptions", "/api/roleTypeOptions",
     "/api/partyOptions", "/api/productActivityCodeOptions",
     "/api/productFieldOptions").
@@ -126,6 +127,17 @@ paths:
         the enum name, label is the enum.ProductField.* message or the enum
         name when no message exists). Added in Phase 2 (Batch 11) for the
         React productType create form.
+      responses:
+        '200':
+          $ref: '#/components/responses/IdLabelOptionsOk'
+  /api/partyTypeCodeOptions:
+    get:
+      operationId: listPartyTypeCodeOptions
+      summary: Party type code options
+      description: >
+        Returns every PartyTypeCode enum value as {id, label} pairs (both
+        the enum name). Added in Phase 2 (Batch 35) for the React partyType
+        form.
       responses:
         '200':
           $ref: '#/components/responses/IdLabelOptionsOk'
