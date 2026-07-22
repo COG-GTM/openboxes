@@ -141,7 +141,12 @@ bootRun {
 }
 
 configurations {
-    configureEach {
+    configureEach { config ->
+        // JaCoCo 0.8.x needs its own modern ASM; don't apply app-wide excludes/forces to it
+        if (config.name.startsWith('jacoco')) {
+            return
+        }
+
         // log4j-over-slf4j exposes the same API as this fork of log4j 1.x does
         exclude group: 'ch.qos.reload4j', module: 'reload4j'
 
@@ -872,8 +877,9 @@ task writePom {
 // Running "./gradlew jacocoTestReport" will execute all unit and integration tests, then generate a code
 // coverage report under the "/build/reports/jacoco" folder.
 jacoco {
-    // Jacoco 0.7.7 requires ASM Version 5.1+ https://www.eclemma.org/jacoco/trunk/doc/changes.html
-    toolVersion = '0.7.6.201602180812'
+    // Jacoco 0.8.7+ is required for the agent to instrument classes on Java 11.
+    // The agent jar shades its own ASM, so this doesn't conflict with asmVersion.
+    toolVersion = '0.8.7'
 }
 // Note that the paths here are by package name (as they are in "build/classes/groovy/main"). As such, we cannot
 // filter by Grails folders such as "**/controller/**" (but we could filter by "**/*Controller.class").

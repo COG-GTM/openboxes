@@ -1091,7 +1091,7 @@ class ProductAvailabilityService {
 
         // Only search if there are search terms otherwise the list of product IDs includes all products
         def innerProductIds = searchTerms ?
-                productService.searchProducts(searchTerms.toArray(), [])?.collect { it.id } : []
+                productService.searchProducts(searchTerms as String[], [])?.collect { it.id } : []
 
         // Retrieve all product types with SEARCHABLE and SEARCHABLE_NO_STOCK activity codes
         String productTypeQuery = "select pt from ProductType pt left join pt.supportedActivities sa where sa=:productActivityCode"

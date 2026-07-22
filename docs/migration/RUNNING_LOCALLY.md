@@ -3,7 +3,8 @@
 Verified baseline environment for the modernization program (Phase 0.1).
 Boots the released OpenBoxes app image (`ghcr.io/openboxes/openboxes:latest`,
 Grails 3.3.16 / Java 8) against a containerized MariaDB 10 database, fronted
-by nginx.
+by nginx. As of Phase 1.1a the source tree builds and runs on **Java 11**
+(see [Running from source on Java 11](#running-from-source-on-java-11)).
 
 ## Prerequisites
 
@@ -89,6 +90,33 @@ with `cd characterization && npm ci && npx playwright install chromium && npm te
 `docker/wait-for-app.sh` blocks until the app healthcheck passes (useful in
 scripts/CI).
 
+## Running from source on Java 11
+
+The app builds and runs on JDK 11 (the Docker image uses
+`eclipse-temurin:11-jre-jammy`). To build the WAR from the source tree and
+boot the stack with it instead of the released image:
+
+```bash
+./gradlew prepareDocker -Dgrails.env=prod       # requires JDK 11
+docker build -t openboxes/openboxes:java11-local build/docker
+cd docker
+OB_IMAGE_REPOSITORY="" OB_VERSION=java11-local docker compose up -d
+```
+
+Then wait for the healthcheck and load demo data as described above. The
+`.github/workflows/characterization-java11.yml` workflow runs exactly this
+flow in CI and executes the Playwright characterization suite against it.
+
+Notes:
+
+- The API snapshot suite must run against a *pristine* demo dataset — run it
+  before any Playwright flows (which mutate data), or reset the database in
+  between.
+- The API snapshots were recorded against the pinned released image and
+  currently drift from source builds of `develop` (identically on Java 8 and
+  Java 11 source builds), so the API suite only runs against the pinned image
+  in CI until the snapshots are re-baselined.
+
 ## Configuration overrides
 
 Optionally create `docker/.env` (see `docker/.env.example`) to override
@@ -122,8 +150,8 @@ docker compose up -d     # re-runs migrations from scratch
 - **Memory** — the JVM is capped at 1 GB heap by default; the app container
   needs ~1.5–2 GB total. Increase via `JAVA_TOOL_OPTIONS` in `docker/.env`
   if you see OOM kills.
-- **No local Java 8 needed for running** — the compose setup uses the
-  released image. Building the WAR from source *does* require JDK 8
+- **No local Java toolchain needed for running** — the compose setup uses the
+  released image. Building the WAR from source requires JDK 11
   (see `.github/workflows/backend-tests.yml` for the CI toolchain).
 - **Demo-data loader needs internet** — the app fetches the demo CSVs from
   `raw.githubusercontent.com/openboxes/openboxes/develop/...` at import time.

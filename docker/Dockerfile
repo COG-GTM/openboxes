@@ -1,7 +1,7 @@
 # We previously used openjdk 8 (which itself was based on Debian 10 aka "buster") as our base image, but they have
 # since deprecated their images. Following their recommendation, we have switched to Temurin. The Temurin image for
-# Java 8 is based on Ubuntu 22.04 (which has LTS until April 2027).
-FROM eclipse-temurin:8-jre-jammy
+# Java 11 is based on Ubuntu 22.04 (which has LTS until April 2027).
+FROM eclipse-temurin:11-jre-jammy
 
 LABEL maintainer="support@openboxes.com"
 EXPOSE 8080
