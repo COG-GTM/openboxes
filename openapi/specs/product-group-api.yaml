@@ -1,0 +1,98 @@
+openapi: 3.0.3
+info:
+  title: OpenBoxes - ProductGroupApiController
+  description: >
+    Product group create endpoint handled by
+    org.pih.warehouse.api.ProductGroupApiController, routed via the explicit
+    "/api/productGroups" mapping. Added in Phase 2 (Batch 10) to back the
+    React productGroup create screen; mirrors the legacy
+    ProductGroupController save action (create only; edit/list/show remain
+    legacy GSPs until Batch 11).
+  version: 0.1.0
+servers:
+  - url: http://localhost:8080/openboxes
+    description: Local Docker baseline (docs/migration/RUNNING_LOCALLY.md)
+security:
+  - cookieAuth: []
+paths:
+  /api/productGroups:
+    post:
+      operationId: createProductGroup
+      summary: Create a product group
+      requestBody:
+        required: true
+        content:
+          application/json:
+            schema:
+              type: object
+              properties:
+                name:
+                  type: string
+                  nullable: true
+                description:
+                  type: string
+                  nullable: true
+                category:
+                  type: object
+                  nullable: true
+                  properties:
+                    id:
+                      $ref: '../components/common.yaml#/components/schemas/Id'
+      responses:
+        '201':
+          description: Created product group.
+          content:
+            application/json:
+              schema:
+                type: object
+                required: [data]
+                properties:
+                  data:
+                    $ref: '#/components/schemas/ProductGroup'
+        '400':
+          description: Validation failure.
+          content:
+            application/json:
+              schema:
+                type: object
+                required: [errorCode, errorMessage]
+                properties:
+                  errorCode:
+                    type: integer
+                  errorMessage:
+                    type: string
+                  errorMessages:
+                    type: array
+                    items:
+                      type: string
+components:
+  securitySchemes:
+    cookieAuth:
+      $ref: '../components/common.yaml#/components/securitySchemes/cookieAuth'
+  schemas:
+    ProductGroup:
+      type: object
+      required: [id, name]
+      properties:
+        id:
+          $ref: '../components/common.yaml#/components/schemas/Id'
+        name:
+          type: string
+        description:
+          type: string
+          nullable: true
+        category:
+          type: object
+          nullable: true
+          properties:
+            id:
+              $ref: '../components/common.yaml#/components/schemas/Id'
+            name:
+              type: string
+              nullable: true
+        dateCreated:
+          type: string
+          nullable: true
+        lastUpdated:
+          type: string
+          nullable: true

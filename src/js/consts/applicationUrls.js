@@ -43,6 +43,23 @@ const PRODUCT_ASSOCIATION_URL = {
   create: () => `${PRODUCT_ASSOCIATION_URL.base}/create`,
   edit: (id) => `${PRODUCT_ASSOCIATION_URL.base}/edit/${id}`,
   exportXls: () => `${PRODUCT_ASSOCIATION_URL.base}/list?format=xls`,
+  show: (id) => `${PRODUCT_ASSOCIATION_URL.base}/show/${id}`,
+};
+
+const PRODUCT_CATALOG_URL = {
+  base: `${CONTEXT_PATH}/productCatalog`,
+  list: () => `${PRODUCT_CATALOG_URL.base}/list`,
+  create: () => `${PRODUCT_CATALOG_URL.base}/create`,
+  edit: (id) => `${PRODUCT_CATALOG_URL.base}/edit/${id}`,
+  show: (id) => `${PRODUCT_CATALOG_URL.base}/show/${id}`,
+  export: (id) => `${PRODUCT_CATALOG_URL.base}/exportProductCatalog/${id}`,
+};
+
+const PRODUCT_GROUP_URL = {
+  base: `${CONTEXT_PATH}/productGroup`,
+  list: () => `${PRODUCT_GROUP_URL.base}/list`,
+  create: () => `${PRODUCT_GROUP_URL.base}/create`,
+  edit: (id) => `${PRODUCT_GROUP_URL.base}/edit/${id}`,
 };
 
 const LOCATION_URL = {
@@ -420,7 +437,9 @@ export {
   PARTY_URL,
   PICKLIST_URL,
   PRODUCT_ASSOCIATION_URL,
+  PRODUCT_CATALOG_URL,
   PRODUCT_CONFIGURATION_URL,
+  PRODUCT_GROUP_URL,
   PRODUCT_SUPPLIER_URL,
   PRODUCT_URL,
   PURCHASE_ORDER_URL,

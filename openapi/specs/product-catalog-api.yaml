@@ -1,0 +1,418 @@
+openapi: 3.0.3
+info:
+  title: OpenBoxes - ProductCatalogApiController
+  description: >
+    Product catalog list/read/create/update/delete and catalog item
+    add/remove/import endpoints handled by
+    org.pih.warehouse.api.ProductCatalogApiController, routed via the explicit
+    "/api/productCatalogs", "/api/productCatalogs/$id",
+    "/api/productCatalogs/$id/items", "/api/productCatalogs/$id/items/$itemId"
+    and "/api/productCatalogs/$id/importItems" mappings. Added in Phase 2
+    (Batch 10) to back the React productCatalog list/create/edit/show screens;
+    mirrors the legacy ProductCatalogController.
+  version: 0.1.0
+servers:
+  - url: http://localhost:8080/openboxes
+    description: Local Docker baseline (docs/migration/RUNNING_LOCALLY.md)
+security:
+  - cookieAuth: []
+paths:
+  /api/productCatalogs:
+    get:
+      operationId: listProductCatalogs
+      summary: List product catalogs (paged, sortable)
+      description: >
+        "q" is matched as a substring ilike on name OR code. "sort" accepts
+        the legacy sortable columns (id, code, name, description, active,
+        color, dateCreated; default name), "order" asc|desc (default asc).
+        Default max=10 (capped at 100), offset=0.
+      parameters:
+        - name: q
+          in: query
+          required: false
+          schema:
+            type: string
+        - name: sort
+          in: query
+          required: false
+          schema:
+            type: string
+        - name: order
+          in: query
+          required: false
+          schema:
+            type: string
+            enum: [asc, desc]
+        - $ref: '../components/common.yaml#/components/parameters/max'
+        - $ref: '../components/common.yaml#/components/parameters/offset'
+      responses:
+        '200':
+          description: Paged product catalogs.
+          content:
+            application/json:
+              schema:
+                type: object
+                required: [data, totalCount]
+                properties:
+                  data:
+                    type: array
+                    items:
+                      $ref: '#/components/schemas/ProductCatalog'
+                  totalCount:
+                    type: integer
+    post:
+      operationId: createProductCatalog
+      summary: Create a product catalog
+      requestBody:
+        required: true
+        content:
+          application/json:
+            schema:
+              $ref: '#/components/schemas/ProductCatalogInput'
+      responses:
+        '201':
+          description: Created product catalog.
+          content:
+            application/json:
+              schema:
+                type: object
+                required: [data]
+                properties:
+                  data:
+                    $ref: '#/components/schemas/ProductCatalog'
+        '400':
+          $ref: '#/components/responses/CatalogValidationError'
+  /api/productCatalogs/{id}:
+    parameters:
+      - name: id
+        in: path
+        required: true
+        schema:
+          $ref: '../components/common.yaml#/components/schemas/Id'
+    get:
+      operationId: readProductCatalog
+      summary: Read a single product catalog with its catalog items
+      responses:
+        '200':
+          description: The product catalog (with productCatalogItems).
+          content:
+            application/json:
+              schema:
+                type: object
+                required: [data]
+                properties:
+                  data:
+                    $ref: '#/components/schemas/ProductCatalogWithItems'
+        '404':
+          $ref: '#/components/responses/CatalogNotFound'
+    put:
+      operationId: updateProductCatalog
+      summary: Update a product catalog
+      description: A stale "version" in the body responds 409.
+      requestBody:
+        required: true
+        content:
+          application/json:
+            schema:
+              $ref: '#/components/schemas/ProductCatalogInput'
+      responses:
+        '200':
+          description: The updated product catalog (with productCatalogItems).
+          content:
+            application/json:
+              schema:
+                type: object
+                required: [data]
+                properties:
+                  data:
+                    $ref: '#/components/schemas/ProductCatalogWithItems'
+        '400':
+          $ref: '#/components/responses/CatalogValidationError'
+        '404':
+          $ref: '#/components/responses/CatalogNotFound'
+        '409':
+          description: Optimistic locking failure (stale version).
+          content:
+            application/json:
+              schema:
+                type: object
+                properties:
+                  errorMessage:
+                    type: string
+    delete:
+      operationId: deleteProductCatalog
+      summary: Delete a product catalog
+      responses:
+        '204':
+          description: Deleted (no content).
+        '400':
+          description: Could not be deleted (data integrity violation).
+          content:
+            application/json:
+              schema:
+                type: object
+                properties:
+                  errorMessage:
+                    type: string
+        '404':
+          $ref: '#/components/responses/CatalogNotFound'
+  /api/productCatalogs/{id}/items:
+    parameters:
+      - name: id
+        in: path
+        required: true
+        schema:
+          $ref: '../components/common.yaml#/components/schemas/Id'
+    post:
+      operationId: addProductCatalogItem
+      summary: Add a product to the catalog
+      description: >
+        Mirrors the legacy addProductCatalogItem action; adding a product that
+        is already in the catalog is a no-op. Responds with the refreshed
+        catalog (with productCatalogItems).
+      requestBody:
+        required: true
+        content:
+          application/json:
+            schema:
+              type: object
+              required: [product]
+              properties:
+                product:
+                  type: object
+                  required: [id]
+                  properties:
+                    id:
+                      $ref: '../components/common.yaml#/components/schemas/Id'
+      responses:
+        '200':
+          description: The catalog with the product added.
+          content:
+            application/json:
+              schema:
+                type: object
+                required: [data]
+                properties:
+                  data:
+                    $ref: '#/components/schemas/ProductCatalogWithItems'
+        '400':
+          description: Missing/unknown product.
+          content:
+            application/json:
+              schema:
+                type: object
+                properties:
+                  errorMessage:
+                    type: string
+        '404':
+          $ref: '#/components/responses/CatalogNotFound'
+  /api/productCatalogs/{id}/items/{itemId}:
+    parameters:
+      - name: id
+        in: path
+        required: true
+        schema:
+          $ref: '../components/common.yaml#/components/schemas/Id'
+      - name: itemId
+        in: path
+        required: true
+        schema:
+          $ref: '../components/common.yaml#/components/schemas/Id'
+    delete:
+      operationId: removeProductCatalogItem
+      summary: Remove a catalog item from the catalog
+      responses:
+        '200':
+          description: The catalog with the item removed.
+          content:
+            application/json:
+              schema:
+                type: object
+                required: [data]
+                properties:
+                  data:
+                    $ref: '#/components/schemas/ProductCatalogWithItems'
+        '404':
+          description: No catalog or catalog item with the given id.
+          content:
+            application/json:
+              schema:
+                type: object
+                required: [errorMessage]
+                properties:
+                  errorMessage:
+                    type: string
+  /api/productCatalogs/{id}/importItems:
+    parameters:
+      - name: id
+        in: path
+        required: true
+        schema:
+          $ref: '../components/common.yaml#/components/schemas/Id'
+    post:
+      operationId: importProductCatalogItems
+      summary: Import catalog items from a CSV file
+      description: >
+        Multipart upload ("importFile" part) parsed by
+        ProductService.parseProductCatalogItems, mirroring the legacy
+        importProductCatalog action. Note the CSV references catalogs by code,
+        so rows may target catalogs other than {id}; the response returns the
+        refreshed catalog {id}.
+      requestBody:
+        required: true
+        content:
+          multipart/form-data:
+            schema:
+              type: object
+              required: [importFile]
+              properties:
+                importFile:
+                  type: string
+                  format: binary
+      responses:
+        '200':
+          description: Imported; the refreshed catalog and imported row count.
+          content:
+            application/json:
+              schema:
+                type: object
+                required: [data, importedCount]
+                properties:
+                  data:
+                    $ref: '#/components/schemas/ProductCatalogWithItems'
+                  importedCount:
+                    type: integer
+        '400':
+          description: Empty file or parse/import failure.
+          content:
+            application/json:
+              schema:
+                type: object
+                properties:
+                  errorMessage:
+                    type: string
+                    nullable: true
+        '404':
+          $ref: '#/components/responses/CatalogNotFound'
+components:
+  securitySchemes:
+    cookieAuth:
+      $ref: '../components/common.yaml#/components/securitySchemes/cookieAuth'
+  responses:
+    CatalogNotFound:
+      description: No product catalog with the given id.
+      content:
+        application/json:
+          schema:
+            type: object
+            required: [errorMessage]
+            properties:
+              errorMessage:
+                type: string
+    CatalogValidationError:
+      description: Validation failure.
+      content:
+        application/json:
+          schema:
+            type: object
+            required: [errorCode, errorMessage]
+            properties:
+              errorCode:
+                type: integer
+              errorMessage:
+                type: string
+              errorMessages:
+                type: array
+                items:
+                  type: string
+  schemas:
+    ProductCatalog:
+      type: object
+      required: [id, code, name, itemCount]
+      properties:
+        id:
+          $ref: '../components/common.yaml#/components/schemas/Id'
+        code:
+          type: string
+          nullable: true
+        name:
+          type: string
+          nullable: true
+        description:
+          type: string
+          nullable: true
+        active:
+          type: boolean
+          nullable: true
+        color:
+          type: string
+          nullable: true
+        dateCreated:
+          type: string
+          nullable: true
+        lastUpdated:
+          type: string
+          nullable: true
+        version:
+          type: integer
+        itemCount:
+          type: integer
+    ProductCatalogWithItems:
+      allOf:
+        - $ref: '#/components/schemas/ProductCatalog'
+        - type: object
+          required: [productCatalogItems]
+          properties:
+            productCatalogItems:
+              type: array
+              items:
+                $ref: '#/components/schemas/ProductCatalogItem'
+    ProductCatalogItem:
+      type: object
+      required: [id, product]
+      properties:
+        id:
+          $ref: '../components/common.yaml#/components/schemas/Id'
+        product:
+          type: object
+          nullable: true
+          required: [id]
+          properties:
+            id:
+              $ref: '../components/common.yaml#/components/schemas/Id'
+            productCode:
+              type: string
+              nullable: true
+            name:
+              type: string
+              nullable: true
+            category:
+              type: object
+              nullable: true
+              properties:
+                id:
+                  $ref: '../components/common.yaml#/components/schemas/Id'
+                name:
+                  type: string
+                  nullable: true
+    ProductCatalogInput:
+      type: object
+      properties:
+        code:
+          type: string
+          nullable: true
+        name:
+          type: string
+          nullable: true
+        description:
+          type: string
+          nullable: true
+        active:
+          type: boolean
+          nullable: true
+        color:
+          type: string
+          nullable: true
+        version:
+          type: integer
+          nullable: true

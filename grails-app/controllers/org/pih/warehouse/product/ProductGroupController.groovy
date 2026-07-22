@@ -41,9 +41,7 @@ class ProductGroupController {
     }
 
     def create() {
-        def productGroupInstance = new ProductGroup()
-        productGroupInstance.properties = params
-        return [productGroupInstance: productGroupInstance]
+        render(view: "/common/react", params: params)
     }
 
     // @CacheFlush("selectProductFamilyCache")

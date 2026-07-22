@@ -488,6 +488,31 @@ const AsyncProductAssociationForm = Loadable({
   loading: Loading,
 });
 
+const AsyncProductAssociationShow = Loadable({
+  loader: () => import('components/productAssociation/ProductAssociationShow'),
+  loading: Loading,
+});
+
+const AsyncProductCatalogList = Loadable({
+  loader: () => import('components/productCatalog/ProductCatalogList'),
+  loading: Loading,
+});
+
+const AsyncProductCatalogForm = Loadable({
+  loader: () => import('components/productCatalog/ProductCatalogForm'),
+  loading: Loading,
+});
+
+const AsyncProductCatalogShow = Loadable({
+  loader: () => import('components/productCatalog/ProductCatalogShow'),
+  loading: Loading,
+});
+
+const AsyncProductGroupForm = Loadable({
+  loader: () => import('components/productGroup/ProductGroupForm'),
+  loading: Loading,
+});
+
 const StockMovementList = (props) => {
   const parsedSearchQuery = queryString.parse(props?.location?.search);
   const direction = parsedSearchQuery?.direction?.toUpperCase();
@@ -855,6 +880,12 @@ const Router = () => {
             <MainLayoutRoute path="**/productAssociation/list" component={AsyncProductAssociationList} />
             <MainLayoutRoute path="**/productAssociation/create" component={AsyncProductAssociationForm} />
             <MainLayoutRoute path="**/productAssociation/edit/:id" component={AsyncProductAssociationForm} />
+            <MainLayoutRoute path="**/productAssociation/show/:id" component={AsyncProductAssociationShow} />
+            <MainLayoutRoute path="**/productCatalog/list" component={AsyncProductCatalogList} />
+            <MainLayoutRoute path="**/productCatalog/create" component={AsyncProductCatalogForm} />
+            <MainLayoutRoute path="**/productCatalog/edit/:id" component={AsyncProductCatalogForm} />
+            <MainLayoutRoute path="**/productCatalog/show/:id" component={AsyncProductCatalogShow} />
+            <MainLayoutRoute path="**/productGroup/create" component={AsyncProductGroupForm} />
             <MainLayoutRoute path="**/stockTransfer/list" component={AsyncStockTransferList} />
             <MainLayoutRoute path="**/locationGroup/list" component={AsyncLocationGroupList} />
             <MainLayoutRoute path="**/locationGroup/create" component={AsyncLocationGroupForm} />

@@ -117,13 +117,7 @@ class ProductAssociationController {
     }
 
     def show() {
-        def productAssociationInstance = ProductAssociation.get(params.id)
-        if (!productAssociationInstance) {
-            flash.message = "${warehouse.message(code: 'default.not.found.message', args: [warehouse.message(code: 'productAssociation.label', default: 'ProductAssociation'), params.id])}"
-            redirect(action: "list")
-        } else {
-            [productAssociationInstance: productAssociationInstance]
-        }
+        render(view: "/common/react")
     }
 
     def edit() {
