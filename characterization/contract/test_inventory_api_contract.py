@@ -236,3 +236,25 @@ def test_import_csv_empty_body(client):
           "/api/facilities/{facilityId}/inventories/import",
           path=f"/api/facilities/{main}/inventories/import",
           data=b"", headers={"Content-Type": "text/csv"})
+
+
+def test_product_group_summary(client, batch4_endpoints):
+    main = client.location_id("Main Warehouse")
+    resp = check(client, spec, "GET",
+                 "/api/facilities/{facilityId}/inventories/productGroupSummary",
+                 path=f"/api/facilities/{main}/inventories/productGroupSummary",
+                 params={"status": ["IN_STOCK", "STOCK_OUT", "LOW_STOCK",
+                                    "REORDER", "IDEAL_STOCK", "OVERSTOCK",
+                                    "INVALID"]})
+    data = resp.json()["data"]
+    assert data["rows"], "seeded Main Warehouse should have in-stock products"
+    assert data["totalValue"] >= 0
+    assert data["totalValueFormatted"]
+
+
+def test_product_group_summary_no_status_is_empty(client, batch4_endpoints):
+    main = client.location_id("Main Warehouse")
+    resp = check(client, spec, "GET",
+                 "/api/facilities/{facilityId}/inventories/productGroupSummary",
+                 path=f"/api/facilities/{main}/inventories/productGroupSummary")
+    assert resp.json()["data"]["rows"] == []

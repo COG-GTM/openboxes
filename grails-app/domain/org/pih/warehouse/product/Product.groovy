@@ -380,7 +380,7 @@ class Product implements Comparable, Serializable, DomainValidatable<ProductVali
      * @return
      */
     Document getThumbnail() {
-        return this.images?.sort({ it?.dateCreated })?.first()
+        return this.images ? this.images.sort({ it?.dateCreated }).first() : null
     }
 
     /**

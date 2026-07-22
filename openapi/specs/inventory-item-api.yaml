@@ -1,0 +1,282 @@
+openapi: 3.0.3
+info:
+  title: OpenBoxes - InventoryItemApiController
+  description: >
+    Inventory item (lot number) management handled by
+    org.pih.warehouse.api.InventoryItemApiController, routed via the explicit
+    "/api/products/$productId/allInventoryItems" (GET list) and
+    "/api/inventoryItems..." mappings (POST create, PUT update, DELETE
+    delete, POST recall / revertRecall). Backs the React "Lot Numbers"
+    screen (Phase 2 Batch 4 migration of inventoryItem/showLotNumbers) and
+    mirrors the legacy InventoryItemController permission checks: update and
+    delete require a superuser, recall and revert recall require an admin.
+  version: 0.1.0
+servers:
+  - url: http://localhost:8080/openboxes
+    description: Local Docker baseline (docs/migration/RUNNING_LOCALLY.md)
+security:
+  - cookieAuth: []
+paths:
+  /api/products/{productId}/allInventoryItems:
+    get:
+      operationId: listInventoryItems
+      summary: All inventory items (lot numbers) of a product
+      description: >
+        Every inventory item ever recorded for the product, regardless of
+        location or on-hand quantity (parity with the legacy showLotNumbers
+        tab).
+      parameters:
+        - name: productId
+          in: path
+          required: true
+          schema:
+            $ref: '../components/common.yaml#/components/schemas/Id'
+      responses:
+        '200':
+          description: Inventory items of the product.
+          content:
+            application/json:
+              schema:
+                type: object
+                required: [data]
+                properties:
+                  data:
+                    type: array
+                    items:
+                      $ref: '#/components/schemas/InventoryItem'
+        '404':
+          description: Unknown product id.
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/ErrorMessage'
+  /api/inventoryItems:
+    post:
+      operationId: createInventoryItem
+      summary: Create an inventory item (lot number) for a product
+      description: >
+        Parity quirks - responds 200 (not 201); blank lot numbers are
+        rejected (products with lot/expiry control additionally require an
+        expiration date); a duplicate lot number for the same product fails
+        the unique constraint and returns 400 with errorMessages.
+      requestBody:
+        required: true
+        content:
+          application/json:
+            schema:
+              type: object
+              required: [product]
+              properties:
+                product:
+                  type: object
+                  required: [id]
+                  properties:
+                    id:
+                      $ref: '../components/common.yaml#/components/schemas/Id'
+                lotNumber:
+                  type: string
+                expirationDate:
+                  type: string
+                  nullable: true
+                  description: yyyy-MM-dd (longer ISO strings are truncated to the date part).
+      responses:
+        '200':
+          description: Created inventory item.
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/InventoryItemResponse'
+        '400':
+          description: Validation failure (missing product, blank lot, duplicate lot, ...).
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/ErrorMessageOrMessages'
+  /api/inventoryItems/{id}:
+    put:
+      operationId: updateInventoryItem
+      summary: Update an inventory item's lot number / expiration date (superuser only)
+      parameters:
+        - $ref: '#/components/parameters/inventoryItemId'
+      requestBody:
+        required: true
+        content:
+          application/json:
+            schema:
+              type: object
+              properties:
+                lotNumber:
+                  type: string
+                expirationDate:
+                  type: string
+                  nullable: true
+      responses:
+        '200':
+          description: Updated inventory item.
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/InventoryItemResponse'
+        '400':
+          description: Validation failure.
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/ErrorMessageOrMessages'
+        '403':
+          description: Current user is not a superuser.
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/ErrorMessage'
+        '404':
+          description: Unknown inventory item id.
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/ErrorMessage'
+    delete:
+      operationId: deleteInventoryItem
+      summary: Delete an inventory item (superuser only)
+      description: >
+        Responds 204 on success; 400 when the item is referenced by
+        transactions/shipments (data integrity violation).
+      parameters:
+        - $ref: '#/components/parameters/inventoryItemId'
+      responses:
+        '204':
+          description: Deleted.
+        '400':
+          description: Item is still referenced and cannot be deleted.
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/ErrorMessage'
+        '403':
+          description: Current user is not a superuser.
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/ErrorMessage'
+        '404':
+          description: Unknown inventory item id.
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/ErrorMessage'
+  /api/inventoryItems/{id}/recall:
+    post:
+      operationId: recallInventoryItem
+      summary: Recall a lot (admin only)
+      description: >
+        Marks the lot recalled and refreshes product availability. Items
+        without a lot number cannot be recalled (400).
+      parameters:
+        - $ref: '#/components/parameters/inventoryItemId'
+      responses:
+        '200':
+          description: Recalled inventory item.
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/InventoryItemResponse'
+        '400':
+          description: The item has no lot number.
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/ErrorMessage'
+        '403':
+          description: Current user is not an admin.
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/ErrorMessage'
+        '404':
+          description: Unknown inventory item id.
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/ErrorMessage'
+  /api/inventoryItems/{id}/revertRecall:
+    post:
+      operationId: revertRecallInventoryItem
+      summary: Revert a lot recall (admin only)
+      parameters:
+        - $ref: '#/components/parameters/inventoryItemId'
+      responses:
+        '200':
+          description: Inventory item with the recall reverted.
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/InventoryItemResponse'
+        '403':
+          description: Current user is not an admin.
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/ErrorMessage'
+        '404':
+          description: Unknown inventory item id.
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/ErrorMessage'
+components:
+  parameters:
+    inventoryItemId:
+      name: id
+      in: path
+      required: true
+      schema:
+        $ref: '../components/common.yaml#/components/schemas/Id'
+      description: Inventory item id.
+  schemas:
+    InventoryItem:
+      type: object
+      required: [id, product]
+      properties:
+        id:
+          $ref: '../components/common.yaml#/components/schemas/Id'
+        version:
+          type: integer
+        lotNumber:
+          type: string
+          nullable: true
+        expirationDate:
+          type: string
+          nullable: true
+          description: yyyy-MM-dd
+        lotStatus:
+          type: string
+          nullable: true
+          enum: [RECALLED, null]
+        product:
+          type: object
+          properties:
+            id:
+              $ref: '../components/common.yaml#/components/schemas/Id'
+    InventoryItemResponse:
+      type: object
+      required: [data]
+      properties:
+        data:
+          $ref: '#/components/schemas/InventoryItem'
+    ErrorMessage:
+      type: object
+      properties:
+        errorMessage:
+          type: string
+    ErrorMessageOrMessages:
+      type: object
+      properties:
+        errorMessage:
+          type: string
+        errorMessages:
+          type: array
+          items:
+            type: string
+  securitySchemes:
+    cookieAuth:
+      $ref: '../components/common.yaml#/components/securitySchemes/cookieAuth'

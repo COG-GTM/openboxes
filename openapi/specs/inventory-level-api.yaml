@@ -5,7 +5,10 @@ info:
     Facility inventory-level listing handled by
     org.pih.warehouse.api.InventoryLevelApiController, routed via the
     explicit "/api/facilities/$facilityId/inventory-levels(.$format)?"
-    mapping (GET -> list). The optional .csv / .xls extension switches the
+    mapping (GET -> list) and the
+    "/api/facilities/$facilityId/products/$productId/inventoryLevel" mapping
+    (GET -> read, PUT -> update) backing the React "Edit Inventory Level"
+    screen. The optional .csv / .xls extension on the list switches the
     response to a CSV or Excel attachment.
   version: 0.1.0
 servers:
@@ -14,6 +17,100 @@ servers:
 security:
   - cookieAuth: []
 paths:
+  /api/facilities/{facilityId}/products/{productId}/inventoryLevel:
+    get:
+      operationId: readInventoryLevel
+      summary: Facility-level inventory level (status) of a product
+      description: >
+        Mirrors the legacy InventoryItemController.editInventoryLevel lookup.
+        When the product has no inventory level yet, id and status are null
+        (the screen then creates one on save). Parity quirk - unknown
+        facility or product ids raise IllegalArgumentException (500).
+      parameters:
+        - $ref: '#/components/parameters/facilityId'
+        - $ref: '#/components/parameters/productId'
+      responses:
+        '200':
+          description: The product's inventory level at the facility.
+          content:
+            application/json:
+              schema:
+                type: object
+                required: [data]
+                properties:
+                  data:
+                    type: object
+                    required: [product, inventory]
+                    properties:
+                      id:
+                        type: string
+                        nullable: true
+                      status:
+                        type: string
+                        nullable: true
+                        enum: [INACTIVE, NOT_SUPPORTED, SUPPORTED_NON_INVENTORY, SUPPORTED, STOCK, FORMULARY, null]
+                      product:
+                        type: object
+                        additionalProperties: true
+                      inventory:
+                        type: object
+                        additionalProperties: true
+        '500':
+          $ref: '../components/common.yaml#/components/responses/ServerError'
+    put:
+      operationId: updateInventoryLevel
+      summary: Create or update the product's facility-level inventory level status
+      description: >
+        Mirrors the legacy InventoryItemController.updateInventoryLevel form,
+        which only edits the status field. Creates the inventory level if it
+        does not exist yet. A null/empty status clears the field.
+      parameters:
+        - $ref: '#/components/parameters/facilityId'
+        - $ref: '#/components/parameters/productId'
+      requestBody:
+        required: true
+        content:
+          application/json:
+            schema:
+              type: object
+              properties:
+                status:
+                  type: string
+                  nullable: true
+                  enum: [INACTIVE, NOT_SUPPORTED, SUPPORTED_NON_INVENTORY, SUPPORTED, STOCK, FORMULARY, null]
+      responses:
+        '200':
+          description: The saved inventory level.
+          content:
+            application/json:
+              schema:
+                type: object
+                required: [data]
+                properties:
+                  data:
+                    type: object
+                    properties:
+                      id:
+                        type: string
+                      status:
+                        type: string
+                        nullable: true
+                      product:
+                        type: object
+                        additionalProperties: true
+        '400':
+          description: Validation failure.
+          content:
+            application/json:
+              schema:
+                type: object
+                properties:
+                  errorMessages:
+                    type: array
+                    items:
+                      type: string
+        '500':
+          $ref: '../components/common.yaml#/components/responses/ServerError'
   /api/facilities/{facilityId}/inventory-levels:
     get:
       operationId: listInventoryLevels
@@ -63,6 +160,21 @@ paths:
         '500':
           $ref: '../components/common.yaml#/components/responses/ServerError'
 components:
+  parameters:
+    facilityId:
+      name: facilityId
+      in: path
+      required: true
+      schema:
+        $ref: '../components/common.yaml#/components/schemas/Id'
+      description: Facility (warehouse) id.
+    productId:
+      name: productId
+      in: path
+      required: true
+      schema:
+        $ref: '../components/common.yaml#/components/schemas/Id'
+      description: Product id.
   securitySchemes:
     cookieAuth:
       $ref: '../components/common.yaml#/components/securitySchemes/cookieAuth'
@@ -108,8 +220,12 @@ components:
           type: string
           nullable: true
         status:
-          type: string
+          description: >
+            Default Grails JSON rendering of the InventoryStatus enum - an
+            object like {"enumType": "...InventoryStatus", "name": "STOCK"}.
+          type: object
           nullable: true
+          additionalProperties: true
         comments:
           type: string
           nullable: true

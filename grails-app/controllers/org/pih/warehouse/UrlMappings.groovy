@@ -1364,6 +1364,104 @@ class UrlMappings {
             action = [POST: "saveRecordStock"]
         }
 
+        "/api/facilities/$facility/inventory/record-stock" {
+            controller = "recordStockApi"
+            action = [GET: "getRecordStock"]
+        }
+
+        /**
+         * Stock card API endpoints (React stock card screen)
+         */
+
+        "/api/stockCard/$id/summary" {
+            controller = "stockCardApi"
+            action = [GET: "getSummary"]
+        }
+
+        "/api/stockCard/$id/stockHistory" {
+            controller = "stockCardApi"
+            action = [GET: "getStockHistory"]
+        }
+
+        "/api/stockCard/$id/allLocations" {
+            controller = "stockCardApi"
+            action = [GET: "getAllLocations"]
+        }
+
+        "/api/stockCard/$id/pendingInbound" {
+            controller = "stockCardApi"
+            action = [GET: "getPendingInbound"]
+        }
+
+        "/api/stockCard/$id/pendingOutbound" {
+            controller = "stockCardApi"
+            action = [GET: "getPendingOutbound"]
+        }
+
+        "/api/stockCard/$id/demand" {
+            controller = "stockCardApi"
+            action = [GET: "getDemand"]
+        }
+
+        "/api/stockCard/$id/snapshots" {
+            controller = "stockCardApi"
+            action = [GET: "getSnapshots"]
+        }
+
+        "/api/stockCard/$id/suppliers" {
+            controller = "stockCardApi"
+            action = [GET: "getSuppliers"]
+        }
+
+        "/api/stockCard/$id/documents" {
+            controller = "stockCardApi"
+            action = [GET: "getDocuments"]
+        }
+
+        "/api/stockCard/$id/associations" {
+            controller = "stockCardApi"
+            action = [GET: "getAssociations"]
+        }
+
+        /**
+         * Inventory item (lot number) API endpoints
+         */
+
+        "/api/products/$productId/allInventoryItems" {
+            controller = "inventoryItemApi"
+            action = [GET: "list"]
+        }
+
+        "/api/inventoryItems"(parseRequest: true) {
+            controller = "inventoryItemApi"
+            action = [POST: "create"]
+        }
+
+        "/api/inventoryItems/$id"(parseRequest: true) {
+            controller = "inventoryItemApi"
+            action = [PUT: "update", DELETE: "delete"]
+        }
+
+        "/api/inventoryItems/$id/recall" {
+            controller = "inventoryItemApi"
+            action = [POST: "recall"]
+        }
+
+        "/api/inventoryItems/$id/revertRecall" {
+            controller = "inventoryItemApi"
+            action = [POST: "revertRecall"]
+        }
+
+        "/api/facilities/$facilityId/products/$productId/inventoryLevel"(parseRequest: true) {
+            controller = "inventoryLevelApi"
+            action = [GET: "read", PUT: "update"]
+        }
+
+        "/api/facilities/$facilityId/inventories/productGroupSummary" {
+            controller = "inventoryApi"
+            action = [GET: "getProductGroupSummary"]
+        }
+
         /**
          * Inventory API endpoints
          */

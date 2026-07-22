@@ -120,3 +120,21 @@ def test_save_record_stock_expiry_without_lot_is_validation_error(client):
     )
     assert resp.status_code == 400
     assert "lot number" in resp.json()["errorMessage"]
+
+
+def test_get_record_stock(client, batch4_endpoints):
+    main = client.location_id("Main Warehouse")
+    product = client.product("BF640")
+    resp = check(
+        client, spec, "GET", "/api/facilities/{facility}/inventory/record-stock",
+        path=f"/api/facilities/{main}/inventory/record-stock",
+        params={"product.id": product["id"]},
+    )
+    assert resp.status_code == 200
+    data = resp.json()["data"]
+    assert data["product"]["id"] == product["id"]
+    assert data["inventory"]["id"]
+    assert data["recordInventoryRows"], "BF640 should have stock rows in Main Warehouse"
+    # The prefilled rows' quantities add up to the current quantity on hand
+    assert sum(row["oldQuantity"] or 0 for row in data["recordInventoryRows"]) \
+        == data["totalQuantityOnHand"]

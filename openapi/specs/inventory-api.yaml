@@ -15,9 +15,11 @@ info:
     "/api/facilities/$facilityId/inventories/summary"
     (GET -> getInventorySummary),
     "/api/facilities/$facilityId/inventories/expiredStock"
-    (GET -> getExpiredStock) and
+    (GET -> getExpiredStock),
     "/api/facilities/$facilityId/inventories/expiringStock"
-    (GET -> getExpiringStock) mappings.
+    (GET -> getExpiringStock) and
+    "/api/facilities/$facilityId/inventories/productGroupSummary"
+    (GET -> getProductGroupSummary) mappings.
   version: 0.1.0
 servers:
   - url: http://localhost:8080/openboxes
@@ -99,6 +101,62 @@ paths:
                       $ref: '#/components/schemas/InventorySummaryItem'
                   totalCount:
                     type: integer
+        '400':
+          description: No location could be resolved.
+          content:
+            application/json:
+              schema:
+                type: object
+                properties:
+                  errorMessage:
+                    type: string
+  /api/facilities/{facilityId}/inventories/productGroupSummary:
+    get:
+      operationId: getProductGroupSummary
+      summary: Quantity on hand by product group with inventory-level status
+      description: >
+        Backs the React inventoryBrowser/list screen. Wraps
+        reportService.calculateQuantityOnHandByProductGroup the same way the
+        legacy JsonController.getQuantityOnHandByProductGroup ajax endpoint
+        did - the repeatable status parameter selects which status buckets'
+        rows are returned (deduplicated as a set). With no status parameter
+        the row list is empty. Parity quirk - if the facilityId cannot be
+        resolved and there is no session warehouse the endpoint responds 400
+        with an errorMessage.
+      parameters:
+        - $ref: '#/components/parameters/facilityId'
+        - name: status
+          in: query
+          required: false
+          schema:
+            type: string
+            enum: [ALL, IN_STOCK, NOT_STOCKED, STOCK_OUT, LOW_STOCK, REORDER, IDEAL_STOCK, OVERSTOCK, INVALID]
+          description: Repeatable status buckets to include.
+      responses:
+        '200':
+          description: Product group rows plus status summary and total value.
+          content:
+            application/json:
+              schema:
+                type: object
+                required: [data]
+                properties:
+                  data:
+                    type: object
+                    required: [rows, totalValue, totalValueFormatted]
+                    properties:
+                      rows:
+                        type: array
+                        items:
+                          type: object
+                          additionalProperties: true
+                      summary:
+                        type: object
+                        additionalProperties: true
+                      totalValue:
+                        type: number
+                      totalValueFormatted:
+                        type: string
         '400':
           description: No location could be resolved.
           content:

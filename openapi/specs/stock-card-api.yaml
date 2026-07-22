@@ -1,0 +1,383 @@
+openapi: 3.0.3
+info:
+  title: OpenBoxes - StockCardApiController
+  description: >
+    Read-only endpoints backing the React stock card screen (Phase 2 Batch 4
+    migration of inventoryItem/showStockCard), handled by
+    org.pih.warehouse.api.StockCardApiController and routed via the explicit
+    "/api/stockCard/$id/..." mappings. Every action resolves the warehouse
+    from the session (the current location chosen at login), never from
+    request parameters - same as the legacy InventoryItemController.
+  version: 0.1.0
+servers:
+  - url: http://localhost:8080/openboxes
+    description: Local Docker baseline (docs/migration/RUNNING_LOCALLY.md)
+security:
+  - cookieAuth: []
+paths:
+  /api/stockCard/{id}/summary:
+    get:
+      operationId: getStockCardSummary
+      summary: Product header and quantity summary for the stock card
+      parameters:
+        - $ref: '#/components/parameters/productId'
+      responses:
+        '200':
+          description: Stock card summary.
+          content:
+            application/json:
+              schema:
+                type: object
+                required: [data]
+                properties:
+                  data:
+                    type: object
+                    required: [product, inventory, totalQuantityOnHand, totalQuantityAvailableToPromise]
+                    properties:
+                      product:
+                        type: object
+                        properties:
+                          id:
+                            $ref: '../components/common.yaml#/components/schemas/Id'
+                          productCode:
+                            type: string
+                          name:
+                            type: string
+                          displayNameOrDefaultName:
+                            type: string
+                            nullable: true
+                          unitOfMeasure:
+                            type: string
+                            nullable: true
+                          category:
+                            type: string
+                            nullable: true
+                          productFamily:
+                            type: string
+                            nullable: true
+                          lotAndExpiryControl:
+                            type: boolean
+                            nullable: true
+                          active:
+                            type: boolean
+                          tags:
+                            type: array
+                            items:
+                              type: object
+                              additionalProperties: true
+                          catalogs:
+                            type: array
+                            items:
+                              type: object
+                              additionalProperties: true
+                      inventory:
+                        type: object
+                        properties:
+                          id:
+                            type: string
+                            nullable: true
+                      inventoryLevel:
+                        type: object
+                        nullable: true
+                        additionalProperties: true
+                      totalQuantityOnHand:
+                        type: number
+                      totalQuantityAvailableToPromise:
+                        type: number
+        '500':
+          $ref: '../components/common.yaml#/components/responses/ServerError'
+  /api/stockCard/{id}/stockHistory:
+    get:
+      operationId: getStockCardStockHistory
+      summary: Transaction history rows with running balance
+      parameters:
+        - $ref: '#/components/parameters/productId'
+      responses:
+        '200':
+          description: Stock history rows.
+          content:
+            application/json:
+              schema:
+                type: object
+                required: [data]
+                properties:
+                  data:
+                    type: object
+                    required: [rows]
+                    properties:
+                      rows:
+                        type: array
+                        items:
+                          type: object
+                          additionalProperties: true
+                      totalBalance:
+                        type: number
+                        nullable: true
+                      totalCount:
+                        type: integer
+                        nullable: true
+                      totalCredit:
+                        type: number
+                        nullable: true
+                      totalDebit:
+                        type: number
+                        nullable: true
+        '500':
+          $ref: '../components/common.yaml#/components/responses/ServerError'
+  /api/stockCard/{id}/allLocations:
+    get:
+      operationId: getStockCardAllLocations
+      summary: Quantity on hand across all depot locations, grouped by location group
+      description: >
+        Value fields are null unless the user has the finance role (parity
+        with the legacy showCurrentStockAllLocations tab).
+      parameters:
+        - $ref: '#/components/parameters/productId'
+      responses:
+        '200':
+          description: Per-location-group quantities.
+          content:
+            application/json:
+              schema:
+                type: object
+                required: [data]
+                properties:
+                  data:
+                    type: array
+                    items:
+                      type: object
+                      properties:
+                        locationGroup:
+                          type: string
+                          nullable: true
+                        totalQuantity:
+                          type: number
+                          nullable: true
+                        totalValue:
+                          type: number
+                          nullable: true
+                        locations:
+                          type: array
+                          items:
+                            type: object
+                            additionalProperties: true
+        '500':
+          $ref: '../components/common.yaml#/components/responses/ServerError'
+  /api/stockCard/{id}/pendingInbound:
+    get:
+      operationId: getStockCardPendingInbound
+      summary: Pending inbound shipment and purchase order lines for the product
+      parameters:
+        - $ref: '#/components/parameters/productId'
+      responses:
+        '200':
+          description: Pending inbound rows.
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/RowsResponse'
+        '500':
+          $ref: '../components/common.yaml#/components/responses/ServerError'
+  /api/stockCard/{id}/pendingOutbound:
+    get:
+      operationId: getStockCardPendingOutbound
+      summary: Pending outbound requisition lines for the product
+      parameters:
+        - $ref: '#/components/parameters/productId'
+      responses:
+        '200':
+          description: Pending outbound rows.
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/RowsResponse'
+        '500':
+          $ref: '../components/common.yaml#/components/responses/ServerError'
+  /api/stockCard/{id}/demand:
+    get:
+      operationId: getStockCardDemand
+      summary: Demand details (requisition-based) for the product
+      parameters:
+        - $ref: '#/components/parameters/productId'
+        - name: destination
+          in: query
+          required: false
+          schema:
+            type: string
+          description: Optional destination location id filter (destination.id).
+        - name: startDate
+          in: query
+          required: false
+          schema:
+            type: string
+          description: MM/dd/yyyy; defaults to the configured demand period back from today.
+        - name: endDate
+          in: query
+          required: false
+          schema:
+            type: string
+          description: MM/dd/yyyy; defaults to yesterday's end of day.
+      responses:
+        '200':
+          description: Demand rows plus available destination filters.
+          content:
+            application/json:
+              schema:
+                type: object
+                required: [data]
+                properties:
+                  data:
+                    type: object
+                    required: [rows]
+                    properties:
+                      rows:
+                        type: array
+                        items:
+                          type: object
+                          additionalProperties: true
+                      monthKeys:
+                        type: array
+                        items:
+                          type: string
+                      destinations:
+                        type: array
+                        items:
+                          type: object
+                          additionalProperties: true
+                      startDate:
+                        type: string
+                      endDate:
+                        type: string
+        '500':
+          $ref: '../components/common.yaml#/components/responses/ServerError'
+  /api/stockCard/{id}/snapshots:
+    get:
+      operationId: getStockCardSnapshots
+      summary: Inventory snapshots recorded for the product at the current location
+      parameters:
+        - $ref: '#/components/parameters/productId'
+      responses:
+        '200':
+          description: Snapshot rows (may be empty - snapshots are only written by batch jobs).
+          content:
+            application/json:
+              schema:
+                type: object
+                required: [data]
+                properties:
+                  data:
+                    type: array
+                    items:
+                      type: object
+                      additionalProperties: true
+        '500':
+          $ref: '../components/common.yaml#/components/responses/ServerError'
+  /api/stockCard/{id}/suppliers:
+    get:
+      operationId: getStockCardSuppliers
+      summary: Active product suppliers (sources) for the product
+      description: >
+        Price fields are null unless the user has the finance role.
+      parameters:
+        - $ref: '#/components/parameters/productId'
+      responses:
+        '200':
+          description: Supplier rows.
+          content:
+            application/json:
+              schema:
+                type: object
+                required: [data]
+                properties:
+                  data:
+                    type: object
+                    required: [rows]
+                    properties:
+                      rows:
+                        type: array
+                        items:
+                          type: object
+                          additionalProperties: true
+                      currencyCode:
+                        type: string
+        '500':
+          $ref: '../components/common.yaml#/components/responses/ServerError'
+  /api/stockCard/{id}/documents:
+    get:
+      operationId: getStockCardDocuments
+      summary: Documents attached to the product
+      parameters:
+        - $ref: '#/components/parameters/productId'
+      responses:
+        '200':
+          description: Document rows.
+          content:
+            application/json:
+              schema:
+                type: object
+                required: [data]
+                properties:
+                  data:
+                    type: array
+                    items:
+                      type: object
+                      additionalProperties: true
+        '500':
+          $ref: '../components/common.yaml#/components/responses/ServerError'
+  /api/stockCard/{id}/associations:
+    get:
+      operationId: getStockCardAssociations
+      summary: Associated products with quantity available at the current location
+      parameters:
+        - $ref: '#/components/parameters/productId'
+      responses:
+        '200':
+          description: Association rows.
+          content:
+            application/json:
+              schema:
+                type: object
+                required: [data]
+                properties:
+                  data:
+                    type: object
+                    required: [rows]
+                    properties:
+                      rows:
+                        type: array
+                        items:
+                          type: object
+                          additionalProperties: true
+                      totalQuantity:
+                        type: number
+        '500':
+          $ref: '../components/common.yaml#/components/responses/ServerError'
+components:
+  parameters:
+    productId:
+      name: id
+      in: path
+      required: true
+      schema:
+        $ref: '../components/common.yaml#/components/schemas/Id'
+      description: >
+        Product id. Parity quirk - an unknown product id raises
+        IllegalArgumentException (500), matching legacy behavior for bad ids.
+  schemas:
+    RowsResponse:
+      type: object
+      required: [data]
+      properties:
+        data:
+          type: object
+          required: [rows]
+          properties:
+            rows:
+              type: array
+              items:
+                type: object
+                additionalProperties: true
+          additionalProperties: true
+  securitySchemes:
+    cookieAuth:
+      $ref: '../components/common.yaml#/components/securitySchemes/cookieAuth'

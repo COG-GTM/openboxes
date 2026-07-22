@@ -30,6 +30,8 @@ import org.pih.warehouse.product.ProductCatalog
 import org.pih.warehouse.core.UserService
 import org.pih.warehouse.report.InventoryReportCommand
 
+import java.text.NumberFormat
+
 class InventoryApiController {
 
     InventoryImportDataService inventoryImportDataService
@@ -38,6 +40,7 @@ class InventoryApiController {
     UserService userService
     def productAvailabilityService
     def productService
+    def reportService
 
     def importCsv() {
         String fileData = request.inputStream.text
@@ -112,6 +115,45 @@ class InventoryApiController {
         }
 
         render([data: data, totalCount: data.size()] as JSON)
+    }
+
+    /**
+     * Backs the React inventory browser screen (legacy inventoryBrowser/list).
+     * Wraps reportService.calculateQuantityOnHandByProductGroup the same way as
+     * the legacy JsonController.getQuantityOnHandByProductGroup /
+     * getSummaryByProductGroup ajax endpoints did.
+     */
+    def getProductGroupSummary() {
+        Location location = Location.get(params.facilityId ?: session?.warehouse?.id)
+        if (!location) {
+            renderMissingLocation()
+            return
+        }
+
+        def data = reportService.calculateQuantityOnHandByProductGroup(location.id)
+
+        def rows = new HashSet()
+        List statuses = params.list("status")
+        statuses.each {
+            def entry = data.productGroupDetails[it]
+            if (entry) {
+                rows += entry.values()
+            }
+        }
+
+        def totalValue = rows.sum { it.totalValue ?: 0 } ?: 0
+        NumberFormat numberFormat = NumberFormat.getNumberInstance()
+        String currencyCode = grailsApplication.config.openboxes.locale.defaultCurrencyCode ?: "USD"
+        numberFormat.currency = Currency.getInstance(currencyCode)
+        numberFormat.maximumFractionDigits = 2
+        numberFormat.minimumFractionDigits = 2
+
+        render([data: [
+                rows               : rows,
+                summary            : data.productGroupSummary,
+                totalValue         : totalValue,
+                totalValueFormatted: numberFormat.format(totalValue),
+        ]] as JSON)
     }
 
     def getExpiredStock(InventoryReportCommand command) {

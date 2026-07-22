@@ -432,6 +432,36 @@ const AsyncEditTransactionPage = Loadable({
   loading: Loading,
 });
 
+const AsyncInventoryBrowserList = Loadable({
+  loader: () => import('components/inventory/InventoryBrowserList'),
+  loading: Loading,
+});
+
+const AsyncStockCardPage = Loadable({
+  loader: () => import('components/inventory/stockCard/StockCardPage'),
+  loading: Loading,
+});
+
+const AsyncLotNumbersPage = Loadable({
+  loader: () => import('components/inventory/stockCard/LotNumbersPage'),
+  loading: Loading,
+});
+
+const AsyncRecordStockPage = Loadable({
+  loader: () => import('components/inventory/stockCard/RecordStockPage'),
+  loading: Loading,
+});
+
+const AsyncStockGraphPage = Loadable({
+  loader: () => import('components/inventory/stockCard/StockGraphPage'),
+  loading: Loading,
+});
+
+const AsyncEditInventoryLevelPage = Loadable({
+  loader: () => import('components/inventory/stockCard/EditInventoryLevelPage'),
+  loading: Loading,
+});
+
 const InventoryLowStockList = (props) => <AsyncInventorySummaryList {...props} lowStock />;
 const ExpiredStockList = (props) => <AsyncExpirationStockList {...props} expired />;
 
@@ -502,6 +532,13 @@ const Router = () => {
             <MainLayoutRoute path="**/inventory/listDailyTransactions" component={AsyncDailyTransactionsList} />
             <MainLayoutRoute path="**/inventory/list" component={AsyncInventorySummaryList} />
             <MainLayoutRoute path="**/inventory/editTransaction/:id" component={AsyncEditTransactionPage} />
+            <MainLayoutRoute path="**/inventoryBrowser/list" component={AsyncInventoryBrowserList} />
+            <MainLayoutRoute path="**/inventoryBrowser/index" component={AsyncInventoryBrowserList} />
+            <MainLayoutRoute path="**/inventoryItem/showStockCard/:id?" component={AsyncStockCardPage} />
+            <MainLayoutRoute path="**/inventoryItem/showLotNumbers/:id?" component={AsyncLotNumbersPage} />
+            <MainLayoutRoute path="**/inventoryItem/showRecordInventory/:id?" component={AsyncRecordStockPage} />
+            <MainLayoutRoute path="**/inventoryItem/showGraph/:id?" component={AsyncStockGraphPage} />
+            <MainLayoutRoute path="**/inventoryItem/editInventoryLevel/:id?" component={AsyncEditInventoryLevelPage} />
             <MainLayoutRoute path="**/inventory/cycleCount/count" component={AsyncCycleCountCountStep} />
             <MainLayoutRoute path="**/inventory/cycleCount/resolve" component={AsyncCycleCountResolveStep} />
             <MainLayoutRoute path="**/inventory/cycleCount/reporting" component={AsyncCycleCountReporting} />

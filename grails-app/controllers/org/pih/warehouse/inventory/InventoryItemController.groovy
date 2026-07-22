@@ -64,18 +64,7 @@ class InventoryItemController {
      * Displays the stock card for a product
      */
     def showStockCard(StockCardCommand cmd) {
-
-        try {
-            // add the current warehouse to the command object which prevents location from being spoofed
-            cmd.warehouse = Location.get(session?.warehouse?.id)
-
-            // now populate the rest of the commmand object
-            inventoryService.getStockCardCommand(cmd, params)
-            [commandInstance: cmd]
-        } catch (ProductException e) {
-            flash.message = e.message
-            redirect(controller: "dashboard", action: "index")
-        }
+        render(view: "/common/react")
     }
 
     def showCurrentStock(StockCardCommand cmd) {
@@ -377,14 +366,7 @@ class InventoryItemController {
      * Displays the stock card for a product
      */
     def showLotNumbers(StockCardCommand cmd) {
-        // add the current warehouse to the command object
-        cmd.warehouse = Location.get(session?.warehouse?.id)
-
-        // now populate the rest of the commmand object
-        def commandInstance = inventoryService.getStockCardCommand(cmd, params)
-
-
-        [commandInstance: commandInstance]
+        render(view: "/common/react")
     }
 
     /**
@@ -405,73 +387,14 @@ class InventoryItemController {
      * Displays the stock card for a product
      */
     def showGraph(StockCardCommand cmd) {
-        // add the current warehouse to the command object
-        cmd.warehouse = Location.get(session?.warehouse?.id)
-
-        // now populate the rest of the commmand object
-        def commandInstance = inventoryService.getStockCardCommand(cmd, params)
-
-        log.info("Inventory item list: " + commandInstance?.inventoryItemList)
-        [commandInstance: commandInstance]
+        render(view: "/common/react")
     }
 
     /**
      * Display the Record Inventory form for the product
      */
     def showRecordInventory(RecordInventoryCommand commandInstance) {
-
-        def locationInstance = Location.get(session?.warehouse?.id)
-
-        // We need to set the inventory instance in order to save an 'inventory' transaction
-        if (!commandInstance.inventory) {
-            commandInstance.inventory = locationInstance?.inventory
-        }
-
-        // We need if/else statement to avoid duplication data (OBPIH-7438)
-        if (flash.recordInventoryRows) {
-            commandInstance.recordInventoryRows = flash.recordInventoryRows.collect { RecordInventoryRowCommand it ->
-                Location binLocation = it?.binLocation ? Location.get(it.binLocation.id) : null
-                [
-                    id: it.id,
-                    lotNumber: it.lotNumber,
-                    binLocation: binLocation,
-                    inventoryItem: it.inventoryItem,
-                    expirationDate: it.expirationDate,
-                    description: it.description,
-                    oldQuantity: it.oldQuantity,
-                    newQuantity: it.newQuantity,
-                    comment: it.comment,
-                    error: it.error,
-                ]
-            }
-        } else {
-            inventoryService.populateRecordInventoryCommand(commandInstance, params)
-        }
-
-        Product productInstance = commandInstance.product
-        List transactionEntryList = inventoryService.getTransactionEntriesByInventoryAndProduct(commandInstance?.inventory, [productInstance])
-
-        // Get the inventory warning level for the given product and inventory
-        commandInstance.inventoryLevel = InventoryLevel.findByProductAndInventory(productInstance, commandInstance?.inventory)
-
-        // Compute the total quantity for the given product
-        commandInstance.totalQuantity = inventoryService.getQuantityByProductMap(transactionEntryList)[productInstance] ?: 0
-
-        commandInstance.totalQuantityAvailableToPromise = inventoryService.getQuantityAvailableToPromise(commandInstance.product, commandInstance?.inventory?.warehouse)
-
-        // FIXME Use this method instead of getQuantityByProductMap
-        // NEED to add tests before we introduce this change
-        //commandInstance.totalQuantity = inventoryService.getQuantityOnHand(locationInstance, productInstance)
-
-        Map<Product, List<InventoryItem>> inventoryItems = inventoryService.getInventoryItemsWithQuantity([productInstance], commandInstance.inventory)
-        def result = []
-        inventoryItems.keySet().each { product ->
-            result = inventoryItems[product].collect { ((InventoryItem) it).toJson() }
-        }
-        String jsonString = [product: productInstance.toJson(), inventoryItems: result] as JSON
-        log.info "record inventory " + jsonString
-
-        [commandInstance: commandInstance, product: jsonString]
+        render(view: "/common/react")
     }
 
     def saveRecordInventory(RecordInventoryCommand commandInstance) {
@@ -583,20 +506,7 @@ class InventoryItemController {
     }
 
     def editInventoryLevel() {
-
-        def productInstance = Product.get(params?.product?.id)
-        def inventoryInstance = Inventory.get(params?.inventory?.id)
-        if (!inventoryInstance) {
-            def warehouse = Location.get(session?.warehouse?.id)
-            inventoryInstance = warehouse.inventory
-        }
-
-        def inventoryLevelInstance = InventoryLevel.findByProductAndInventory(productInstance, inventoryInstance)
-        if (!inventoryLevelInstance) {
-            inventoryLevelInstance = new InventoryLevel()
-        }
-
-        [productInstance: productInstance, inventoryInstance: inventoryInstance, inventoryLevelInstance: inventoryLevelInstance]
+        render(view: "/common/react")
     }
 
     @Transactional

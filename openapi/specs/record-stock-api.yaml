@@ -4,9 +4,13 @@ info:
   description: >
     Baseline stock recount ("record stock") handled by
     org.pih.warehouse.api.RecordStockApiController, routed via the explicit
-    "/api/facilities/$facility/inventory/record-stock/save" mapping. A single
+    "/api/facilities/$facility/inventory/record-stock/save" mapping. The
     POST action creates a baseline transaction plus an adjustment transaction
-    for the given product and refreshes product availability.
+    for the given product and refreshes product availability. The companion
+    "/api/facilities/$facility/inventory/record-stock" GET mapping
+    (getRecordStock) returns the prefilled count rows backing the React
+    Record Stock screen (Phase 2 Batch 4 migration of
+    inventoryItem/showRecordInventory).
   version: 0.1.0
 servers:
   - url: http://localhost:8080/openboxes
@@ -115,6 +119,86 @@ paths:
                     $ref: '#/components/schemas/RecordInventoryCommand'
         '400':
           $ref: '../components/common.yaml#/components/responses/ValidationError'
+  /api/facilities/{facility}/inventory/record-stock:
+    get:
+      operationId: getRecordStock
+      summary: Prefilled record-stock form data for a product at a facility
+      description: >
+        Mirrors InventoryItemController.showRecordInventory - one row per
+        existing bin/lot combination with the current (old) quantity, plus
+        product info and totals. Parity quirk - an unknown facility id raises
+        IllegalArgumentException (500).
+      parameters:
+        - name: facility
+          in: path
+          required: true
+          schema:
+            $ref: '../components/common.yaml#/components/schemas/Id'
+          description: Facility (warehouse Location) id.
+        - name: product.id
+          in: query
+          required: true
+          schema:
+            $ref: '../components/common.yaml#/components/schemas/Id'
+          description: Product id (bound into the RecordInventoryCommand).
+      responses:
+        '200':
+          description: Record stock form data.
+          content:
+            application/json:
+              schema:
+                type: object
+                required: [data]
+                properties:
+                  data:
+                    type: object
+                    required: [product, inventory, totalQuantityOnHand, totalQuantityAvailableToPromise, recordInventoryRows]
+                    properties:
+                      product:
+                        type: object
+                        additionalProperties: true
+                      inventory:
+                        type: object
+                        additionalProperties: true
+                      inventoryLevel:
+                        type: object
+                        nullable: true
+                        additionalProperties: true
+                      totalQuantityOnHand:
+                        type: integer
+                      totalQuantityAvailableToPromise:
+                        type: integer
+                      recordInventoryRows:
+                        type: array
+                        items:
+                          type: object
+                          properties:
+                            id:
+                              type: string
+                              nullable: true
+                            lotNumber:
+                              type: string
+                              nullable: true
+                            binLocation:
+                              type: object
+                              nullable: true
+                              additionalProperties: true
+                            expirationDate:
+                              type: string
+                              nullable: true
+                            oldQuantity:
+                              type: integer
+                              nullable: true
+                            newQuantity:
+                              type: integer
+                              nullable: true
+                            comment:
+                              type: string
+                              nullable: true
+        '400':
+          $ref: '../components/common.yaml#/components/responses/ValidationError'
+        '500':
+          $ref: '../components/common.yaml#/components/responses/ServerError'
 components:
   schemas:
     RecordInventoryCommand:

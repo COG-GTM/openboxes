@@ -16,6 +16,8 @@ class InventoryBrowserController {
     }
 
 
-    def list() {}
+    def list() {
+        render(view: "/common/react")
+    }
 
 }
