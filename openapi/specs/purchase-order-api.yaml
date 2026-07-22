@@ -1,0 +1,279 @@
+openapi: 3.0.3
+info:
+  title: OpenBoxes - PurchaseOrderApiController
+  description: >
+    Purchase-order endpoints handled by
+    org.pih.warehouse.api.PurchaseOrderApiController, routed via explicit URL
+    mappings ("/api/purchaseOrders", "/api/purchaseOrders/$id",
+    "/api/purchaseOrders/$id/rollback", "/api/orderSummaryStatus"). The
+    controller also defines an orderItemsDerivedStatus closure that no /api
+    URL mapping routes to; it is not specified here. Purchase orders are
+    created through the legacy purchaseOrder web controller, not this API.
+  version: 0.1.0
+servers:
+  - url: http://localhost:8080/openboxes
+    description: Local Docker baseline (docs/migration/RUNNING_LOCALLY.md)
+security:
+  - cookieAuth: []
+paths:
+  /api/purchaseOrders:
+    get:
+      operationId: listPurchaseOrders
+      summary: List purchase orders (JSON or CSV export)
+      parameters:
+        - $ref: '../components/common.yaml#/components/parameters/max'
+        - $ref: '../components/common.yaml#/components/parameters/offset'
+        - name: format
+          in: query
+          required: false
+          schema:
+            type: string
+          description: >
+            "csv" switches the response to a CSV attachment; any other (or
+            no) value renders JSON.
+        - name: orderItems
+          in: query
+          required: false
+          schema:
+            type: boolean
+          description: >
+            With format=csv, "true" exports one row per order line item
+            instead of one row per order.
+        - name: searchTerm
+          in: query
+          required: false
+          schema:
+            type: string
+        - name: status
+          in: query
+          required: false
+          schema:
+            type: array
+            items:
+              type: string
+          style: form
+          explode: true
+          description: Derived OrderSummaryStatus values to filter by.
+      responses:
+        '200':
+          description: >
+            Purchase orders visible to the current location, as OrderSummary
+            rows (custom flat rendering registered for the order list page).
+          content:
+            application/json:
+              schema:
+                type: object
+                required: [data, totalPrice, totalCount]
+                properties:
+                  data:
+                    type: array
+                    items:
+                      $ref: '#/components/schemas/OrderSummaryRow'
+                  totalPrice:
+                    type: number
+                    nullable: true
+                    description: Sum of normalized order totals (0.0 when empty).
+                  totalCount:
+                    type: integer
+                    nullable: true
+            text/csv:
+              schema:
+                type: string
+                description: Orders or order-line-items CSV attachment.
+  /api/purchaseOrders/{id}:
+    get:
+      operationId: readPurchaseOrder
+      summary: Read a purchase order
+      parameters:
+        - name: id
+          in: path
+          required: true
+          schema:
+            $ref: '../components/common.yaml#/components/schemas/Id'
+      responses:
+        '200':
+          description: The order (default Grails Order rendering, deep).
+          content:
+            application/json:
+              schema:
+                type: object
+                required: [data]
+                properties:
+                  data:
+                    type: object
+                    additionalProperties: true
+        '404':
+          description: >
+            Parity quirk - the not-found branch does not return, so both
+            renders execute: a text/html body containing the localized
+            not-found message immediately followed by the JSON fallback,
+            e.g. 'Order not found with id abc{"data":null}'.
+          content:
+            text/html:
+              schema:
+                type: string
+    delete:
+      operationId: deletePurchaseOrder
+      summary: Delete a pending purchase order
+      parameters:
+        - name: id
+          in: path
+          required: true
+          schema:
+            $ref: '../components/common.yaml#/components/schemas/Id'
+      responses:
+        '204':
+          description: Order deleted (only PENDING purchase orders).
+        '400':
+          description: >
+            Order has a prepayment invoice, is beyond PENDING, or is not a
+            purchase order (or deletion hit a data-integrity violation).
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/ErrorMessagesBody'
+        '404':
+          description: Order not found.
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/ErrorMessageBody'
+  /api/purchaseOrders/{id}/rollback:
+    post:
+      operationId: rollbackPurchaseOrder
+      summary: Roll back a purchase order's status
+      description: >
+        Rolls a PLACED/PARTIALLY_RECEIVED/RECEIVED order back to PENDING
+        (deleting shipment/receipt data); a no-op for orders in other
+        statuses. Orders with associated shipments raise an
+        IllegalArgumentException (500).
+      parameters:
+        - name: id
+          in: path
+          required: true
+          schema:
+            $ref: '../components/common.yaml#/components/schemas/Id'
+      responses:
+        '200':
+          description: Rollback performed (empty body).
+        '404':
+          description: Order not found.
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/ErrorMessageBody'
+        '500':
+          $ref: '../components/common.yaml#/components/responses/ServerError'
+  /api/orderSummaryStatus:
+    get:
+      operationId: purchaseOrderStatusOptions
+      summary: Derived order-summary status options
+      responses:
+        '200':
+          description: OrderSummaryStatus derived statuses as select options.
+          content:
+            application/json:
+              schema:
+                type: object
+                required: [data]
+                properties:
+                  data:
+                    type: array
+                    items:
+                      type: object
+                      required: [id, value, label]
+                      properties:
+                        id:
+                          type: string
+                        value:
+                          type: string
+                        label:
+                          type: string
+                        variant:
+                          type: string
+                          nullable: true
+components:
+  securitySchemes:
+    cookieAuth:
+      $ref: '../components/common.yaml#/components/securitySchemes/cookieAuth'
+  schemas:
+    OrderSummaryRow:
+      type: object
+      description: >
+        Flat OrderSummary rendering (custom JSON marshaller for the purchase
+        order list page).
+      required: [id, orderNumber, status]
+      properties:
+        id:
+          $ref: '../components/common.yaml#/components/schemas/Id'
+        status:
+          type: string
+          description: Derived OrderSummaryStatus (falls back to order status).
+        orderNumber:
+          type: string
+        name:
+          type: string
+          nullable: true
+        paymentTerm:
+          type: string
+          nullable: true
+        origin:
+          type: string
+          nullable: true
+          description: '"Name (ORG CODE)".'
+        destination:
+          type: string
+          nullable: true
+        dateOrdered:
+          type: string
+          nullable: true
+        orderedBy:
+          type: string
+          nullable: true
+        createdBy:
+          type: string
+          nullable: true
+        orderItemsCount:
+          type: integer
+          nullable: true
+        orderedOrderItemsCount:
+          type: integer
+          nullable: true
+        shippedItemsCount:
+          type: integer
+          nullable: true
+        receivedItemsCount:
+          type: integer
+          nullable: true
+        invoicedItemsCount:
+          type: integer
+          nullable: true
+        total:
+          type: string
+          nullable: true
+          description: '"0.00 USD"-style formatted amount.'
+        totalNormalized:
+          type: string
+          nullable: true
+        shipmentsCount:
+          type: integer
+          nullable: true
+      additionalProperties: true
+    ErrorMessageBody:
+      type: object
+      description: Controller-local error shape (no errorCode key).
+      required: [errorMessage]
+      properties:
+        errorMessage:
+          type: string
+      additionalProperties: true
+    ErrorMessagesBody:
+      type: object
+      description: Controller-local error shape (no errorCode key).
+      required: [errorMessages]
+      properties:
+        errorMessages:
+          type: array
+          items:
+            type: string
+      additionalProperties: true

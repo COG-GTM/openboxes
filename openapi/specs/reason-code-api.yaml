@@ -1,0 +1,106 @@
+openapi: 3.0.3
+info:
+  title: OpenBoxes - ReasonCodeApiController
+  description: >
+    Reason-code listing/read handled by
+    org.pih.warehouse.api.ReasonCodeApiController, routed via the standard
+    "/api/${resource}s" REST mappings (only list() and read() exist). Reason
+    codes are enum values (org.pih.warehouse.core.ReasonCode), not domain
+    records; ids are enum constant names.
+  version: 0.1.0
+servers:
+  - url: http://localhost:8080/openboxes
+    description: Local Docker baseline (docs/migration/RUNNING_LOCALLY.md)
+security:
+  - cookieAuth: []
+paths:
+  /api/reasonCodes:
+    get:
+      operationId: listReasonCodes
+      summary: List reason codes, optionally filtered by activity
+      parameters:
+        - name: activityCode
+          in: query
+          required: false
+          schema:
+            type: array
+            items:
+              type: string
+              enum:
+                - SUBSTITUTE_REQUISITION_ITEM
+                - MODIFY_REQUISITION_ITEM
+                - ADJUST_INVENTORY
+                - CYCLE_COUNT
+          style: form
+          explode: true
+          description: >
+            Selects one of four fixed reason-code subsets; the first matching
+            activity in the order SUBSTITUTE_REQUISITION_ITEM,
+            MODIFY_REQUISITION_ITEM, ADJUST_INVENTORY, CYCLE_COUNT wins. Any
+            other (or no) value falls back to the default subset. A value
+            that is not a valid ActivityCode enum name raises an
+            IllegalArgumentException (500).
+      responses:
+        '200':
+          description: Reason codes (localized names), unsorted.
+          content:
+            application/json:
+              schema:
+                type: object
+                required: [data]
+                properties:
+                  data:
+                    type: array
+                    items:
+                      $ref: '#/components/schemas/ReasonCode'
+        '500':
+          $ref: '../components/common.yaml#/components/responses/ServerError'
+  /api/reasonCodes/{id}:
+    get:
+      operationId: readReasonCode
+      summary: Read a single reason code by enum name
+      parameters:
+        - name: id
+          in: path
+          required: true
+          schema:
+            type: string
+          description: >
+            A org.pih.warehouse.core.ReasonCode enum constant name (e.g.
+            CORRECTION). A name that is no enum constant raises an
+            IllegalArgumentException (500) - there is no 404 branch.
+      responses:
+        '200':
+          description: Reason code.
+          content:
+            application/json:
+              schema:
+                type: object
+                required: [data]
+                properties:
+                  data:
+                    $ref: '#/components/schemas/ReasonCode'
+        '500':
+          $ref: '../components/common.yaml#/components/responses/ServerError'
+components:
+  securitySchemes:
+    cookieAuth:
+      $ref: '../components/common.yaml#/components/securitySchemes/cookieAuth'
+  schemas:
+    ReasonCode:
+      type: object
+      description: >
+        ReasonCodeCommand.toJson() rendering. The command also carries a
+        "description" field, but toJson() does not emit it.
+      required: [id, name, sortOrder]
+      properties:
+        id:
+          type: string
+          description: ReasonCode enum constant name (e.g. STOCKOUT).
+        name:
+          type: string
+          nullable: true
+          description: Localized display name from messages.properties.
+        sortOrder:
+          type: integer
+          nullable: true

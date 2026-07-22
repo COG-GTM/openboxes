@@ -1,0 +1,224 @@
+openapi: 3.0.3
+info:
+  title: OpenBoxes - ProductSupplierPreferenceApiController
+  description: >
+    Product-supplier preference endpoints handled by
+    org.pih.warehouse.api.ProductSupplierPreferenceApiController, routed via
+    the standard "/api/${resource}s" REST mappings (create/update/delete;
+    there is no list() or read()) plus the explicit
+    "/api/productSupplierPreferences/batch" mapping.
+  version: 0.1.0
+servers:
+  - url: http://localhost:8080/openboxes
+    description: Local Docker baseline (docs/migration/RUNNING_LOCALLY.md)
+security:
+  - cookieAuth: []
+paths:
+  /api/productSupplierPreferences:
+    post:
+      operationId: createProductSupplierPreference
+      summary: Create a product-supplier preference
+      requestBody:
+        required: true
+        content:
+          application/json:
+            schema:
+              $ref: '#/components/schemas/ProductSupplierPreferenceInput'
+      responses:
+        '201':
+          description: The persisted preference (default Grails rendering).
+          content:
+            application/json:
+              schema:
+                type: object
+                required: [data]
+                properties:
+                  data:
+                    $ref: '#/components/schemas/ProductSupplierPreference'
+        '400':
+          $ref: '../components/common.yaml#/components/responses/ValidationError'
+  /api/productSupplierPreferences/{id}:
+    post:
+      operationId: updateProductSupplierPreferencePost
+      summary: Update a product-supplier preference (POST-as-update quirk)
+      parameters:
+        - $ref: '#/components/parameters/id'
+      requestBody:
+        required: true
+        content:
+          application/json:
+            schema:
+              $ref: '#/components/schemas/ProductSupplierPreferenceInput'
+      responses:
+        '200':
+          description: The updated preference.
+          content:
+            application/json:
+              schema:
+                type: object
+                required: [data]
+                properties:
+                  data:
+                    $ref: '#/components/schemas/ProductSupplierPreference'
+        '400':
+          $ref: '../components/common.yaml#/components/responses/ValidationError'
+    put:
+      operationId: updateProductSupplierPreference
+      summary: Update a product-supplier preference
+      parameters:
+        - $ref: '#/components/parameters/id'
+      requestBody:
+        required: true
+        content:
+          application/json:
+            schema:
+              $ref: '#/components/schemas/ProductSupplierPreferenceInput'
+      responses:
+        '200':
+          description: The updated preference.
+          content:
+            application/json:
+              schema:
+                type: object
+                required: [data]
+                properties:
+                  data:
+                    $ref: '#/components/schemas/ProductSupplierPreference'
+        '400':
+          $ref: '../components/common.yaml#/components/responses/ValidationError'
+    delete:
+      operationId: deleteProductSupplierPreference
+      summary: Delete a product-supplier preference
+      description: >
+        Parity quirk - deleting an unknown id is a silent no-op and still
+        responds 204.
+      parameters:
+        - $ref: '#/components/parameters/id'
+      responses:
+        '204':
+          description: Preference deleted (or id unknown - no 404 branch).
+  /api/productSupplierPreferences/batch:
+    post:
+      operationId: createOrUpdateProductSupplierPreferencesBatch
+      summary: Create or update preferences in batch
+      description: >
+        Validates that each preference is valid and that at most one default
+        preference (null destinationParty) exists per product supplier.
+      requestBody:
+        required: true
+        content:
+          application/json:
+            schema:
+              type: object
+              properties:
+                productSupplierPreferences:
+                  type: array
+                  items:
+                    $ref: '#/components/schemas/ProductSupplierPreferenceInput'
+              additionalProperties: true
+      responses:
+        '200':
+          description: The persisted preferences.
+          content:
+            application/json:
+              schema:
+                type: object
+                required: [data]
+                properties:
+                  data:
+                    type: array
+                    items:
+                      $ref: '#/components/schemas/ProductSupplierPreference'
+        '400':
+          $ref: '../components/common.yaml#/components/responses/ValidationError'
+components:
+  securitySchemes:
+    cookieAuth:
+      $ref: '../components/common.yaml#/components/securitySchemes/cookieAuth'
+  parameters:
+    id:
+      name: id
+      in: path
+      required: true
+      schema:
+        $ref: '../components/common.yaml#/components/schemas/Id'
+  schemas:
+    ProductSupplierPreferenceInput:
+      type: object
+      description: >
+        Grails data binding onto the ProductSupplierPreference domain;
+        associations are bound by nested id.
+      properties:
+        id:
+          $ref: '../components/common.yaml#/components/schemas/Id'
+        productSupplier:
+          type: object
+          properties:
+            id:
+              $ref: '../components/common.yaml#/components/schemas/Id'
+        preferenceType:
+          type: object
+          properties:
+            id:
+              type: string
+              description: PreferenceType id (e.g. QUALIFIED, PREFERRED).
+        destinationParty:
+          nullable: true
+          type: object
+          properties:
+            id:
+              $ref: '../components/common.yaml#/components/schemas/Id'
+          description: Organization; null marks the default preference.
+        comments:
+          type: string
+          nullable: true
+        validityStartDate:
+          type: string
+          nullable: true
+        validityEndDate:
+          type: string
+          nullable: true
+      additionalProperties: true
+    ProductSupplierPreference:
+      type: object
+      description: Default Grails JSON rendering of the domain object.
+      required: [id]
+      properties:
+        id:
+          $ref: '../components/common.yaml#/components/schemas/Id'
+        dateCreated:
+          type: string
+          nullable: true
+        lastUpdated:
+          type: string
+          nullable: true
+        validityStartDate:
+          type: string
+          nullable: true
+        validityEndDate:
+          type: string
+          nullable: true
+        comments:
+          type: string
+          nullable: true
+        productSupplier:
+          type: object
+          nullable: true
+          additionalProperties: true
+        destinationParty:
+          type: object
+          nullable: true
+          additionalProperties: true
+        preferenceType:
+          type: object
+          nullable: true
+          additionalProperties: true
+        createdBy:
+          type: object
+          nullable: true
+          additionalProperties: true
+        updatedBy:
+          type: object
+          nullable: true
+          additionalProperties: true
+      additionalProperties: true

@@ -1,0 +1,301 @@
+openapi: 3.0.3
+info:
+  title: OpenBoxes - PutawayApiController
+  description: >
+    Putaway endpoints handled by org.pih.warehouse.api.PutawayApiController,
+    routed via the standard "/api/${resource}s" REST mappings. Only list(),
+    read() and create() exist; a putaway is a command object wrapped around a
+    PUTAWAY order (org.pih.warehouse.order.Order), so {id} is an order id.
+  version: 0.1.0
+servers:
+  - url: http://localhost:8080/openboxes
+    description: Local Docker baseline (docs/migration/RUNNING_LOCALLY.md)
+security:
+  - cookieAuth: []
+paths:
+  /api/putaways:
+    get:
+      operationId: listPutawayCandidates
+      summary: List pending putaway candidates for a facility
+      parameters:
+        - name: location.id
+          in: query
+          required: false
+          schema:
+            $ref: '../components/common.yaml#/components/schemas/Id'
+          description: >
+            Facility to list candidates for; defaults to the session
+            warehouse. An unresolvable location raises an
+            IllegalArgumentException (500).
+      responses:
+        '200':
+          description: >
+            Candidate putaway items (stock sitting in receiving bins), each
+            rendered with PutawayItem.toJson(). Empty on a freshly seeded
+            database.
+          content:
+            application/json:
+              schema:
+                type: object
+                required: [data]
+                properties:
+                  data:
+                    type: array
+                    items:
+                      $ref: '#/components/schemas/PutawayItem'
+        '500':
+          $ref: '../components/common.yaml#/components/responses/ServerError'
+    post:
+      operationId: createPutaway
+      summary: Create or update a putaway (200-on-create)
+      description: >
+        Saves the putaway as a PUTAWAY order. When putawayStatus is COMPLETED
+        the putaway is executed (stock moved into bins); otherwise it is
+        saved as PENDING. Parity quirks: responds 200 (not 201); a missing
+        putawayStatus raises a NullPointerException (500); posting the id of
+        an already-COMPLETED putaway raises an IllegalArgumentException
+        (500).
+      requestBody:
+        required: true
+        content:
+          application/json:
+            schema:
+              type: object
+              properties:
+                id:
+                  $ref: '../components/common.yaml#/components/schemas/Id'
+                putawayStatus:
+                  type: string
+                  enum: [PENDING, COMPLETED, CANCELED]
+                putawayNumber:
+                  type: string
+                  description: Generated when absent.
+                sortBy:
+                  type: string
+                putawayItems:
+                  type: array
+                  items:
+                    type: object
+                    additionalProperties: true
+              additionalProperties: true
+      responses:
+        '200':
+          description: The saved putaway (Putaway.toJson()).
+          content:
+            application/json:
+              schema:
+                type: object
+                required: [data]
+                properties:
+                  data:
+                    $ref: '#/components/schemas/Putaway'
+        '500':
+          $ref: '../components/common.yaml#/components/responses/ServerError'
+  /api/putaways/{id}:
+    get:
+      operationId: readPutaway
+      summary: Read a putaway (by PUTAWAY order id)
+      parameters:
+        - name: id
+          in: path
+          required: true
+          schema:
+            $ref: '../components/common.yaml#/components/schemas/Id'
+        - name: sortBy
+          in: query
+          required: false
+          schema:
+            type: string
+            enum: [currentBins, preferredBin]
+          description: Sort order for putawayItems (echoed in the response).
+      responses:
+        '200':
+          description: Putaway built from the order (Putaway.toJson()).
+          content:
+            application/json:
+              schema:
+                type: object
+                required: [data]
+                properties:
+                  data:
+                    $ref: '#/components/schemas/Putaway'
+        '500':
+          description: >
+            Unknown order id raises an IllegalArgumentException (500) -
+            there is no 404 branch.
+          content:
+            application/json:
+              schema:
+                $ref: '../components/common.yaml#/components/schemas/ErrorResponse'
+components:
+  securitySchemes:
+    cookieAuth:
+      $ref: '../components/common.yaml#/components/securitySchemes/cookieAuth'
+  schemas:
+    Putaway:
+      type: object
+      description: Putaway.toJson() rendering (flattened dotted keys).
+      required: [id, putawayNumber, putawayItems]
+      properties:
+        id:
+          $ref: '../components/common.yaml#/components/schemas/Id'
+        putawayNumber:
+          type: string
+          description: The order's orderNumber (P-... when generated).
+        putawayStatus:
+          type: string
+          nullable: true
+          enum: [PENDING, COMPLETED, CANCELED, null]
+        putawayDate:
+          type: string
+          nullable: true
+          description: MM/dd/yyyy (order dateCompleted).
+        dateCreated:
+          type: string
+          nullable: true
+          description: MMMM dd, yyyy (order dateOrdered).
+        putawayAssignee:
+          nullable: true
+          type: object
+          additionalProperties: true
+          description: Default Grails Person rendering (order completedBy).
+        origin.id:
+          type: string
+          nullable: true
+        origin.name:
+          type: string
+          nullable: true
+        destination.id:
+          type: string
+          nullable: true
+        destination.name:
+          type: string
+          nullable: true
+        putawayItems:
+          type: array
+          items:
+            $ref: '#/components/schemas/PutawayItem'
+        orderedBy:
+          type: string
+          nullable: true
+          description: Display name of the ordering person.
+        sortBy:
+          type: string
+          nullable: true
+      additionalProperties: true
+    PutawayItem:
+      type: object
+      description: PutawayItem.toJson() rendering (flattened dotted keys).
+      required: [id]
+      properties:
+        id:
+          type: string
+          nullable: true
+          description: Order item id (null for unsaved candidates).
+        stockMovement.id:
+          type: string
+          nullable: true
+          description: Quirk - populated with the current location NAME.
+        stockMovement.name:
+          type: string
+          nullable: true
+          description: Quirk - populated with the current location name.
+        putawayStatus:
+          type: string
+          nullable: true
+          enum: [PENDING, COMPLETED, CANCELED, null]
+        transactionNumber:
+          type: string
+          nullable: true
+        currentFacility.id:
+          type: string
+          nullable: true
+        currentFacility.name:
+          type: string
+          nullable: true
+        currentLocation.id:
+          type: string
+          nullable: true
+        currentLocation.name:
+          type: string
+          nullable: true
+        container:
+          nullable: true
+          type: object
+          additionalProperties: true
+        product.id:
+          type: string
+          nullable: true
+        product.productCode:
+          type: string
+          nullable: true
+        product.name:
+          type: string
+          nullable: true
+        product.displayNameOrDefaultName:
+          type: string
+          nullable: true
+        inventoryItem.id:
+          type: string
+          nullable: true
+        inventoryItem.lotNumber:
+          type: string
+          nullable: true
+        inventoryItem.expirationDate:
+          type: string
+          nullable: true
+          description: MM/dd/yyyy.
+        recipient.id:
+          type: string
+          nullable: true
+        recipient.name:
+          type: string
+          nullable: true
+        currentBins:
+          type: string
+          nullable: true
+        preferredBin.id:
+          type: string
+          nullable: true
+        preferredBin.name:
+          type: string
+          nullable: true
+        preferredBin.zoneId:
+          type: string
+          nullable: true
+        preferredBin.zoneName:
+          type: string
+          nullable: true
+        currentBinsAbbreviated:
+          type: string
+          nullable: true
+        putawayFacility.id:
+          type: string
+          nullable: true
+        putawayFacility.name:
+          type: string
+          nullable: true
+        putawayLocation.id:
+          type: string
+          nullable: true
+        putawayLocation.name:
+          type: string
+          nullable: true
+        putawayLocation.zoneId:
+          type: string
+          nullable: true
+        putawayLocation.zoneName:
+          type: string
+          nullable: true
+        quantity:
+          type: number
+          nullable: true
+        quantityAvailable:
+          type: integer
+          nullable: true
+        splitItems:
+          type: array
+          items:
+            type: object
+            additionalProperties: true
+      additionalProperties: true

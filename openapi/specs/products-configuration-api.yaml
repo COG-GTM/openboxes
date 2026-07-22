@@ -1,0 +1,194 @@
+openapi: 3.0.3
+info:
+  title: OpenBoxes - ProductsConfigurationApiController
+  description: >
+    Product-configuration-wizard endpoints handled by
+    org.pih.warehouse.api.ProductsConfigurationApiController, routed via the
+    explicit "/api/productsConfiguration/*" URL mappings.
+  version: 0.1.0
+servers:
+  - url: http://localhost:8080/openboxes
+    description: Local Docker baseline (docs/migration/RUNNING_LOCALLY.md)
+security:
+  - cookieAuth: []
+paths:
+  /api/productsConfiguration/categoriesCount:
+    get:
+      operationId: getCategoriesCount
+      summary: Count of product categories
+      responses:
+        '200':
+          description: Total Category.count().
+          content:
+            application/json:
+              schema:
+                type: object
+                required: [data]
+                properties:
+                  data:
+                    type: integer
+  /api/productsConfiguration/categoryOptions:
+    get:
+      operationId: categoryOptions
+      summary: Importable category-tree options
+      responses:
+        '200':
+          description: >
+            The openboxes.configurationWizard.categoryOptions config map
+            (keys like defaultCategories, unspscCategories, whoCategories).
+          content:
+            application/json:
+              schema:
+                type: object
+                required: [data]
+                properties:
+                  data:
+                    type: object
+                    additionalProperties:
+                      $ref: '#/components/schemas/ImportOption'
+  /api/productsConfiguration/productOptions:
+    get:
+      operationId: productOptions
+      summary: Importable product-list options
+      responses:
+        '200':
+          description: >
+            The openboxes.configurationWizard.productOptions config map
+            (keys like whoProducts).
+          content:
+            application/json:
+              schema:
+                type: object
+                required: [data]
+                properties:
+                  data:
+                    type: object
+                    additionalProperties:
+                      $ref: '#/components/schemas/ImportOption'
+  /api/productsConfiguration/downloadCategoryTemplate:
+    get:
+      operationId: downloadCategoryTemplate
+      summary: Download the category-import CSV template
+      responses:
+        '200':
+          description: >
+            CSV attachment (Category_template.csv) with the header row
+            "Category Name,Parent Category Name".
+          content:
+            text/csv:
+              schema:
+                type: string
+  /api/productsConfiguration/downloadCategories:
+    get:
+      operationId: downloadCategories
+      summary: Download all categories as CSV
+      responses:
+        '200':
+          description: CSV attachment (Categories.csv) of Category.CSV_PROPERTIES.
+          content:
+            text/csv:
+              schema:
+                type: string
+  /api/productsConfiguration/importCategories:
+    post:
+      operationId: importCategories
+      summary: Import a predefined category tree
+      description: >
+        Imports the category tree configured under the categoryOption key
+        (e.g. defaultCategories); the CSV is fetched from the configured
+        fileUrl. An unknown/missing option raises an exception (500).
+      requestBody:
+        required: false
+        content:
+          application/json:
+            schema:
+              type: object
+              properties:
+                categoryOption:
+                  type: string
+                  description: Key into the categoryOptions config map.
+              additionalProperties: true
+      responses:
+        '200':
+          description: Categories imported (empty body).
+        '500':
+          $ref: '../components/common.yaml#/components/responses/ServerError'
+  /api/productsConfiguration/importCategoryCsv:
+    post:
+      operationId: importCategoryCsv
+      summary: Import categories from an uploaded CSV
+      requestBody:
+        required: true
+        content:
+          multipart/form-data:
+            schema:
+              type: object
+              properties:
+                importFile:
+                  type: string
+                  format: binary
+                  description: >
+                    CSV upload (content type must be text/csv) with columns
+                    "Category Name,Parent Category Name".
+      responses:
+        '200':
+          description: Categories imported (empty body).
+        '500':
+          description: >
+            Any import failure (empty file, non-CSV content type, parse
+            errors) is caught and rendered as a controller-local JSON body
+            {errorCode: 500, errorMessage: ...}.
+          content:
+            application/json:
+              schema:
+                $ref: '../components/common.yaml#/components/schemas/ErrorResponse'
+  /api/productsConfiguration/importProducts:
+    post:
+      operationId: importProducts
+      summary: Import a predefined product list (superuser only)
+      description: >
+        Imports the product list configured under the productOption key
+        (e.g. whoProducts). Requires a superuser session; otherwise an
+        exception is raised (500).
+      requestBody:
+        required: false
+        content:
+          application/json:
+            schema:
+              type: object
+              properties:
+                productOption:
+                  type: string
+                  description: >
+                    Key into the productOptions config map; a missing option
+                    is a no-op (still 200).
+              additionalProperties: true
+      responses:
+        '200':
+          description: Products imported (empty body).
+        '500':
+          $ref: '../components/common.yaml#/components/responses/ServerError'
+components:
+  securitySchemes:
+    cookieAuth:
+      $ref: '../components/common.yaml#/components/securitySchemes/cookieAuth'
+  schemas:
+    ImportOption:
+      type: object
+      description: One configurationWizard import option (from runtime.groovy).
+      properties:
+        enabled:
+          type: boolean
+        fileUrl:
+          type: string
+        title:
+          type: string
+        description:
+          type: string
+        rootCategoryName:
+          type: string
+        categoryNameColumnIndex:
+          type: integer
+        parentCategoryNameColumnIndex:
+          type: integer
+      additionalProperties: true

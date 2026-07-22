@@ -1,0 +1,43 @@
+openapi: 3.0.3
+info:
+  title: OpenBoxes - PutawayItemApiController
+  description: >
+    Putaway-item removal handled by
+    org.pih.warehouse.api.PutawayItemApiController, routed via the explicit
+    "/api/putawayItems/$id" URL mapping (DELETE -> removingItem, the only
+    action).
+  version: 0.1.0
+servers:
+  - url: http://localhost:8080/openboxes
+    description: Local Docker baseline (docs/migration/RUNNING_LOCALLY.md)
+security:
+  - cookieAuth: []
+paths:
+  /api/putawayItems/{id}:
+    delete:
+      operationId: removePutawayItem
+      summary: Remove an item from a pending putaway
+      parameters:
+        - name: id
+          in: path
+          required: true
+          schema:
+            $ref: '../components/common.yaml#/components/schemas/Id'
+          description: Order item id of the putaway item.
+      responses:
+        '204':
+          description: Item removed from the putaway order.
+        '500':
+          description: >
+            No 404 branch. An unknown id raises a MissingPropertyException
+            (the not-found guard interpolates an undefined "id" variable)
+            and removing an item of a COMPLETED putaway raises an
+            IllegalArgumentException; both surface as 500.
+          content:
+            application/json:
+              schema:
+                $ref: '../components/common.yaml#/components/schemas/ErrorResponse'
+components:
+  securitySchemes:
+    cookieAuth:
+      $ref: '../components/common.yaml#/components/securitySchemes/cookieAuth'
