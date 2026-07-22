@@ -32,6 +32,14 @@ const PRODUCT_URL = {
 const LOCATION_URL = {
   base: `${CONTEXT_PATH}/location`,
   list: () => `${LOCATION_URL.base}/list`,
+  create: () => `${LOCATION_URL.base}/edit`,
+  edit: (id) => `${LOCATION_URL.base}/edit/${id}`,
+  showBinLocations: (id) => `${LOCATION_URL.base}/showBinLocations/${id}`,
+  showZoneLocations: (id) => `${LOCATION_URL.base}/showZoneLocations/${id}`,
+  showContents: (id) => `${LOCATION_URL.base}/showContents/${id}`,
+  uploadLogo: (id) => `${LOCATION_URL.base}/uploadLogo/${id}`,
+  viewLogo: (id) => `${LOCATION_URL.base}/viewLogo/${id}`,
+  exportBinLocations: (id) => `${LOCATION_URL.base}/exportBinLocations/${id}`,
 };
 
 const STOCK_MOVEMENT_URL = {

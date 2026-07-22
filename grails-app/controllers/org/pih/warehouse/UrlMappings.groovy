@@ -200,6 +200,36 @@ class UrlMappings {
             action = [POST: "importCsv"]
         }
 
+        "/api/locations/search" {
+            controller = { "locationApi" }
+            action = [GET: "search"]
+        }
+
+        "/api/locations/$id/details" {
+            controller = { "locationApi" }
+            action = [GET: "details"]
+        }
+
+        "/api/locations/$id/binLocations" {
+            controller = { "locationApi" }
+            action = [GET: "binLocations"]
+        }
+
+        "/api/locations/$id/zoneLocations" {
+            controller = { "locationApi" }
+            action = [GET: "zoneLocations"]
+        }
+
+        "/api/locations/$id/contents" {
+            controller = { "locationApi" }
+            action = [GET: "contents"]
+        }
+
+        "/api/locations/$id/logo" {
+            controller = { "locationApi" }
+            action = [DELETE: "deleteLogo"]
+        }
+
         "/api/locations/$id/$action" {
             controller = { "locationApi" }
         }

@@ -9,7 +9,6 @@
 **/
 package org.pih.warehouse.core
 
-import grails.gorm.PagedResultList
 import grails.testing.gorm.DataTest
 import grails.testing.web.controllers.ControllerUnitTest
 import spock.lang.Shared
@@ -69,65 +68,23 @@ class LocationControllerSpec extends Specification implements ControllerUnitTest
         assert response.redirectedUrl == '/location/list'
     }
 
-    void "when fetching locations with no filter expect some locations can be returned"() {
-        given:
-        params.put('max', 10)
-        params.put('offset', 0)
-
-        and:
-        controller.locationService.getLocations(_, _, _, _, params.max, params.offset, _, _) >>
-                buildStubbedPagedResultList([bostonDepot, miamiDepot])
-
+    void "expect list to render the React entrypoint"() {
         when:
-        def model = controller.list()
+        controller.list()
 
         then:
-        assert model.locationInstanceList.size() == 2
-        assert model.locationInstanceTotal == 2
+        assert view == '/common/react'
     }
 
-    void "when fetching locations by some filter criteria expect some locations can be returned"() {
+    void "expect edit to render the React entrypoint"() {
         given:
-        params.put('q', "Bos")
-        params.put('locationGroup.id', bostonGroup.id)
-        params.put('organization.id', mainOrg.id)
-        params.put('locationType.id', depotLocationType.id)
-        params.put('max', 10)
-        params.put('offset', 0)
-
-        and:
-        controller.locationService.getLocations(mainOrg, depotLocationType, bostonGroup, params.q, params.max, params.offset, _, _) >>
-                buildStubbedPagedResultList([bostonDepot])
-
-        when:
-        def model = controller.list()
-
-        then:
-        assert model.locationInstanceList.size() == 1
-        assert model.locationInstanceTotal == 1
-    }
-
-    void "when loading the edit page expect the correct location is returned"() {
-        given:
-        controller.inventoryService.getLocation(bostonDepot.id) >> bostonDepot
-
-        and:
         params.put('id', bostonDepot.id)
 
         when:
-        def model = controller.edit()
+        controller.edit()
 
         then:
-        assert view == '/location/edit.gsp'
-        assert model.locationInstance.name == "Boston"
-    }
-
-    PagedResultList buildStubbedPagedResultList(ArrayList expectedList) {
-        return new PagedResultList(null).with {
-            resultList = expectedList
-            totalCount = expectedList.size()
-            it
-        }
+        assert view == '/common/react'
     }
 
     LocationGroup createLocationGroup(String name) {

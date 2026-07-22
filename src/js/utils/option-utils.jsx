@@ -331,6 +331,19 @@ export const fetchOrganization = async (id) => {
   return data.data;
 };
 
+export const fetchLocationGroupById = async (id) => {
+  const { data } = await apiClient.get(`/api/locationGroups/${id}`);
+  const locationGroup = data.data;
+  return locationGroup
+    ? {
+      id: locationGroup.id,
+      value: locationGroup.id,
+      name: locationGroup.name,
+      label: locationGroup.name,
+    }
+    : null;
+};
+
 export const fetchIndicatorProductsInventoried = async (params = {}) => {
   const { data } = await indicatorsApi.getProductsInventoried(params);
   return data.data;

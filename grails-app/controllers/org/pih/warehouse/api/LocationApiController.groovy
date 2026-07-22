@@ -17,8 +17,10 @@ import org.pih.warehouse.core.ActivityCode
 import org.pih.warehouse.core.Location
 import org.pih.warehouse.core.LocationDataService
 import org.pih.warehouse.core.LocationIdentifierService
+import org.pih.warehouse.core.LocationGroup
 import org.pih.warehouse.core.LocationRole
 import org.pih.warehouse.core.LocationType
+import org.pih.warehouse.core.Organization
 import org.pih.warehouse.core.RoleType
 import org.pih.warehouse.core.User
 import org.pih.warehouse.importer.CSVUtils
@@ -42,6 +44,179 @@ class LocationApiController extends BaseDomainApiController {
     def read() {
         Location location = Location.get(params.id)
         render([data: location] as JSON)
+    }
+
+    /**
+     * Paginated location search backing the React location list screen
+     * (same filters as the legacy location/list GSP).
+     */
+    def search() {
+        Organization organization = params["organization.id"] ? Organization.get(params["organization.id"]) : null
+        LocationType locationType = params["locationType.id"] ? LocationType.get(params["locationType.id"]) : null
+        LocationGroup locationGroup = params["locationGroup.id"] ? LocationGroup.get(params["locationGroup.id"]) : null
+
+        Integer max = Math.min(params.max ? params.int("max") : 10, 100)
+        Integer offset = params.offset ? params.int("offset") : 0
+
+        def locations = locationService.getLocations(organization, locationType, locationGroup,
+                params.q, max, offset, params.sort ?: "name", params.order ?: "asc")
+
+        def data = locations.collect { Location location ->
+            [
+                    id                 : location.id,
+                    name               : location.name,
+                    locationNumber     : location.locationNumber,
+                    locationType       : location.locationType,
+                    locationGroup      : location.locationGroup ? [id: location.locationGroup.id, name: location.locationGroup.name] : null,
+                    organization       : location.organization ? [id: location.organization.id, name: location.organization.name, code: location.organization.code] : null,
+                    status             : location.status?.name(),
+                    active             : location.active,
+                    fgColor            : location.fgColor,
+                    bgColor            : location.bgColor,
+                    supportedActivities: (location.supportedActivities ?: location.locationType?.supportedActivities) as List,
+            ]
+        }
+
+        render([data: data, totalCount: locations.totalCount] as JSON)
+    }
+
+    /**
+     * Extended location rendering backing the React location edit screen.
+     */
+    def details() {
+        Location location = Location.get(params.id)
+        if (!location) {
+            render([data: null] as JSON)
+            return
+        }
+
+        List supportedActivities = (location.supportedActivities ?: []) as List
+        List defaultSupportedActivities = (location.locationType?.supportedActivities ?: []) as List
+        boolean useDefaultActivities = supportedActivities.empty ||
+                (supportedActivities as Set) == (defaultSupportedActivities as Set)
+
+        def data = [
+                id                        : location.id,
+                name                      : location.name,
+                description               : location.description,
+                locationNumber            : location.locationNumber,
+                active                    : location.active,
+                fgColor                   : location.fgColor,
+                bgColor                   : location.bgColor,
+                status                    : location.status?.name(),
+                locationType              : location.locationType,
+                locationGroup             : location.locationGroup ? [id: location.locationGroup.id, name: location.locationGroup.name] : null,
+                organization              : location.organization ? [id: location.organization.id, name: location.organization.name, code: location.organization.code] : null,
+                manager                   : location.manager ? [id: location.manager.id, name: location.manager.name] : null,
+                parentLocation            : location.parentLocation ? location.parentLocation.toBaseJson() : null,
+                zone                      : location.zone ? location.zone.toBaseJson() : null,
+                isInternalLocation        : location.isInternalLocation(),
+                isZoneLocation            : location.isZoneLocation(),
+                hasLogo                   : location.logo ? true : false,
+                supportedActivities       : useDefaultActivities ? defaultSupportedActivities : supportedActivities,
+                defaultSupportedActivities: defaultSupportedActivities,
+                useDefaultActivities      : useDefaultActivities,
+                address                   : location.address ? [
+                        id             : location.address.id,
+                        address        : location.address.address,
+                        address2       : location.address.address2,
+                        city           : location.address.city,
+                        stateOrProvince: location.address.stateOrProvince,
+                        postalCode     : location.address.postalCode,
+                        country        : location.address.country,
+                        description    : location.address.description,
+                ] : null,
+        ]
+
+        render([data: data] as JSON)
+    }
+
+    /**
+     * Bin locations of a facility (or bins assigned to a zone), backing the
+     * React location/showBinLocations screen.
+     */
+    def binLocations() {
+        Location location = Location.get(params.id)
+        if (!location) {
+            render([data: null] as JSON)
+            return
+        }
+        def binLocations = location.isZoneLocation() ?
+                Location.findAllByZone(location) : locationService.getBinLocations(location)
+
+        def data = binLocations.collect { Location binLocation ->
+            [
+                    id          : binLocation.id,
+                    name        : binLocation.name,
+                    active      : binLocation.active,
+                    zone        : binLocation.zone ? [id: binLocation.zone.id, name: binLocation.zone.name] : null,
+                    locationType: binLocation.locationType,
+            ]
+        }
+        render([data: data] as JSON)
+    }
+
+    /**
+     * Zone locations of a facility, backing the React location/showZoneLocations screen.
+     */
+    def zoneLocations() {
+        Location location = Location.get(params.id)
+        if (!location) {
+            render([data: null] as JSON)
+            return
+        }
+        def zoneLocations = locationService.getZones(location)
+        def data = zoneLocations.collect { Location zoneLocation ->
+            [
+                    id          : zoneLocation.id,
+                    name        : zoneLocation.name,
+                    active      : zoneLocation.active,
+                    locationType: zoneLocation.locationType,
+            ]
+        }
+        render([data: data] as JSON)
+    }
+
+    /**
+     * Contents (inventory) of a bin location, backing the React location/showContents screen.
+     */
+    def contents() {
+        Location binLocation = Location.get(params.id)
+        if (!binLocation) {
+            render([data: null] as JSON)
+            return
+        }
+        List contents = inventoryService.getQuantityByBinLocation(binLocation.parentLocation, binLocation)
+        def data = contents.collect { entry ->
+            [
+                    product      : [
+                            id         : entry?.product?.id,
+                            name       : entry?.product?.name,
+                            productCode: entry?.product?.productCode,
+                    ],
+                    inventoryItem: [
+                            id            : entry?.inventoryItem?.id,
+                            lotNumber     : entry?.inventoryItem?.lotNumber,
+                            expirationDate: entry?.inventoryItem?.expirationDate?.format("MMM yyyy"),
+                    ],
+                    quantity     : entry?.quantity,
+            ]
+        }
+        render([data: data, binLocation: [id: binLocation.id, name: binLocation.name]] as JSON)
+    }
+
+    /**
+     * Remove the logo of a location, backing the React location/uploadLogo screen.
+     */
+    def deleteLogo() {
+        Location location = Location.get(params.id)
+        if (!location) {
+            render([data: null] as JSON)
+            return
+        }
+        location.logo = []
+        locationGormService.save(location)
+        render(status: 204)
     }
 
     def list() {

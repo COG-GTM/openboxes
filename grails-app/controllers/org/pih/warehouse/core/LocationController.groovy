@@ -38,17 +38,7 @@ class LocationController {
     }
 
     def list() {
-        def defaultLocationType = LocationType.findByLocationTypeCode(LocationTypeCode.DEPOT)
-        def locationType = params.containsKey("locationType.id")?LocationType.get(params["locationType.id"])?:null:defaultLocationType
-        def locationGroup = LocationGroup.get(params["locationGroup.id"])
-        def organization = Organization.get(params["organization.id"])
-
-        params.max = Math.min(params.max ? params.int('max') : 10, 100)
-        params.offset = params.offset ? params.int("offset") : 0
-
-        def locations = locationService.getLocations(organization, locationType, locationGroup, params.q, params.max, params.offset as int, params.sort ?: "name", params.order ?: "asc")
-
-        [locationInstanceList: locations, locationInstanceTotal: locations.totalCount, defaultLocationType:defaultLocationType]
+        render(view: "/common/react")
     }
 
     def show() {
@@ -56,13 +46,7 @@ class LocationController {
     }
 
     def edit() {
-        def locationInstance = inventoryService.getLocation(params.id)
-        if (!locationInstance) {
-            flash.message = "${warehouse.message(code: 'default.not.found.message', args: [warehouse.message(code: 'location.label', default: 'Location'), params.id])}"
-            redirect(action: "list")
-        } else {
-            return [locationInstance: locationInstance]
-        }
+        render(view: "/common/react")
     }
 
     @Transactional
@@ -74,9 +58,8 @@ class LocationController {
                 def version = params.version.toLong()
                 if (locationInstance.version > version) {
 
-                    locationInstance.errors.rejectValue("version", "default.optimistic.locking.failure", [
-                            warehouse.message(code: 'location.label', default: 'Location')] as Object[], "Another user has updated this Location while you were editing")
-                    render(view: "edit", model: [locationInstance: locationInstance])
+                    flash.message = "Another user has updated this Location while you were editing"
+                    redirect(action: "edit", id: locationInstance.id)
                     return
                 }
             }
@@ -131,22 +114,26 @@ class LocationController {
                 } catch (ValidationException e) {
                     flash.message = e.message
                     log.error("error: " + e.message, e)
-                    render(view: "edit", model: [locationInstance: locationInstance])
+                    redirect(action: "edit", id: locationInstance.id)
                     return
 
                 } catch (Exception e) {
                     flash.message = e.message
                     log.error("error: " + e.message, e)
-                    render(view: "edit", model: [locationInstance: locationInstance])
+                    redirect(action: "edit", id: locationInstance.id)
                     return
                 }
             } else {
                 // Refresh to avoid saving binded, not validated data to the persisted object
                 // Refresh only if editing, not creating a brand new location, thus if has id
                 if (locationInstance?.id) {
+                    flash.message = locationInstance.errors.allErrors.join("; ")
                     locationInstance.refresh()
+                    redirect(action: "edit", id: locationInstance.id)
+                } else {
+                    flash.message = locationInstance.errors.allErrors.join("; ")
+                    redirect(action: "edit")
                 }
-                render(view: "edit", model: [locationInstance: locationInstance])
                 return
             }
         } else {
@@ -202,16 +189,7 @@ class LocationController {
     }
 
     def showContents() {
-        def binLocation = Location.get(params.id)
-        if (!binLocation) {
-            render "${warehouse.message(code: 'default.not.found.message', args: [warehouse.message(code: 'location.label', default: 'Location'), params.id])}"
-
-        } else {
-            List contents = inventoryService.getQuantityByBinLocation(binLocation.parentLocation, binLocation)
-            return [binLocation: binLocation, contents: contents]
-        }
-
-
+        render(view: "/common/react")
     }
 
 
@@ -257,7 +235,7 @@ class LocationController {
                 if (!okcontents.contains(logo.getContentType())) {
                     log.info "Photo is not correct type"
                     flash.message = "Photo must be one of: ${okcontents}"
-                    render(view: "uploadLogo", model: [locationInstance: locationInstance])
+                    redirect(action: "uploadLogo", id: locationInstance.id)
                     return
                 }
 
@@ -269,7 +247,7 @@ class LocationController {
                     } else {
                         // there were errors, the logo was not saved
                         flash.message = "${warehouse.message(code: 'default.not.updated.message', args: [warehouse.message(code: 'user.label'), locationInstance.id])}"
-                        render(view: "uploadPhoto", model: [locationInstance: locationInstance])
+                        redirect(action: "uploadLogo", id: locationInstance.id)
                         return
                     }
                 } else {
@@ -280,8 +258,9 @@ class LocationController {
             } else {
                 "${warehouse.message(code: 'default.not.found.message', args: [warehouse.message(code: 'warehouse.label', default: 'Location'), params.id])}"
             }
+            return
         }
-        [locationInstance: locationInstance]
+        render(view: "/common/react")
     }
 
     def deleteLogo() {
@@ -338,29 +317,11 @@ class LocationController {
     }
 
     def showBinLocations() {
-
-        def locationInstance = Location.get(params.id)
-        if (!locationInstance) {
-            render "${warehouse.message(code: 'default.not.found.message', args: [warehouse.message(code: 'location.label', default: 'Location'), params.id])}"
-        } else {
-            def binLocations
-            if (locationInstance.isZoneLocation()) {
-                binLocations = Location.findAllByZone(locationInstance)
-            } else {
-                binLocations = locationService.getBinLocations(locationInstance)
-            }
-            [locationInstance: locationInstance, binLocations: binLocations]
-        }
+        render(view: "/common/react")
     }
 
     def showZoneLocations() {
-        def locationInstance = Location.get(params.id)
-        if (!locationInstance) {
-            render "${warehouse.message(code: 'default.not.found.message', args: [warehouse.message(code: 'location.label', default: 'Location'), params.id])}"
-        } else {
-            def zoneLocations = locationService.getZones(locationInstance)
-            [locationInstance: locationInstance, zoneLocations: zoneLocations]
-        }
+        render(view: "/common/react")
     }
 
     def importBinLocations() {
@@ -379,10 +340,9 @@ class LocationController {
             redirect(action: "edit", id: params.id)
 
         } catch (Exception e) {
-            Location locationInstance = Location.read(params.id)
             log.error("Failed to import bin locations due to the following error: " + e.message, e)
             flash.message = e.message
-            render(view: "edit", model: [locationInstance: locationInstance])
+            redirect(action: "edit", id: params.id)
             return
         }
     }

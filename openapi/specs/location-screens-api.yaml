@@ -1,0 +1,457 @@
+openapi: 3.0.3
+info:
+  title: OpenBoxes - LocationApiController (React location screens)
+  description: >
+    Endpoints added to org.pih.warehouse.api.LocationApiController to back the
+    React location management screens (Phase 2 Batch 31 migration of the
+    legacy location/list, location/edit, location/showBinLocations,
+    location/showZoneLocations, location/showContents and location/uploadLogo
+    GSPs). Routed via explicit mappings in UrlMappings.groovy. Parity quirks:
+    unknown ids respond 200 with {"data": null} rather than 404 (matching the
+    legacy GSP screens, which rendered a not-found message with HTTP 200).
+  version: 0.1.0
+servers:
+  - url: http://localhost:8080/openboxes
+    description: Local Docker baseline (docs/migration/RUNNING_LOCALLY.md)
+security:
+  - cookieAuth: []
+paths:
+  /api/locations/search:
+    get:
+      operationId: searchLocations
+      summary: Paginated location search backing the React location list screen
+      description: >
+        Same filters as the legacy location/list GSP. Top-level locations only
+        (parentLocation is null), unless filtering by the BIN_LOCATION
+        location type, in which case only child locations are returned.
+        Inactive locations are included.
+      parameters:
+        - name: q
+          in: query
+          required: false
+          schema:
+            type: string
+          description: Substring search (ilike "%q%") on location name.
+        - name: locationType.id
+          in: query
+          required: false
+          schema:
+            type: string
+          description: Filter by location type id. Unknown ids are ignored.
+        - name: locationGroup.id
+          in: query
+          required: false
+          schema:
+            type: string
+          description: Filter by location group id. Unknown ids are ignored.
+        - name: organization.id
+          in: query
+          required: false
+          schema:
+            type: string
+          description: Filter by organization id. Unknown ids are ignored.
+        - name: sort
+          in: query
+          required: false
+          schema:
+            type: string
+            default: name
+          description: >
+            Location property to sort by (top-level properties only, e.g.
+            name or locationNumber).
+        - name: order
+          in: query
+          required: false
+          schema:
+            type: string
+            enum: [asc, desc]
+            default: asc
+        - $ref: '../components/common.yaml#/components/parameters/max'
+        - $ref: '../components/common.yaml#/components/parameters/offset'
+      responses:
+        '200':
+          description: Matching locations plus the unpaginated total count.
+          content:
+            application/json:
+              schema:
+                type: object
+                required: [data, totalCount]
+                properties:
+                  data:
+                    type: array
+                    items:
+                      $ref: '#/components/schemas/LocationSearchResult'
+                  totalCount:
+                    type: integer
+  /api/locations/{id}/details:
+    get:
+      operationId: getLocationDetails
+      summary: Extended location rendering backing the React location edit screen
+      parameters:
+        - $ref: '#/components/parameters/locationId'
+      responses:
+        '200':
+          description: >
+            Location details, or {"data": null} when the id is unknown.
+          content:
+            application/json:
+              schema:
+                type: object
+                required: [data]
+                properties:
+                  data:
+                    type: object
+                    nullable: true
+                    additionalProperties: true
+                    description: >
+                      LocationDetails object (see components/schemas/LocationDetails),
+                      or null when the id is unknown.
+  /api/locations/{id}/binLocations:
+    get:
+      operationId: getLocationBinLocations
+      summary: Bin locations of a facility (or bins assigned to a zone)
+      description: >
+        For a zone location, returns the bin locations assigned to the zone
+        (including inactive ones); otherwise returns the active bin locations
+        whose parent is the given facility. Matches the legacy
+        location/showBinLocations GSP.
+      parameters:
+        - $ref: '#/components/parameters/locationId'
+      responses:
+        '200':
+          description: >
+            Bin locations, or {"data": null} when the id is unknown.
+          content:
+            application/json:
+              schema:
+                type: object
+                required: [data]
+                properties:
+                  data:
+                    type: array
+                    nullable: true
+                    items:
+                      $ref: '#/components/schemas/BinLocationSummary'
+  /api/locations/{id}/zoneLocations:
+    get:
+      operationId: getLocationZoneLocations
+      summary: Zone locations of a facility
+      description: >
+        Active zone locations whose parent is the given facility. Matches the
+        legacy location/showZoneLocations GSP.
+      parameters:
+        - $ref: '#/components/parameters/locationId'
+      responses:
+        '200':
+          description: >
+            Zone locations, or {"data": null} when the id is unknown.
+          content:
+            application/json:
+              schema:
+                type: object
+                required: [data]
+                properties:
+                  data:
+                    type: array
+                    nullable: true
+                    items:
+                      $ref: '#/components/schemas/ZoneLocationSummary'
+  /api/locations/{id}/contents:
+    get:
+      operationId: getLocationContents
+      summary: Contents (inventory) of a bin location
+      description: >
+        Quantity by inventory item within the given bin location, computed
+        against the bin's parent location inventory. Matches the legacy
+        location/showContents GSP.
+      parameters:
+        - $ref: '#/components/parameters/locationId'
+      responses:
+        '200':
+          description: >
+            Bin contents, or {"data": null} when the id is unknown (the
+            binLocation property is omitted in that case).
+          content:
+            application/json:
+              schema:
+                type: object
+                required: [data]
+                properties:
+                  data:
+                    type: array
+                    nullable: true
+                    items:
+                      $ref: '#/components/schemas/BinContentsEntry'
+                  binLocation:
+                    type: object
+                    properties:
+                      id:
+                        $ref: '../components/common.yaml#/components/schemas/Id'
+                      name:
+                        type: string
+  /api/locations/{id}/logo:
+    delete:
+      operationId: deleteLocationLogo
+      summary: Remove the logo of a location
+      description: >
+        Clears the location logo (sets it to an empty byte array). Backing
+        the React location/uploadLogo screen. Parity quirk: an unknown id
+        responds 200 with {"data": null} rather than 404.
+      parameters:
+        - $ref: '#/components/parameters/locationId'
+      responses:
+        '204':
+          description: Logo removed.
+        '200':
+          description: Unknown id; nothing deleted.
+          content:
+            application/json:
+              schema:
+                type: object
+                required: [data]
+                properties:
+                  data:
+                    type: object
+                    nullable: true
+                    description: Always null.
+components:
+  parameters:
+    locationId:
+      name: id
+      in: path
+      required: true
+      schema:
+        type: string
+      description: Location id.
+  schemas:
+    NamedReference:
+      type: object
+      properties:
+        id:
+          $ref: '../components/common.yaml#/components/schemas/Id'
+        name:
+          type: string
+    OrganizationReference:
+      type: object
+      properties:
+        id:
+          $ref: '../components/common.yaml#/components/schemas/Id'
+        name:
+          type: string
+        code:
+          type: string
+          nullable: true
+    LocationType:
+      type: object
+      description: Default Grails JSON rendering of a LocationType.
+      properties:
+        id:
+          $ref: '../components/common.yaml#/components/schemas/Id'
+        name:
+          type: string
+        locationTypeCode:
+          type: string
+          nullable: true
+      additionalProperties: true
+    LocationSearchResult:
+      type: object
+      required: [id, name]
+      properties:
+        id:
+          $ref: '../components/common.yaml#/components/schemas/Id'
+        name:
+          type: string
+        locationNumber:
+          type: string
+          nullable: true
+        locationType:
+          $ref: '#/components/schemas/LocationType'
+        locationGroup:
+          type: object
+          nullable: true
+          additionalProperties: true
+          description: NamedReference ({id, name}) or null.
+        organization:
+          type: object
+          nullable: true
+          additionalProperties: true
+          description: OrganizationReference ({id, name, code}) or null.
+        status:
+          type: string
+          nullable: true
+          description: LocationStatus enum name (ENABLED or DISABLED).
+        active:
+          type: boolean
+        fgColor:
+          type: string
+          nullable: true
+        bgColor:
+          type: string
+          nullable: true
+        supportedActivities:
+          type: array
+          items:
+            type: string
+          description: >
+            The location's own supported activities, falling back to its
+            location type's defaults when none are set.
+    LocationDetails:
+      type: object
+      required: [id, name]
+      properties:
+        id:
+          $ref: '../components/common.yaml#/components/schemas/Id'
+        name:
+          type: string
+        description:
+          type: string
+          nullable: true
+        locationNumber:
+          type: string
+          nullable: true
+        active:
+          type: boolean
+        fgColor:
+          type: string
+          nullable: true
+        bgColor:
+          type: string
+          nullable: true
+        status:
+          type: string
+          nullable: true
+        locationType:
+          $ref: '#/components/schemas/LocationType'
+        locationGroup:
+          type: object
+          nullable: true
+          additionalProperties: true
+          description: NamedReference ({id, name}) or null.
+        organization:
+          type: object
+          nullable: true
+          additionalProperties: true
+          description: OrganizationReference ({id, name, code}) or null.
+        manager:
+          type: object
+          nullable: true
+          additionalProperties: true
+          description: NamedReference ({id, name}) or null.
+        parentLocation:
+          type: object
+          nullable: true
+          description: Base JSON rendering (Location.toBaseJson()).
+          additionalProperties: true
+        zone:
+          type: object
+          nullable: true
+          description: Base JSON rendering (Location.toBaseJson()).
+          additionalProperties: true
+        isInternalLocation:
+          type: boolean
+        isZoneLocation:
+          type: boolean
+        hasLogo:
+          type: boolean
+        supportedActivities:
+          type: array
+          items:
+            type: string
+        defaultSupportedActivities:
+          type: array
+          items:
+            type: string
+          description: The location type's default supported activities.
+        useDefaultActivities:
+          type: boolean
+          description: >
+            True when the location has no supported activities of its own or
+            they match the location type defaults exactly.
+        address:
+          type: object
+          nullable: true
+          properties:
+            id:
+              $ref: '../components/common.yaml#/components/schemas/Id'
+            address:
+              type: string
+              nullable: true
+            address2:
+              type: string
+              nullable: true
+            city:
+              type: string
+              nullable: true
+            stateOrProvince:
+              type: string
+              nullable: true
+            postalCode:
+              type: string
+              nullable: true
+            country:
+              type: string
+              nullable: true
+            description:
+              type: string
+              nullable: true
+    BinLocationSummary:
+      type: object
+      required: [id, name, active]
+      properties:
+        id:
+          $ref: '../components/common.yaml#/components/schemas/Id'
+        name:
+          type: string
+        active:
+          type: boolean
+        zone:
+          type: object
+          nullable: true
+          additionalProperties: true
+          description: NamedReference ({id, name}) or null.
+        locationType:
+          $ref: '#/components/schemas/LocationType'
+    ZoneLocationSummary:
+      type: object
+      required: [id, name, active]
+      properties:
+        id:
+          $ref: '../components/common.yaml#/components/schemas/Id'
+        name:
+          type: string
+        active:
+          type: boolean
+        locationType:
+          $ref: '#/components/schemas/LocationType'
+    BinContentsEntry:
+      type: object
+      properties:
+        product:
+          type: object
+          properties:
+            id:
+              $ref: '../components/common.yaml#/components/schemas/Id'
+            name:
+              type: string
+              nullable: true
+            productCode:
+              type: string
+              nullable: true
+        inventoryItem:
+          type: object
+          properties:
+            id:
+              $ref: '../components/common.yaml#/components/schemas/Id'
+            lotNumber:
+              type: string
+              nullable: true
+            expirationDate:
+              type: string
+              nullable: true
+              description: Formatted as "MMM yyyy" (e.g. "Jan 2026").
+        quantity:
+          type: number
+          nullable: true
+  securitySchemes:
+    cookieAuth:
+      $ref: '../components/common.yaml#/components/securitySchemes/cookieAuth'

@@ -122,6 +122,14 @@ export const LOCATION_TYPES = `${LOCATION_API}/locationTypes`;
 export const LOCATION_TEMPLATE = `${CONTEXT_PATH}${LOCATION_API}/template`;
 export const LOCATION_IMPORT = `${CONTEXT_PATH}${LOCATION_API}/importCsv`;
 export const LOCATION = (id) => `${LOCATION_API}/${id}`;
+export const LOCATION_SEARCH_API = `${LOCATION_API}/search`;
+export const LOCATION_SUPPORTED_ACTIVITIES = `${LOCATION_API}/supportedActivities`;
+export const LOCATION_DETAILS = (id) => `${LOCATION_API}/${id}/details`;
+export const LOCATION_BIN_LOCATIONS = (id) => `${LOCATION_API}/${id}/binLocations`;
+export const LOCATION_ZONE_LOCATIONS = (id) => `${LOCATION_API}/${id}/zoneLocations`;
+export const LOCATION_CONTENTS = (id) => `${LOCATION_API}/${id}/contents`;
+export const LOCATION_LOGO = (id) => `${LOCATION_API}/${id}/logo`;
+export const LOCATION_GROUPS_API = `${API}/locationGroups`;
 
 // PUTAWAY
 export const PUTAWAY_GENERATE_PDF = (id) => `/putAway/generatePdf/${id}`;
