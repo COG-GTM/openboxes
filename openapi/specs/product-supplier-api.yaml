@@ -1,0 +1,249 @@
+openapi: 3.0.3
+info:
+  title: OpenBoxes - ProductSupplierApiController
+  description: >
+    Product source (ProductSupplier) CRUD and export handled by
+    org.pih.warehouse.api.ProductSupplierApiController. Routed via the
+    standard "/api/${resource}s" and "/api/${resource}s/$id" REST mappings
+    (GET list / POST create; GET read / POST+PUT update / DELETE delete) plus
+    the explicit "/api/productSuppliers/export" mapping (GET export). Parity
+    quirks pinned here: create responds 201 but update responds 200 for both
+    POST and PUT; read on an unknown id 404s (ObjectNotFoundException) while
+    DELETE on an unknown id responds 500 (NullPointerException in
+    ProductSupplierService.delete).
+  version: 0.1.0
+servers:
+  - url: http://localhost:8080/openboxes
+    description: Local Docker baseline (docs/migration/RUNNING_LOCALLY.md)
+security:
+  - cookieAuth: []
+paths:
+  /api/productSuppliers:
+    get:
+      operationId: listProductSuppliers
+      summary: List product sources
+      description: >
+        Filterable via ProductSupplierFilterCommand (product, supplier,
+        searchTerm, defaultPreferenceTypes, createdFrom/createdTo,
+        includeInactive, sort/order, max/offset, disableMaxLimit).
+      parameters:
+        - $ref: '../components/common.yaml#/components/parameters/max'
+        - $ref: '../components/common.yaml#/components/parameters/offset'
+        - name: searchTerm
+          in: query
+          required: false
+          schema:
+            type: string
+        - name: product
+          in: query
+          required: false
+          description: Product id to filter by.
+          schema:
+            type: string
+        - name: supplier
+          in: query
+          required: false
+          description: Supplier organization id to filter by.
+          schema:
+            type: string
+        - name: includeInactive
+          in: query
+          required: false
+          schema:
+            type: boolean
+      responses:
+        '200':
+          description: Product sources with pagination total.
+          content:
+            application/json:
+              schema:
+                type: object
+                required: [data, totalCount]
+                properties:
+                  data:
+                    type: array
+                    items:
+                      $ref: '../components/common.yaml#/components/schemas/ProductSupplier'
+                  totalCount:
+                    type: integer
+                    nullable: true
+    post:
+      operationId: createProductSupplier
+      summary: Create a product source
+      requestBody:
+        $ref: '#/components/requestBodies/ProductSupplierBody'
+      responses:
+        '201':
+          description: Product source created.
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/ProductSupplierEnvelope'
+        '400':
+          $ref: '../components/common.yaml#/components/responses/ValidationError'
+  /api/productSuppliers/{id}:
+    get:
+      operationId: readProductSupplier
+      summary: Read a product source
+      parameters:
+        - $ref: '#/components/parameters/productSupplierId'
+      responses:
+        '200':
+          description: The product source (ProductSupplier.toJson()).
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/ProductSupplierEnvelope'
+        '404':
+          $ref: '../components/common.yaml#/components/responses/NotFound'
+    post:
+      operationId: updateProductSupplierPost
+      summary: Update a product source (POST variant of update())
+      parameters:
+        - $ref: '#/components/parameters/productSupplierId'
+      requestBody:
+        $ref: '#/components/requestBodies/ProductSupplierBody'
+      responses:
+        '200':
+          description: Product source updated.
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/ProductSupplierEnvelope'
+        '400':
+          $ref: '../components/common.yaml#/components/responses/ValidationError'
+    put:
+      operationId: updateProductSupplierPut
+      summary: Update a product source (PUT variant of update())
+      parameters:
+        - $ref: '#/components/parameters/productSupplierId'
+      requestBody:
+        $ref: '#/components/requestBodies/ProductSupplierBody'
+      responses:
+        '200':
+          description: Product source updated.
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/ProductSupplierEnvelope'
+        '400':
+          $ref: '../components/common.yaml#/components/responses/ValidationError'
+    delete:
+      operationId: deleteProductSupplier
+      summary: Delete a product source
+      description: >
+        Also deletes the source's product packages and preferences. Unknown
+        ids respond 500 (NullPointerException), not 404.
+      parameters:
+        - $ref: '#/components/parameters/productSupplierId'
+      responses:
+        '204':
+          description: Product source deleted (empty body).
+        '500':
+          $ref: '../components/common.yaml#/components/responses/ServerError'
+  /api/productSuppliers/export:
+    get:
+      operationId: exportProductSuppliers
+      summary: Export product sources (JSON, CSV or XLS)
+      description: >
+        Content negotiation via withFormat: the default (and the shape used
+        when the client sends Accept: application/json) is JSON; format=csv
+        yields a text/csv attachment; format=xls an application/vnd.ms-excel
+        attachment. Rows use human-readable, capitalized column names.
+      parameters:
+        - name: format
+          in: query
+          required: false
+          schema:
+            type: string
+            enum: [json, csv, xls]
+      responses:
+        '200':
+          description: Export rows.
+          content:
+            application/json:
+              schema:
+                type: object
+                required: [data, totalCount]
+                properties:
+                  data:
+                    type: array
+                    items:
+                      type: object
+                      description: >
+                        Export row keyed by display column names, e.g. "ID",
+                        "Product Code", "Product Name", "Supplier Name",
+                        "Package price", "active".
+                      additionalProperties: true
+                  totalCount:
+                    type: integer
+            text/csv:
+              schema:
+                type: string
+            application/vnd.ms-excel:
+              schema:
+                type: string
+                format: binary
+components:
+  parameters:
+    productSupplierId:
+      name: id
+      in: path
+      required: true
+      schema:
+        $ref: '../components/common.yaml#/components/schemas/Id'
+  requestBodies:
+    ProductSupplierBody:
+      required: true
+      content:
+        application/json:
+          schema:
+            type: object
+            description: >
+              ProductSupplierDetailsCommand binding. supplier and name are
+              required; code is generated when omitted.
+            properties:
+              product:
+                type: object
+                properties:
+                  id:
+                    $ref: '../components/common.yaml#/components/schemas/Id'
+              supplier:
+                type: object
+                properties:
+                  id:
+                    $ref: '../components/common.yaml#/components/schemas/Id'
+              manufacturer:
+                type: object
+                properties:
+                  id:
+                    $ref: '../components/common.yaml#/components/schemas/Id'
+              code:
+                type: string
+              name:
+                type: string
+              supplierCode:
+                type: string
+              manufacturerCode:
+                type: string
+              active:
+                type: boolean
+              description:
+                type: string
+              brandName:
+                type: string
+              ratingTypeCode:
+                type: string
+              productCode:
+                type: string
+            additionalProperties: true
+  schemas:
+    ProductSupplierEnvelope:
+      type: object
+      required: [data]
+      properties:
+        data:
+          $ref: '../components/common.yaml#/components/schemas/ProductSupplier'
+  securitySchemes:
+    cookieAuth:
+      $ref: '../components/common.yaml#/components/securitySchemes/cookieAuth'

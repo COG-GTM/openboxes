@@ -1,0 +1,91 @@
+openapi: 3.0.3
+info:
+  title: OpenBoxes - ProductSupplierAttributeApiController
+  description: >
+    Batch create/update/delete of product-supplier attribute values handled by
+    org.pih.warehouse.api.ProductSupplierAttributeApiController, routed via
+    the explicit "/api/productSupplierAttributes/batch" mapping
+    (POST -> updateAttributes()). Each entry references an Attribute with
+    entity type PRODUCT_SUPPLIER and a ProductSupplier; a non-empty value
+    creates or updates the ProductAttribute, an empty value deletes it.
+    Validation failures (unknown/ineligible attribute, disallowed value,
+    missing required attributes) respond 400. Parity quirk: an absent
+    productAttributes list is not rejected - the request responds 200 with an
+    empty change summary.
+  version: 0.1.0
+servers:
+  - url: http://localhost:8080/openboxes
+    description: Local Docker baseline (docs/migration/RUNNING_LOCALLY.md)
+security:
+  - cookieAuth: []
+paths:
+  /api/productSupplierAttributes/batch:
+    post:
+      operationId: updateProductSupplierAttributes
+      summary: Batch create/update/delete product-supplier attribute values
+      requestBody:
+        required: true
+        content:
+          application/json:
+            schema:
+              type: object
+              properties:
+                productAttributes:
+                  type: array
+                  items:
+                    type: object
+                    properties:
+                      attribute:
+                        type: object
+                        properties:
+                          id:
+                            $ref: '../components/common.yaml#/components/schemas/Id'
+                      productSupplier:
+                        type: object
+                        properties:
+                          id:
+                            $ref: '../components/common.yaml#/components/schemas/Id'
+                      value:
+                        type: string
+                        nullable: true
+                        description: Empty/absent value deletes the attribute.
+                    additionalProperties: true
+              additionalProperties: true
+      responses:
+        '200':
+          description: Summary of the applied changes.
+          content:
+            application/json:
+              schema:
+                type: object
+                required: [data]
+                properties:
+                  data:
+                    type: object
+                    required:
+                      - createdAttributes
+                      - updatedAttributes
+                      - deletedAttributes
+                    properties:
+                      createdAttributes:
+                        type: array
+                        items:
+                          type: object
+                          description: Default Grails rendering of ProductAttribute.
+                          additionalProperties: true
+                      updatedAttributes:
+                        type: array
+                        items:
+                          type: object
+                          additionalProperties: true
+                      deletedAttributes:
+                        type: array
+                        items:
+                          type: string
+                          description: Ids of deleted ProductAttributes.
+        '400':
+          $ref: '../components/common.yaml#/components/responses/ValidationError'
+components:
+  securitySchemes:
+    cookieAuth:
+      $ref: '../components/common.yaml#/components/securitySchemes/cookieAuth'

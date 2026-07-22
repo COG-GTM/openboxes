@@ -1,0 +1,78 @@
+openapi: 3.0.3
+info:
+  title: OpenBoxes - ProductPackageApiController
+  description: >
+    Product package creation handled by
+    org.pih.warehouse.api.ProductPackageApiController, routed via the standard
+    "/api/${resource}s" REST mapping (POST -> create(); only create() exists).
+    Parity quirks pinned here: the endpoint responds 200 (not 201), and the
+    body is the parent ProductSupplier (with the new/updated package as
+    defaultProductPackage), not the ProductPackage itself. Posting an existing
+    uom+quantity combination updates that package's price instead of creating
+    a duplicate.
+  version: 0.1.0
+servers:
+  - url: http://localhost:8080/openboxes
+    description: Local Docker baseline (docs/migration/RUNNING_LOCALLY.md)
+security:
+  - cookieAuth: []
+paths:
+  /api/productPackages:
+    post:
+      operationId: createProductPackage
+      summary: Create (or update) a product package on a product source
+      requestBody:
+        required: true
+        content:
+          application/json:
+            schema:
+              type: object
+              description: >
+                ProductPackageCommand binding. productSupplier, uom and
+                productPackageQuantity are required (productPackageQuantity
+                must be >= 0).
+              properties:
+                productSupplier:
+                  type: object
+                  properties:
+                    id:
+                      $ref: '../components/common.yaml#/components/schemas/Id'
+                uom:
+                  type: object
+                  description: UnitOfMeasure reference.
+                  properties:
+                    id:
+                      $ref: '../components/common.yaml#/components/schemas/Id'
+                productPackageQuantity:
+                  type: integer
+                  minimum: 0
+                productPackagePrice:
+                  type: number
+                minOrderQuantity:
+                  type: number
+                contractPricePrice:
+                  type: number
+                contractPriceValidUntil:
+                  type: string
+                tieredPricing:
+                  type: boolean
+              additionalProperties: true
+      responses:
+        '200':
+          description: >
+            The parent product source, including the created/updated package
+            as defaultProductPackage.
+          content:
+            application/json:
+              schema:
+                type: object
+                required: [data]
+                properties:
+                  data:
+                    $ref: '../components/common.yaml#/components/schemas/ProductSupplier'
+        '400':
+          $ref: '../components/common.yaml#/components/responses/ValidationError'
+components:
+  securitySchemes:
+    cookieAuth:
+      $ref: '../components/common.yaml#/components/securitySchemes/cookieAuth'

@@ -1,0 +1,78 @@
+openapi: 3.0.3
+info:
+  title: OpenBoxes - PrepaymentInvoiceItemApiController
+  description: >
+    Invoice-item edit/delete endpoints for final invoices on prepaid purchase
+    orders, handled by org.pih.warehouse.api.PrepaymentInvoiceItemApiController,
+    routed via the explicit "/api/prepaymentInvoiceItems/$id" mapping
+    (POST -> update(), DELETE -> delete()). Parity quirks pinned here: update
+    is POST (not PUT/PATCH) and both operations return an empty body; all
+    business-rule failures (unknown item, posted invoice, prepayment/inverse
+    items, missing attributes, quantity/price bounds) surface as
+    IllegalArgumentException and therefore respond 500 via
+    ErrorsController.handleException - never 404/400.
+  version: 0.1.0
+servers:
+  - url: http://localhost:8080/openboxes
+    description: Local Docker baseline (docs/migration/RUNNING_LOCALLY.md)
+security:
+  - cookieAuth: []
+paths:
+  /api/prepaymentInvoiceItems/{id}:
+    post:
+      operationId: updatePrepaymentInvoiceItem
+      summary: Update an invoice item's quantity or unit price
+      description: >
+        PrepaymentInvoiceService.updateInvoiceItem. Exactly one of "quantity"
+        (for items backed by a shipment item) or "unitPrice" (for items backed
+        by an order adjustment) is applied; quantity wins when both are sent.
+        Responds 200 with an empty body on success. A body with neither
+        attribute, an unknown item id, a posted invoice, or an out-of-bounds
+        value all raise IllegalArgumentException (500).
+      parameters:
+        - $ref: '#/components/parameters/invoiceItemId'
+      requestBody:
+        required: true
+        content:
+          application/json:
+            schema:
+              type: object
+              properties:
+                quantity:
+                  type: integer
+                  description: New quantity (must be > 0).
+                unitPrice:
+                  type: number
+                  description: New unit price (must be non-zero).
+              additionalProperties: true
+      responses:
+        '200':
+          description: Item updated. Empty body (render status 200).
+        '500':
+          $ref: '../components/common.yaml#/components/responses/ServerError'
+    delete:
+      operationId: deletePrepaymentInvoiceItem
+      summary: Delete an invoice item (and its inverse item)
+      description: >
+        PrepaymentInvoiceService.removeInvoiceItem. Also removes the related
+        inverse item when one exists. Unknown ids, prepayment/inverse items
+        and posted invoices raise IllegalArgumentException (500).
+      parameters:
+        - $ref: '#/components/parameters/invoiceItemId'
+      responses:
+        '204':
+          description: Item deleted (empty body).
+        '500':
+          $ref: '../components/common.yaml#/components/responses/ServerError'
+components:
+  parameters:
+    invoiceItemId:
+      name: id
+      in: path
+      required: true
+      description: InvoiceItem id.
+      schema:
+        $ref: '../components/common.yaml#/components/schemas/Id'
+  securitySchemes:
+    cookieAuth:
+      $ref: '../components/common.yaml#/components/securitySchemes/cookieAuth'

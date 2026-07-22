@@ -1,0 +1,778 @@
+openapi: 3.0.3
+info:
+  title: OpenBoxes - ProductApiController
+  description: >
+    Product listing, search, availability/demand lookups and creation handled
+    by org.pih.warehouse.api.ProductApiController. Routed via the explicit
+    "/api/products" mappings (GET list / POST save), "/api/products/search",
+    the per-action "/api/products/$id/$action" mapping (demand, demandSummary,
+    productSummary, productAvailability, availableBins, substitutions,
+    associatedProducts, withCatalogs, productAvailabilityAndDemand,
+    productDemand), "/api/products/$productId/inventoryItems/$lotNumber",
+    "/api/products/getLatestInventoryCountDate", "/api/products/import",
+    "/api/products/availableItems" and
+    "/api/products/inventoryItems/lotNumbersWithExpirationDate". Parity
+    quirks pinned here: save() responds 200 (not 201) with a {"product": ...}
+    envelope (not "data"); unknown product ids on the per-product lookups do
+    NOT 404 (Product.get()/load() simply yields null/empty data or a 500 when
+    the null is dereferenced); availableItems/availableBins without a location
+    and at least one product id respond 500 (IllegalArgumentException).
+  version: 0.1.0
+servers:
+  - url: http://localhost:8080/openboxes
+    description: Local Docker baseline (docs/migration/RUNNING_LOCALLY.md)
+security:
+  - cookieAuth: []
+paths:
+  /api/products:
+    get:
+      operationId: listProducts
+      summary: List products
+      description: >
+        Paged product listing. "q" fans out to name/description/brand/
+        manufacturer/vendor/productCode/unitOfMeasure matching. format=csv
+        downloads every product as a text/csv attachment (max is forced to
+        -1); format=list renders compact ProductListItem objects instead of
+        the default product marshalling.
+      parameters:
+        - $ref: '../components/common.yaml#/components/parameters/max'
+        - $ref: '../components/common.yaml#/components/parameters/offset'
+        - name: q
+          in: query
+          required: false
+          schema:
+            type: string
+        - name: categoryId
+          in: query
+          required: false
+          schema:
+            type: string
+        - name: tagId
+          in: query
+          required: false
+          schema:
+            type: string
+        - name: catalogId
+          in: query
+          required: false
+          schema:
+            type: string
+        - name: includeInactive
+          in: query
+          required: false
+          schema:
+            type: boolean
+        - name: format
+          in: query
+          required: false
+          schema:
+            type: string
+            enum: [csv, list]
+      responses:
+        '200':
+          description: Products with pagination total (or a CSV attachment).
+          content:
+            application/json:
+              schema:
+                type: object
+                required: [data]
+                properties:
+                  data:
+                    type: array
+                    items:
+                      $ref: '#/components/schemas/Product'
+                  totalCount:
+                    type: integer
+                    nullable: true
+            text/csv:
+              schema:
+                type: string
+    post:
+      operationId: createProduct
+      summary: Create a product
+      description: >
+        save() - responds 200 with {"product": Product.toFullJson()} (no
+        "data" envelope). A productCode is generated when omitted. Validation
+        failures respond 400; a non-default productType without code and
+        identifier format responds 500 (IllegalArgumentException).
+      requestBody:
+        required: true
+        content:
+          application/json:
+            schema:
+              type: object
+              properties:
+                name:
+                  type: string
+                category:
+                  type: object
+                  properties:
+                    id:
+                      $ref: '../components/common.yaml#/components/schemas/Id'
+                productCode:
+                  type: string
+                description:
+                  type: string
+                unitOfMeasure:
+                  type: string
+                pricePerUnit:
+                  type: number
+                active:
+                  type: boolean
+              additionalProperties: true
+      responses:
+        '200':
+          description: The created product (Product.toFullJson()).
+          content:
+            application/json:
+              schema:
+                type: object
+                required: [product]
+                properties:
+                  product:
+                    type: object
+                    description: Product.toFullJson() rendering (large; loosely pinned).
+                    properties:
+                      id:
+                        $ref: '../components/common.yaml#/components/schemas/Id'
+                      name:
+                        type: string
+                      productCode:
+                        type: string
+                    additionalProperties: true
+        '400':
+          $ref: '../components/common.yaml#/components/responses/ValidationError'
+        '500':
+          $ref: '../components/common.yaml#/components/responses/ServerError'
+  /api/products/search:
+    get:
+      operationId: searchProducts
+      summary: Typeahead product search
+      description: >
+        Splits "name" into terms on commas/spaces. Terms shorter than the
+        configured typeahead minimum render {"data": []}. With
+        availableItems=true the results are grouped bin-location availability
+        summaries instead of plain product DTOs.
+      parameters:
+        - name: name
+          in: query
+          required: false
+          schema:
+            type: string
+        - name: availableItems
+          in: query
+          required: false
+          schema:
+            type: boolean
+      responses:
+        '200':
+          description: Matching products (ProductDto rendering).
+          content:
+            application/json:
+              schema:
+                type: object
+                required: [data]
+                properties:
+                  data:
+                    type: array
+                    items:
+                      type: object
+                      properties:
+                        id:
+                          $ref: '../components/common.yaml#/components/schemas/Id'
+                        name:
+                          type: string
+                          nullable: true
+                        productCode:
+                          type: string
+                          nullable: true
+                        displayName:
+                          type: string
+                          nullable: true
+                        exactMatch:
+                          type: boolean
+                        active:
+                          type: boolean
+                        color:
+                          type: string
+                          nullable: true
+                        lotAndExpiryControl:
+                          type: boolean
+                        unitOfMeasure:
+                          type: string
+                          nullable: true
+                        handlingIcons:
+                          type: array
+                          items:
+                            type: object
+                            additionalProperties: true
+                      additionalProperties: true
+  /api/products/{id}/demand:
+    get:
+      operationId: getProductDemand
+      summary: Demand for a product at the session warehouse
+      parameters:
+        - $ref: '#/components/parameters/productId'
+      responses:
+        '200':
+          description: Demand figures plus the product and session location.
+          content:
+            application/json:
+              schema:
+                type: object
+                required: [data]
+                properties:
+                  data:
+                    type: object
+                    required: [demand, location, product]
+                    properties:
+                      demand:
+                        type: object
+                        properties:
+                          dailyDemand:
+                            type: number
+                          monthlyDemand:
+                            type: number
+                          onHandMonths:
+                            type: number
+                          quantityOnHand:
+                            type: integer
+                            nullable: true
+                          totalDays:
+                            type: integer
+                          totalDemand:
+                            type: number
+                        additionalProperties: true
+                      location:
+                        type: object
+                        nullable: true
+                        allOf:
+                          - $ref: '../components/common.yaml#/components/schemas/Location'
+                      product:
+                        type: object
+                        nullable: true
+                        allOf:
+                          - $ref: '#/components/schemas/Product'
+  /api/products/{id}/demandSummary:
+    get:
+      operationId: getProductDemandSummary
+      summary: Monthly demand summary for a product at the session warehouse
+      parameters:
+        - $ref: '#/components/parameters/productId'
+      responses:
+        '200':
+          description: Monthly demand summary rows (empty when no demand).
+          content:
+            application/json:
+              schema:
+                type: object
+                required: [data]
+                properties:
+                  data:
+                    type: array
+                    items:
+                      type: object
+                      additionalProperties: true
+  /api/products/{id}/productSummary:
+    get:
+      operationId: getProductSummary
+      summary: Quantity on hand for a product at the session warehouse
+      parameters:
+        - $ref: '#/components/parameters/productId'
+      responses:
+        '200':
+          description: Product/location ids and summed quantity on hand.
+          content:
+            application/json:
+              schema:
+                type: object
+                required: [data]
+                properties:
+                  data:
+                    type: object
+                    required: [product, location]
+                    properties:
+                      product:
+                        type: object
+                        properties:
+                          id:
+                            $ref: '../components/common.yaml#/components/schemas/Id'
+                      location:
+                        type: object
+                        properties:
+                          id:
+                            $ref: '../components/common.yaml#/components/schemas/Id'
+                      quantityOnHand:
+                        type: integer
+                        nullable: true
+                        description: Null when the product has no availability rows.
+  /api/products/{id}/productAvailability:
+    get:
+      operationId: getProductAvailability
+      summary: ProductAvailability rows for a product at the session warehouse
+      parameters:
+        - $ref: '#/components/parameters/productId'
+      responses:
+        '200':
+          description: One row per bin location / inventory item.
+          content:
+            application/json:
+              schema:
+                type: object
+                required: [data]
+                properties:
+                  data:
+                    type: array
+                    items:
+                      type: object
+                      properties:
+                        id:
+                          $ref: '../components/common.yaml#/components/schemas/Id'
+                        productCode:
+                          type: string
+                          nullable: true
+                        lotNumber:
+                          type: string
+                          nullable: true
+                        binLocationName:
+                          type: string
+                          nullable: true
+                        quantityOnHand:
+                          type: integer
+                        quantityAllocated:
+                          type: integer
+                        quantityOnHold:
+                          type: integer
+                        quantityNotPicked:
+                          type: integer
+                        quantityAvailableToPromise:
+                          type: integer
+                      additionalProperties: true
+  /api/products/{id}/availableBins:
+    get:
+      operationId: getAvailableBins
+      summary: Available bin locations for a product
+      description: >
+        Same rendering as /api/products/availableItems, keyed off the path
+        product id. Responds 500 when the session has no warehouse and no
+        location.id parameter is given.
+      parameters:
+        - $ref: '#/components/parameters/productId'
+        - $ref: '#/components/parameters/locationIdQuery'
+      responses:
+        '200':
+          $ref: '#/components/responses/AvailableItemsOk'
+        '500':
+          $ref: '../components/common.yaml#/components/responses/ServerError'
+  /api/products/{id}/substitutions:
+    get:
+      operationId: getProductSubstitutions
+      summary: Substitutions (SUBSTITUTE associations) for a product
+      description: >
+        Forwards to associatedProducts() with type=SUBSTITUTE; the association
+        list is rendered under "substitutions".
+      parameters:
+        - $ref: '#/components/parameters/productId'
+        - $ref: '#/components/parameters/locationIdQuery'
+      responses:
+        '200':
+          $ref: '#/components/responses/AssociatedProductsOk'
+  /api/products/{id}/associatedProducts:
+    get:
+      operationId: getAssociatedProducts
+      summary: Associated products for a product
+      description: >
+        The association list is rendered under the "resource" parameter's
+        value ("productAssociations" by default).
+      parameters:
+        - $ref: '#/components/parameters/productId'
+        - $ref: '#/components/parameters/locationIdQuery'
+        - name: type
+          in: query
+          required: false
+          description: ProductAssociationTypeCode values (e.g. SUBSTITUTE).
+          schema:
+            type: string
+        - name: resource
+          in: query
+          required: false
+          description: Key under which the association list is rendered.
+          schema:
+            type: string
+      responses:
+        '200':
+          $ref: '#/components/responses/AssociatedProductsOk'
+  /api/products/{id}/withCatalogs:
+    get:
+      operationId: getProductWithCatalogs
+      summary: Product with its catalog memberships
+      parameters:
+        - $ref: '#/components/parameters/productId'
+      responses:
+        '200':
+          description: Compact product with catalog id/name pairs.
+          content:
+            application/json:
+              schema:
+                type: object
+                required: [data]
+                properties:
+                  data:
+                    type: object
+                    required: [id, catalogs]
+                    properties:
+                      id:
+                        $ref: '../components/common.yaml#/components/schemas/Id'
+                      name:
+                        type: string
+                        nullable: true
+                      productCode:
+                        type: string
+                        nullable: true
+                      catalogs:
+                        type: array
+                        nullable: true
+                        items:
+                          type: object
+                          properties:
+                            id:
+                              $ref: '../components/common.yaml#/components/schemas/Id'
+                            name:
+                              type: string
+                              nullable: true
+  /api/products/{id}/productAvailabilityAndDemand:
+    get:
+      operationId: getProductAvailabilityAndDemand
+      summary: Quantity on hand/available and monthly demand at a location
+      parameters:
+        - $ref: '#/components/parameters/productId'
+        - name: locationId
+          in: query
+          required: true
+          schema:
+            $ref: '../components/common.yaml#/components/schemas/Id'
+      responses:
+        '200':
+          description: Bare object - no "data" envelope.
+          content:
+            application/json:
+              schema:
+                type: object
+                required: [monthlyDemand, quantityOnHand, quantityAvailable]
+                properties:
+                  monthlyDemand:
+                    type: number
+                  quantityOnHand:
+                    type: integer
+                  quantityAvailable:
+                    type: integer
+  /api/products/{id}/productDemand:
+    get:
+      operationId: getProductDemandBetweenLocations
+      summary: Monthly demand between an origin and destination
+      parameters:
+        - $ref: '#/components/parameters/productId'
+        - name: originId
+          in: query
+          required: false
+          schema:
+            $ref: '../components/common.yaml#/components/schemas/Id'
+        - name: destinationId
+          in: query
+          required: false
+          schema:
+            $ref: '../components/common.yaml#/components/schemas/Id'
+      responses:
+        '200':
+          description: Bare object - no "data" envelope.
+          content:
+            application/json:
+              schema:
+                type: object
+                required: [monthlyDemand, quantityOnHand]
+                properties:
+                  monthlyDemand:
+                    type: number
+                  quantityOnHand:
+                    type: integer
+                    nullable: true
+  /api/products/{productId}/inventoryItems/{lotNumber}:
+    get:
+      operationId: getInventoryItem
+      summary: Inventory item lookup by product and lot number
+      description: >
+        Parity quirk: unknown product/lot combinations do NOT 404 - the
+        endpoint responds 200 with {"inventoryItem": null, "quantityOnHand": 0}.
+      parameters:
+        - name: productId
+          in: path
+          required: true
+          schema:
+            $ref: '../components/common.yaml#/components/schemas/Id'
+        - name: lotNumber
+          in: path
+          required: true
+          schema:
+            type: string
+      responses:
+        '200':
+          description: Bare object - no "data" envelope.
+          content:
+            application/json:
+              schema:
+                type: object
+                required: [inventoryItem, quantityOnHand]
+                properties:
+                  inventoryItem:
+                    type: object
+                    nullable: true
+                    description: Default Grails rendering of InventoryItem.
+                    additionalProperties: true
+                  quantityOnHand:
+                    type: integer
+  /api/products/getLatestInventoryCountDate:
+    get:
+      operationId: getLatestInventoryCountDate
+      summary: Latest inventory count date per product
+      parameters:
+        - name: productIds
+          in: query
+          required: false
+          description: Repeatable product id parameter.
+          schema:
+            type: string
+      responses:
+        '200':
+          description: Map of product id to latest count timestamp.
+          content:
+            application/json:
+              schema:
+                type: object
+                required: [data]
+                properties:
+                  data:
+                    type: object
+                    additionalProperties:
+                      type: string
+                      nullable: true
+  /api/products/availableItems:
+    get:
+      operationId: getAvailableItems
+      summary: Available bin locations for one or more products
+      description: >
+        Requires a location (location.id parameter or session warehouse) and
+        at least one product id ("product.id" or "id", repeatable); otherwise
+        responds 500 (IllegalArgumentException).
+      parameters:
+        - name: product.id
+          in: query
+          required: false
+          schema:
+            type: string
+        - name: id
+          in: query
+          required: false
+          schema:
+            type: string
+        - $ref: '#/components/parameters/locationIdQuery'
+      responses:
+        '200':
+          $ref: '#/components/responses/AvailableItemsOk'
+        '500':
+          $ref: '../components/common.yaml#/components/responses/ServerError'
+  /api/products/inventoryItems/lotNumbersWithExpirationDate:
+    get:
+      operationId: getLotNumbersWithExpirationDate
+      summary: Lot numbers with expiration dates per product
+      parameters:
+        - name: productIds
+          in: query
+          required: false
+          description: Repeatable product id parameter.
+          schema:
+            type: string
+      responses:
+        '200':
+          description: >
+            Map of product id to lot-number entries (empty object when the
+            products have no lots).
+          content:
+            application/json:
+              schema:
+                type: object
+                required: [data]
+                properties:
+                  data:
+                    type: object
+                    additionalProperties:
+                      type: array
+                      items:
+                        type: object
+                        additionalProperties: true
+  /api/products/import:
+    post:
+      operationId: importProductsCsv
+      summary: Import products from a CSV request body
+      description: >
+        Reads the raw request body as CSV (Content-Type must be text/csv;
+        anything else, or an empty body, responds 500 via
+        IllegalArgumentException). Responds 200 with the imported products.
+        Not exercised by the contract suite - a successful import would
+        permanently add products to the seeded dataset (no delete API).
+      requestBody:
+        required: true
+        content:
+          text/csv:
+            schema:
+              type: string
+      responses:
+        '200':
+          description: The imported products.
+          content:
+            application/json:
+              schema:
+                type: object
+                required: [data]
+                properties:
+                  data:
+                    type: array
+                    items:
+                      type: object
+                      additionalProperties: true
+        '500':
+          $ref: '../components/common.yaml#/components/responses/ServerError'
+components:
+  parameters:
+    productId:
+      name: id
+      in: path
+      required: true
+      description: >
+        Product id. Unknown ids do NOT 404 (see individual operations).
+      schema:
+        $ref: '../components/common.yaml#/components/schemas/Id'
+    locationIdQuery:
+      name: location.id
+      in: query
+      required: false
+      description: Location id (defaults to the session warehouse).
+      schema:
+        $ref: '../components/common.yaml#/components/schemas/Id'
+  responses:
+    AvailableItemsOk:
+      description: Available inventory grouped by bin location.
+      content:
+        application/json:
+          schema:
+            type: object
+            required: [data]
+            properties:
+              data:
+                type: array
+                items:
+                  type: object
+                  properties:
+                    binLocation:
+                      type: object
+                      nullable: true
+                      allOf:
+                        - $ref: '../components/common.yaml#/components/schemas/Location'
+                    quantityAvailable:
+                      type: integer
+                      nullable: true
+                    quantityOnHand:
+                      type: integer
+                      nullable: true
+                  additionalProperties: true
+    AssociatedProductsOk:
+      description: >
+        Product associations plus current availability. The association list
+        is rendered under a dynamic key ("substitutions" for the
+        substitutions endpoint, otherwise the "resource" parameter or
+        "productAssociations").
+      content:
+        application/json:
+          schema:
+            type: object
+            required: [data]
+            properties:
+              data:
+                type: object
+                required:
+                  - product
+                  - availableItems
+                  - hasAssociations
+                  - hasEarlierExpiringItems
+                properties:
+                  product:
+                    type: object
+                    nullable: true
+                    allOf:
+                      - $ref: '#/components/schemas/Product'
+                  availableItems:
+                    type: array
+                    items:
+                      type: object
+                      additionalProperties: true
+                  hasAssociations:
+                    type: boolean
+                  hasEarlierExpiringItems:
+                    type: boolean
+                additionalProperties: true
+  schemas:
+    Product:
+      type: object
+      description: >
+        Compact product rendering produced by the registered Product JSON
+        marshaller (used by list() and nested product references).
+      properties:
+        id:
+          $ref: '../components/common.yaml#/components/schemas/Id'
+        name:
+          type: string
+          nullable: true
+        productCode:
+          type: string
+          nullable: true
+        description:
+          type: string
+          nullable: true
+        category:
+          type: string
+          nullable: true
+        unitOfMeasure:
+          type: string
+          nullable: true
+        pricePerUnit:
+          type: number
+          nullable: true
+        active:
+          type: boolean
+        color:
+          type: string
+          nullable: true
+        lotAndExpiryControl:
+          type: boolean
+        dateCreated:
+          type: string
+          nullable: true
+        lastUpdated:
+          type: string
+          nullable: true
+        updatedBy:
+          type: string
+          nullable: true
+        displayNames:
+          type: object
+          nullable: true
+          additionalProperties: true
+        handlingIcons:
+          type: array
+          nullable: true
+          items:
+            type: object
+            additionalProperties: true
+      additionalProperties: true
+  securitySchemes:
+    cookieAuth:
+      $ref: '../components/common.yaml#/components/securitySchemes/cookieAuth'

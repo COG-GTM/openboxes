@@ -1,0 +1,54 @@
+openapi: 3.0.3
+info:
+  title: OpenBoxes - ProductClassificationApiController
+  description: >
+    Product classification listing handled by
+    org.pih.warehouse.api.ProductClassificationApiController, routed via the
+    explicit "/api/facilities/$facilityId/products/classifications" mapping
+    (GET -> list()). Classifications are the distinct non-empty "abcClass"
+    strings across all products plus the inventory levels of the requested
+    facility. Parity quirk pinned here: an invalid facilityId raises
+    IllegalArgumentException and responds 500 (not 404).
+  version: 0.1.0
+servers:
+  - url: http://localhost:8080/openboxes
+    description: Local Docker baseline (docs/migration/RUNNING_LOCALLY.md)
+security:
+  - cookieAuth: []
+paths:
+  /api/facilities/{facilityId}/products/classifications:
+    get:
+      operationId: listProductClassifications
+      summary: List product classifications for a facility
+      parameters:
+        - name: facilityId
+          in: path
+          required: true
+          description: Facility (Location) id. Invalid ids respond 500.
+          schema:
+            $ref: '../components/common.yaml#/components/schemas/Id'
+      responses:
+        '200':
+          description: >
+            Sorted, distinct classification names (empty in the seeded demo
+            dataset, which configures no abcClass values).
+          content:
+            application/json:
+              schema:
+                type: object
+                required: [data]
+                properties:
+                  data:
+                    type: array
+                    items:
+                      type: object
+                      required: [name]
+                      properties:
+                        name:
+                          type: string
+        '500':
+          $ref: '../components/common.yaml#/components/responses/ServerError'
+components:
+  securitySchemes:
+    cookieAuth:
+      $ref: '../components/common.yaml#/components/securitySchemes/cookieAuth'
