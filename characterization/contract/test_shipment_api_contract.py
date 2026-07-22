@@ -206,3 +206,153 @@ def test_send_unknown(client):
     resp = check(client, spec, "POST", "/api/shipments/{id}/send",
                  path="/api/shipments/doesnotexist0000/send", json={})
     assert resp.status_code == 404
+
+
+# Batch 22: classic shipping screens (shipment/list, showDetails,
+# showPackingList, receiveShipment, sendShipment, shipmentItem/create)
+
+
+def test_list_options(client, batch22_endpoints):
+    resp = check(client, spec, "GET", "/api/shipments/listOptions",
+                 path="/api/shipments/listOptions")
+    assert resp.status_code == 200
+    data = resp.json()["data"]
+    assert data["shipmentTypes"], "expected seeded shipment types"
+    assert "PENDING" in data["statusCodes"]
+    assert data["locations"], "expected seeded locations"
+
+
+def test_list_shipments(client, batch22_endpoints, shipment_id):
+    resp = check(client, spec, "GET", "/api/shipments",
+                 path="/api/shipments", params={"type": "incoming"})
+    assert resp.status_code == 200
+    data = resp.json()["data"]
+    assert data["incoming"] is True
+    rows = [s for s in data["shipments"] if s["id"] == shipment_id]
+    assert rows, "expected the contract shipment inbound to Main Warehouse"
+    assert rows[0]["shipmentNumber"]
+
+
+def test_show_details(client, batch22_endpoints, shipment_id):
+    resp = check(client, spec, "GET", "/api/shipments/{id}/showDetails",
+                 path=f"/api/shipments/{shipment_id}/showDetails")
+    assert resp.status_code == 200
+    data = resp.json()["data"]
+    assert data["id"] == shipment_id
+    assert data["wasReceived"] is False
+    assert data["shipmentItems"] == []
+    assert data["eventTypes"], "expected seeded event types"
+
+
+def test_packing_list(client, batch22_endpoints, shipment_id):
+    resp = check(client, spec, "GET", "/api/shipments/{id}/packingList",
+                 path=f"/api/shipments/{shipment_id}/packingList")
+    assert resp.status_code == 200
+    data = resp.json()["data"]
+    assert data["id"] == shipment_id
+    assert data["shipmentItems"] == []
+
+
+def test_add_comment(client, batch22_endpoints, shipment_id):
+    resp = check(client, spec, "POST", "/api/shipments/{id}/comments",
+                 path=f"/api/shipments/{shipment_id}/comments",
+                 json={"comment": "ZZ contract comment"})
+    assert resp.status_code == 200
+
+    resp = client.get_json(f"/api/shipments/{shipment_id}/showDetails")
+    comments = resp["data"]["comments"]
+    assert [c for c in comments if c["comment"] == "ZZ contract comment"]
+
+
+def test_add_event(client, batch22_endpoints, shipment_id):
+    details = client.get_json(f"/api/shipments/{shipment_id}/showDetails")["data"]
+    event_type_id = details["eventTypes"][0]["id"]
+    resp = check(client, spec, "POST", "/api/shipments/{id}/events",
+                 path=f"/api/shipments/{shipment_id}/events",
+                 json={"eventTypeId": event_type_id,
+                       "eventDate": "2026-07-01 10:00"})
+    assert resp.status_code == 200
+
+    details = client.get_json(f"/api/shipments/{shipment_id}/showDetails")["data"]
+    assert details["events"], "expected the added event"
+
+
+def test_receipt_lifecycle(client, batch22_endpoints, options, shipment_id):
+    inventory_item_id = _inventory_item_id(client, options, shipment_id)
+    resp = client.request("POST", f"/api/shipments/{shipment_id}/items",
+                          json={"inventoryItemId": inventory_item_id,
+                                "quantity": 3})
+    assert resp.status_code == 201
+
+    resp = check(client, spec, "GET", "/api/shipments/{id}/receipt",
+                 path=f"/api/shipments/{shipment_id}/receipt")
+    assert resp.status_code == 200
+    data = resp.json()["data"]
+    receipt_items = data["receipt"]["receiptItems"]
+    assert len(receipt_items) == 1
+    assert receipt_items[0]["quantityShipped"] == 3
+    receipt_item_id = receipt_items[0]["id"]
+
+    resp = check(client, spec, "POST", "/api/shipments/{id}/receipt",
+                 path=f"/api/shipments/{shipment_id}/receipt",
+                 json={"action": "save",
+                       "actualDeliveryDate": "2026-07-10 10:00",
+                       "receiptItems": [{"id": receipt_item_id,
+                                         "quantityReceived": 3}]})
+    assert resp.status_code == 200
+    assert resp.json()["data"]["received"] is False
+
+    resp = check(client, spec, "POST",
+                 "/api/shipments/{id}/receipt/items/{receiptItemId}/split",
+                 path=(f"/api/shipments/{shipment_id}/receipt/items/"
+                       f"{receipt_item_id}/split"))
+    assert resp.status_code == 200
+
+    data = client.get_json(f"/api/shipments/{shipment_id}/receipt")["data"]
+    assert len(data["receipt"]["receiptItems"]) == 2
+    split_id = [i["id"] for i in data["receipt"]["receiptItems"]
+                if i["id"] != receipt_item_id][0]
+
+    resp = check(client, spec, "GET",
+                 "/api/shipments/{id}/receipt/items/{receiptItemId}/putawayLocations",
+                 path=(f"/api/shipments/{shipment_id}/receipt/items/"
+                       f"{receipt_item_id}/putawayLocations"))
+    assert resp.status_code == 200
+
+    resp = check(client, spec, "DELETE",
+                 "/api/shipments/{id}/receipt/items/{receiptItemId}",
+                 path=f"/api/shipments/{shipment_id}/receipt/items/{split_id}")
+    assert resp.status_code == 200
+
+    resp = check(client, spec, "DELETE", "/api/shipments/{id}/receipt",
+                 path=f"/api/shipments/{shipment_id}/receipt")
+    assert resp.status_code == 200
+
+
+def test_item_create_options(client, batch22_endpoints):
+    resp = check(client, spec, "GET", "/api/shipmentItems/createOptions",
+                 path="/api/shipmentItems/createOptions")
+    assert resp.status_code == 200
+    data = resp.json()["data"]
+    assert data["shipments"], "expected seeded shipments"
+    assert data["products"], "expected seeded products"
+
+
+def test_create_item(client, batch22_endpoints, shipment_id):
+    product_id = client.product_id("BF640")
+    resp = check(client, spec, "POST", "/api/shipmentItems",
+                 path="/api/shipmentItems",
+                 json={"shipmentId": shipment_id,
+                       "productId": product_id,
+                       "quantity": 2})
+    assert resp.status_code == 201
+    data = resp.json()["data"]
+    assert data["quantity"] == 2
+    assert data["product"]["id"] == product_id
+
+
+def test_bulk_action_unknown(client, batch22_endpoints):
+    resp = check(client, spec, "POST", "/api/shipments/bulkAction",
+                 path="/api/shipments/bulkAction",
+                 json={"action": "explode", "shipmentIds": []})
+    assert resp.status_code == 400

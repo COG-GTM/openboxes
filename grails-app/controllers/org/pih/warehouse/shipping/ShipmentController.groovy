@@ -54,48 +54,10 @@ class ShipmentController {
         redirect(action: "showDetails", params: ['id': params.id])
     }
 
+    // React screen that replaced the legacy list GSP (Phase 2, Batch 22).
+    // Data comes from GET /api/shipments (ShipmentApiController.list).
     def list() {
-        def startTime = System.currentTimeMillis()
-        println "Get shipments: " + params
-
-        params.max = Math.min(params.max ? params.int('max') : 100, 10000)
-
-        Calendar calendar = Calendar.instance
-        int dayOfMonth = calendar.get(Calendar.DAY_OF_MONTH)
-        int firstDayOfMonth = calendar.getActualMinimum(Calendar.DAY_OF_MONTH)
-        int lastDayOfMonth = calendar.getActualMaximum(Calendar.DAY_OF_MONTH)
-        calendar.set(calendar.get(Calendar.YEAR), calendar.get(Calendar.MONTH), firstDayOfMonth)
-        def lastUpdatedFromDefault = calendar.getTime()
-        def lastUpdatedToDefault = calendar.getTime()
-
-        boolean incoming = params?.type?.toUpperCase() == "INCOMING"
-        def origin = incoming ? (params.origin ? Location.get(params.origin) : null) : Location.get(session.warehouse.id)
-        def destination = incoming ? Location.get(session.warehouse.id) : (params.destination ? Location.get(params.destination) : null)
-        def shipmentType = params.shipmentType ? ShipmentType.get(params.shipmentType) : null
-        def statusCode = params.status ? Enum.valueOf(ShipmentStatusCode.class, params.status) : null
-        def statusStartDate = params.statusStartDate ? Date.parse("MM/dd/yyyy", params.statusStartDate) : null
-        def statusEndDate = params.statusEndDate ? Date.parse("MM/dd/yyyy", params.statusEndDate) : null
-        def lastUpdatedFrom = params.lastUpdatedFrom ? Date.parse("MM/dd/yyyy", params.lastUpdatedFrom) : null
-        def lastUpdatedTo = params.lastUpdatedTo ? Date.parse("MM/dd/yyyy", params.lastUpdatedTo) : null
-
-
-        println "lastUpdatedFrom = " + lastUpdatedFrom + " lastUpdatedTo = " + lastUpdatedTo
-
-        def shipments = shipmentService.getShipments(params.terms, shipmentType, origin, destination,
-                statusCode, statusStartDate, statusEndDate, lastUpdatedFrom, lastUpdatedTo, params.max)
-
-        println "List shipments: " + (System.currentTimeMillis() - startTime) + " ms"
-
-        [
-                shipments      : shipments,
-                shipmentType   : shipmentType?.id,
-                origin         : origin?.id,
-                destination    : destination?.id,
-                status         : statusCode?.name,
-                lastUpdatedFrom: lastUpdatedFrom,
-                lastUpdatedTo  : lastUpdatedTo,
-                incoming       : incoming
-        ]
+        render(view: "/common/react")
     }
 
 
@@ -236,9 +198,10 @@ class ShipmentController {
                 return
             }
 
-            def eventTypes = EventType.list()
-            def shipmentWorkflow = shipmentService.getShipmentWorkflow(shipmentInstance)
-            [shipmentInstance: shipmentInstance, shipmentWorkflow: shipmentWorkflow, shippingEventTypes: eventTypes]
+            // React screen that replaced the legacy showDetails GSP
+            // (Phase 2, Batch 22). Data comes from
+            // GET /api/shipments/$id/showDetails.
+            render(view: "/common/react")
         }
     }
 
@@ -279,52 +242,16 @@ class ShipmentController {
         }
     }
 
+    // React screen that replaced the legacy sendShipment GSP (Phase 2,
+    // Batch 22). Sending goes through POST /api/shipments/$id/send.
     def sendShipment() {
-        def transactionInstance
         def shipmentInstance = Shipment.get(params.id)
-        def shipmentWorkflow = shipmentService.getShipmentWorkflow(params.id)
-
         if (!shipmentInstance) {
             flash.message = "${warehouse.message(code: 'default.not.found.message', args: [warehouse.message(code: 'shipment.label', default: 'Shipment'), params.id])}"
             redirect(action: "list", params: [type: params.type])
-        } else {
-            // handle a submit
-            if ("POST".equalsIgnoreCase(request.getMethod())) {
-                // make sure a shipping date has been specified and that is not the future
-                if (!params.actualShippingDate || Date.parse("MM/dd/yyyy HH:mm XXX", params.actualShippingDate) > new Date()) {
-                    flash.message = "${warehouse.message(code: 'shipping.specifyValidShipmentDate.message')}"
-                    render(view: "sendShipment", model: [shipmentInstance: shipmentInstance, shipmentWorkflow: shipmentWorkflow])
-                    return
-                }
-
-                // create the list of email recipients
-                def emailRecipients = new HashSet()
-                params.emailRecipientId?.each({
-                    emailRecipients = emailRecipients + Person.get(it)
-                })
-                try {
-                    // send the shipment
-                    shipmentService.sendShipment(shipmentInstance, params.comment, session.user, session.warehouse,
-                            Date.parse("MM/dd/yyyy HH:mm XXX", params.actualShippingDate))
-                    //triggerSendShipmentEmails(shipmentInstance, userInstance, emailRecipients)
-                }
-                catch (TransactionException e) {
-                    transactionInstance = e.transaction
-                    shipmentInstance = Shipment.get(params.id)
-                    shipmentWorkflow = shipmentService.getShipmentWorkflow(params.id)
-                    render(view: "sendShipment", model: [shipmentInstance: shipmentInstance, shipmentWorkflow: shipmentWorkflow, transactionInstance: transactionInstance])
-                    return
-                }
-
-                if (!shipmentInstance?.hasErrors() && !transactionInstance?.hasErrors()) {
-                    flash.message = "${warehouse.message(code: 'default.updated.message', args: [warehouse.message(code: 'shipment.label', default: 'Shipment'), shipmentInstance.id])}"
-                    redirect(action: "showDetails", id: shipmentInstance?.id)
-                }
-            }
-
-            // populate the model and render the page
-            render(view: "sendShipment", model: [shipmentInstance: shipmentInstance, shipmentWorkflow: shipmentWorkflow])
+            return
         }
+        render(view: "/common/react")
     }
 
     def refreshCurrentStatus() {
@@ -520,85 +447,16 @@ class ShipmentController {
     }
 
 
+    // React screen that replaced the legacy receiveShipment GSP (Phase 2,
+    // Batch 22). Receiving goes through /api/shipments/$id/receipt.
     def receiveShipment(ReceiveShipmentCommand command) {
-        log.info "params: " + params
-        def receiptInstance
-        def location = Location.get(session.warehouse.id)
         def shipmentInstance = Shipment.get(params.id)
-        def userInstance = User.get(session.user.id)
-
         if (!shipmentInstance) {
             flash.message = "${warehouse.message(code: 'default.not.found.message', args: [warehouse.message(code: 'shipment.label', default: 'Shipment'), params.id])}"
             redirect(action: "list", params: [type: 'incoming'])
             return
         }
-
-        // Process receive shipment form
-        if ("POST".equalsIgnoreCase(request.method)) {
-
-            // FIXME Somewhat unreadable code here ... need to clean it up a bit, but basically we're just checking
-            // to see if there's already a receipt on the shipment. If not we create one
-            receiptInstance = shipmentInstance.receipt
-            if (!receiptInstance) {
-                receiptInstance = new Receipt(params)
-                shipmentInstance.addToReceipts(receiptInstance)
-            } else {
-                receiptInstance.properties = params
-            }
-
-            // check for errors
-            if (receiptInstance.hasErrors() || !receiptInstance.validate()) {
-                render(view: "receiveShipment", model: [shipmentInstance: shipmentInstance, receiptInstance: receiptInstance])
-                return
-            }
-
-
-            if (params.saveButton == 'receiveShipment') {
-                // For now, we'll always credit stock on receipt of shipment
-                //def creditStockOnReceipt = params.creditStockOnReceipt=='yes'
-                def creditStockOnReceipt = true
-                // actually process the receipt
-                try {
-                    shipmentService.receiveShipment(shipmentInstance.id, params.comment, session?.user?.id, session.warehouse?.id, creditStockOnReceipt)
-                    // If there were no errors we can trigger shipment emails to be sent
-                    if (!shipmentInstance.hasErrors()) {
-                        def recipients = new HashSet()
-                        triggerReceiveShipmentEmails(shipmentInstance, userInstance, recipients)
-                        flash.message = "${warehouse.message(code: 'default.received.message', args: [warehouse.message(code: 'shipment.label', default: 'Shipment'), shipmentInstance.shipmentNumber ?: shipmentInstance?.id])}"
-                        redirect(action: "showDetails", id: shipmentInstance?.id)
-                        return
-                    }
-                } catch (ValidationException e) {
-                    shipmentInstance = Shipment.read(params.id)
-                    receiptInstance.errors = e.errors
-                    render(view: "receiveShipment", model: [shipmentInstance: shipmentInstance, receiptInstance: receiptInstance])
-                    return
-                }
-            } else {
-
-                flash.message = "${warehouse.message(code: 'default.updated.message', args: [warehouse.message(code: 'shipment.label', default: 'Shipment'), shipmentInstance.shipmentNumber ?: shipmentInstance?.id])}"
-                if (params.saveButton == 'saveAndExit') {
-                    redirect(controller: "shipment", action: "showDetails", id: shipmentInstance?.id)
-                } else {
-                    redirect(controller: "shipment", action: "receiveShipment", id: shipmentInstance?.id, fragment: "tabs-details")
-                }
-                return
-
-            }
-        }
-
-        // Display form
-        else {
-
-            if (shipmentInstance?.destination != location) {
-                flash.message = "${g.message(code: 'shipping.mustBeLoggedIntoDestinationToReceive.message', args: [shipmentInstance?.destination])}"
-            }
-
-            receiptInstance = shipmentService.findOrCreateReceipt(shipmentInstance)
-
-        }
-
-        render(view: "receiveShipment", model: [shipmentInstance: shipmentInstance, receiptInstance: receiptInstance])
+        render(view: "/common/react")
     }
 
 
@@ -658,13 +516,15 @@ class ShipmentController {
     }
 
 
+    // React screen that replaced the legacy showPackingList GSP (Phase 2,
+    // Batch 22). Data comes from GET /api/shipments/$id/packingList.
     def showPackingList() {
         def shipmentInstance = Shipment.get(params.id)
         if (!shipmentInstance) {
             flash.message = "${warehouse.message(code: 'default.not.found.message', args: [warehouse.message(code: 'shipment.label', default: 'Shipment'), params.id])}"
             redirect(action: "list", params: [type: params.type])
         } else {
-            [shipmentInstance: shipmentInstance]
+            render(view: "/common/react")
         }
     }
 

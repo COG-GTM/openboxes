@@ -861,7 +861,17 @@ class UrlMappings {
 
         "/api/shipments"(parseRequest: true) {
             controller = "shipmentApi"
-            action = [POST: "saveDetails"]
+            action = [POST: "saveDetails", GET: "list"]
+        }
+
+        "/api/shipments/listOptions" {
+            controller = "shipmentApi"
+            action = [GET: "listOptions"]
+        }
+
+        "/api/shipments/bulkAction"(parseRequest: true) {
+            controller = "shipmentApi"
+            action = [POST: "bulkAction"]
         }
 
         "/api/shipments/$id" {
@@ -934,11 +944,58 @@ class UrlMappings {
             action = [POST: "send"]
         }
 
+        // Classic shipping screens migrated to React (Phase 2, Batch 22)
+
+        "/api/shipments/$id/showDetails" {
+            controller = "shipmentApi"
+            action = [GET: "showDetails"]
+        }
+
+        "/api/shipments/$id/packingList" {
+            controller = "shipmentApi"
+            action = [GET: "packingList"]
+        }
+
+        "/api/shipments/$id/comments"(parseRequest: true) {
+            controller = "shipmentApi"
+            action = [POST: "addComment"]
+        }
+
+        "/api/shipments/$id/events"(parseRequest: true) {
+            controller = "shipmentApi"
+            action = [POST: "addEvent"]
+        }
+
+        "/api/shipments/$id/receipt"(parseRequest: true) {
+            controller = "shipmentApi"
+            action = [GET: "receipt", POST: "saveReceipt", DELETE: "deleteReceipt"]
+        }
+
+        "/api/shipments/$id/receipt/items/$receiptItemId" {
+            controller = "shipmentApi"
+            action = [DELETE: "deleteReceiptItem"]
+        }
+
+        "/api/shipments/$id/receipt/items/$receiptItemId/split"(parseRequest: true) {
+            controller = "shipmentApi"
+            action = [POST: "splitReceiptItem"]
+        }
+
+        "/api/shipments/$id/receipt/items/$receiptItemId/putawayLocations" {
+            controller = "shipmentApi"
+            action = [GET: "putawayLocations"]
+        }
+
+        "/api/shipmentItems/createOptions" {
+            controller = "shipmentApi"
+            action = [GET: "itemCreateOptions"]
+        }
+
         // Shipment Item API (shipmentItem scaffold screens migrated to React)
 
         "/api/shipmentItems"(parseRequest: true) {
-            controller = { "shipmentItemApi" }
-            action = [GET: "list"]
+            controller = { request.method == "POST" ? "shipmentApi" : "shipmentItemApi" }
+            action = [GET: "list", POST: "createItem"]
         }
 
         "/api/shipmentItems/options" {

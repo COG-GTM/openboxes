@@ -29,10 +29,10 @@ class ShipmentItemController {
         render(view: "/common/react", params: params)
     }
 
+    // React screen that replaced the legacy scaffolded create GSP
+    // (Phase 2, Batch 22). Creation goes through POST /api/shipmentItems.
     def create() {
-        def shipmentItemInstance = new ShipmentItem()
-        shipmentItemInstance.properties = params
-        return [shipmentItemInstance: shipmentItemInstance]
+        render(view: "/common/react")
     }
 
     def save() {

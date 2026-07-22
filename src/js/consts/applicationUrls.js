@@ -507,6 +507,9 @@ const SHIPMENT_SHOW_URL = {
   base: `${CONTEXT_PATH}/shipment`,
   show: (id) => `${SHIPMENT_SHOW_URL.base}/showDetails/${id}`,
   list: () => `${SHIPMENT_SHOW_URL.base}/list`,
+  packingList: (id) => `${SHIPMENT_SHOW_URL.base}/showPackingList/${id}`,
+  receive: (id) => `${SHIPMENT_SHOW_URL.base}/receiveShipment/${id}`,
+  send: (id) => `${SHIPMENT_SHOW_URL.base}/sendShipment/${id}`,
 };
 
 const SHIPMENT_ITEM_URL = {

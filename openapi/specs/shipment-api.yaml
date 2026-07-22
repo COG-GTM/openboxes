@@ -59,6 +59,72 @@ paths:
           $ref: '#/components/responses/Forbidden'
 
   /api/shipments:
+    get:
+      operationId: getShipmentList
+      summary: Shipments for the shipment list screen
+      description: >
+        Mirrors the legacy ShipmentController.list() filters - incoming lists
+        shipments into the current warehouse, outgoing lists shipments out of
+        it.
+      parameters:
+        - name: type
+          in: query
+          schema:
+            type: string
+            enum: [incoming, outgoing]
+        - name: terms
+          in: query
+          schema:
+            type: string
+        - name: status
+          in: query
+          schema:
+            type: string
+        - name: shipmentType
+          in: query
+          schema:
+            type: string
+        - name: origin
+          in: query
+          schema:
+            type: string
+        - name: destination
+          in: query
+          schema:
+            type: string
+        - name: max
+          in: query
+          schema:
+            type: integer
+      responses:
+        '200':
+          description: Shipment list rows.
+          content:
+            application/json:
+              schema:
+                type: object
+                required: [data]
+                properties:
+                  data:
+                    type: object
+                    required: [shipments, incoming, isSuperuser]
+                    properties:
+                      shipments:
+                        type: array
+                        items:
+                          $ref: '#/components/schemas/ShipmentListRow'
+                      incoming:
+                        type: boolean
+                      origin:
+                        type: string
+                        nullable: true
+                      destination:
+                        type: string
+                        nullable: true
+                      isSuperuser:
+                        type: boolean
+        '400':
+          $ref: '#/components/responses/ValidationError'
     post:
       operationId: createShipment
       summary: Create a shipment (wizard details step)
@@ -501,7 +567,11 @@ paths:
                 actualShippingDate:
                   type: string
                   nullable: true
-                  description: Format yyyy-MM-dd HH:mm; defaults to now.
+                  description: >-
+                    Format yyyy-MM-dd HH:mm, optionally followed by a UTC
+                    offset (e.g. "2024-01-01 12:00 +02:00"). When an offset is
+                    present the date is validated to not be in the future.
+                    Defaults to now.
                 comments:
                   type: string
                   nullable: true
@@ -524,6 +594,531 @@ paths:
           $ref: '#/components/responses/Forbidden'
         '404':
           $ref: '#/components/responses/ControllerNotFound'
+
+  # Batch 22: classic shipping screens (shipment/list, showDetails,
+  # showPackingList, receiveShipment, sendShipment, shipmentItem/create)
+
+  /api/shipments/listOptions:
+    get:
+      operationId: getShipmentListOptions
+      summary: Filter options for the shipment list screen
+      responses:
+        '200':
+          description: Shipment list filter options.
+          content:
+            application/json:
+              schema:
+                type: object
+                required: [data]
+                properties:
+                  data:
+                    type: object
+                    required: [shipmentTypes, statusCodes, locations]
+                    properties:
+                      shipmentTypes:
+                        type: array
+                        items:
+                          $ref: '#/components/schemas/NamedReference'
+                      statusCodes:
+                        type: array
+                        items:
+                          type: string
+                      locations:
+                        type: array
+                        items:
+                          $ref: '#/components/schemas/NamedReference'
+
+  /api/shipments/bulkAction:
+    post:
+      operationId: shipmentBulkAction
+      summary: Bulk actions from the shipment list screen (superuser only)
+      requestBody:
+        required: true
+        content:
+          application/json:
+            schema:
+              type: object
+              required: [action, shipmentIds]
+              properties:
+                action:
+                  type: string
+                  enum: [delete, receive, markAsReceived, rollback]
+                shipmentIds:
+                  type: array
+                  items:
+                    type: string
+      responses:
+        '200':
+          description: Bulk action result.
+          content:
+            application/json:
+              schema:
+                type: object
+                required: [data]
+                properties:
+                  data:
+                    type: object
+                    required: [success, count]
+                    properties:
+                      success:
+                        type: boolean
+                      count:
+                        type: integer
+        '400':
+          $ref: '#/components/responses/ValidationError'
+        '403':
+          $ref: '#/components/responses/Forbidden'
+
+  /api/shipments/{id}/showDetails:
+    get:
+      operationId: getShipmentShowDetails
+      summary: Data for the shipment showDetails screen
+      description: >
+        Wizard details plus the contents/receipt/documents/comments/events/
+        transactions/tracking tab data of the legacy showDetails GSP.
+      parameters:
+        - $ref: '#/components/parameters/shipmentId'
+      responses:
+        '200':
+          description: Shipment show-details data.
+          content:
+            application/json:
+              schema:
+                type: object
+                required: [data]
+                properties:
+                  data:
+                    allOf:
+                      - $ref: '#/components/schemas/WizardDetails'
+                      - type: object
+                        required: [shipmentItems, documents, comments, events, transactions]
+                        properties:
+                          wasReceived:
+                            type: boolean
+                          isReceiveAllowed:
+                            type: boolean
+                          isSendAllowed:
+                            type: boolean
+                          actualDeliveryDate:
+                            type: string
+                            nullable: true
+                          totalWeightInPounds:
+                            type: number
+                            nullable: true
+                          trackingUrl:
+                            type: string
+                            nullable: true
+                          shipmentItems:
+                            type: array
+                            items:
+                              $ref: '#/components/schemas/ShowItemDetails'
+                          receipt:
+                            $ref: '#/components/schemas/ReceiptDetails'
+                          documents:
+                            type: array
+                            items:
+                              type: object
+                          comments:
+                            type: array
+                            items:
+                              type: object
+                          events:
+                            type: array
+                            items:
+                              type: object
+                          transactions:
+                            type: array
+                            items:
+                              type: object
+                          eventTypes:
+                            type: array
+                            items:
+                              $ref: '#/components/schemas/NamedReference'
+                          eventLocations:
+                            type: array
+                            items:
+                              $ref: '#/components/schemas/NamedReference'
+        '404':
+          $ref: '#/components/responses/ControllerNotFound'
+
+  /api/shipments/{id}/packingList:
+    get:
+      operationId: getShipmentPackingList
+      summary: Data for the shipment showPackingList screen
+      parameters:
+        - $ref: '#/components/parameters/shipmentId'
+      responses:
+        '200':
+          description: Packing list data.
+          content:
+            application/json:
+              schema:
+                type: object
+                required: [data]
+                properties:
+                  data:
+                    type: object
+                    required: [id, shipmentNumber, shipmentItems]
+                    properties:
+                      id:
+                        $ref: '../components/common.yaml#/components/schemas/Id'
+                      name:
+                        type: string
+                        nullable: true
+                      shipmentNumber:
+                        type: string
+                        nullable: true
+                      status:
+                        type: string
+                        nullable: true
+                      origin:
+                        type: string
+                        nullable: true
+                      destination:
+                        type: string
+                        nullable: true
+                      wasReceived:
+                        type: boolean
+                      shipmentItems:
+                        type: array
+                        items:
+                          allOf:
+                            - $ref: '#/components/schemas/ShowItemDetails'
+                            - type: object
+                              properties:
+                                containerDetails:
+                                  type: object
+                                  nullable: true
+        '404':
+          $ref: '#/components/responses/ControllerNotFound'
+
+  /api/shipments/{id}/comments:
+    post:
+      operationId: addShipmentComment
+      summary: Add a comment to a shipment
+      parameters:
+        - $ref: '#/components/parameters/shipmentId'
+      requestBody:
+        required: true
+        content:
+          application/json:
+            schema:
+              type: object
+              required: [comment]
+              properties:
+                comment:
+                  type: string
+                recipientId:
+                  type: string
+                  nullable: true
+      responses:
+        '200':
+          $ref: '#/components/responses/SuccessData'
+        '403':
+          $ref: '#/components/responses/Forbidden'
+        '404':
+          $ref: '#/components/responses/ControllerNotFound'
+
+  /api/shipments/{id}/events:
+    post:
+      operationId: addShipmentEvent
+      summary: Add an event to a shipment
+      parameters:
+        - $ref: '#/components/parameters/shipmentId'
+      requestBody:
+        required: true
+        content:
+          application/json:
+            schema:
+              type: object
+              required: [eventTypeId]
+              properties:
+                eventTypeId:
+                  type: string
+                eventLocationId:
+                  type: string
+                  nullable: true
+                eventDate:
+                  type: string
+                  nullable: true
+                  description: Format yyyy-MM-dd HH:mm; defaults to now.
+      responses:
+        '200':
+          $ref: '#/components/responses/SuccessData'
+        '400':
+          $ref: '#/components/responses/ValidationError'
+        '403':
+          $ref: '#/components/responses/Forbidden'
+        '404':
+          $ref: '#/components/responses/ControllerNotFound'
+
+  /api/shipments/{id}/receipt:
+    get:
+      operationId: getShipmentReceipt
+      summary: Pending or existing receipt for the receive shipment screen
+      parameters:
+        - $ref: '#/components/parameters/shipmentId'
+      responses:
+        '200':
+          description: Receipt data with bin location options.
+          content:
+            application/json:
+              schema:
+                type: object
+                required: [data]
+                properties:
+                  data:
+                    type: object
+                    required: [shipment, receipt, isDestination, hasBinLocationSupport, binLocations]
+                    properties:
+                      shipment:
+                        $ref: '#/components/schemas/WizardDetails'
+                      receipt:
+                        $ref: '#/components/schemas/ReceiptDetails'
+                      isDestination:
+                        type: boolean
+                      hasBinLocationSupport:
+                        type: boolean
+                      binLocations:
+                        type: array
+                        items:
+                          $ref: '#/components/schemas/NamedReference'
+        '403':
+          $ref: '#/components/responses/Forbidden'
+        '404':
+          $ref: '#/components/responses/ControllerNotFound'
+    post:
+      operationId: saveShipmentReceipt
+      summary: Save the receipt or receive the shipment
+      parameters:
+        - $ref: '#/components/parameters/shipmentId'
+      requestBody:
+        required: true
+        content:
+          application/json:
+            schema:
+              type: object
+              properties:
+                action:
+                  type: string
+                  enum: [save, saveAndExit, receiveShipment]
+                actualDeliveryDate:
+                  type: string
+                  nullable: true
+                  description: Format yyyy-MM-dd HH:mm.
+                recipientId:
+                  type: string
+                  nullable: true
+                comment:
+                  type: string
+                  nullable: true
+                receiptItems:
+                  type: array
+                  items:
+                    type: object
+                    required: [id]
+                    properties:
+                      id:
+                        type: string
+                      quantityReceived:
+                        type: integer
+                        nullable: true
+                      binLocationId:
+                        type: string
+                        nullable: true
+                      comment:
+                        type: string
+                        nullable: true
+      responses:
+        '200':
+          description: Receipt saved (and shipment optionally received).
+          content:
+            application/json:
+              schema:
+                type: object
+                required: [data]
+                properties:
+                  data:
+                    type: object
+                    required: [id, received]
+                    properties:
+                      id:
+                        $ref: '../components/common.yaml#/components/schemas/Id'
+                      received:
+                        type: boolean
+        '400':
+          $ref: '#/components/responses/ValidationError'
+        '403':
+          $ref: '#/components/responses/Forbidden'
+        '404':
+          $ref: '#/components/responses/ControllerNotFound'
+    delete:
+      operationId: deleteShipmentReceipt
+      summary: Delete the pending receipt
+      parameters:
+        - $ref: '#/components/parameters/shipmentId'
+      responses:
+        '200':
+          $ref: '#/components/responses/ShipmentIdData'
+        '403':
+          $ref: '#/components/responses/Forbidden'
+        '404':
+          $ref: '#/components/responses/ControllerNotFound'
+
+  /api/shipments/{id}/receipt/items/{receiptItemId}:
+    delete:
+      operationId: deleteShipmentReceiptItem
+      summary: Delete a receipt item
+      parameters:
+        - $ref: '#/components/parameters/shipmentId'
+        - $ref: '#/components/parameters/receiptItemId'
+      responses:
+        '200':
+          $ref: '#/components/responses/ShipmentIdData'
+        '400':
+          $ref: '#/components/responses/ValidationError'
+        '403':
+          $ref: '#/components/responses/Forbidden'
+        '404':
+          $ref: '#/components/responses/ControllerNotFound'
+
+  /api/shipments/{id}/receipt/items/{receiptItemId}/split:
+    post:
+      operationId: splitShipmentReceiptItem
+      summary: Split a receipt item so it can be received into two bins
+      parameters:
+        - $ref: '#/components/parameters/shipmentId'
+        - $ref: '#/components/parameters/receiptItemId'
+      responses:
+        '200':
+          $ref: '#/components/responses/ShipmentIdData'
+        '403':
+          $ref: '#/components/responses/Forbidden'
+        '404':
+          $ref: '#/components/responses/ControllerNotFound'
+
+  /api/shipments/{id}/receipt/items/{receiptItemId}/putawayLocations:
+    get:
+      operationId: getReceiptItemPutawayLocations
+      summary: Bin locations with quantity on hand for a receipt item's product
+      parameters:
+        - $ref: '#/components/parameters/shipmentId'
+        - $ref: '#/components/parameters/receiptItemId'
+      responses:
+        '200':
+          description: Putaway locations.
+          content:
+            application/json:
+              schema:
+                type: object
+                required: [data]
+                properties:
+                  data:
+                    type: array
+                    items:
+                      type: object
+                      properties:
+                        binLocation:
+                          type: string
+                          nullable: true
+                        lotNumber:
+                          type: string
+                          nullable: true
+                        quantity:
+                          type: number
+                          nullable: true
+        '403':
+          $ref: '#/components/responses/Forbidden'
+        '404':
+          $ref: '#/components/responses/ControllerNotFound'
+
+  /api/shipmentItems/createOptions:
+    get:
+      operationId: getShipmentItemCreateOptions
+      summary: Options for the admin shipmentItem/create screen
+      responses:
+        '200':
+          description: Create options.
+          content:
+            application/json:
+              schema:
+                type: object
+                required: [data]
+                properties:
+                  data:
+                    type: object
+                    required: [shipments, products, recipients]
+                    properties:
+                      shipments:
+                        type: array
+                        items:
+                          $ref: '#/components/schemas/NamedReference'
+                      containers:
+                        type: array
+                        items:
+                          $ref: '#/components/schemas/NamedReference'
+                      products:
+                        type: array
+                        items:
+                          type: object
+                      inventoryItems:
+                        type: array
+                        items:
+                          $ref: '#/components/schemas/NamedReference'
+                      recipients:
+                        type: array
+                        items:
+                          $ref: '#/components/schemas/NamedReference'
+                      donors:
+                        type: array
+                        items:
+                          $ref: '#/components/schemas/NamedReference'
+        '403':
+          $ref: '#/components/responses/Forbidden'
+
+  /api/shipmentItems:
+    post:
+      operationId: createShipmentItem
+      summary: Create a standalone shipment item (admin screen)
+      requestBody:
+        required: true
+        content:
+          application/json:
+            schema:
+              type: object
+              required: [shipmentId, productId, quantity]
+              properties:
+                shipmentId:
+                  type: string
+                containerId:
+                  type: string
+                  nullable: true
+                productId:
+                  type: string
+                lotNumber:
+                  type: string
+                  nullable: true
+                expirationDate:
+                  type: string
+                  nullable: true
+                quantity:
+                  type: integer
+                recipientId:
+                  type: string
+                  nullable: true
+                inventoryItemId:
+                  type: string
+                  nullable: true
+                donorId:
+                  type: string
+                  nullable: true
+      responses:
+        '201':
+          $ref: '#/components/responses/ItemData'
+        '400':
+          $ref: '#/components/responses/ValidationError'
+        '403':
+          $ref: '#/components/responses/Forbidden'
 
   /api/shipments/{id}/outboundReturnPrint:
     get:
@@ -610,6 +1205,14 @@ components:
         $ref: '../components/common.yaml#/components/schemas/Id'
       description: Shipment item id.
 
+    receiptItemId:
+      name: receiptItemId
+      in: path
+      required: true
+      schema:
+        $ref: '../components/common.yaml#/components/schemas/Id'
+      description: Receipt item id.
+
   responses:
     Forbidden:
       description: The user does not have the role required for this action.
@@ -684,6 +1287,21 @@ components:
                 properties:
                   id:
                     $ref: '../components/common.yaml#/components/schemas/Id'
+
+    SuccessData:
+      description: Simple success flag after a mutation.
+      content:
+        application/json:
+          schema:
+            type: object
+            required: [data]
+            properties:
+              data:
+                type: object
+                required: [success]
+                properties:
+                  success:
+                    type: boolean
 
     ItemData:
       description: Shipment item details after a mutation.
@@ -849,6 +1467,132 @@ components:
               type: array
               items:
                 $ref: '#/components/schemas/NamedReference'
+
+    ShipmentListRow:
+      type: object
+      required: [id, shipmentNumber, shipmentItemCount]
+      properties:
+        id:
+          $ref: '../components/common.yaml#/components/schemas/Id'
+        shipmentNumber:
+          type: string
+          nullable: true
+        name:
+          type: string
+          nullable: true
+        status:
+          type: string
+          nullable: true
+        shipmentType:
+          type: string
+          nullable: true
+        origin:
+          type: string
+          nullable: true
+        destination:
+          type: string
+          nullable: true
+        shipmentItemCount:
+          type: integer
+        hasShipped:
+          type: boolean
+        wasReceived:
+          type: boolean
+        expectedShippingDate:
+          type: string
+          nullable: true
+        actualShippingDate:
+          type: string
+          nullable: true
+        expectedDeliveryDate:
+          type: string
+          nullable: true
+        actualDeliveryDate:
+          type: string
+          nullable: true
+        lastUpdated:
+          type: string
+          nullable: true
+        requisitionId:
+          type: string
+          nullable: true
+
+    ShowItemDetails:
+      allOf:
+        - $ref: '#/components/schemas/ItemDetails'
+        - type: object
+          properties:
+            quantityReceived:
+              type: integer
+              nullable: true
+            quantityCanceled:
+              type: integer
+              nullable: true
+            isFullyReceived:
+              type: boolean
+            lotNumber:
+              type: string
+              nullable: true
+            expirationDate:
+              type: string
+              nullable: true
+
+    ReceiptDetails:
+      type: object
+      nullable: true
+      required: [id, receiptItems]
+      properties:
+        id:
+          $ref: '../components/common.yaml#/components/schemas/Id'
+        receiptStatusCode:
+          type: string
+          nullable: true
+        actualDeliveryDate:
+          type: string
+          nullable: true
+        expectedDeliveryDate:
+          type: string
+          nullable: true
+        recipient:
+          $ref: '#/components/schemas/NullableNamedReference'
+        receiptItems:
+          type: array
+          items:
+            type: object
+            required: [id]
+            properties:
+              id:
+                $ref: '../components/common.yaml#/components/schemas/Id'
+              shipmentItemId:
+                type: string
+                nullable: true
+              container:
+                type: string
+                nullable: true
+              product:
+                type: object
+                nullable: true
+              lotNumber:
+                type: string
+                nullable: true
+              expirationDate:
+                type: string
+                nullable: true
+              quantityShipped:
+                type: integer
+                nullable: true
+              quantityReceived:
+                type: integer
+                nullable: true
+              binLocation:
+                $ref: '#/components/schemas/NullableNamedReference'
+              comment:
+                type: string
+                nullable: true
+              isSplitAllowed:
+                type: boolean
+              isDeleteAllowed:
+                type: boolean
 
     PersonReference:
       type: object
