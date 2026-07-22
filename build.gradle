@@ -308,11 +308,11 @@ configurations {
              * consume their API's directly.
              */
             force 'com.google.errorprone:error_prone_annotations:2.19.1'  // use consistent version
-            force 'com.google.protobuf:protobuf-java:3.21.11'  // security patch
-            force 'commons-io:commons-io:2.12.0'  // security patch
+            force 'com.google.protobuf:protobuf-java:3.21.12'  // security patch
+            force 'commons-io:commons-io:2.15.1'  // security patch
             force 'commons-validator:commons-validator:1.7'  // security patch
             force 'jline:jline:2.14.6'  // use consistent version
-            force 'org.apache.commons:commons-lang3:3.12.0'  // security patch
+            force 'org.apache.commons:commons-lang3:3.14.0'  // security patch
             force 'org.apache.xmlgraphics:xmlgraphics-commons:2.8'  // use consistent version
             force 'org.apache.xmlbeans:xmlbeans:3.1.0'  // security patch, build fixes
             force 'org.checkerframework:checker-qual:3.12.0'  // use consistent version
@@ -459,14 +459,14 @@ dependencies {
     implementation "com.github.librepdf:openpdf:${openPdfVersion}"
 
     // security patch
-    compile 'com.google.code.gson:gson:2.10.1'
+    compile 'com.google.code.gson:gson:2.10.1'  // 2.11+ requires error-prone annotation updates
 
     // expose javax.annotation.Nullable, com.google.common.base.Enums, etc.
     compile 'com.google.guava:guava:32.0.1-jre'
 
-    compile 'com.google.zxing:javase:3.5.1'  // barcode support
+    compile 'com.google.zxing:javase:3.5.3'  // barcode support
 
-    testImplementation 'com.icegreen:greenmail:1.6.14'
+    testImplementation 'com.icegreen:greenmail:1.6.15'
 
     compile 'com.newrelic.agent.java:newrelic-api:8.2.0'
 
@@ -474,7 +474,7 @@ dependencies {
 
     compile 'commons-beanutils:commons-beanutils:1.9.4'
 
-    compile 'commons-codec:commons-codec:1.15'
+    compile 'commons-codec:commons-codec:1.16.1'
 
     // FIXME migrate code under our control to commons-collections4
     implementation 'org.apache.commons:commons-collections4:4.4'
@@ -501,11 +501,8 @@ dependencies {
 
     implementation 'fr.w3blog:zebra-zpl:0.0.4'  // ZebraUtils.printZpl(), Labelary API, etc.
 
-    /*
-     * FIXME Used in only one place: ApiControllerFunctionalSpec.groovy.
-     * FIXME Use apache's httpclient instead.
-     */
-    testCompile 'io.micronaut:micronaut-http-client:1.2.11'
+    // rest-assured registers this via ServiceLoader to (de)serialize java.time types in API specs
+    testCompile "com.fasterxml.jackson.datatype:jackson-datatype-jsr310:${jacksonVersion}"
 
     implementation "io.sentry:sentry-logback:${sentryVersion}"
     implementation "io.sentry:sentry-servlet:${sentryVersion}"
@@ -518,7 +515,7 @@ dependencies {
     implementation "io.sentry:sentry-spring:${sentryVersion}"
 
     // incorporate latest timezone changes
-    implementation 'joda-time:joda-time:2.12.5'
+    implementation 'joda-time:joda-time:2.12.7'
 
     testCompile 'junit:junit:4.13.2'
 
@@ -528,7 +525,7 @@ dependencies {
 
     testRuntime "net.sourceforge.htmlunit:htmlunit:${htmlUnitVersion}"
 
-    implementation 'org.apache.commons:commons-csv:1.10.0'
+    implementation 'org.apache.commons:commons-csv:1.11.0'
     compile 'org.apache.commons:commons-email:1.5'
 
     implementation 'org.apache.httpcomponents:fluent-hc'
@@ -705,9 +702,6 @@ dependencies {
     compile "org.hibernate:hibernate-core:${hibernateVersion}"
     runtime "org.hibernate:hibernate-ehcache:${hibernateVersion}"
     testImplementation "org.hibernate:hibernate-testing:${hibernateVersion}"
-
-    // joda-time support for hibernate
-    implementation 'org.jadira.usertype:usertype.jodatime:2.0.1'
 
     // used in only one place: DocumentTemplateService.groovy for Customer Invoice Template
     implementation 'org.jxls:jxls:2.12.0'
