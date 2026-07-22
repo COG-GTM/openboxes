@@ -131,6 +131,28 @@ class UrlMappings {
             action = [GET: "locationTypeCodeOptions"]
         }
 
+        // Party type options for the organization form
+        "/api/partyTypeOptions"(parseRequest: true) {
+            controller = { "selectOptionsApi" }
+            action = [GET: "partyTypeOptions"]
+        }
+
+        // Organization role type options for the organization list filters
+        "/api/organizationRoleTypeOptions"(parseRequest: true) {
+            controller = { "selectOptionsApi" }
+            action = [GET: "organizationRoleTypeOptions"]
+        }
+
+        "/api/organizations/search"(parseRequest: true) {
+            controller = { "organizationApi" }
+            action = [GET: "search"]
+        }
+
+        "/api/organizations/$id/details"(parseRequest: true) {
+            controller = { "organizationApi" }
+            action = [GET: "details"]
+        }
+
         "/api/locationTypes"(parseRequest: true) {
             controller = { "locationTypeApi" }
             action = [GET: "list", POST: "create"]

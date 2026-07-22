@@ -13,19 +13,17 @@ import grails.plugins.csv.CSVWriter
 
 class OrganizationController {
 
-    OrganizationIdentifierService organizationIdentifierService
     def organizationService
     OrganizationDataService organizationDataService
 
-    static allowedMethods = [save: "POST", update: "POST", delete: "POST"]
+    static allowedMethods = [delete: "POST"]
 
     def index() {
         redirect(action: "list", params: params)
     }
 
     def search() {
-        def organizationInstanceList = organizationService.getOrganizations(params)
-        render(view: "list", model: [organizationInstanceList:organizationInstanceList, organizationInstanceTotal:organizationInstanceList.totalCount])
+        redirect(action: "list", params: params)
     }
 
     def download() {
@@ -54,86 +52,19 @@ class OrganizationController {
     }
 
     def list() {
-        params.max = Math.min(params.max ? params.int('max') : 10, 100)
-        [organizationInstanceList: Organization.list(params), organizationInstanceTotal: Organization.count()]
+        render(view: "/common/react", params: params)
     }
 
     def create() {
-        def organizationInstance = new Organization()
-        organizationInstance.properties = params
-        return [organizationInstance: organizationInstance]
+        render(view: "/common/react", params: params)
     }
-
-    def save() {
-        Organization organizationInstance = new Organization(params)
-
-        if (organizationInstance.name && !organizationInstance.code) {
-            organizationInstance.code = organizationIdentifierService.generate(organizationInstance)
-        }
-
-        if (organizationInstance.validate()) {
-            organizationDataService.save(organizationInstance)
-            flash.message = "${warehouse.message(code: 'default.created.message', args: [warehouse.message(code: 'organization.label', default: 'Organization'), organizationInstance.id])}"
-            redirect(controller: "organization", action: "edit", id: organizationInstance?.id)
-        } else {
-            render(view: "create", model: [organizationInstance: organizationInstance])
-        }
-    }
-
-    def update() {
-        def organizationInstance = Organization.get(params.id)
-        if (organizationInstance) {
-            if (params.version) {
-                def version = params.version.toLong()
-                if (organizationInstance.version > version) {
-                    organizationInstance.errors.rejectValue("version", "default.optimistic.locking.failure", [warehouse.message(code: 'organization.label', default: 'Organization')] as Object[], "Another user has updated this Organization while you were editing")
-                    render(view: "edit", model: [organizationInstance: organizationInstance])
-                    return
-                }
-            }
-            organizationInstance.properties = params
-            if (params.containsKey("sequences")) {
-                organizationInstance.sequences = params.sequences
-            }
-            if (!organizationInstance.code) {
-                organizationInstance.code = organizationIdentifierService.generate(organizationInstance)
-            }
-
-            if (organizationInstance.validate()) {
-                organizationDataService.save(organizationInstance)
-                flash.message = "${warehouse.message(code: 'default.updated.message', args: [warehouse.message(code: 'organization.label', default: 'Organization'), organizationInstance.id])}"
-                redirect(action: "edit", id: organizationInstance.id)
-            } else {
-                render(view: "edit", model: [organizationInstance: organizationInstance])
-            }
-        } else {
-            flash.message = "${warehouse.message(code: 'default.not.found.message', args: [warehouse.message(code: 'organization.label', default: 'Organization'), params.id])}"
-            redirect(action: "list")
-        }
-    }
-
-
 
     def show() {
-        def organizationInstance = Organization.get(params.id)
-        if (!organizationInstance) {
-            flash.message = "${warehouse.message(code: 'default.not.found.message', args: [warehouse.message(code: 'organization.label', default: 'Organization'), params.id])}"
-            redirect(action: "list")
-        }
-        else {
-            [organizationInstance: organizationInstance]
-        }
+        render(view: "/common/react", params: params)
     }
 
     def edit() {
-        def organizationInstance = Organization.get(params.id)
-        if (!organizationInstance) {
-            flash.message = "${warehouse.message(code: 'default.not.found.message', args: [warehouse.message(code: 'organization.label', default: 'Organization'), params.id])}"
-            redirect(action: "list")
-        }
-        else {
-            return [organizationInstance: organizationInstance]
-        }
+        render(view: "/common/react", params: params)
     }
 
     def delete() {
@@ -152,15 +83,6 @@ class OrganizationController {
             flash.message = "${warehouse.message(code: 'default.not.deleted.message', args: [warehouse.message(code: 'organizationInstance.label', default: 'Organization'), params.id])}"
             redirect(action: "edit", id: params.id)
         }
-    }
-
-    def resetSequence() {
-        IdentifierTypeCode identifierTypeCode = params.identifierTypeCode as IdentifierTypeCode
-        Integer sequenceNumber = params.sequenceNumber?:0 as Integer
-        def organizationInstance = Organization.get(params.id)
-        organizationInstance.sequences.put(identifierTypeCode.toString(), sequenceNumber.toString())
-        organizationInstance.save()
-        redirect(action: "edit", id: params.id)
     }
 
 }

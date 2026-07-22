@@ -141,6 +141,17 @@ class OrganizationService {
     List<Organization> getOrganizations(Map params) {
         List roleTypes = params.list("roleType").collect { it as RoleType }
 
+        // Restrict by an id subquery rather than joining the roles collection,
+        // which would return one row per matching role and break pagination.
+        List<String> roleOrgIds = roleTypes
+                ? PartyRole.executeQuery(
+                        "select distinct pr.party.id from PartyRole pr where pr.roleType in (:roleTypes)",
+                        [roleTypes: roleTypes])
+                : null
+        if (roleTypes && !roleOrgIds) {
+            return []
+        }
+
         List<Organization> organizations = Organization.createCriteria().list(params) {
             if (params.q) {
                 or {
@@ -150,10 +161,8 @@ class OrganizationService {
                     ilike("description", "${params.q}%")
                 }
             }
-            if (roleTypes) {
-                roles {
-                    'in'("roleType", roleTypes)
-                }
+            if (roleOrgIds) {
+                'in'("id", roleOrgIds)
             }
             if (params.active) {
                 eq('active', true)

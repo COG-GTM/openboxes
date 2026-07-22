@@ -2,14 +2,17 @@ openapi: 3.0.3
 info:
   title: OpenBoxes - OrganizationApiController
   description: >
-    Organization list/read/create endpoints handled by
+    Organization endpoints handled by
     org.pih.warehouse.api.OrganizationApiController, routed via the standard
-    "/api/${resource}s" and "/api/${resource}s/$id" REST mappings. The
-    controller extends BaseDomainApiController but overrides list(), read()
-    and create(); the inherited update/delete actions forward to
-    GenericApiController and are not pinned here. Parity quirks: create
-    responds 200 (not 201) with only {"data": {"id": ...}}, and an unknown id
-    on read raises IllegalArgumentException (HTTP 500, not 404).
+    "/api/${resource}s" and "/api/${resource}s/$id" REST mappings plus the
+    explicit "/api/organizations/search" and "/api/organizations/$id/details"
+    mappings added in Phase 2 (Batch 33) for the React organization screens.
+    The controller extends BaseDomainApiController but overrides list(),
+    read(), create(), search(), details(), update() and delete(). Parity
+    quirks: create responds 200 (not 201) with only {"data": {"id": ...}},
+    and an unknown id on read raises IllegalArgumentException (HTTP 500, not
+    404); the newer details/update/delete actions respond 404 for unknown
+    ids.
   version: 0.1.0
 servers:
   - url: http://localhost:8080/openboxes
@@ -112,6 +115,112 @@ paths:
                         $ref: '../components/common.yaml#/components/schemas/Id'
         '400':
           $ref: '../components/common.yaml#/components/responses/ValidationError'
+  /api/organizations/search:
+    get:
+      operationId: searchOrganizations
+      summary: Paginated organization search for the React list screen
+      description: >
+        Returns a page of organizations with a totalCount, for the React
+        organization list. Added in Phase 2 (Batch 33).
+      parameters:
+        - name: q
+          in: query
+          required: false
+          schema:
+            type: string
+          description: >
+            Prefix search (ilike "q%") across id, code, name and description.
+        - name: roleType
+          in: query
+          required: false
+          schema:
+            type: string
+          description: >
+            RoleType enum name (e.g. ROLE_SUPPLIER); may be repeated. Unknown
+            values raise a conversion error (HTTP 500).
+        - name: active
+          in: query
+          required: false
+          schema:
+            type: string
+          description: >
+            Any non-empty value restricts results to active organizations.
+        - name: sort
+          in: query
+          required: false
+          schema:
+            type: string
+          description: One of id, code, name, active; anything else falls back to name.
+        - name: order
+          in: query
+          required: false
+          schema:
+            type: string
+            enum: [asc, desc]
+        - $ref: '../components/common.yaml#/components/parameters/max'
+        - $ref: '../components/common.yaml#/components/parameters/offset'
+      responses:
+        '200':
+          description: A page of organization rows.
+          content:
+            application/json:
+              schema:
+                type: object
+                required: [data, totalCount]
+                properties:
+                  data:
+                    type: array
+                    items:
+                      type: object
+                      required: [id]
+                      properties:
+                        id:
+                          $ref: '../components/common.yaml#/components/schemas/Id'
+                        code:
+                          type: string
+                          nullable: true
+                        name:
+                          type: string
+                          nullable: true
+                        active:
+                          type: boolean
+                          nullable: true
+                        defaultLocation:
+                          type: string
+                          nullable: true
+                        roles:
+                          type: array
+                          items:
+                            type: string
+                  totalCount:
+                    type: integer
+  /api/organizations/{id}/details:
+    get:
+      operationId: organizationDetails
+      summary: Organization details for the React edit/show screens
+      description: >
+        Full organization details, including party type, default location,
+        candidate locations, roles, sequences and purchase-order-derived
+        fields. Added in Phase 2 (Batch 33).
+      parameters:
+        - name: id
+          in: path
+          required: true
+          schema:
+            $ref: '../components/common.yaml#/components/schemas/Id'
+      responses:
+        '200':
+          description: Organization details.
+          content:
+            application/json:
+              schema:
+                type: object
+                required: [data]
+                properties:
+                  data:
+                    $ref: '#/components/schemas/OrganizationDetails'
+        '404':
+          $ref: '../components/common.yaml#/components/responses/NotFound'
   /api/organizations/{id}:
     get:
       operationId: readOrganization
@@ -138,6 +247,97 @@ paths:
                     $ref: '#/components/schemas/Organization'
         '500':
           $ref: '../components/common.yaml#/components/responses/ServerError'
+    put:
+      operationId: updateOrganization
+      summary: Update an organization
+      description: >
+        Partially updates an organization from the JSON body (only keys
+        present in the body are bound). Code changes are ignored when the
+        organization has purchase orders and the caller is not a superuser;
+        sequences changes are only applied for superusers. A blank code is
+        regenerated. Added in Phase 2 (Batch 33).
+      parameters:
+        - name: id
+          in: path
+          required: true
+          schema:
+            $ref: '../components/common.yaml#/components/schemas/Id'
+      requestBody:
+        required: true
+        content:
+          application/json:
+            schema:
+              type: object
+              properties:
+                name:
+                  type: string
+                code:
+                  type: string
+                  nullable: true
+                description:
+                  type: string
+                  nullable: true
+                active:
+                  type: boolean
+                partyType:
+                  type: string
+                  nullable: true
+                  description: PartyType id.
+                defaultLocation:
+                  type: string
+                  nullable: true
+                  description: Location id.
+                sequences:
+                  type: object
+                  additionalProperties: true
+              additionalProperties: true
+      responses:
+        '200':
+          description: Updated; only the id is returned.
+          content:
+            application/json:
+              schema:
+                type: object
+                required: [data]
+                properties:
+                  data:
+                    type: object
+                    required: [id]
+                    properties:
+                      id:
+                        $ref: '../components/common.yaml#/components/schemas/Id'
+        '400':
+          $ref: '../components/common.yaml#/components/responses/ValidationError'
+        '404':
+          $ref: '../components/common.yaml#/components/responses/NotFound'
+    delete:
+      operationId: deleteOrganization
+      summary: Delete an organization
+      description: >
+        Deletes the organization; responds 400 when it is still referenced
+        (data integrity violation). Added in Phase 2 (Batch 33).
+      parameters:
+        - name: id
+          in: path
+          required: true
+          schema:
+            $ref: '../components/common.yaml#/components/schemas/Id'
+      responses:
+        '204':
+          description: Deleted.
+        '400':
+          description: Organization is still referenced and cannot be deleted.
+          content:
+            application/json:
+              schema:
+                type: object
+                properties:
+                  errorCode:
+                    type: integer
+                  errorMessage:
+                    type: string
+        '404':
+          $ref: '../components/common.yaml#/components/responses/NotFound'
 components:
   schemas:
     Organization:
@@ -206,6 +406,88 @@ components:
           type: object
           additionalProperties: true
       additionalProperties: true
+    OrganizationDetails:
+      type: object
+      description: Detail projection used by the React organization edit/show screens.
+      required: [id]
+      properties:
+        id:
+          $ref: '../components/common.yaml#/components/schemas/Id'
+        code:
+          type: string
+          nullable: true
+        name:
+          type: string
+          nullable: true
+        description:
+          type: string
+          nullable: true
+        active:
+          type: boolean
+          nullable: true
+        version:
+          type: integer
+          nullable: true
+        dateCreated:
+          type: string
+          nullable: true
+        lastUpdated:
+          type: string
+          nullable: true
+        partyType:
+          type: object
+          nullable: true
+          properties:
+            id:
+              $ref: '../components/common.yaml#/components/schemas/Id'
+            name:
+              type: string
+              nullable: true
+        defaultLocation:
+          type: object
+          nullable: true
+          properties:
+            id:
+              $ref: '../components/common.yaml#/components/schemas/Id'
+            name:
+              type: string
+              nullable: true
+        locations:
+          type: array
+          items:
+            type: object
+            properties:
+              id:
+                $ref: '../components/common.yaml#/components/schemas/Id'
+              name:
+                type: string
+                nullable: true
+        roles:
+          type: array
+          items:
+            type: object
+            properties:
+              id:
+                $ref: '../components/common.yaml#/components/schemas/Id'
+              name:
+                type: string
+                nullable: true
+        sequences:
+          type: object
+          additionalProperties: true
+        identifierTypeCodes:
+          type: array
+          items:
+            type: string
+        maxPurchaseOrderNumber:
+          type: string
+          nullable: true
+        hasPurchaseOrders:
+          type: boolean
+        isCodeEditable:
+          type: boolean
+        isSuperuser:
+          type: boolean
   securitySchemes:
     cookieAuth:
       $ref: '../components/common.yaml#/components/securitySchemes/cookieAuth'

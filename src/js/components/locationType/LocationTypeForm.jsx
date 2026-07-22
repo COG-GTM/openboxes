@@ -3,7 +3,7 @@ import React, { useEffect, useState } from 'react';
 import { confirmAlert } from 'react-confirm-alert';
 import { Controller, useForm } from 'react-hook-form';
 import { useDispatch } from 'react-redux';
-import { useParams } from 'react-router-dom';
+import { useHistory, useParams } from 'react-router-dom';
 
 import { hideSpinner, showSpinner } from 'actions';
 import locationTypeApi from 'api/services/LocationTypeApi';
@@ -26,6 +26,7 @@ const LocationTypeForm = () => {
   useTranslation('locationType', 'default');
 
   const { locationTypeId } = useParams();
+  const history = useHistory();
   const dispatch = useDispatch();
   const translate = useTranslate();
 
@@ -47,10 +48,8 @@ const LocationTypeForm = () => {
       });
   }, []);
 
-  // The legacy list/show screens are still GSP pages, so leave the SPA with a
-  // full page load when returning to them.
   const goToList = () => {
-    window.location.href = LOCATION_TYPE_URL.list();
+    history.push(LOCATION_TYPE_URL.list());
   };
 
   const getLocationType = async () => {

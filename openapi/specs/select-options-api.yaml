@@ -11,7 +11,8 @@ info:
     "/api/productTypeOptions", "/api/documentTypeOptions",
     "/api/productAssociationTypeCodeOptions" and
     "/api/stockMovements/shipmentStatusCodes", "/api/glAccountTypeOptions",
-    "/api/locationTypeCodeOptions").
+    "/api/locationTypeCodeOptions", "/api/partyTypeOptions",
+    "/api/organizationRoleTypeOptions").
     All endpoints are GET-only and
     render an option list under a "data" envelope; the option shape varies
     slightly per endpoint (some include "value" and/or "variant").
@@ -70,6 +71,29 @@ paths:
         Returns every LocationTypeCode enum value as {id, label} pairs (both
         the enum name). Added in Phase 2 (Batch 32) for the React
         locationType form.
+      responses:
+        '200':
+          $ref: '#/components/responses/IdLabelOptionsOk'
+  /api/partyTypeOptions:
+    get:
+      operationId: listPartyTypeOptions
+      summary: Party type options
+      description: >
+        Returns all PartyType records as {id, label} pairs (label is the
+        party type name). Added in Phase 2 (Batch 33) for the React
+        organization form.
+      responses:
+        '200':
+          $ref: '#/components/responses/IdLabelOptionsOk'
+  /api/organizationRoleTypeOptions:
+    get:
+      operationId: listOrganizationRoleTypeOptions
+      summary: Organization role type options
+      description: >
+        Returns the RoleType.listOrganizationRoleTypes() enum values (e.g.
+        ROLE_SUPPLIER, ROLE_MANUFACTURER) as {id, label} pairs (both the
+        enum name). Added in Phase 2 (Batch 33) for the React organization
+        list filters.
       responses:
         '200':
           $ref: '#/components/responses/IdLabelOptionsOk'

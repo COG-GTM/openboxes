@@ -6,10 +6,9 @@ import { captureStep, resetStepCounter } from '../fixtures/screenshots';
 /**
  * React screens for locationGroup and locationType (Phase 2, Batch 32).
  *
- * The legacy /locationGroup/(list|create|edit|show) and
- * /locationType/(create|edit) URLs now render the React SPA. The
- * locationType list/show screens remain GSPs until Batch 33, so the
- * locationType flow round-trips between the GSP list and the React form.
+ * The legacy /locationGroup/(list|create|edit|show) URLs render the React
+ * SPA, and since Batch 33 the /locationType/(list|create|edit|show) URLs do
+ * too.
  */
 
 async function reactTableRowCount(page: Page): Promise<number> {
@@ -89,7 +88,20 @@ test.describe('location type react screens', () => {
     test.skip(probe.status() !== 200, 'app build does not expose /api/locationTypes (pinned released image)');
   });
 
-  test('creates, edits and deletes a location type', async ({ page }) => {
+  test('lists location types with data from the API', async ({ page }) => {
+    const apiResponse = page.waitForResponse((resp) =>
+      resp.url().includes('/api/locationTypes') && resp.status() === 200);
+    await page.goto(url('/locationType/list'));
+    const body = await (await apiResponse).json();
+    await expect(page.getByText('List Location Types').first()).toBeVisible();
+    await captureStep(page, 'location-type', 'react-list');
+    const visibleRows = Math.min(body.totalCount, 10);
+    await expect
+      .poll(async () => reactTableRowCount(page))
+      .toBe(visibleRows);
+  });
+
+  test('creates, edits, shows and deletes a location type', async ({ page }) => {
     const name = `ZZLT${runId()}`;
     await page.goto(url('/locationType/create'));
     await expect(page.getByText('Create Location Type').first()).toBeVisible();
@@ -107,12 +119,13 @@ test.describe('location type react screens', () => {
     await page.getByLabel('Sort Order').fill('999');
     await page.getByRole('button', { name: 'Save' }).click();
 
-    // Save returns to the legacy GSP list, which shows the new type.
+    // Save returns to the React list; the new row is findable via search.
     await page.waitForURL('**/locationType/list**');
+    await page.getByPlaceholder('Search by name').fill(name);
+    await page.getByRole('button', { name: 'Find' }).click();
     await expect(page.getByRole('link', { name }).first()).toBeVisible();
-    await captureStep(page, 'location-type', 'legacy-list-after-create');
+    await captureStep(page, 'location-type', 'react-list-after-create');
 
-    // The legacy list links into the React edit screen.
     const created = await page.request.get(url(`/api/locationTypes?q=${name}`));
     const lt = (await created.json()).data[0];
     expect(lt.locationTypeCode).toBe('INTERNAL');
@@ -126,8 +139,13 @@ test.describe('location type react screens', () => {
     const updated = await page.request.get(url(`/api/locationTypes?q=${name}`));
     expect((await updated.json()).data[0].description).toBe('renamed by characterization');
 
-    // Delete through the React edit screen.
-    await page.goto(url(`/locationType/edit/${lt.id}`));
+    // The show screen renders the type details.
+    await page.goto(url(`/locationType/show/${lt.id}`));
+    await expect(page.getByText(`Location Type: ${name}`)).toBeVisible();
+    await expect(page.getByLabel('Description')).toHaveText('renamed by characterization');
+    await captureStep(page, 'location-type', 'react-show');
+
+    // Delete through the show screen.
     await page.getByRole('button', { name: 'Delete' }).click();
     await page.getByRole('button', { name: 'Yes' }).click();
     await page.waitForURL('**/locationType/list**');

@@ -16,9 +16,11 @@ import org.pih.warehouse.core.GlAccountType
 import org.pih.warehouse.core.GlAccountTypeCode
 import org.pih.warehouse.core.BudgetCode
 import org.pih.warehouse.core.LocationTypeCode
+import org.pih.warehouse.core.PartyType
 import org.pih.warehouse.core.PaymentTerm
 import org.pih.warehouse.core.PreferenceType
 import org.pih.warehouse.core.RatingTypeCode
+import org.pih.warehouse.core.RoleType
 import org.pih.warehouse.core.Tag
 import org.pih.warehouse.core.User
 import org.pih.warehouse.core.UserService
@@ -64,6 +66,21 @@ class SelectOptionsApiController {
     def glAccountTypeCodeOptions() {
         List<Map> options = GlAccountTypeCode.list().collect {
             [id: it.name(), value: it.name(), label: it.name()]
+        }
+        render([data: options] as JSON)
+    }
+
+    def partyTypeOptions() {
+        List<PartyType> partyTypes = PartyType.list()
+                .collect {
+                    [id: it.id, label: it.name]
+                }
+        render([data: partyTypes] as JSON)
+    }
+
+    def organizationRoleTypeOptions() {
+        List options = RoleType.listOrganizationRoleTypes().collect {
+            [id: it.name(), label: it.name()]
         }
         render([data: options] as JSON)
     }
