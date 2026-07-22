@@ -148,6 +148,42 @@ paths:
                 additionalProperties: false
         '500':
           $ref: '../components/common.yaml#/components/responses/ServerError'
+  /api/stocklists/{id}/details:
+    get:
+      operationId: getStocklistDetails
+      summary: Full requisition template details for the React show screen
+      description: >
+        Backs the React requisitionTemplate/show screen (Phase 2 Batch 18).
+        Renders the template header, auditing fields and requisition items
+        sorted by the template's sortByCode (SORT_INDEX by default).
+        Finance-only fields (totalCost, item unitCost/totalCost) are null
+        unless the current user has the finance role, mirroring the legacy
+        <g:hasRoleFinance> GSP blocks; hasRoleFinance reports that gate.
+        Unknown ids respond 404 with {"errorMessage"}.
+      parameters:
+        - $ref: '#/components/parameters/stocklistId'
+      responses:
+        '200':
+          description: The full requisition template details, in a "data" envelope.
+          content:
+            application/json:
+              schema:
+                type: object
+                required: [data]
+                properties:
+                  data:
+                    $ref: '#/components/schemas/StocklistDetails'
+        '404':
+          description: Unknown template id.
+          content:
+            application/json:
+              schema:
+                type: object
+                required: [errorMessage]
+                properties:
+                  errorMessage:
+                    type: string
+                additionalProperties: false
   /api/stocklists/sendMail/{id}:
     post:
       operationId: sendStocklistMail
@@ -322,6 +358,123 @@ components:
           type: string
           nullable: true
       additionalProperties: true
+    StocklistDetails:
+      type: object
+      description: Full template rendering used by details().
+      required: [id, requisitionItems]
+      properties:
+        id:
+          $ref: '../components/common.yaml#/components/schemas/Id'
+        version:
+          type: integer
+        name:
+          type: string
+          nullable: true
+        description:
+          type: string
+          nullable: true
+        isPublished:
+          type: boolean
+          nullable: true
+        replenishmentPeriod:
+          type: integer
+          nullable: true
+        requisitionItemCount:
+          type: integer
+          nullable: true
+          description: Count of ORIGINAL-type items only (legacy summary parity).
+        origin:
+          $ref: '#/components/schemas/NamedReference'
+        destination:
+          $ref: '#/components/schemas/NamedReference'
+        requestedBy:
+          $ref: '#/components/schemas/NamedReference'
+        commodityClass:
+          type: string
+          nullable: true
+        sortByCode:
+          type: object
+          nullable: true
+          properties:
+            name:
+              type: string
+            friendlyName:
+              type: string
+          additionalProperties: false
+        createdBy:
+          type: string
+          nullable: true
+        updatedBy:
+          type: string
+          nullable: true
+        dateCreated:
+          type: string
+          nullable: true
+          description: ISO-8601 with offset (yyyy-MM-dd'T'HH:mm:ssXXX).
+        lastUpdated:
+          type: string
+          nullable: true
+          description: >
+            Max of the template's and its items' lastUpdated (legacy GSP
+            parity), ISO-8601 with offset.
+        hasRoleFinance:
+          type: boolean
+        totalCost:
+          type: number
+          nullable: true
+        requisitionItems:
+          type: array
+          items:
+            type: object
+            required: [id]
+            properties:
+              id:
+                $ref: '../components/common.yaml#/components/schemas/Id'
+              quantity:
+                type: integer
+                nullable: true
+              product:
+                type: object
+                nullable: true
+                properties:
+                  id:
+                    type: string
+                    nullable: true
+                  productCode:
+                    type: string
+                    nullable: true
+                  name:
+                    type: string
+                    nullable: true
+                  color:
+                    type: string
+                    nullable: true
+                  active:
+                    type: boolean
+                    nullable: true
+                  category:
+                    type: string
+                    nullable: true
+                additionalProperties: false
+              unitCost:
+                type: number
+                nullable: true
+              totalCost:
+                type: number
+                nullable: true
+            additionalProperties: false
+      additionalProperties: false
+    NamedReference:
+      type: object
+      nullable: true
+      properties:
+        id:
+          type: string
+          nullable: true
+        name:
+          type: string
+          nullable: true
+      additionalProperties: false
     StocklistSummary:
       type: object
       description: Requisition.toStocklistJson() rendering used by list().

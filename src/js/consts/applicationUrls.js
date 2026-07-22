@@ -243,14 +243,14 @@ const CONSUMPTION_URL = {
 
 const REQUISITION_TEMPLATE_URL = {
   base: `${CONTEXT_PATH}/requisitionTemplate`,
+  list: () => `${REQUISITION_TEMPLATE_URL.base}/list`,
   create: () => `${REQUISITION_TEMPLATE_URL.base}/create`,
   show: (id) => `${REQUISITION_TEMPLATE_URL.base}/show/${id}`,
   edit: (id) => `${REQUISITION_TEMPLATE_URL.base}/edit/${id}`,
   batch: (id) => `${REQUISITION_TEMPLATE_URL.base}/batch/${id}`,
   editHeader: (id) => `${REQUISITION_TEMPLATE_URL.base}/editHeader/${id}`,
-  list: () => `${REQUISITION_TEMPLATE_URL.base}/list`,
-  sendMail: (id) => `${REQUISITION_TEMPLATE_URL.base}/sendMail/${id}`,
   export: (id) => `${REQUISITION_TEMPLATE_URL.base}/export/${id}`,
+  sendMail: (id) => `${REQUISITION_TEMPLATE_URL.base}/sendMail/${id}`,
   clone: (id) => `${REQUISITION_TEMPLATE_URL.base}/clone/${id}`,
   publish: (id) => `${REQUISITION_TEMPLATE_URL.base}/publish/${id}`,
   unpublish: (id) => `${REQUISITION_TEMPLATE_URL.base}/unpublish/${id}`,

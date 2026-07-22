@@ -188,6 +188,16 @@ const AsyncProductGroupShow = Loadable({
   loading: Loading,
 });
 
+const AsyncRequisitionTemplateShow = Loadable({
+  loader: () => import('components/requisitionTemplate/RequisitionTemplateShow'),
+  loading: Loading,
+});
+
+const AsyncStockListLocationShow = Loadable({
+  loader: () => import('components/stock-list/StockListLocationShow'),
+  loading: Loading,
+});
+
 const AsyncProductTypeForm = Loadable({
   loader: () => import('components/productType/ProductTypeForm'),
   loading: Loading,
@@ -1014,6 +1024,8 @@ const Router = () => {
             <MainLayoutRoute path="**/picklist/returnPrint/:orderId" component={AsyncPicklistReturnPrint} />
             <MainLayoutRoute path="**/purchaseOrder/list" component={AsyncPurchaseOrderList} />
             <MainLayoutRoute path="**/requisitionTemplate/list" component={AsyncStockList} />
+            <MainLayoutRoute path="**/requisitionTemplate/show/:requisitionTemplateId" component={AsyncRequisitionTemplateShow} />
+            <MainLayoutRoute path="**/stocklist/show/:locationId" component={AsyncStockListLocationShow} />
             <MainLayoutRoute path="**/requisitionTemplate/create" component={AsyncStockListTemplateCreate} />
             <MainLayoutRoute path="**/requisitionTemplate/edit/:templateId" component={AsyncStockListTemplateEdit} />
             <MainLayoutRoute path="**/requisitionTemplate/editHeader/:templateId" component={AsyncStockListTemplateEditHeader} />

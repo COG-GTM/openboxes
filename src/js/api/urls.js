@@ -134,6 +134,7 @@ export const AVAILABLE_ITEMS = `${PRODUCT_API}/availableItems`;
 // STOCK LIST
 export const STOCKLIST_API = `${API}/stocklists`;
 export const STOCKLIST_EXPORT = (id) => `${STOCKLIST_API}/${id}/export`;
+export const STOCKLIST_DETAILS = (id) => `${STOCKLIST_API}/${id}/details`;
 export const STOCKLIST_DELETE = (id) => `${STOCKLIST_API}/${id}`;
 export const STOCKLIST_CLEAR = (id) => `${STOCKLIST_API}/${id}/clear`;
 export const STOCKLIST_CLONE = (id) => `${STOCKLIST_API}/${id}/clone`;

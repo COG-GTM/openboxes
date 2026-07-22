@@ -51,6 +51,39 @@ def test_read(client):
           path=f"/api/stocklists/{sid}")
 
 
+def _require_details_endpoint(client):
+    # The details endpoint ships with this batch; the pinned released image
+    # predates it, so skip against builds that don't expose it.
+    sid = _seeded_stocklist_id(client)
+    if client.request("GET", f"/api/stocklists/{sid}/details").status_code != 200:
+        pytest.skip("app build does not expose /api/stocklists/{id}/details")
+    return sid
+
+
+def test_details(client):
+    sid = _require_details_endpoint(client)
+    resp = check(client, spec, "GET", "/api/stocklists/{id}/details",
+                 path=f"/api/stocklists/{sid}/details")
+    data = resp.json()["data"]
+    assert data["id"] == sid
+    assert data["requisitionItems"], "seeded stock list should have items"
+    item = data["requisitionItems"][0]
+    assert item["product"]["productCode"]
+    # finance gating: cost fields are either all present or all null
+    if data["hasRoleFinance"]:
+        assert data["totalCost"] is not None
+        assert item["unitCost"] is not None
+    else:
+        assert data["totalCost"] is None
+        assert item["unitCost"] is None
+
+
+def test_details_unknown(client):
+    _require_details_endpoint(client)
+    check(client, spec, "GET", "/api/stocklists/{id}/details",
+          path="/api/stocklists/doesnotexist0000/details")
+
+
 def test_read_unknown(client):
     check(client, spec, "GET", "/api/stocklists/{id}",
           path="/api/stocklists/doesnotexist0000")

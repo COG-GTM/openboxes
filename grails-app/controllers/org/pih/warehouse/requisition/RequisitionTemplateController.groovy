@@ -149,14 +149,7 @@ class RequisitionTemplateController {
 
 
     def show() {
-        def requisition = Requisition.get(params.id)
-
-        if (!requisition) {
-            flash.message = "${warehouse.message(code: 'default.not.found.message', args: [warehouse.message(code: 'request.label', default: 'Request'), params.id])}"
-            redirect(action: "list")
-        } else {
-            return [requisition: requisition]
-        }
+        render(view: "/common/react")
     }
 
     def delete() {

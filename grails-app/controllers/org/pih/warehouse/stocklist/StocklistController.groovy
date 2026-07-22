@@ -12,8 +12,6 @@ package org.pih.warehouse.stocklist
 import grails.gorm.transactions.Transactional
 import grails.util.Holders
 import org.pih.warehouse.api.Stocklist
-import org.pih.warehouse.inventory.InventoryLevel
-import org.pih.warehouse.core.Location
 
 @Transactional
 class StocklistController {
@@ -22,11 +20,7 @@ class StocklistController {
     def documentService
 
     def show() {
-        println "stocklist " + params
-        def location = Location.get(params.id)
-        def inventoryLevels = InventoryLevel.findAllByInventory(location.inventory)
-
-        [location: location, inventoryLevels: inventoryLevels]
+        render(view: "/common/react")
     }
 
     def renderHtml() {

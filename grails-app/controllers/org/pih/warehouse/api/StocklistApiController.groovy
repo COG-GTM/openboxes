@@ -57,6 +57,69 @@ class StocklistApiController {
         ] as JSON)
     }
 
+    /**
+     * Full requisition template rendering backing the React
+     * requisitionTemplate/show screen. Mirrors the data the legacy GSP
+     * (show.gsp + _summary/_header templates) pulled straight off the
+     * Requisition domain: header fields, auditing info and the requisition
+     * items sorted by the template's sortByCode. Finance-only fields
+     * (unit/total cost) are gated by hasRoleFinance, matching the legacy
+     * <g:hasRoleFinance> blocks.
+     */
+    def details() {
+        Requisition requisition = Requisition.get(params.id)
+        if (!requisition) {
+            response.status = 404
+            render([errorMessage: "Requisition template with id ${params.id} not found"] as JSON)
+            return
+        }
+
+        boolean hasRoleFinance = userService.hasRoleFinance(session?.user)
+        RequisitionItemSortByCode sortByCode = requisition.sortByCode ?: RequisitionItemSortByCode.SORT_INDEX
+        def requisitionItems = requisition."${sortByCode.methodName}"
+
+        // lastUpdated is not touched on the parent when only child items change,
+        // so take the max across the template and its items (legacy GSP parity)
+        def lastUpdated = [requisition.lastUpdated, requisition.requisitionItems*.lastUpdated?.max()].findAll { it }.max()
+
+        render([data: [
+                id                 : requisition.id,
+                version            : requisition.version,
+                name               : requisition.name,
+                description        : requisition.description,
+                isPublished        : requisition.isPublished,
+                replenishmentPeriod: requisition.replenishmentPeriod,
+                requisitionItemCount: requisition.requisitionItemCount,
+                origin             : requisition.origin ? [id: requisition.origin.id, name: requisition.origin.name] : null,
+                destination        : requisition.destination ? [id: requisition.destination.id, name: requisition.destination.name] : null,
+                requestedBy        : requisition.requestedBy ? [id: requisition.requestedBy.id, name: requisition.requestedBy.name] : null,
+                commodityClass     : requisition.commodityClass?.name(),
+                sortByCode         : requisition.sortByCode ? [name: requisition.sortByCode.name(), friendlyName: requisition.sortByCode.friendlyName] : null,
+                createdBy          : requisition.createdBy?.name,
+                updatedBy          : requisition.updatedBy?.name,
+                dateCreated        : requisition.dateCreated?.format("yyyy-MM-dd'T'HH:mm:ssXXX"),
+                lastUpdated        : lastUpdated?.format("yyyy-MM-dd'T'HH:mm:ssXXX"),
+                hasRoleFinance     : hasRoleFinance,
+                totalCost          : hasRoleFinance ? (requisition.totalCost ?: 0) : null,
+                requisitionItems   : requisitionItems?.collect { item ->
+                    [
+                            id        : item.id,
+                            quantity  : item.quantity,
+                            product   : [
+                                    id         : item.product?.id,
+                                    productCode: item.product?.productCode,
+                                    name       : item.product?.name,
+                                    color      : item.product?.color,
+                                    active     : item.product?.active,
+                                    category   : item.product?.category?.name,
+                            ],
+                            unitCost  : hasRoleFinance ? (item.product?.pricePerUnit ?: 0) : null,
+                            totalCost : hasRoleFinance ? (item.totalCost ?: 0) : null,
+                    ]
+                } ?: [],
+        ]] as JSON)
+    }
+
     def read() {
         Stocklist stocklist = stocklistService.getStocklist(params.id)
 
