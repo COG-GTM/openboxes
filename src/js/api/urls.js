@@ -72,6 +72,18 @@ export const INVOICE_DOCUMENT_BY_ID = (id, documentId) => `${INVOICE_DOCUMENTS(i
 export const ORDER_API = `${API}/orders`;
 export const ORDER_BY_ID = (id) => `${ORDER_API}/${id}`;
 export const ORDER_COMMENTS = (id) => `${ORDER_BY_ID(id)}/comments`;
+export const ORDER_PENDING_ITEMS = `${ORDER_API}/pendingItems`;
+export const ORDER_DOCUMENT_TYPES = `${ORDER_API}/documentTypes`;
+export const ORDER_DOCUMENTS = (id) => `${ORDER_BY_ID(id)}/documents`;
+export const ORDER_ITEM_OPTIONS = (id) => `${ORDER_BY_ID(id)}/orderItemOptions`;
+export const ORDER_ADJUSTMENTS = (id) => `${ORDER_BY_ID(id)}/adjustments`;
+export const ORDER_ADJUSTMENT_BY_ID = (id, adjustmentId) => `${ORDER_ADJUSTMENTS(id)}/${adjustmentId}`;
+export const ORDER_SUMMARIES = `${API}/orderSummaries`;
+export const ORDER_ITEM_SUMMARIES = `${API}/orderItemSummaries`;
+export const ORDER_ADJUSTMENT_TYPE_OPTIONS = `${API}/orderAdjustmentTypeOptions`;
+export const BUDGET_CODE_OPTIONS = `${API}/budgetCodeOptions`;
+export const ORDER_STATUS_OPTIONS = `${API}/orderStatusOptions`;
+export const ORDER_SUMMARY_STATUS_OPTIONS = `${API}/orderSummaryStatusOptions`;
 
 // INVOICE ITEM
 export const INVOICE_ITEM_API = `${API}/invoiceItems`;

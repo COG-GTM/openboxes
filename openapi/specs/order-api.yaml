@@ -6,7 +6,9 @@ info:
     org.pih.warehouse.api.OrderApiController. Read is routed via the standard
     "/api/${resource}s/$id" REST mapping; comment creation via the custom
     "/api/orders/$id/comments" mapping. Added in Phase 2 (Batch 27) to back
-    the React order addComment screen.
+    the React order addComment screen. Batch 28 adds order list, pending order
+    items, order/order item summary lists, order document upload and order
+    adjustment endpoints backing the migrated order screens.
   version: 0.1.0
 servers:
   - url: http://localhost:8080/openboxes
@@ -14,6 +16,406 @@ servers:
 security:
   - cookieAuth: []
 paths:
+  /api/orders:
+    get:
+      operationId: listOrders
+      summary: List orders
+      description: >
+        Mirrors the legacy OrderController.list action (defaults to purchase
+        orders; the migrated screen is typically used with
+        orderType=PUTAWAY_ORDER). Supports q, orderType, status, origin,
+        destination, orderedBy, createdBy, statusStartDate, statusEndDate,
+        max and offset parameters. With format=csv or downloadOrders=csv the
+        matching orders are returned as CSV attachments instead of JSON.
+      parameters:
+        - name: q
+          in: query
+          required: false
+          schema:
+            type: string
+        - name: orderType
+          in: query
+          required: false
+          schema:
+            type: string
+          description: Order type id or code (defaults to PURCHASE_ORDER).
+        - name: status
+          in: query
+          required: false
+          schema:
+            type: string
+        - name: max
+          in: query
+          required: false
+          schema:
+            type: integer
+        - name: offset
+          in: query
+          required: false
+          schema:
+            type: integer
+      responses:
+        '200':
+          description: Page of orders.
+          content:
+            application/json:
+              schema:
+                type: object
+                required: [data, totalCount]
+                properties:
+                  data:
+                    type: array
+                    items:
+                      $ref: '#/components/schemas/OrderListEntry'
+                  totalCount:
+                    type: integer
+                  totalPrice:
+                    type: number
+                    nullable: true
+                  defaultCurrencyCode:
+                    type: string
+                    nullable: true
+                  isCentralPurchasingEnabled:
+                    type: boolean
+                additionalProperties: true
+            text/csv:
+              schema:
+                type: string
+  /api/orders/pendingItems:
+    get:
+      operationId: listPendingOrderItems
+      summary: List order items that are not completely fulfilled
+      description: >
+        Mirrors the legacy OrderController.listOrderItems action.
+      responses:
+        '200':
+          description: Pending order items.
+          content:
+            application/json:
+              schema:
+                type: object
+                required: [data]
+                properties:
+                  data:
+                    type: array
+                    items:
+                      $ref: '#/components/schemas/PendingOrderItem'
+                additionalProperties: true
+  /api/orders/documentTypes:
+    get:
+      operationId: listOrderDocumentTypes
+      summary: List non-template document types
+      description: >
+        Non-template document types for the migrated order addDocument screen.
+      responses:
+        '200':
+          description: Document type options.
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/OptionsResponse'
+  /api/orders/{id}/documents:
+    parameters:
+      - name: id
+        in: path
+        required: true
+        schema:
+          $ref: '../components/common.yaml#/components/schemas/Id'
+        description: Order id.
+    post:
+      operationId: uploadOrderDocument
+      summary: Attach a document (file upload or URL) to an order
+      description: >
+        Mirrors the order branch of the legacy DocumentController.uploadDocument
+        action. Accepts multipart/form-data with either a fileContents file or
+        a fileUri URL, plus optional name, documentNumber and typeId fields.
+      requestBody:
+        required: true
+        content:
+          multipart/form-data:
+            schema:
+              type: object
+              properties:
+                fileContents:
+                  type: string
+                  format: binary
+                fileUri:
+                  type: string
+                name:
+                  type: string
+                documentNumber:
+                  type: string
+                typeId:
+                  type: string
+      responses:
+        '201':
+          description: Created document.
+          content:
+            application/json:
+              schema:
+                type: object
+                required: [data]
+                properties:
+                  data:
+                    $ref: '#/components/schemas/OrderDocument'
+        '400':
+          description: Validation errors (empty document, disallowed file type, too large).
+          content:
+            application/json:
+              schema:
+                $ref: '../components/common.yaml#/components/schemas/ErrorResponse'
+        '404':
+          description: Unknown order id.
+          content:
+            application/json:
+              schema:
+                $ref: '../components/common.yaml#/components/schemas/ErrorResponse'
+  /api/orders/{id}/orderItemOptions:
+    parameters:
+      - name: id
+        in: path
+        required: true
+        schema:
+          $ref: '../components/common.yaml#/components/schemas/Id'
+        description: Order id.
+    get:
+      operationId: listOrderItemOptions
+      summary: Order item select options for the adjustment form
+      responses:
+        '200':
+          description: Order item options.
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/OptionsResponse'
+        '404':
+          description: Unknown order id.
+          content:
+            application/json:
+              schema:
+                $ref: '../components/common.yaml#/components/schemas/ErrorResponse'
+  /api/orders/{id}/adjustments:
+    parameters:
+      - name: id
+        in: path
+        required: true
+        schema:
+          $ref: '../components/common.yaml#/components/schemas/Id'
+        description: Order id.
+    post:
+      operationId: createOrderAdjustment
+      summary: Create an order adjustment
+      description: >
+        Mirrors the create branch of the legacy OrderController.saveAdjustment
+        action, including the GL-account requirement when the current location
+        requires accounting.
+      requestBody:
+        required: true
+        content:
+          application/json:
+            schema:
+              $ref: '#/components/schemas/OrderAdjustmentRequest'
+      responses:
+        '201':
+          description: Created adjustment.
+          content:
+            application/json:
+              schema:
+                type: object
+                required: [data]
+                properties:
+                  data:
+                    $ref: '#/components/schemas/OrderAdjustment'
+        '400':
+          description: Validation errors.
+          content:
+            application/json:
+              schema:
+                $ref: '../components/common.yaml#/components/schemas/ErrorResponse'
+        '404':
+          description: Unknown order id.
+          content:
+            application/json:
+              schema:
+                $ref: '../components/common.yaml#/components/schemas/ErrorResponse'
+  /api/orders/{id}/adjustments/{adjustmentId}:
+    parameters:
+      - name: id
+        in: path
+        required: true
+        schema:
+          $ref: '../components/common.yaml#/components/schemas/Id'
+        description: Order id.
+      - name: adjustmentId
+        in: path
+        required: true
+        schema:
+          $ref: '../components/common.yaml#/components/schemas/Id'
+        description: Order adjustment id.
+    get:
+      operationId: readOrderAdjustment
+      summary: Read an order adjustment
+      responses:
+        '200':
+          description: The adjustment.
+          content:
+            application/json:
+              schema:
+                type: object
+                required: [data]
+                properties:
+                  data:
+                    $ref: '#/components/schemas/OrderAdjustment'
+        '404':
+          description: Unknown order or adjustment id.
+          content:
+            application/json:
+              schema:
+                $ref: '../components/common.yaml#/components/schemas/ErrorResponse'
+    put:
+      operationId: updateOrderAdjustment
+      summary: Update an order adjustment
+      description: >
+        Mirrors the update branch of the legacy OrderController.saveAdjustment
+        action; adjustments already invoiced with a regular invoice cannot be
+        edited (403).
+      requestBody:
+        required: true
+        content:
+          application/json:
+            schema:
+              $ref: '#/components/schemas/OrderAdjustmentRequest'
+      responses:
+        '200':
+          description: Updated adjustment.
+          content:
+            application/json:
+              schema:
+                type: object
+                required: [data]
+                properties:
+                  data:
+                    $ref: '#/components/schemas/OrderAdjustment'
+        '400':
+          description: Validation errors.
+          content:
+            application/json:
+              schema:
+                $ref: '../components/common.yaml#/components/schemas/ErrorResponse'
+        '403':
+          description: Adjustment has a regular invoice and cannot be edited.
+          content:
+            application/json:
+              schema:
+                $ref: '../components/common.yaml#/components/schemas/ErrorResponse'
+        '404':
+          description: Unknown order or adjustment id.
+          content:
+            application/json:
+              schema:
+                $ref: '../components/common.yaml#/components/schemas/ErrorResponse'
+  /api/orderSummaries:
+    get:
+      operationId: listOrderSummaries
+      summary: List order summaries (derived status view)
+      description: >
+        Mirrors the legacy OrderController.orderSummaryList action backed by
+        the order_summary SQL view. Status filters accept repeated parameters.
+      parameters:
+        - name: orderNumber
+          in: query
+          required: false
+          schema:
+            type: string
+        - name: derivedStatus
+          in: query
+          required: false
+          schema:
+            type: array
+            items:
+              type: string
+          style: form
+          explode: true
+        - name: max
+          in: query
+          required: false
+          schema:
+            type: integer
+        - name: offset
+          in: query
+          required: false
+          schema:
+            type: integer
+      responses:
+        '200':
+          description: Page of order summaries.
+          content:
+            application/json:
+              schema:
+                type: object
+                required: [data, totalCount]
+                properties:
+                  data:
+                    type: array
+                    items:
+                      $ref: '#/components/schemas/OrderSummaryEntry'
+                  totalCount:
+                    type: integer
+                additionalProperties: true
+  /api/orderItemSummaries:
+    get:
+      operationId: listOrderItemSummaries
+      summary: List order item summaries (derived status views)
+      description: >
+        Mirrors the legacy OrderController.orderItemSummary and
+        orderItemDetails actions. Use variant=details for the simplified view.
+      parameters:
+        - name: orderNumber
+          in: query
+          required: false
+          schema:
+            type: string
+        - name: variant
+          in: query
+          required: false
+          schema:
+            type: string
+            enum: [summary, details]
+        - name: derivedStatus
+          in: query
+          required: false
+          schema:
+            type: array
+            items:
+              type: string
+          style: form
+          explode: true
+        - name: max
+          in: query
+          required: false
+          schema:
+            type: integer
+        - name: offset
+          in: query
+          required: false
+          schema:
+            type: integer
+      responses:
+        '200':
+          description: Page of order item summaries.
+          content:
+            application/json:
+              schema:
+                type: object
+                required: [data, totalCount]
+                properties:
+                  data:
+                    type: array
+                    items:
+                      $ref: '#/components/schemas/OrderItemSummaryEntry'
+                  totalCount:
+                    type: integer
+                additionalProperties: true
   /api/orders/{id}:
     parameters:
       - name: id
@@ -102,6 +504,280 @@ paths:
                 $ref: '../components/common.yaml#/components/schemas/ErrorResponse'
 components:
   schemas:
+    OptionsResponse:
+      type: object
+      required: [data]
+      properties:
+        data:
+          type: array
+          items:
+            type: object
+            properties:
+              id:
+                type: string
+              value:
+                type: string
+              label:
+                type: string
+                nullable: true
+            additionalProperties: true
+      additionalProperties: true
+    OrderListEntry:
+      type: object
+      required: [id, orderNumber]
+      properties:
+        id:
+          $ref: '../components/common.yaml#/components/schemas/Id'
+        orderNumber:
+          type: string
+        name:
+          type: string
+          nullable: true
+        derivedStatus:
+          type: string
+          nullable: true
+        orderType:
+          type: object
+          nullable: true
+          additionalProperties: true
+        isPutawayOrder:
+          type: boolean
+        origin:
+          type: object
+          nullable: true
+          additionalProperties: true
+        destination:
+          type: object
+          nullable: true
+          additionalProperties: true
+        orderedBy:
+          type: object
+          nullable: true
+          additionalProperties: true
+        dateOrdered:
+          type: string
+          nullable: true
+        lineItemsCount:
+          type: integer
+        orderedItemsCount:
+          type: integer
+        shippedItemsCount:
+          type: integer
+        receivedItemsCount:
+          type: integer
+        total:
+          type: number
+          nullable: true
+        totalNormalized:
+          type: number
+          nullable: true
+        currencyCode:
+          type: string
+          nullable: true
+      additionalProperties: true
+    PendingOrderItem:
+      type: object
+      required: [id]
+      properties:
+        id:
+          $ref: '../components/common.yaml#/components/schemas/Id'
+        order:
+          type: object
+          nullable: true
+          properties:
+            id:
+              type: string
+              nullable: true
+            name:
+              type: string
+              nullable: true
+          additionalProperties: true
+        description:
+          type: string
+          nullable: true
+        quantity:
+          type: integer
+          nullable: true
+        isCompletelyFulfilled:
+          type: boolean
+      additionalProperties: true
+    OrderDocument:
+      type: object
+      required: [id]
+      properties:
+        id:
+          $ref: '../components/common.yaml#/components/schemas/Id'
+        name:
+          type: string
+          nullable: true
+        filename:
+          type: string
+          nullable: true
+        documentNumber:
+          type: string
+          nullable: true
+        documentType:
+          type: object
+          nullable: true
+          additionalProperties: true
+        fileUri:
+          type: string
+          nullable: true
+      additionalProperties: true
+    OrderAdjustmentRequest:
+      type: object
+      required: [description]
+      properties:
+        orderItem:
+          type: object
+          nullable: true
+          properties:
+            id:
+              type: string
+        orderAdjustmentType:
+          type: object
+          nullable: true
+          properties:
+            id:
+              type: string
+        description:
+          type: string
+        amount:
+          type: number
+          nullable: true
+        percentage:
+          type: number
+          nullable: true
+        comments:
+          type: string
+          nullable: true
+        budgetCode:
+          type: object
+          nullable: true
+          properties:
+            id:
+              type: string
+      additionalProperties: true
+    OrderAdjustment:
+      type: object
+      required: [id]
+      properties:
+        id:
+          $ref: '../components/common.yaml#/components/schemas/Id'
+        order:
+          type: object
+          nullable: true
+          additionalProperties: true
+        orderItem:
+          type: object
+          nullable: true
+          additionalProperties: true
+        orderAdjustmentType:
+          type: object
+          nullable: true
+          additionalProperties: true
+        description:
+          type: string
+          nullable: true
+        amount:
+          type: number
+          nullable: true
+        percentage:
+          type: number
+          nullable: true
+        comments:
+          type: string
+          nullable: true
+        budgetCode:
+          type: object
+          nullable: true
+          additionalProperties: true
+        hasRegularInvoice:
+          type: boolean
+      additionalProperties: true
+    OrderSummaryEntry:
+      type: object
+      required: [id]
+      properties:
+        id:
+          $ref: '../components/common.yaml#/components/schemas/Id'
+        orderNumber:
+          type: string
+          nullable: true
+        itemsOrdered:
+          type: integer
+          nullable: true
+        itemsShipped:
+          type: integer
+          nullable: true
+        itemsReceived:
+          type: integer
+          nullable: true
+        itemsInvoiced:
+          type: integer
+          nullable: true
+        orderStatus:
+          type: string
+          nullable: true
+        shipmentStatus:
+          type: string
+          nullable: true
+        receiptStatus:
+          type: string
+          nullable: true
+        paymentStatus:
+          type: string
+          nullable: true
+        derivedStatus:
+          type: string
+          nullable: true
+      additionalProperties: true
+    OrderItemSummaryEntry:
+      type: object
+      required: [id]
+      properties:
+        id:
+          $ref: '../components/common.yaml#/components/schemas/Id'
+        orderId:
+          type: string
+          nullable: true
+        orderNumber:
+          type: string
+          nullable: true
+        productCode:
+          type: string
+          nullable: true
+        orderItemStatus:
+          type: string
+          nullable: true
+        quantityOrdered:
+          type: integer
+          nullable: true
+        quantityShipped:
+          type: integer
+          nullable: true
+        quantityReceived:
+          type: integer
+          nullable: true
+        quantityCanceled:
+          type: integer
+          nullable: true
+        quantityInvoiced:
+          type: integer
+          nullable: true
+        isItemFullyShipped:
+          type: boolean
+          nullable: true
+        isItemFullyReceived:
+          type: boolean
+          nullable: true
+        isItemFullyInvoiced:
+          type: boolean
+          nullable: true
+        derivedStatus:
+          type: string
+          nullable: true
+      additionalProperties: true
     OrderSummary:
       type: object
       required: [id, orderNumber]

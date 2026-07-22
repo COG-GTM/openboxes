@@ -14,6 +14,7 @@ import org.pih.warehouse.core.DocumentType
 import org.pih.warehouse.core.GlAccount
 import org.pih.warehouse.core.GlAccountType
 import org.pih.warehouse.core.GlAccountTypeCode
+import org.pih.warehouse.core.BudgetCode
 import org.pih.warehouse.core.LocationTypeCode
 import org.pih.warehouse.core.PaymentTerm
 import org.pih.warehouse.core.PreferenceType
@@ -23,6 +24,9 @@ import org.pih.warehouse.core.User
 import org.pih.warehouse.core.UserService
 import org.pih.warehouse.data.ProductSupplierService
 import org.pih.warehouse.glAccount.GlAccountService
+import org.pih.warehouse.order.OrderAdjustmentType
+import org.pih.warehouse.order.OrderStatus
+import org.pih.warehouse.order.OrderSummaryStatus
 import org.pih.warehouse.product.Category
 import org.pih.warehouse.product.ProductAssociationTypeCode
 import org.pih.warehouse.product.ProductCatalog
@@ -189,6 +193,50 @@ class SelectOptionsApiController {
                     [id: it.id, label: it.name]
                 }
         render([data: documentTypes] as JSON)
+    }
+
+    def orderAdjustmentTypeOptions() {
+        List<OrderAdjustmentType> orderAdjustmentTypes = OrderAdjustmentType.list()
+                .collect {
+                    [id: it.id, value: it.id, label: it.name]
+                }
+        render([data: orderAdjustmentTypes] as JSON)
+    }
+
+    def budgetCodeOptions() {
+        boolean active = params.boolean("active", true)
+        List<BudgetCode> budgetCodes = (active ? BudgetCode.findAllByActive(true) : BudgetCode.list())
+                .sort { it.code?.toLowerCase() }
+                .collect {
+                    [id: it.id, value: it.id, label: it.code]
+                }
+        render([data: budgetCodes] as JSON)
+    }
+
+    def orderStatusOptions() {
+        List options = OrderStatus.list().collect {
+            [id: it.name(), value: it.name(), label: g.message(code: "enum.OrderStatus.${it.name()}", default: it.name())]
+        }
+        render([data: options] as JSON)
+    }
+
+    /**
+     * Grouped OrderSummaryStatus options for the migrated order summary list
+     * filters (mirrors the enum groupings used by the legacy GSP filters).
+     */
+    def orderSummaryStatusOptions() {
+        Closure toOptions = { List statuses ->
+            statuses.collect {
+                [id: it.name(), value: it.name(), label: g.message(code: "enum.OrderSummaryStatus.${it.name()}", default: it.name())]
+            }
+        }
+        render([data: [
+                orderStatuses   : toOptions(OrderSummaryStatus.orderStatuses()),
+                shipmentStatuses: toOptions(OrderSummaryStatus.shipmentStatuses()),
+                receiptStatuses : toOptions(OrderSummaryStatus.receiptStatuses()),
+                paymentStatuses : toOptions(OrderSummaryStatus.paymentStatuses()),
+                derivedStatuses : toOptions(OrderSummaryStatus.derivedStatuses()),
+        ]] as JSON)
     }
 
     def productAssociationTypeCodeOptions() {

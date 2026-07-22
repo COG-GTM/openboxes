@@ -333,6 +333,36 @@ const AsyncOrderAddComment = Loadable({
   loading: Loading,
 });
 
+const AsyncOrderAddDocument = Loadable({
+  loader: () => import('components/order/OrderAddDocument'),
+  loading: Loading,
+});
+
+const AsyncOrderEditAdjustment = Loadable({
+  loader: () => import('components/order/OrderEditAdjustment'),
+  loading: Loading,
+});
+
+const AsyncOrderList = Loadable({
+  loader: () => import('components/order/OrderList'),
+  loading: Loading,
+});
+
+const AsyncOrderPendingItemsList = Loadable({
+  loader: () => import('components/order/OrderPendingItemsList'),
+  loading: Loading,
+});
+
+const AsyncOrderSummaryList = Loadable({
+  loader: () => import('components/order/OrderSummaryList'),
+  loading: Loading,
+});
+
+const AsyncOrderItemSummaryList = Loadable({
+  loader: () => import('components/order/OrderItemSummaryList'),
+  loading: Loading,
+});
+
 const AsyncAttributeList = Loadable({
   loader: () => import('components/attribute/AttributeList'),
   loading: Loading,
@@ -529,6 +559,8 @@ const AsyncEditInventoryLevelPage = Loadable({
 
 const InventoryLowStockList = (props) => <AsyncInventorySummaryList {...props} lowStock />;
 const InventoryReorderStockList = (props) => <AsyncInventorySummaryList {...props} reorderStock />;
+
+const OrderItemDetailsList = (props) => <AsyncOrderItemSummaryList {...props} variant="details" />;
 const ExpiredStockList = (props) => <AsyncExpirationStockList {...props} expired />;
 
 const AsyncRequisitionCreate = Loadable({
@@ -689,6 +721,14 @@ const Router = () => {
             <MainLayoutRoute path="**/invoice/show/:invoiceId" component={AsyncInvoiceShow} />
             <MainLayoutRoute path="**/invoice/addDocument/:invoiceId" component={AsyncInvoiceAddDocument} />
             <MainLayoutRoute path="**/order/addComment/:orderId" component={AsyncOrderAddComment} />
+            <MainLayoutRoute path="**/order/addDocument/:orderId" component={AsyncOrderAddDocument} />
+            <MainLayoutRoute path="**/order/addAdjustment/:orderId" component={AsyncOrderEditAdjustment} />
+            <MainLayoutRoute path="**/order/editAdjustment/:adjustmentId" component={AsyncOrderEditAdjustment} />
+            <MainLayoutRoute path="**/order/listOrderItems" component={AsyncOrderPendingItemsList} />
+            <MainLayoutRoute path="**/order/list" component={AsyncOrderList} />
+            <MainLayoutRoute path="**/order/orderSummaryList" component={AsyncOrderSummaryList} />
+            <MainLayoutRoute path="**/order/orderItemSummary" component={AsyncOrderItemSummaryList} />
+            <MainLayoutRoute path="**/order/orderItemDetails" component={OrderItemDetailsList} />
             <MainLayoutRoute path="**/stockTransfer/create/:stockTransferId?" component={AsyncStockTransfer} />
             <MainLayoutRoute path="**/stockTransfer/createOutboundReturn/:outboundReturnId?" component={AsyncOutboundReturns} />
             <MainLayoutRoute path="**/stockTransfer/createInboundReturn/:inboundReturnId?" component={AsyncInboundReturns} />

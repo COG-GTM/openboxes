@@ -837,6 +837,67 @@ class UrlMappings {
             action = [POST: "createComment"]
         }
 
+        // Order API (migrated order list / documents / adjustments screens)
+        "/api/orders/pendingItems"(parseRequest: true) {
+            controller = "orderApi"
+            action = [GET: "pendingItems"]
+        }
+
+        "/api/orders/documentTypes"(parseRequest: true) {
+            controller = "orderApi"
+            action = [GET: "documentTypes"]
+        }
+
+        "/api/orders/$id/documents"(parseRequest: false) {
+            controller = "orderApi"
+            action = [POST: "uploadDocument"]
+        }
+
+        "/api/orders/$id/orderItemOptions"(parseRequest: true) {
+            controller = "orderApi"
+            action = [GET: "orderItemOptions"]
+        }
+
+        "/api/orders/$id/adjustments"(parseRequest: true) {
+            controller = "orderApi"
+            action = [POST: "createAdjustment"]
+        }
+
+        "/api/orders/$id/adjustments/$adjustmentId"(parseRequest: true) {
+            controller = "orderApi"
+            action = [GET: "readAdjustment", PUT: "updateAdjustment"]
+        }
+
+        "/api/orderSummaries"(parseRequest: true) {
+            controller = "orderApi"
+            action = [GET: "orderSummaryList"]
+        }
+
+        "/api/orderItemSummaries"(parseRequest: true) {
+            controller = "orderApi"
+            action = [GET: "orderItemSummaryList"]
+        }
+
+        "/api/orderAdjustmentTypeOptions"(parseRequest: true) {
+            controller = { "selectOptionsApi" }
+            action = [GET: "orderAdjustmentTypeOptions"]
+        }
+
+        "/api/budgetCodeOptions"(parseRequest: true) {
+            controller = { "selectOptionsApi" }
+            action = [GET: "budgetCodeOptions"]
+        }
+
+        "/api/orderStatusOptions"(parseRequest: true) {
+            controller = { "selectOptionsApi" }
+            action = [GET: "orderStatusOptions"]
+        }
+
+        "/api/orderSummaryStatusOptions"(parseRequest: true) {
+            controller = { "selectOptionsApi" }
+            action = [GET: "orderSummaryStatusOptions"]
+        }
+
         "/api/invoices/$id/items"(parseRequest: true) {
             controller = "invoiceApi"
             action = [POST: "updateItems", GET: "getInvoiceItems"]

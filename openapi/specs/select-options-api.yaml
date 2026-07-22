@@ -220,6 +220,90 @@ paths:
       responses:
         '200':
           $ref: '#/components/responses/IdLabelOptionsOk'
+  /api/orderAdjustmentTypeOptions:
+    get:
+      operationId: orderAdjustmentTypeOptions
+      summary: Order adjustment type options (React order adjustment screen)
+      description: >
+        Renders all OrderAdjustmentType records as id/value/label options,
+        mirroring the legacy selectOrderAdjustmentTypes tag.
+      responses:
+        '200':
+          $ref: '#/components/responses/IdLabelValueOptionsOk'
+  /api/budgetCodeOptions:
+    get:
+      operationId: budgetCodeOptions
+      summary: Budget code options (React order adjustment screen)
+      description: >
+        Renders BudgetCode records (active only by default) as id/value/label
+        options labeled with the budget code, mirroring the legacy
+        selectBudgetCode tag.
+      parameters:
+        - name: active
+          in: query
+          required: false
+          schema:
+            type: boolean
+            default: true
+      responses:
+        '200':
+          $ref: '#/components/responses/IdLabelValueOptionsOk'
+  /api/orderStatusOptions:
+    get:
+      operationId: orderStatusOptions
+      summary: Order status options (React order list screen)
+      description: >
+        Renders the OrderStatus enum values as id/value/label options with
+        localized labels.
+      responses:
+        '200':
+          $ref: '#/components/responses/IdLabelValueOptionsOk'
+  /api/orderSummaryStatusOptions:
+    get:
+      operationId: orderSummaryStatusOptions
+      summary: Grouped OrderSummaryStatus options (React order summary screens)
+      description: >
+        Renders the OrderSummaryStatus enum groupings (order, shipment,
+        receipt, payment and derived statuses) used by the legacy order
+        summary list filters.
+      responses:
+        '200':
+          description: Grouped status options.
+          content:
+            application/json:
+              schema:
+                type: object
+                required: [data]
+                properties:
+                  data:
+                    type: object
+                    required:
+                      - orderStatuses
+                      - shipmentStatuses
+                      - receiptStatuses
+                      - paymentStatuses
+                      - derivedStatuses
+                    properties:
+                      orderStatuses:
+                        type: array
+                        items:
+                          $ref: '#/components/schemas/IdLabelValueOption'
+                      shipmentStatuses:
+                        type: array
+                        items:
+                          $ref: '#/components/schemas/IdLabelValueOption'
+                      receiptStatuses:
+                        type: array
+                        items:
+                          $ref: '#/components/schemas/IdLabelValueOption'
+                      paymentStatuses:
+                        type: array
+                        items:
+                          $ref: '#/components/schemas/IdLabelValueOption'
+                      derivedStatuses:
+                        type: array
+                        items:
+                          $ref: '#/components/schemas/IdLabelValueOption'
   /api/productAssociationTypeCodeOptions:
     get:
       operationId: productAssociationTypeCodeOptions

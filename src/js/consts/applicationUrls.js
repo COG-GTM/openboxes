@@ -118,6 +118,12 @@ const ORDER_URL = {
   addComment: (id) => `${ORDER_URL.base}/addComment/${id}`,
   addDocument: (id) => `${ORDER_URL.base}/addDocument/${id}`,
   placeOrder: (id) => `${ORDER_URL.base}/placeOrder/${id}`,
+  listOrderItems: () => `${ORDER_URL.base}/listOrderItems`,
+  addAdjustment: (id) => `${ORDER_URL.base}/addAdjustment/${id}`,
+  editAdjustment: (id) => `${ORDER_URL.base}/editAdjustment/${id}`,
+  orderSummaryList: () => `${ORDER_URL.base}/orderSummaryList`,
+  orderItemSummary: () => `${ORDER_URL.base}/orderItemSummary`,
+  orderItemDetails: () => `${ORDER_URL.base}/orderItemDetails`,
 };
 
 const PURCHASE_ORDER_URL = {

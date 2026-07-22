@@ -105,3 +105,37 @@ def test_product_type_options(client, batch8_endpoints):
 def test_document_type_options(client, batch8_endpoints):
     resp = check(client, spec, "GET", "/api/documentTypeOptions")
     assert resp.json()["data"]
+
+
+@pytest.fixture(scope="module")
+def batch28_options(client):
+    # The pinned released image predates these endpoints; only source builds
+    # of this branch expose them.
+    if client.request("GET", "/api/orderStatusOptions").status_code != 200:
+        pytest.skip("app build does not expose the batch 28 option endpoints")
+
+
+def test_order_adjustment_type_options(client, batch28_options):
+    check(client, spec, "GET", "/api/orderAdjustmentTypeOptions")
+
+
+def test_budget_code_options(client, batch28_options):
+    check(client, spec, "GET", "/api/budgetCodeOptions")
+
+
+def test_order_status_options(client, batch28_options):
+    resp = check(client, spec, "GET", "/api/orderStatusOptions")
+    values = {o["value"] for o in resp.json()["data"]}
+    assert "PENDING" in values and "COMPLETED" in values
+
+
+def test_order_summary_status_options(client, batch28_options):
+    resp = check(client, spec, "GET", "/api/orderSummaryStatusOptions")
+    data = resp.json()["data"]
+    assert {o["value"] for o in data["orderStatuses"]} == {
+        "PENDING", "PLACED", "COMPLETED", "CANCELED", "REJECTED",
+    }
+    assert {o["value"] for o in data["shipmentStatuses"]} == {
+        "PARTIALLY_SHIPPED", "SHIPPED",
+    }
+    assert len(data["derivedStatuses"]) == 12

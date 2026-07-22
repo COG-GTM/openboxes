@@ -50,173 +50,12 @@ class OrderController {
         redirect(action: "list", params: params)
     }
 
-    def list(OrderCommand command) {
-
-        Location currentLocation = Location.get(session.warehouse.id)
-        Boolean isCentralPurchasingEnabled = currentLocation.supports(ActivityCode.ENABLE_CENTRAL_PURCHASING)
-
-        // Parse date parameters
-        Date statusStartDate = params.statusStartDate ? Date.parse("MM/dd/yyyy", params.statusStartDate) : null
-        Date statusEndDate = params.statusEndDate ? Date.parse("MM/dd/yyyy", params.statusEndDate) : null
-
-        // Set default values
-        params.destination = params.destination == null && !isCentralPurchasingEnabled ? session?.warehouse?.id : params.destination
-
-        OrderType orderType = params.orderType ? OrderType.findByIdOrCode(params.orderType, params.orderType) : OrderType.findByCode(OrderTypeCode.PURCHASE_ORDER.name())
-
-        params.status = params.status ? Enum.valueOf(OrderStatus.class, params.status) : null
-        params.destinationParty = isCentralPurchasingEnabled ? currentLocation?.organization?.id : params.destinationParty
-
-        // Pagination parameters
-        params.max = (params.format || params.downloadOrders) ? null : params.max?:10
-        params.offset = (params.format || params.downloadOrders) ? null : params.offset?:0
-
-        def orderTemplate = new Order(params)
-        orderTemplate.orderType = orderType
-
-        def orders = orderService.getOrders(orderTemplate, statusStartDate, statusEndDate, params)
-
-        def ordersDerivedStatus
-        if (params.format || params.downloadOrders) {
-            def orderIds = orders?.collect { it?.id }
-            ordersDerivedStatus = orderService.getOrdersDerivedStatus(orderIds)
-        }
-
-        if (params.format && orders) {
-            def csv = CSVUtils.getCSVPrinter()
-            csv.printRecord(
-                    "Supplier organization",
-                    "Supplier location",
-                    "Destination",
-                    "PO Number",
-                    "PO Description",
-                    "PO Status",
-                    "Code",
-                    "Product",
-                    "Item Status",
-                    "Source Code",
-                    "Supplier Code",
-                    "Manufacturer",
-                    "Manufacturer Code",
-                    "Unit of Measure",
-                    "Qty per UOM",
-                    "Quantity Ordered",
-                    "Quantity Shipped",
-                    "Quantity Received",
-                    "Quantity Invoiced",
-                    "Unit Price",
-                    "Total Cost",
-                    "Currency",
-                    "Recipient",
-                    "Estimated Ready Date",
-                    "Actual Ready Date",
-                    "Budget Code"
-            )
-
-            orders*.orderItems*.each { orderItem ->
-                csv.printRecord(
-                        orderItem?.order?.origin?.organization?.code + " - " + orderItem?.order?.origin?.organization?.name,
-                        orderItem?.order?.origin?.name,
-                        orderItem?.order?.destination?.name,
-                        orderItem?.order?.orderNumber,
-                        orderItem?.order?.name,
-                        (ordersDerivedStatus && orderItem?.order?.id ? ordersDerivedStatus[orderItem.order.id] : ''),
-                        orderItem?.product?.productCode,
-                        orderItem?.product?.name,
-                        OrderItemStatusCode.CANCELED == orderItem?.orderItemStatusCode ? orderItem?.orderItemStatusCode?.name() : '',
-                        orderItem?.productSupplier?.code,
-                        orderItem?.productSupplier?.supplierCode,
-                        orderItem?.productSupplier?.manufacturer?.name,
-                        orderItem?.productSupplier?.manufacturerCode,
-                        orderItem?.quantityUom?.code,
-                        orderItem?.quantityPerUom,
-                        orderItem?.quantity,
-                        orderItem?.quantityShipped,
-                        orderItem?.quantityReceived,
-                        orderItem?.quantityInvoicedInStandardUom,
-                        orderItem?.unitPrice,
-                        orderItem?.total,
-                        orderItem?.order?.currencyCode,
-                        orderItem?.recipient,
-                        orderItem?.estimatedReadyDate?.format("MM/dd/yyyy"),
-                        orderItem?.actualReadyDate?.format("MM/dd/yyyy"),
-                        orderItem?.budgetCode?.code,
-                )
-            }
-
-            response.setHeader("Content-disposition", "attachment; filename=\"OrdersLineItems-${new Date().format("MM/dd/yyyy")}.csv\"")
-            render(contentType: "text/csv", text: csv.out.toString())
-        }
-
-        if (params.downloadOrders && orders) {
-            def csv = CSVUtils.getCSVPrinter()
-            csv.printRecord(
-                    "Status",
-                    "PO Number",
-                    "Name",
-                    "Supplier",
-                    "Destination name",
-                    "Ordered by",
-                    "Ordered on",
-                    "Payment method",
-                    "Payment terms",
-                    "Line items",
-                    "Ordered",
-                    "Shipped",
-                    "Received",
-                    "Invoiced",
-                    "Currency code",
-                    "Total Amount (Local Currency)",
-                    "Total Amount (Default Currency)"
-            )
-
-            orders.each { order ->
-                Integer lineItemsSize = order?.orderItems?.findAll { it.orderItemStatusCode != OrderItemStatusCode.CANCELED }.size() ?: 0
-                BigDecimal totalPrice = new BigDecimal(order?.total).setScale(2, RoundingMode.HALF_UP)
-                BigDecimal totalPriceNormalized = order?.totalNormalized.setScale(2, RoundingMode.HALF_UP)
-                csv.printRecord(
-                        (ordersDerivedStatus && order.id ? ordersDerivedStatus[order.id] : ''),
-                        order?.orderNumber,
-                        order?.name,
-                        "${order?.origin?.name} (${order?.origin?.organization?.code})",
-                        "${order?.destination?.name} (${order?.destination?.organization?.code})",
-                        order?.orderedBy?.name,
-                        order?.dateOrdered?.format("MM/dd/yyyy"),
-                        order?.paymentMethodType?.name,
-                        order?.paymentTerm?.name,
-                        lineItemsSize,
-                        order?.orderedOrderItems?.size() ?: 0,
-                        order?.shippedOrderItems?.size() ?: 0,
-                        order?.receivedOrderItems?.size() ?: 0,
-                        order?.invoiceItems?.size() ?: 0,
-                        order?.currencyCode ?: grailsApplication.config.openboxes.locale.defaultCurrencyCode,
-                        "${totalPrice} ${order?.currencyCode ?: grailsApplication.config.openboxes.locale.defaultCurrencyCode}",
-                        "${totalPriceNormalized} ${grailsApplication.config.openboxes.locale.defaultCurrencyCode}",
-                )
-            }
-
-            response.setHeader("Content-disposition", "attachment; filename=\"Orders-${new Date().format("MM/dd/yyyy")}.csv\"")
-            render(contentType: "text/csv", text: csv.out.toString())
-            return
-        }
-
-        def totalPrice = orders?.sum { it.totalNormalized?:0.0 } ?:0.0
-
-        [
-                orders         : orders,
-                command        : command,
-                status         : orderTemplate.status,
-                statusStartDate: statusStartDate,
-                statusEndDate  : statusEndDate,
-                totalPrice     : totalPrice,
-                orderType      : orderTemplate?.orderType,
-                isCentralPurchasingEnabled : isCentralPurchasingEnabled
-        ]
+    def list() {
+        render(view: "/common/react", params: params)
     }
 
     def listOrderItems() {
-        def orderItems = OrderItem.getAll().findAll { !it.isCompletelyFulfilled() }
-        return [orderItems: orderItems]
+        render(view: "/common/react", params: params)
     }
 
     def create() {
@@ -330,32 +169,11 @@ class OrderController {
     }
 
     def addAdjustment() {
-        def orderInstance = Order.get(params?.id)
-        if (!orderInstance) {
-            flash.message = "${warehouse.message(code: 'default.not.found.message', args: [warehouse.message(code: 'order.label', default: 'Order'), params.id])}"
-            redirect(action: "list")
-        } else {
-            render(view: "editAdjustment", model: [orderInstance: orderInstance, orderAdjustment: new OrderAdjustment()])
-        }
+        render(view: "/common/react", params: params)
     }
 
     def editAdjustment() {
-        def orderInstance = Order.get(params?.order?.id)
-        def currentLocation = Location.get(session.warehouse.id)
-        def isAccountingRequired = currentLocation?.isAccountingRequired()
-        if (!orderInstance) {
-                log.info "order not found"
-            flash.message = "${warehouse.message(code: 'default.not.found.message', args: [warehouse.message(code: 'order.label', default: 'Order'), params.id])}"
-            redirect(action: "list")
-        } else {
-            def orderAdjustment = OrderAdjustment.get(params?.id)
-            if (!orderAdjustment) {
-                log.info "order adjustement not found"
-                flash.message = "${warehouse.message(code: 'default.not.found.message', args: [warehouse.message(code: 'comment.label', default: 'Comment'), commentInstance.id])}"
-                redirect(action: "show", id: orderInstance?.id)
-            }
-            render(view: "editAdjustment", model: [orderInstance: orderInstance, orderAdjustment: orderAdjustment, isAccountingRequired: isAccountingRequired])
-        }
+        render(view: "/common/react", params: params)
     }
 
     @Transactional
@@ -498,15 +316,7 @@ class OrderController {
     }
 
     def addDocument() {
-        Order orderInstance = Order.get(params.id)
-        List<DocumentType> documentTypes = documentService.getNonTemplateDocumentTypes()
-
-        if (!orderInstance) {
-            flash.message = "${warehouse.message(code: 'default.not.found.message', args: [warehouse.message(code: 'order.label', default: 'Order'), params.id])}"
-            redirect(action: "list")
-        } else {
-            return [orderInstance: orderInstance, documentTypes: documentTypes]
-        }
+        render(view: "/common/react", params: params)
     }
 
     def editDocument() {
@@ -1162,25 +972,16 @@ class OrderController {
 
     // For testing order derived status feature. orderSummaryList action gets the data from extended SQL view
     def orderSummaryList() {
-        params.max = params.max?:10
-        params.offset = params.offset?:0
-        def orderSummaryList = orderService.getOrderSummaryList(params)
-        render(view: "orderSummaryList", model: [orderSummaryList: orderSummaryList ?: []], params: params)
+        render(view: "/common/react", params: params)
     }
 
     // For testing order item derived status feature. orderItemSummary action gets the data from extended SQL view
     def orderItemSummary() {
-        params.max = params.max?:10
-        params.offset = params.offset?:0
-        def orderItemSummaryList = orderService.getOrderItemSummaryList(params)
-        render(view: "orderItemSummaryList", model: [orderItemSummaryList: orderItemSummaryList ?: [], actionName: "orderItemSummary"], params: params)
+        render(view: "/common/react", params: params)
     }
 
     // For testing order item derived status feature. orderItemDetails action gets the data from simplified SQL view
     def orderItemDetails() {
-        params.max = params.max?:10
-        params.offset = params.offset?:0
-        def orderItemDetailsList = orderService.getOrderItemDetailsList(params)
-        render(view: "orderItemSummaryList", model: [orderItemSummaryList: orderItemDetailsList ?: []], actionName: "orderItemDetails", params: params)
+        render(view: "/common/react", params: params)
     }
 }
