@@ -392,15 +392,15 @@ class AvailableItem {
         return AvailableItemStatus.PICKED
     }
 
-    Boolean isPickable() {
+    boolean isPickable() {
         return (inventoryItem ? inventoryItem.pickable : true) && (binLocation ? binLocation.pickable : true)
     }
 
-    Boolean isOnHold() {
+    boolean isOnHold() {
         return binLocation?.onHold
     }
 
-    Boolean isRecalled() {
+    boolean isRecalled() {
         return inventoryItem?.recalled
     }
 
@@ -432,7 +432,7 @@ class AvailableItem {
         return binLocation?.supports(ActivityCode.RECEIVE_STOCK)
     }
 
-    Boolean isAvailable() {
+    boolean isAvailable() {
         return quantityAvailable > 0
     }
 

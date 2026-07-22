@@ -12,6 +12,7 @@ package org.pih.warehouse
 import grails.converters.JSON
 import grails.util.Holders
 
+import org.pih.warehouse.monitoring.ApplicationBootHealthIndicator
 import org.pih.warehouse.core.http.ResponseBodyFormattable
 import org.pih.warehouse.core.mapper.MapperComponentResolver
 import org.pih.warehouse.core.mapper.ResponseMapper
@@ -129,6 +130,8 @@ class BootStrap {
         uploadService.findOrCreateUploadsDirectory()
 
         refreshAnalyticsData()
+
+        ApplicationBootHealthIndicator.bootstrapComplete = true
     }
 
     void refreshAnalyticsData() {

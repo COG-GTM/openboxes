@@ -1,6 +1,6 @@
 package org.pih.warehouse.user
 
-import org.junit.Ignore
+import spock.lang.Ignore
 import org.pih.warehouse.core.*
 import grails.testing.web.controllers.ControllerUnitTest
 import org.pih.warehouse.core.Location

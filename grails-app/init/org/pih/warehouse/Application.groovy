@@ -2,6 +2,8 @@ package org.pih.warehouse
 
 import grails.boot.GrailsApp
 import grails.boot.config.GrailsAutoConfiguration
+import liquibase.servicelocator.CustomResolverServiceLocator
+import liquibase.servicelocator.ServiceLocator
 import org.springframework.boot.web.servlet.ServletComponentScan
 import org.springframework.context.annotation.ComponentScan
 
@@ -14,6 +16,11 @@ import org.springframework.context.annotation.ComponentScan
 @ServletComponentScan
 class Application extends GrailsAutoConfiguration {
     static void main(String[] args) {
+        // Liquibase 3.x cannot scan Spring Boot nested jars for its services.
+        // Spring Boot used to install a Spring-based resolver for it, but that
+        // was removed in Boot 2.6, so install our own port of it here (it must
+        // happen before anything touches the Liquibase service registries).
+        ServiceLocator.setInstance(new CustomResolverServiceLocator(new LiquibaseSpringPackageScanClassResolver()))
         GrailsApp.run(Application, args)
     }
 }

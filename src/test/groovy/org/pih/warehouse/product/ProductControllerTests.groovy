@@ -2,7 +2,7 @@ package org.pih.warehouse.product
 
 import grails.testing.gorm.DataTest
 import grails.testing.web.controllers.ControllerUnitTest
-import org.junit.Ignore
+import spock.lang.Ignore
 import org.pih.warehouse.PaginatedList
 import spock.lang.Specification
 

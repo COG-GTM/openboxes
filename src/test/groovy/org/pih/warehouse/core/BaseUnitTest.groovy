@@ -10,7 +10,7 @@
 package org.pih.warehouse.core
 
 import grails.test.*
-import org.junit.Ignore
+import spock.lang.Ignore
 import org.pih.warehouse.core.Location
 import org.pih.warehouse.core.LocationType
 import org.pih.warehouse.inventory.Inventory

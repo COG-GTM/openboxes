@@ -10,7 +10,7 @@
 package org.pih.warehouse.product
 
 import grails.test.*
-import org.junit.Ignore
+import spock.lang.Ignore
 import org.pih.warehouse.core.User
 import org.springframework.context.ApplicationEvent
 import org.pih.warehouse.product.Category

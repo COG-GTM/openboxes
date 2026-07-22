@@ -59,7 +59,7 @@ class DatePickerTagLib {
         // Instant and ZonedDateTime fields and 'day' for LocalDate fields) but when the value is null (ie the date
         // picker is blank), we don't know what type we're working with and so we never enter the switch cases below.
         if (StringUtils.isBlank(attrs.precision as String)) {
-            attrs.precision = configService.getProperty('grails.tags.datePicker.default.precision') ?: 'minute'
+            attrs.precision = configService.getProperty('grails.tags.datePicker.default.precision', String) ?: 'minute'
         }
 
         // We display datetimes in the user's timezone (date-only fields don't have a timezone component) because

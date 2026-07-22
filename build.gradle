@@ -34,7 +34,7 @@ buildscript {
     }
     dependencies {
         classpath "com.bertramlabs.plugins:asset-pipeline-gradle:${assetPipelineVersion}"
-        classpath "org.grails:grails-gradle-plugin:${grailsVersion}"
+        classpath "org.grails:grails-gradle-plugin:${grailsGradlePluginVersion}"
         classpath "org.grails.plugins:database-migration:${databaseMigrationVersion}"
         classpath "org.grails.plugins:views-gradle:${grailsViewsVersion}"
         classpath "org.owasp:dependency-check-gradle:${owaspVersion}"
@@ -70,7 +70,7 @@ plugins {
     id 'com.gorylenko.gradle-git-properties' version '2.2.4'
 
     // enable `npmInstall` and `npm_run_*` targets, and the `node` block below
-    id 'com.github.node-gradle.node' version '1.5.3'
+    id 'com.github.node-gradle.node' version '3.5.1'
 
     // resolve a Windows-specific build issue
     id 'com.virgo47.ClasspathJar' version '1.0.0'
@@ -167,7 +167,6 @@ configurations {
         exclude group: 'dom4j', module: 'dom4j'
 
         // presented by spring-boot-starter-jetty and spring-boot-starter-tomcat
-        exclude group: 'javax.annotation', module: 'javax.annotation-api'
         exclude group: 'javax.el', module: 'javax.el-api'
 
         /*
@@ -308,7 +307,11 @@ configurations {
              * consume their API's directly.
              */
             force 'com.google.errorprone:error_prone_annotations:2.19.1'  // use consistent version
-            force 'io.micronaut:micronaut-aop:1.3.7'  // use the version from grails-bom 4.1.4
+            force 'io.micronaut:micronaut-aop:3.8.5'  // use the version from grails-bom 5.3.6
+            force 'io.micronaut.spring:micronaut-spring:4.5.0'  // use the version from grails-bom 5.3.6
+            force 'org.junit:junit-bom:5.9.2'  // use consistent version
+            force "org.testcontainers:testcontainers-bom:${testContainersVersion}"  // match our direct testcontainers deps
+            force 'io.opentelemetry:opentelemetry-bom:1.18.0'  // use consistent version
             force 'org.apache.ant:ant:1.9.15'  // use consistent version
             force 'org.apache.ant:ant-junit:1.9.15'  // use consistent version
             force 'org.apache.ant:ant-launcher:1.9.15'  // use consistent version
@@ -324,6 +327,9 @@ configurations {
             force 'org.checkerframework:checker-qual:3.12.0'  // use consistent version
             force 'org.dom4j:dom4j:2.1.4'  // security patch
             force 'org.objenesis:objenesis:2.1'  // openjdk support
+            force "org.apache.logging.log4j:log4j-api:${slf4jProvidedLog4j2Version}"  // use consistent version
+            force 'org.jetbrains:annotations:20.1.0'  // use consistent version
+            force 'jakarta.annotation:jakarta.annotation-api:2.1.1'  // Micronaut 3 needs the jakarta.annotation package
         }
     }
 }
@@ -450,51 +456,58 @@ dependencies {
     } else if (targetWebServer() == 'jetty') {
         logger.quiet 'configuring for a Jetty-hosted environment...'
         provided "javax.servlet:javax.servlet-api:${servletVersion}"
-        compile "org.apache.tomcat:tomcat-jdbc:${tomcatVersion}"
+        implementation "org.apache.tomcat:tomcat-jdbc:${tomcatVersion}"
         provided 'org.springframework.boot:spring-boot-starter-jetty'
     } else {
         logger.quiet 'configuring for a standalone environment...'
-        compile "org.apache.tomcat:tomcat-jdbc:${tomcatVersion}"
-        compile 'org.springframework.boot:spring-boot-starter-tomcat'
+        implementation "org.apache.tomcat:tomcat-jdbc:${tomcatVersion}"
+        implementation 'org.springframework.boot:spring-boot-starter-tomcat'
     }
 
     implementation 'ch.qos.logback:logback-classic'
     implementation 'ch.qos.logback:logback-core'
+
+    // GORM 7.3's AST transforms need javax.annotation.PostConstruct at compile
+    // time, while Micronaut 3 (embedded in Grails 5) needs the jakarta.annotation
+    // package at runtime; the two live in different versions of the same jar, so
+    // include both the javax artifact and the jakarta 2.x artifact
+    implementation 'javax.annotation:javax.annotation-api:1.3.2'
+    implementation 'jakarta.annotation:jakarta.annotation-api:2.1.1'
 
     /*
      * Manage static assets in the grails-app/assets/ directory.
      *
      * See https://github.com/bertramdev/asset-pipeline#documentation-1
      */
-    runtime "com.bertramlabs.plugins:asset-pipeline-grails:${assetPipelineVersion}"
+    runtimeOnly "com.bertramlabs.plugins:asset-pipeline-grails:${assetPipelineVersion}"
 
     implementation "com.github.librepdf:openpdf:${openPdfVersion}"
 
     // security patch
-    compile 'com.google.code.gson:gson:2.10.1'  // 2.11+ requires error-prone annotation updates
+    implementation 'com.google.code.gson:gson:2.10.1'  // 2.11+ requires error-prone annotation updates
 
     // expose javax.annotation.Nullable, com.google.common.base.Enums, etc.
-    compile 'com.google.guava:guava:32.0.1-jre'
+    implementation 'com.google.guava:guava:32.0.1-jre'
 
-    compile 'com.google.zxing:javase:3.5.3'  // barcode support
+    implementation 'com.google.zxing:javase:3.5.3'  // barcode support
 
     testImplementation 'com.icegreen:greenmail:1.6.15'
 
-    compile 'com.newrelic.agent.java:newrelic-api:8.2.0'
+    implementation 'com.newrelic.agent.java:newrelic-api:8.2.0'
 
     implementation 'com.sun.mail:jakarta.mail:1.6.7'
 
-    compile 'commons-beanutils:commons-beanutils:1.9.4'
+    implementation 'commons-beanutils:commons-beanutils:1.9.4'
 
-    compile 'commons-codec:commons-codec:1.16.1'
+    implementation 'commons-codec:commons-codec:1.16.1'
 
     // FIXME migrate code under our control to commons-collections4
     implementation 'org.apache.commons:commons-collections4:4.4'
     implementation 'commons-collections:commons-collections:3.2.2'
 
-    compile 'commons-fileupload:commons-fileupload:1.5'
+    implementation 'commons-fileupload:commons-fileupload:1.5'
 
-    compile 'commons-lang:commons-lang:2.6'  // FIXME migrate to commons-lang3
+    implementation 'commons-lang:commons-lang:2.6'  // FIXME migrate to commons-lang3
 
     implementation 'org.apache.commons:commons-text:1.15.0'
 
@@ -514,7 +527,7 @@ dependencies {
     implementation 'fr.w3blog:zebra-zpl:0.0.4'  // ZebraUtils.printZpl(), Labelary API, etc.
 
     // rest-assured registers this via ServiceLoader to (de)serialize java.time types in API specs
-    testCompile "com.fasterxml.jackson.datatype:jackson-datatype-jsr310:${jacksonVersion}"
+    testImplementation "com.fasterxml.jackson.datatype:jackson-datatype-jsr310:${jacksonVersion}"
 
     implementation "io.sentry:sentry-logback:${sentryVersion}"
     implementation "io.sentry:sentry-servlet:${sentryVersion}"
@@ -529,16 +542,20 @@ dependencies {
     // incorporate latest timezone changes
     implementation 'joda-time:joda-time:2.12.7'
 
-    testCompile 'junit:junit:4.13.2'
+    // RequisitionService throws javassist.NotFoundException; Hibernate 5.4
+    // leaked this jar transitively, Hibernate 5.6 (Byte Buddy) no longer does
+    implementation 'org.javassist:javassist:3.27.0-GA'
+
+    testImplementation 'junit:junit:4.13.2'
 
     // Database jdbc connectors (Connector/J)
-    compile "mysql:mysql-connector-java:${mySqlConnectorVersion}"
+    implementation "mysql:mysql-connector-java:${mySqlConnectorVersion}"
     implementation 'org.mariadb.jdbc:mariadb-java-client'
 
-    testRuntime "net.sourceforge.htmlunit:htmlunit:${htmlUnitVersion}"
+    testRuntimeOnly "net.sourceforge.htmlunit:htmlunit:${htmlUnitVersion}"
 
     implementation 'org.apache.commons:commons-csv:1.11.0'
-    compile 'org.apache.commons:commons-email:1.5'
+    implementation 'org.apache.commons:commons-email:1.5'
 
     implementation 'org.apache.httpcomponents:fluent-hc'
     implementation 'org.apache.httpcomponents:httpclient'
@@ -558,7 +575,7 @@ dependencies {
     // enable `import groovy.sql.Sql`
     implementation 'org.codehaus.groovy:groovy-sql'
 
-    compile 'org.docx4j:docx4j-JAXB-ReferenceImpl'
+    implementation 'org.docx4j:docx4j-JAXB-ReferenceImpl'
 
     // enable grails console web ui
     console 'org.grails:grails-console'
@@ -569,30 +586,30 @@ dependencies {
      * Enable unit tests of domain activity; see
      * https://testing.grails.org/1.1.5/guide/index.html
      */
-    testCompile 'org.grails:grails-gorm-testing-support'
+    testImplementation 'org.grails:grails-gorm-testing-support'
 
     // set up grails log framework (logback under the hood)
     implementation 'org.grails:grails-logging'
 
     // prevent `java.lang.NullPointerException: Cannot invoke method registerStructuredEditor() on null object`
-    compile 'org.grails:grails-plugin-databinding'
+    implementation 'org.grails:grails-plugin-databinding'
 
     // prevent `java.lang.ClassNotFoundException: grails.artefact.Interceptor`
-    compile 'org.grails:grails-plugin-interceptors'
+    implementation 'org.grails:grails-plugin-interceptors'
 
     // enable `import grails.converters.JSON`
-    compile 'org.grails:grails-plugin-rest'
+    implementation 'org.grails:grails-plugin-rest'
 
     // prevent Grails from thinking services are broken Domain objects
-    compile 'org.grails:grails-plugin-services'
+    implementation 'org.grails:grails-plugin-services'
 
-    compile 'org.grails:grails-web-boot'
+    implementation 'org.grails:grails-web-boot'
 
     /*
      * Enable `import grails.testing.web.controllers.ControllerUnitTest`.
      * Using `testCompile` prevents integrationTestCompileClasspath warnings.
      */
-    testCompile 'org.grails:grails-web-testing-support'
+    testImplementation 'org.grails:grails-web-testing-support'
 
     /*
      * <g:formRemote> and <g:remoteLink> were deprecated in Grails 3.0:
@@ -603,7 +620,7 @@ dependencies {
      * them an additional lease on life, although leaving it out doesn't
      * seem to break anything.
      */
-    compile 'org.grails.plugins:ajax-tags:1.0.0'
+    implementation 'org.grails.plugins:ajax-tags:1.0.0'
 
     // prevent java.lang.ClassNotFoundException for a few classes we don't directly consume
     implementation 'org.grails.plugins:async'
@@ -613,7 +630,7 @@ dependencies {
      *
      * Integration tests break messily if this is set to `implementation`.
      */
-    compile 'org.grails.plugins:browser-detection:3.4.0'
+    implementation 'org.grails.plugins:browser-detection:3.4.0'
 
     // enable `import grails.plugin.cache.Cacheable`
     implementation 'org.grails.plugins:cache:4.0.3'
@@ -625,7 +642,7 @@ dependencies {
     implementation 'net.sf.opencsv:opencsv:2.3'
 
     // enable liquibase migrations
-    compile("org.grails.plugins:database-migration:${databaseMigrationVersion}") {
+    implementation("org.grails.plugins:database-migration:${databaseMigrationVersion}") {
         exclude group: 'com.h2database', module: 'h2'
     }
 
@@ -636,7 +653,7 @@ dependencies {
     implementation 'org.grails.plugins:external-config:2.0.0'
 
     // enable `import geb.*`
-    testCompile 'org.grails.plugins:geb'
+    testImplementation 'org.grails.plugins:geb'
 
     // enable prettytime.display(), which we use only three times
     implementation 'org.grails.plugins:grails-pretty-time:4.0.0'
@@ -644,10 +661,10 @@ dependencies {
     implementation 'org.ocpsoft.prettytime:prettytime:4.0.0.Final'
 
     // enable `import org.grails.plugins.web.taglib.*`
-    compile 'org.grails.plugins:gsp'
+    implementation 'org.grails.plugins:gsp'
 
     // prevent `No GORM implementations configured. Ensure GORM has been initialized correctly`
-    compile("org.grails.plugins:hibernate5:${gormHibernateVersion}") {
+    implementation("org.grails.plugins:hibernate5:${gormHibernateVersion}") {
         exclude group: 'com.h2database', module: 'h2'
     }
 
@@ -655,7 +672,7 @@ dependencies {
     implementation 'org.grails.plugins:joda-time:2.1.0'
 
     // enable `import grails.plugins.quartz.Job*`
-    compile('org.grails.plugins:quartz:2.0.13') {
+    implementation('org.grails.plugins:quartz:2.0.13') {
         transitive = false  // we pull in quartz-scheduler directly, below
     }
 
@@ -666,10 +683,10 @@ dependencies {
      *
      * This plugin has an undeclared dependency on spring-test, q.v.
      */
-    compile 'org.grails.plugins:rendering:2.0.3'
+    implementation 'org.grails.plugins:rendering:2.0.3'
 
     // enable `static scaffold` declarations
-    compile 'org.grails.plugins:scaffolding'
+    implementation 'org.grails.plugins:scaffolding'
 
     /*
      * These plugins enable grails-app/views/*.gson files. I don't think
@@ -679,14 +696,14 @@ dependencies {
      *
      * See http://views.grails.org/1.2.10/
      */
-    compile 'org.grails.plugins:views-json-templates'
-    compile 'org.grails.plugins:views-json'
+    implementation 'org.grails.plugins:views-json-templates'
+    implementation 'org.grails.plugins:views-json'
 
     profile 'org.grails.profiles:react-webpack'
 
     // enable `import org.hibernate.tool.schema.TargetType`, etc.
-    compile "org.hibernate:hibernate-core:${hibernateVersion}"
-    runtime "org.hibernate:hibernate-ehcache:${hibernateVersion}"
+    implementation "org.hibernate:hibernate-core:${hibernateVersion}"
+    runtimeOnly "org.hibernate:hibernate-ehcache:${hibernateVersion}"
     testImplementation "org.hibernate:hibernate-testing:${hibernateVersion}"
 
     // used in only one place: DocumentTemplateService.groovy for Customer Invoice Template
@@ -696,10 +713,10 @@ dependencies {
     }
 
     // strict dependency of database-migration plugin; see gradle.properties
-    compile "org.liquibase:liquibase-core:${liquibaseVersion}"
+    implementation "org.liquibase:liquibase-core:${liquibaseVersion}"
 
     // enable `import org.quartz.*`
-    compile('org.quartz-scheduler:quartz:2.3.2') {
+    implementation('org.quartz-scheduler:quartz:2.3.2') {
         /*
          * We currently use tomcat-jdbc, but Quartz pulls in these two
          * alternative pooling libraries. If we see connection issues
@@ -709,14 +726,14 @@ dependencies {
         exclude group: 'com.zaxxer'
     }
 
-    testRuntime "org.seleniumhq.selenium:htmlunit-driver:${htmlUnitVersion}"
+    testRuntimeOnly "org.seleniumhq.selenium:htmlunit-driver:${htmlUnitVersion}"
 
-    testCompile 'org.seleniumhq.selenium:selenium-api'
-    testRuntime 'org.seleniumhq.selenium:selenium-chrome-driver'
-    testRuntime 'org.seleniumhq.selenium:selenium-edge-driver'
-    testRuntime 'org.seleniumhq.selenium:selenium-ie-driver'
-    testRuntime 'org.seleniumhq.selenium:selenium-firefox-driver'
-    testRuntime 'org.seleniumhq.selenium:selenium-safari-driver'
+    testImplementation 'org.seleniumhq.selenium:selenium-api'
+    testRuntimeOnly 'org.seleniumhq.selenium:selenium-chrome-driver'
+    testRuntimeOnly 'org.seleniumhq.selenium:selenium-edge-driver'
+    testRuntimeOnly 'org.seleniumhq.selenium:selenium-ie-driver'
+    testRuntimeOnly 'org.seleniumhq.selenium:selenium-firefox-driver'
+    testRuntimeOnly 'org.seleniumhq.selenium:selenium-safari-driver'
 
     implementation 'org.slf4j:jcl-over-slf4j'  // Apache/Jakarta Commons Logging -> slf4j
     implementation 'org.slf4j:jul-to-slf4j'  // java.util.logging -> slf4j
@@ -728,16 +745,19 @@ dependencies {
      *
      * N.B., these libraries needlessly duplicate Grails' imports.
      */
-    testCompile('org.spockframework:spock-core:1.3-groovy-2.5') {
+    testImplementation('org.spockframework:spock-core:2.1-groovy-3.0') {
         exclude group: 'org.codehaus.groovy', module: 'groovy-all'
     }
-    testCompile('org.spockframework:spock-spring:1.3-groovy-2.5') {
+    testImplementation('org.spockframework:spock-spring:2.1-groovy-3.0') {
         exclude group: 'org.codehaus.groovy', module: 'groovy-all'
     }
 
+    // Spock 2 runs on the JUnit Platform; keep JUnit 4-style tests working
+    testRuntimeOnly 'org.junit.vintage:junit-vintage-engine'
+
     // enable `import org.json.JSONArray` (previously leaked onto the test
     // classpath from a plugin pom's runtime scope; Gradle 5+ stopped that)
-    testCompile 'org.json:json:20230618'
+    testImplementation 'org.json:json:20230618'
 
     // enable `import org.springframework.orm.hibernate5.*`
     implementation 'org.springframework:spring-orm'
@@ -748,10 +768,10 @@ dependencies {
      * 2. grails.util.GrailsWebMockUtil.bindMockWebRequest(), creates
      * 3. org.springframework.mock.web.MockHttpServletRequest
      */
-    runtime 'org.springframework:spring-test'
+    runtimeOnly 'org.springframework:spring-test'
 
     // may enable '/health' and '/info' endpoints
-    compile 'org.springframework.boot:spring-boot-starter-actuator'
+    implementation 'org.springframework.boot:spring-boot-starter-actuator'
 
     // set up Spring log framework (slf4j under the hood)
     implementation 'org.springframework.boot:spring-boot-starter-logging'
@@ -762,17 +782,17 @@ dependencies {
     implementation 'com.github.albfernandez:juniversalchardet:2.4.0'
 
     // security patch
-    compile 'org.yaml:snakeyaml:1.33'
+    implementation 'org.yaml:snakeyaml:1.33'
     console 'org.yaml:snakeyaml:1.33'
 
     // For integration tests
-    testCompile 'org.apache.commons:commons-compress:1.21'  // Needed to avoid a dependency conflict
-    testCompile "org.testcontainers:mysql:${testContainersVersion}"
-    testCompile "org.testcontainers:mariadb:${testContainersVersion}"
-    testCompile "org.testcontainers:spock:${testContainersVersion}"
-    testCompile 'org.springframework:spring-test'
-    testCompile 'io.rest-assured:rest-assured:3.2.0'
-    testCompile "org.grails.plugins:build-test-data:4.0.0"
+    testImplementation 'org.apache.commons:commons-compress:1.21'  // Needed to avoid a dependency conflict
+    testImplementation "org.testcontainers:mysql:${testContainersVersion}"
+    testImplementation "org.testcontainers:mariadb:${testContainersVersion}"
+    testImplementation "org.testcontainers:spock:${testContainersVersion}"
+    testImplementation 'org.springframework:spring-test'
+    testImplementation 'io.rest-assured:rest-assured:3.2.0'
+    testImplementation "org.grails.plugins:build-test-data:4.0.0"
 }
 
 /*
@@ -897,15 +917,11 @@ jacocoTestReport {
         html.enabled true  // Useful for verifying locally during development.
     }
 
-    doFirst {
-        // Our source code builds to both "build/classes/groovy" and "build/classes/java" so we need to filter one of
-        // the two class paths out to avoid "Can't add different class with same name" errors. It's dirty to do this
-        // in the "doFirst" block, but it's the only way to tell Jacoco to ONLY use this path.
-        classDirectories.setFrom(files("build/classes/groovy/main").collect {
-            // Then also exclude any packages from the report that we didn't actually generate any coverage % for.
-            fileTree(dir: it, exclude: jacocoExcludes)
-        })
-    }
+    // Our source code builds to both "build/classes/groovy" and "build/classes/java" so we need to filter one of
+    // the two class paths out to avoid "Can't add different class with same name" errors. fileTree is evaluated
+    // lazily, so this can be configured up front (Gradle 7 finalizes the collection before doFirst runs).
+    // Also exclude any packages from the report that we didn't actually generate any coverage % for.
+    classDirectories.setFrom(fileTree(dir: "build/classes/groovy/main", exclude: jacocoExcludes))
 }
 
 // groovyc needs a lot of heap to compile the full test suite in one pass, so run
@@ -917,6 +933,9 @@ tasks.withType(GroovyCompile) {
 
 // Configuration for both "test" and "integrationTest" tasks.
 tasks.withType(Test) {
+    // Spock 2 runs on the JUnit Platform (JUnit 4 tests run via the vintage engine)
+    useJUnitPlatform()
+
     // never consider test tasks as up-to-date - always run them when requested
     outputs.upToDateWhen { false }
 

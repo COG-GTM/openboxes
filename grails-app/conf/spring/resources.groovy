@@ -3,6 +3,7 @@ package spring
 import org.springframework.boot.web.servlet.FilterRegistrationBean
 import org.springframework.core.Ordered
 
+import org.pih.warehouse.monitoring.ApplicationBootHealthIndicator
 import org.pih.warehouse.monitoring.SentryGrailsTracingFilter
 
 // This is where we can register spring-specific beans using the Spring Bean DSL.
@@ -17,4 +18,8 @@ beans = {
         urlPatterns = ['/*']
         order = Ordered.HIGHEST_PRECEDENCE + 1
     }
+
+    // Keep /health DOWN until BootStrap (migrations, Quartz, etc.) completes;
+    // Grails 5 starts Tomcat before BootStrap runs.
+    applicationBootHealthIndicator(ApplicationBootHealthIndicator)
 }

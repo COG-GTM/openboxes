@@ -102,7 +102,7 @@ class ProductIdentifierService extends IdentifierService<Product> implements Bla
     }
 
     private String generateForRandom(Product product, ProductType productType) {
-        String format = configService.getProperty("openboxes.identifier.product.random.format")
+        String format = configService.getProperty("openboxes.identifier.product.random.format", String)
 
         if (format.contains(Constants.IDENTIFIER_FORMAT_KEYWORD_SEQUENCE_NUMBER)) {
             throw new IllegalArgumentException("Random format cannot contain a sequenceNumber component. Check your configuration!")
@@ -115,7 +115,7 @@ class ProductIdentifierService extends IdentifierService<Product> implements Bla
         //       so if there's a format specified, use that as the random. Once we update our environments to use
         //       ".random.template" instead of ".format", this line can be removed, as well as the
         //       "openboxes.identifier.product.generatorType" property and all the logic around it.
-        String randomTemplate = configService.getProperty("openboxes.identifier.product.format")
+        String randomTemplate = configService.getProperty("openboxes.identifier.product.format", String)
 
         // Because we're using a format that is conditional on the type, we need to  override it in order to fit
         // with the base identifier service flow. We can use the random flow from the identifier service as is though.
@@ -129,7 +129,7 @@ class ProductIdentifierService extends IdentifierService<Product> implements Bla
     }
 
     private String generateForSequence(Product product, ProductType productType) {
-        String format = configService.getProperty("openboxes.identifier.product.sequence.format")
+        String format = configService.getProperty("openboxes.identifier.product.sequence.format", String)
 
         if (format.contains(Constants.IDENTIFIER_FORMAT_KEYWORD_RANDOM)) {
             throw new IllegalArgumentException("Sequential format cannot contain a random component. Check your configuration!")
@@ -140,7 +140,7 @@ class ProductIdentifierService extends IdentifierService<Product> implements Bla
         // We don't allow using a sequential product code for products that don't have a type or that are of a
         // non-default type that does not have a code. We do this because we want to keep sequential default
         // and non-default product codes distinct from each other, which isn't possible without the product type code.
-        boolean isDefaultProductType = productType?.id == configService.getProperty('openboxes.productType.default.id')
+        boolean isDefaultProductType = productType?.id == configService.getProperty('openboxes.productType.default.id', String)
         if (!isDefaultProductType && !productType?.code) {
             throw new IllegalArgumentException("Cannot generate sequential productCode for non-default type products where product type has no code. Check your product type configuration!")
         }

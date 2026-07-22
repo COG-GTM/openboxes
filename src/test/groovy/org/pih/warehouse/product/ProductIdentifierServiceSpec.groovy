@@ -52,7 +52,7 @@ class ProductIdentifierServiceSpec extends Specification implements ServiceUnitT
         configServiceStub.getProperty('openboxes.identifier.default.sequenceNumber.minSize', Integer) >> 5
         configServiceStub.getProperty('openboxes.identifier.product.properties', Map) >> null
         configServiceStub.getProperty('openboxes.identifier.product.random.condition', RandomCondition) >> RandomCondition.ALWAYS
-        configServiceStub.getProperty('openboxes.productType.default.id') >> "1"
+        configServiceStub.getProperty('openboxes.productType.default.id', String) >> "1"
 
         and:
         ProductType productType = new ProductType(
@@ -72,9 +72,9 @@ class ProductIdentifierServiceSpec extends Specification implements ServiceUnitT
     void 'generate should succeed for the default product type with a sequential number that exceeds the minSize'() {
         given:
         configServiceStub.getProperty('openboxes.identifier.product.properties', Map) >> null
-        configServiceStub.getProperty('openboxes.productType.default.id') >> "1"
+        configServiceStub.getProperty('openboxes.productType.default.id', String) >> "1"
         configServiceStub.getProperty('openboxes.identifier.product.generatorType', IdentifierGeneratorTypeCode) >> IdentifierGeneratorTypeCode.SEQUENCE
-        configServiceStub.getProperty('openboxes.identifier.product.sequence.format') >> "\${sequenceNumber}"
+        configServiceStub.getProperty('openboxes.identifier.product.sequence.format', String) >> "\${sequenceNumber}"
 
         and: 'Min size is two digits'
         configServiceStub.getProperty('openboxes.identifier.default.sequenceNumber.minSize', Integer) >> 2
@@ -102,11 +102,11 @@ class ProductIdentifierServiceSpec extends Specification implements ServiceUnitT
 
         and:
         configServiceStub.getProperty('openboxes.identifier.product.generatorType', IdentifierGeneratorTypeCode) >> IdentifierGeneratorTypeCode.SEQUENCE
-        configServiceStub.getProperty('openboxes.identifier.product.sequence.format') >> "\${custom.productTypeCode}\${delimiter}\${sequenceNumber}"
+        configServiceStub.getProperty('openboxes.identifier.product.sequence.format', String) >> "\${custom.productTypeCode}\${delimiter}\${sequenceNumber}"
         configServiceStub.getProperty('openboxes.identifier.product.delimiter', String) >> '-'
         configServiceStub.getProperty('openboxes.identifier.default.sequenceNumber.minSize', Integer) >> 5
         configServiceStub.getProperty('openboxes.identifier.product.properties', Map) >> null
-        configServiceStub.getProperty('openboxes.productType.default.id') >> "1"
+        configServiceStub.getProperty('openboxes.productType.default.id', String) >> "1"
 
         and:
         ProductType productType = new ProductType(
@@ -133,7 +133,7 @@ class ProductIdentifierServiceSpec extends Specification implements ServiceUnitT
         configServiceStub.getProperty('openboxes.identifier.default.sequenceNumber.minSize', Integer) >> 5
         configServiceStub.getProperty('openboxes.identifier.product.random.condition', RandomCondition) >> RandomCondition.ALWAYS
         configServiceStub.getProperty('openboxes.identifier.product.properties', Map) >> null
-        configServiceStub.getProperty('openboxes.productType.default.id') >> "999"
+        configServiceStub.getProperty('openboxes.productType.default.id', String) >> "999"
 
         and:
         ProductType productType = new ProductType(
@@ -156,7 +156,7 @@ class ProductIdentifierServiceSpec extends Specification implements ServiceUnitT
 
         and:
         configServiceStub.getProperty('openboxes.identifier.product.properties', Map) >> null
-        configServiceStub.getProperty('openboxes.productType.default.id') >> "999"
+        configServiceStub.getProperty('openboxes.productType.default.id', String) >> "999"
         configServiceStub.getProperty('openboxes.identifier.attempts.max', Integer) >> 1
         configServiceStub.getProperty('openboxes.identifier.product.random.condition', RandomCondition) >> RandomCondition.ALWAYS
 
@@ -184,11 +184,12 @@ class ProductIdentifierServiceSpec extends Specification implements ServiceUnitT
 
         and:
         configServiceStub.getProperty('openboxes.identifier.product.generatorType', IdentifierGeneratorTypeCode) >> IdentifierGeneratorTypeCode.RANDOM
-        configServiceStub.getProperty('openboxes.identifier.product.random.format') >> "\${random}"
+        configServiceStub.getProperty('openboxes.identifier.product.random.format', String) >> "\${random}"
         configServiceStub.getProperty('openboxes.identifier.attempts.max', Integer) >> 1
         configServiceStub.getProperty('openboxes.identifier.product.random.condition', RandomCondition) >> RandomCondition.ALWAYS
         configServiceStub.getProperty('openboxes.identifier.product.random.template', String) >> "LLNN"
-        configServiceStub.getProperty('openboxes.productType.default.id') >> "999"
+        configServiceStub.getProperty('openboxes.identifier.product.format', String) >> null
+        configServiceStub.getProperty('openboxes.productType.default.id', String) >> "999"
         configServiceStub.getProperty('openboxes.identifier.product.properties', Map) >> null
 
         and:
@@ -209,8 +210,8 @@ class ProductIdentifierServiceSpec extends Specification implements ServiceUnitT
     void 'generate should fail for non-default products with no override, a sequential format, and no type code'() {
         given:
         configServiceStub.getProperty('openboxes.identifier.product.generatorType', IdentifierGeneratorTypeCode) >> IdentifierGeneratorTypeCode.SEQUENCE
-        configServiceStub.getProperty('openboxes.identifier.product.sequence.format') >> "\${custom.productTypeCode}\${sequenceNumber}"
-        configServiceStub.getProperty('openboxes.productType.default.id') >> "999"
+        configServiceStub.getProperty('openboxes.identifier.product.sequence.format', String) >> "\${custom.productTypeCode}\${sequenceNumber}"
+        configServiceStub.getProperty('openboxes.productType.default.id', String) >> "999"
 
         and:
         ProductType productType = new ProductType(
@@ -233,7 +234,7 @@ class ProductIdentifierServiceSpec extends Specification implements ServiceUnitT
     void 'generate should fail for products with no override if the random format contains sequence number'() {
         given:
         configServiceStub.getProperty('openboxes.identifier.product.generatorType', IdentifierGeneratorTypeCode) >> IdentifierGeneratorTypeCode.RANDOM
-        configServiceStub.getProperty('openboxes.identifier.product.random.format') >> "\${random}-\${sequenceNumber}"
+        configServiceStub.getProperty('openboxes.identifier.product.random.format', String) >> "\${random}-\${sequenceNumber}"
 
         and:
         ProductType productType = new ProductType(
@@ -256,7 +257,7 @@ class ProductIdentifierServiceSpec extends Specification implements ServiceUnitT
     void 'generate should fail for products with no override if the sequence format contains random'() {
         given:
         configServiceStub.getProperty('openboxes.identifier.product.generatorType', IdentifierGeneratorTypeCode) >> IdentifierGeneratorTypeCode.SEQUENCE
-        configServiceStub.getProperty('openboxes.identifier.product.sequence.format') >> "\${random}-\${sequenceNumber}"
+        configServiceStub.getProperty('openboxes.identifier.product.sequence.format', String) >> "\${random}-\${sequenceNumber}"
 
         and:
         ProductType productType = new ProductType(

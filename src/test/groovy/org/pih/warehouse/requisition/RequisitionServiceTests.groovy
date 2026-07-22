@@ -1,6 +1,6 @@
 package org.pih.warehouse.requisition
 
-import org.junit.Ignore
+import spock.lang.Ignore
 import org.junit.Test
 import org.pih.warehouse.core.*
 // import Inventory
