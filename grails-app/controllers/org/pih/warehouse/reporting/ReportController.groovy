@@ -228,7 +228,9 @@ class ReportController {
         return
     }
 
-    def showInventoryReport() {}
+    def showInventoryReport() {
+        render(view: "/common/react")
+    }
 
     def showInventorySamplingReport() {
 
@@ -310,11 +312,17 @@ class ReportController {
     }
 
     def showPaginatedPackingListReport(ChecklistReportCommand command) {
-        command.rootCategory = productService.getRootCategory()
-        if (!command?.hasErrors()) {
-            reportService.generateShippingReport(command)
+        // The print rendering is still served by the legacy GSP (it is the
+        // printable export the React screen links to).
+        if (params.print) {
+            command.rootCategory = productService.getRootCategory()
+            if (!command?.hasErrors()) {
+                reportService.generateShippingReport(command)
+            }
+            render(view: "showPaginatedPackingListReport", model: [command: command])
+            return
         }
-        [command: command]
+        render(view: "/common/react")
     }
 
     def printShippingReport(ChecklistReportCommand command) {
@@ -559,13 +567,15 @@ class ReportController {
                 response.setHeader("Content-disposition", "attachment; filename=\"Detailed-Order-Report-${new Date().format("MM/dd/yyyy")}.csv\"")
                 render(contentType: "text/csv", text: CSVUtils.prependBomToCsvString(sw.toString()), encoding: "UTF-8")
             }
+        } else {
+            render(view: "/common/react")
         }
     }
 
     def showInventoryByLocationReport(MultiLocationInventoryReportCommand command) {
 
-        if (!command.validate()) {
-            render(view: 'showInventoryByLocationReport', model: [command: command])
+        if (!command.isActionDownload) {
+            render(view: "/common/react")
             return
         }
 
@@ -577,70 +587,63 @@ class ReportController {
 
         command.entries = productAvailabilityService.getQuantityOnHandByProduct(command.locations, command.categories)
 
-        if (command.isActionDownload) {
-            def sw = new StringWriter()
+        def sw = new StringWriter()
 
-            try {
-                if (command.entries) {
-                    sw.append("Code").append(",")
-                    sw.append("Product").append(",")
-                    sw.append("Product Family").append(",")
-                    sw.append("Category").append(",")
-                    sw.append("Formularies").append(",")
-                    sw.append("Tags").append(",")
+        try {
+            if (command.entries) {
+                sw.append("Code").append(",")
+                sw.append("Product").append(",")
+                sw.append("Product Family").append(",")
+                sw.append("Category").append(",")
+                sw.append("Formularies").append(",")
+                sw.append("Tags").append(",")
 
-                    command.locations?.each { location ->
-                        String locationName = StringEscapeUtils.escapeCsv(location?.name)
-                        sw.append(locationName).append(",")
-                    }
-
-                    sw.append("QoH Total").append(",")
-                    sw.append("Quantity Available Total")
-                    sw.append("\n")
-
-                    command.entries.each { entry ->
-
-                        if (entry.key) {
-                            def totalQuantity = entry.value?.values()?.quantityOnHand?.sum()
-                            def totalQuantityAvailableToPromise = entry.value?.values()?.quantityAvailableToPromise?.sum()
-                            def form = entry.key?.getProductCatalogs()?.collect {
-                                it.name
-                            }?.join(",")
-
-                            sw.append('"' + (entry.key?.productCode ?: "").toString()?.replace('"', '""') + '"').append(",")
-                            sw.append('"' + (entry.key?.displayNameWithLocaleCode ?: "").toString()?.replace('"', '""') + '"').append(",")
-                            sw.append('"' + (entry.key?.productFamily?.name ?: "").toString()?.replace('"', '""') + '"').append(",")
-                            sw.append('"' + (entry.key?.category?.getHierarchyAsString(" > ") ?: "").toString()?.replace('"', '""') + '"').append(",")
-                            sw.append('"' + (form ?: "").toString()?.replace('"', '""') + '"').append(",")
-                            sw.append('"' + (entry.key?.tagsToString() ?: "")?.toString()?.replace('"', '""') + '"').append(",")
-
-                            command.locations?.each { location ->
-                                sw.append('"' + (entry.value[location?.id] != null ? entry.value[location?.id]?.quantityOnHand?:0 : "").toString() + '"').append(",")
-                            }
-
-                            sw.append('"' + (totalQuantity != null ? totalQuantity : "").toString() + '"').append(",")
-                            sw.append('"' + (totalQuantityAvailableToPromise != null ? totalQuantityAvailableToPromise : "").toString() + '"')
-                            sw.append("\n")
-                        }
-                    }
+                command.locations?.each { location ->
+                    String locationName = StringEscapeUtils.escapeCsv(location?.name)
+                    sw.append(locationName).append(",")
                 }
 
-            } catch (RuntimeException e) {
-                log.error("Unexpected error occurred while generating report ", e.message)
-                sw.append(e.message)
-            }
-            response.setHeader("Content-disposition", "attachment; filename=\"Inventory-by-location-${new Date().format("yyyyMMdd-hhmmss")}.csv\"")
-            render(contentType: "text/csv", text: CSVUtils.prependBomToCsvString(sw.toString()), encoding: "UTF-8")
-            return
-        }
+                sw.append("QoH Total").append(",")
+                sw.append("Quantity Available Total")
+                sw.append("\n")
 
-        render(view: 'showInventoryByLocationReport', model: [command: command])
+                command.entries.each { entry ->
+
+                    if (entry.key) {
+                        def totalQuantity = entry.value?.values()?.quantityOnHand?.sum()
+                        def totalQuantityAvailableToPromise = entry.value?.values()?.quantityAvailableToPromise?.sum()
+                        def form = entry.key?.getProductCatalogs()?.collect {
+                            it.name
+                        }?.join(",")
+
+                        sw.append('"' + (entry.key?.productCode ?: "").toString()?.replace('"', '""') + '"').append(",")
+                        sw.append('"' + (entry.key?.displayNameWithLocaleCode ?: "").toString()?.replace('"', '""') + '"').append(",")
+                        sw.append('"' + (entry.key?.productFamily?.name ?: "").toString()?.replace('"', '""') + '"').append(",")
+                        sw.append('"' + (entry.key?.category?.getHierarchyAsString(" > ") ?: "").toString()?.replace('"', '""') + '"').append(",")
+                        sw.append('"' + (form ?: "").toString()?.replace('"', '""') + '"').append(",")
+                        sw.append('"' + (entry.key?.tagsToString() ?: "")?.toString()?.replace('"', '""') + '"').append(",")
+
+                        command.locations?.each { location ->
+                            sw.append('"' + (entry.value[location?.id] != null ? entry.value[location?.id]?.quantityOnHand?:0 : "").toString() + '"').append(",")
+                        }
+
+                        sw.append('"' + (totalQuantity != null ? totalQuantity : "").toString() + '"').append(",")
+                        sw.append('"' + (totalQuantityAvailableToPromise != null ? totalQuantityAvailableToPromise : "").toString() + '"')
+                        sw.append("\n")
+                    }
+                }
+            }
+
+        } catch (RuntimeException e) {
+            log.error("Unexpected error occurred while generating report ", e.message)
+            sw.append(e.message)
+        }
+        response.setHeader("Content-disposition", "attachment; filename=\"Inventory-by-location-${new Date().format("yyyyMMdd-hhmmss")}.csv\"")
+        render(contentType: "text/csv", text: CSVUtils.prependBomToCsvString(sw.toString()), encoding: "UTF-8")
     }
 
     def showRequestDetailReport() {
-        def origin = Location.get(session.warehouse.id)
-        params.origin = origin.id
-        render(view: 'showRequestDetailReport', params: params)
+        render(view: "/common/react")
     }
 
     def expirationHistoryReport() {
@@ -770,10 +773,12 @@ class ReportController {
             } else {
                 log.info("Unable to generate forecast report due to lack of data")
                 flash.message = "Unable to generate forecast report due to lack of data"
+                redirect(action: "showForecastReport")
             }
+            return
         }
 
-        render(view: 'showForecastReport', params: params)
+        render(view: "/common/react")
     }
 
     def amountOutstandingOnOrdersReport() {

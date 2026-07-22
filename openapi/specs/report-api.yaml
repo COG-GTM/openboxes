@@ -1,0 +1,534 @@
+openapi: 3.0.3
+info:
+  title: OpenBoxes - ReportApiController
+  description: >
+    JSON report endpoints handled by
+    org.pih.warehouse.api.ReportApiController, routed via explicit
+    "/api/reports/..." mappings in UrlMappings.groovy
+    (on-order-summary, on-order-details, request-details,
+    request-reason-codes, inventory-by-location, packing-list,
+    packing-list-shipments). Added in Phase 2 (Reports batch) to back the
+    React report screens; serializations mirror what the legacy GSP report
+    screens rendered server-side.
+  version: 0.1.0
+servers:
+  - url: http://localhost:8080/openboxes
+    description: Local Docker baseline (docs/migration/RUNNING_LOCALLY.md)
+security:
+  - cookieAuth: []
+paths:
+  /api/reports/on-order-summary:
+    get:
+      operationId: getOnOrderSummary
+      summary: On-order quantities summarized by product for the current location
+      description: >
+        Same data as the legacy /json/getSummaryOrderReport DataTable source
+        used by report/showOnOrderReport. Location comes from the session.
+      responses:
+        '200':
+          description: Summary rows, one per product on order.
+          content:
+            application/json:
+              schema:
+                type: object
+                required: [data]
+                properties:
+                  data:
+                    type: array
+                    items:
+                      $ref: '#/components/schemas/OnOrderSummaryRow'
+        '500':
+          $ref: '../components/common.yaml#/components/responses/ServerError'
+  /api/reports/on-order-details:
+    get:
+      operationId: getOnOrderDetails
+      summary: Pending inbound order and shipment items for the current location
+      description: >
+        Same data as the legacy /json/getDetailedOrderReport DataTable source
+        used by report/showOnOrderReport. Rows are either pending order items
+        (order columns filled, shipment columns empty strings) or pending
+        shipment items (the reverse). Location comes from the session.
+      responses:
+        '200':
+          description: Detail rows.
+          content:
+            application/json:
+              schema:
+                type: object
+                required: [data]
+                properties:
+                  data:
+                    type: array
+                    items:
+                      $ref: '#/components/schemas/OnOrderDetailRow'
+        '500':
+          $ref: '../components/common.yaml#/components/responses/ServerError'
+  /api/reports/request-details:
+    get:
+      operationId: getRequestDetails
+      summary: Completed request items issued between two dates
+      description: >
+        Same data as the legacy /json/getRequestDetailReport DataTable source
+        used by report/showRequestDetailReport. originId, startDate and
+        endDate are required; dates use MM/dd/yyyy.
+      parameters:
+        - name: originId
+          in: query
+          required: true
+          schema:
+            type: array
+            items:
+              type: string
+          style: form
+          explode: true
+          description: Fulfilling (origin) location ids.
+        - name: startDate
+          in: query
+          required: true
+          schema:
+            type: string
+          description: Start of the date-issued range (MM/dd/yyyy).
+        - name: endDate
+          in: query
+          required: true
+          schema:
+            type: string
+          description: End of the date-issued range (MM/dd/yyyy).
+        - name: destinationId
+          in: query
+          required: false
+          schema:
+            type: string
+        - name: productId
+          in: query
+          required: false
+          schema:
+            type: string
+        - name: reasonCode
+          in: query
+          required: false
+          schema:
+            type: string
+          description: Reason code classification (ReasonCode enum name).
+        - name: category
+          in: query
+          required: false
+          schema:
+            type: string
+          description: Category id.
+        - name: includeCategoryChildren
+          in: query
+          required: false
+          schema:
+            type: string
+          description: Any non-empty value includes subcategory products.
+        - name: catalogs
+          in: query
+          required: false
+          schema:
+            type: array
+            items:
+              type: string
+          style: form
+          explode: true
+        - name: tags
+          in: query
+          required: false
+          schema:
+            type: array
+            items:
+              type: string
+          style: form
+          explode: true
+      responses:
+        '200':
+          description: Completed request item rows.
+          content:
+            application/json:
+              schema:
+                type: object
+                required: [data]
+                properties:
+                  data:
+                    type: array
+                    items:
+                      $ref: '#/components/schemas/RequestDetailRow'
+        '400':
+          description: originId, startDate or endDate missing.
+          content:
+            application/json:
+              schema:
+                type: object
+                required: [errorMessage]
+                properties:
+                  errorMessage:
+                    type: string
+        '500':
+          $ref: '../components/common.yaml#/components/responses/ServerError'
+  /api/reports/request-reason-codes:
+    get:
+      operationId: getRequestReasonCodes
+      summary: Request-type reason codes for the request detail report filter
+      responses:
+        '200':
+          description: Reason codes (ids are ReasonCode enum names, names localized).
+          content:
+            application/json:
+              schema:
+                type: object
+                required: [data]
+                properties:
+                  data:
+                    type: array
+                    items:
+                      type: object
+                      required: [id, name]
+                      properties:
+                        id:
+                          type: string
+                        name:
+                          type: string
+        '500':
+          $ref: '../components/common.yaml#/components/responses/ServerError'
+  /api/reports/inventory-by-location:
+    get:
+      operationId: getInventoryByLocation
+      summary: Quantity on hand by product across multiple depot locations
+      description: >
+        The data the legacy report/showInventoryByLocationReport GSP rendered
+        server-side. Unknown location/category ids are silently ignored.
+        includeSubcategories defaults to true (matching the legacy command
+        default) and explodes the selected categories.
+      parameters:
+        - name: locations
+          in: query
+          required: false
+          schema:
+            type: array
+            items:
+              type: string
+          style: form
+          explode: true
+          description: Location ids to report on.
+        - name: categories
+          in: query
+          required: false
+          schema:
+            type: array
+            items:
+              type: string
+          style: form
+          explode: true
+          description: Category ids to filter products by.
+        - name: includeSubcategories
+          in: query
+          required: false
+          schema:
+            type: string
+          description: Boolean flag ("true"/"false"/"on").
+      responses:
+        '200':
+          description: One row per product, plus the echoed location list.
+          content:
+            application/json:
+              schema:
+                type: object
+                required: [data, locations]
+                properties:
+                  data:
+                    type: array
+                    items:
+                      $ref: '#/components/schemas/InventoryByLocationRow'
+                  locations:
+                    type: array
+                    items:
+                      type: object
+                      required: [id, name]
+                      properties:
+                        id:
+                          $ref: '../components/common.yaml#/components/schemas/Id'
+                        name:
+                          type: string
+        '500':
+          $ref: '../components/common.yaml#/components/responses/ServerError'
+  /api/reports/packing-list:
+    get:
+      operationId: getPackingList
+      summary: Packing list entries grouped by container for a shipment
+      description: >
+        The data the legacy report/showPaginatedPackingListReport GSP rendered
+        server-side. Returns {"data": null} when shipmentId is missing or
+        unknown (no 404 branch).
+      parameters:
+        - name: shipmentId
+          in: query
+          required: false
+          schema:
+            type: string
+      responses:
+        '200':
+          description: Packing list, or {"data":null} for unknown/missing shipment.
+          content:
+            application/json:
+              schema:
+                type: object
+                required: [data]
+                properties:
+                  data:
+                    nullable: true
+                    type: object
+                    required: [shipment, containers]
+                    properties:
+                      shipment:
+                        type: object
+                        required: [id, name, shipmentNumber]
+                        properties:
+                          id:
+                            $ref: '../components/common.yaml#/components/schemas/Id'
+                          name:
+                            type: string
+                            nullable: true
+                          shipmentNumber:
+                            type: string
+                            nullable: true
+                      containers:
+                        type: array
+                        items:
+                          $ref: '#/components/schemas/PackingListContainer'
+        '500':
+          $ref: '../components/common.yaml#/components/responses/ServerError'
+  /api/reports/packing-list-shipments:
+    get:
+      operationId: getPackingListShipments
+      summary: Shipment options for the packing list report picker
+      description: >
+        Mirrors the legacy g:selectShipment taglib backing the shipment
+        picker (shipments destined for the current location, sorted by name).
+      responses:
+        '200':
+          description: Shipment options.
+          content:
+            application/json:
+              schema:
+                type: object
+                required: [data]
+                properties:
+                  data:
+                    type: array
+                    items:
+                      type: object
+                      required: [id, label]
+                      properties:
+                        id:
+                          $ref: '../components/common.yaml#/components/schemas/Id'
+                        label:
+                          type: string
+        '500':
+          $ref: '../components/common.yaml#/components/responses/ServerError'
+components:
+  securitySchemes:
+    cookieAuth:
+      $ref: '../components/common.yaml#/components/securitySchemes/cookieAuth'
+  schemas:
+    OnOrderSummaryRow:
+      type: object
+      required: [productCode, productName]
+      properties:
+        productCode:
+          type: string
+          nullable: true
+        productName:
+          type: string
+          nullable: true
+        displayNameWithLocaleCode:
+          type: string
+          nullable: true
+        displayName:
+          type: string
+          nullable: true
+        productFamily:
+          type: string
+          nullable: true
+        category:
+          type: string
+          nullable: true
+        productCatalogs:
+          type: string
+          nullable: true
+        qtyOrderedNotShipped:
+          description: Integer, or empty string when zero.
+        qtyShippedNotReceived:
+          description: Number, or empty string when zero.
+        totalOnOrder:
+          type: number
+          nullable: true
+        totalOnHand:
+          type: number
+          nullable: true
+        totalOnHandAndOnOrder:
+          type: number
+          nullable: true
+    OnOrderDetailRow:
+      type: object
+      properties:
+        productCode:
+          type: string
+          nullable: true
+        productName:
+          type: string
+          nullable: true
+        displayName:
+          type: string
+          nullable: true
+        qtyOrderedNotShipped:
+          description: Number for order items, empty string for shipment items.
+        qtyShippedNotReceived:
+          description: Number for shipment items, empty string for order items.
+        orderNumber:
+          type: string
+          nullable: true
+        orderDescription:
+          type: string
+          nullable: true
+        supplierOrganization:
+          type: string
+          nullable: true
+        supplierLocation:
+          type: string
+          nullable: true
+        supplierLocationGroup:
+          type: string
+          nullable: true
+        estimatedGoodsReadyDate:
+          type: string
+          nullable: true
+        shipmentNumber:
+          type: string
+          nullable: true
+        shipDate:
+          type: string
+          nullable: true
+        shipmentType:
+          type: string
+          nullable: true
+    RequestDetailRow:
+      type: object
+      properties:
+        requestNumber:
+          type: string
+          nullable: true
+        dateRequested:
+          type: string
+          nullable: true
+        dateIssued:
+          type: string
+          nullable: true
+        origin:
+          type: string
+          nullable: true
+        destination:
+          type: string
+          nullable: true
+        productCode:
+          type: string
+          nullable: true
+        productName:
+          type: string
+          nullable: true
+        productFamily:
+          type: string
+          nullable: true
+        category:
+          description: Default Grails rendering of the Category domain object, or empty string.
+        productCatalogs:
+          type: string
+          nullable: true
+        unitPrice:
+          description: Number, or empty string when null.
+        quantityRequested:
+          type: number
+          nullable: true
+        quantityIssued:
+          type: number
+          nullable: true
+        quantityDemand:
+          type: number
+          nullable: true
+        reasonCode:
+          type: string
+          nullable: true
+        reasonCodeClassification:
+          type: string
+          nullable: true
+    InventoryByLocationRow:
+      type: object
+      required: [productId, productCode]
+      properties:
+        productId:
+          $ref: '../components/common.yaml#/components/schemas/Id'
+        productCode:
+          type: string
+          nullable: true
+        productName:
+          type: string
+          nullable: true
+        productFamily:
+          type: string
+          nullable: true
+        category:
+          type: string
+          nullable: true
+        formularies:
+          type: string
+          nullable: true
+        tags:
+          type: string
+          nullable: true
+        quantityOnHandByLocation:
+          type: object
+          additionalProperties:
+            type: object
+            properties:
+              quantityOnHand:
+                type: number
+                nullable: true
+              quantityAvailableToPromise:
+                type: number
+                nullable: true
+        totalQuantityOnHand:
+          type: number
+          nullable: true
+        totalQuantityAvailableToPromise:
+          type: number
+          nullable: true
+    PackingListContainer:
+      type: object
+      required: [entries]
+      properties:
+        name:
+          type: string
+          nullable: true
+          description: Container name; null for unpacked items.
+        entries:
+          type: array
+          items:
+            type: object
+            properties:
+              productCode:
+                type: string
+                nullable: true
+              productName:
+                type: string
+                nullable: true
+              lotNumber:
+                type: string
+                nullable: true
+              expirationDate:
+                type: string
+                nullable: true
+              recipient:
+                type: string
+                nullable: true
+              quantity:
+                type: number
+                nullable: true

@@ -280,6 +280,16 @@ const REPLENISHMENT_URL = {
   print: (id) => `${REPLENISHMENT_URL.base}/print/${id}`,
 };
 
+const REPORT_URL = {
+  base: `${CONTEXT_PATH}/report`,
+  showForecastReport: () => `${REPORT_URL.base}/showForecastReport`,
+  showOnOrderReport: () => `${REPORT_URL.base}/showOnOrderReport`,
+  exportInventoryReport: () => `${REPORT_URL.base}/exportInventoryReport`,
+  showInventoryByLocationReport: () => `${REPORT_URL.base}/showInventoryByLocationReport`,
+  showPaginatedPackingListReport: () => `${REPORT_URL.base}/showPaginatedPackingListReport`,
+  downloadShippingReport: () => `${REPORT_URL.base}/downloadShippingReport`,
+};
+
 const BUDGET_CODE_URL = {
   base: `${CONTEXT_PATH}/budgetCode`,
   list: () => `${BUDGET_CODE_URL.base}/list`,
@@ -553,6 +563,7 @@ export {
   PUTAWAY_URL,
   RECEIVE_ORDER_URL,
   REPLENISHMENT_URL,
+  REPORT_URL,
   REQUISITION_ITEM_URL,
   REQUISITION_TEMPLATE_URL,
   REQUISITION_URL,

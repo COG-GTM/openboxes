@@ -1950,6 +1950,41 @@ class UrlMappings {
             action = [GET: "getInventoryTransactionsSummary"]
         }
 
+        "/api/reports/on-order-summary" {
+            controller = "reportApi"
+            action = [GET: "onOrderSummary"]
+        }
+
+        "/api/reports/on-order-details" {
+            controller = "reportApi"
+            action = [GET: "onOrderDetails"]
+        }
+
+        "/api/reports/request-details" {
+            controller = "reportApi"
+            action = [GET: "requestDetails"]
+        }
+
+        "/api/reports/request-reason-codes" {
+            controller = "reportApi"
+            action = [GET: "requestReasonCodes"]
+        }
+
+        "/api/reports/inventory-by-location" {
+            controller = "reportApi"
+            action = [GET: "inventoryByLocation"]
+        }
+
+        "/api/reports/packing-list" {
+            controller = "reportApi"
+            action = [GET: "packingList"]
+        }
+
+        "/api/reports/packing-list-shipments" {
+            controller = "reportApi"
+            action = [GET: "packingListShipments"]
+        }
+
         "/api/reports/indicators/productsInventoried" {
             controller = "indicatorApi"
             action = [GET: "getProductsInventoried"]
