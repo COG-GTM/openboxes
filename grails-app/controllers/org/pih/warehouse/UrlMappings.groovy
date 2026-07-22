@@ -240,6 +240,21 @@ class UrlMappings {
             action = [GET: "productFieldOptions"]
         }
 
+        "/api/tags/$id"(parseRequest: true) {
+            controller = { "tagApi" }
+            action = [GET: "read", DELETE: "delete"]
+        }
+
+        "/api/unitOfMeasureConversions"(parseRequest: true) {
+            controller = { "unitOfMeasureConversionApi" }
+            action = [GET: "list", POST: "create"]
+        }
+
+        "/api/unitOfMeasureConversions/$id"(parseRequest: true) {
+            controller = { "unitOfMeasureConversionApi" }
+            action = [GET: "read", PUT: "update", DELETE: "delete"]
+        }
+
         "/api/locationTypes"(parseRequest: true) {
             controller = { "locationTypeApi" }
             action = [GET: "list", POST: "create"]

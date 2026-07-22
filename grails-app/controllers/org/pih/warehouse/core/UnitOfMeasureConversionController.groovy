@@ -11,73 +11,20 @@ package org.pih.warehouse.core
 
 class UnitOfMeasureConversionController {
 
-    UnitOfMeasureConversionDataService unitOfMeasureConversionDataService
-
     def index() {
         redirect(action: "list", params: params)
     }
 
     def list() {
-        params.max = Math.min(params.max ? params.int('max') : 10, 100)
-        [unitOfMeasureConversions: UnitOfMeasureConversion.list(params), unitOfMeasureConversionsTotal: UnitOfMeasureConversion.count()]
+        render(view: "/common/react", params: params)
     }
 
     def create() {
-        UnitOfMeasureConversion unitOfMeasureConversion = new UnitOfMeasureConversion()
-        unitOfMeasureConversion.properties = params
-        return [unitOfMeasureConversion: unitOfMeasureConversion]
+        render(view: "/common/react", params: params)
     }
 
     def edit() {
-        UnitOfMeasureConversion unitOfMeasureConversion = unitOfMeasureConversionDataService.get(params.id)
-        return [unitOfMeasureConversion: unitOfMeasureConversion]
-    }
-
-    def save() {
-        UnitOfMeasureConversion unitOfMeasureConversion = new UnitOfMeasureConversion(params)
-        if (!unitOfMeasureConversion.hasErrors() && unitOfMeasureConversionDataService.save(unitOfMeasureConversion)) {
-            def messageArgs = [warehouse.message(code: 'unitOfMeasureConversion.label', default: 'Unit of Measure conversion'), unitOfMeasureConversion.id]
-            flash.message = "${warehouse.message(code: 'default.created.message', args: messageArgs)}"
-            redirect(controller: "unitOfMeasureConversion", action: "edit", id: unitOfMeasureConversion?.id)
-        } else {
-            render(view: "create", model: [unitOfMeasureConversion: unitOfMeasureConversion])
-        }
-    }
-
-    def update() {
-        UnitOfMeasureConversion unitOfMeasureConversion = unitOfMeasureConversionDataService.get(params.id)
-        def messageArgs = [warehouse.message(code: 'unitOfMeasureConversion.label', default: 'Unit of Measure conversion'), params.id]
-        if (unitOfMeasureConversion) {
-            unitOfMeasureConversion.properties = params
-            if (!unitOfMeasureConversion.hasErrors() && unitOfMeasureConversionDataService.save(unitOfMeasureConversion)) {
-                flash.message = "${warehouse.message(code: 'default.updated.message', args: messageArgs)}"
-                redirect(action: "list")
-            } else {
-                render(view: "edit", id: unitOfMeasureConversion.id, model: [unitOfMeasureConversion: unitOfMeasureConversion])
-            }
-        } else {
-            flash.message = "${warehouse.message(code: 'default.not.found.message', args: messageArgs)}"
-            redirect(action: "list")
-        }
-    }
-
-    def delete() {
-        UnitOfMeasureConversion unitOfMeasureConversion = unitOfMeasureConversionDataService.get(params.id)
-        def messageArgs = [warehouse.message(code: 'unitOfMeasureConversion.label', default: 'Unit of Measure conversion'), params.id]
-        if (unitOfMeasureConversion) {
-            try {
-                unitOfMeasureConversionDataService.delete(unitOfMeasureConversion.id)
-                flash.message = "${warehouse.message(code: 'default.deleted.message', args: messageArgs)}"
-                redirect(action: "list")
-            }
-            catch (org.springframework.dao.DataIntegrityViolationException e) {
-                flash.message = "${warehouse.message(code: 'default.not.deleted.message', args: messageArgs)}"
-                redirect(action: "list", id: params.id)
-            }
-        } else {
-            flash.message = "${warehouse.message(code: 'default.not.found.message', args: messageArgs)}"
-            redirect(action: "list")
-        }
+        render(view: "/common/react", params: params)
     }
 
 }

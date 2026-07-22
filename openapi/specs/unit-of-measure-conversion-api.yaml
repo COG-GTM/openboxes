@@ -1,0 +1,225 @@
+openapi: 3.0.3
+info:
+  title: OpenBoxes - UnitOfMeasureConversionApiController
+  description: >
+    CRUD endpoints for unit of measure conversions handled by
+    org.pih.warehouse.api.UnitOfMeasureConversionApiController, routed via
+    "/api/unitOfMeasureConversions" and "/api/unitOfMeasureConversions/{id}".
+    Added in Phase 2 (Batch 13) for the migrated unitOfMeasureConversion
+    list/create/edit screens.
+  version: 0.1.0
+servers:
+  - url: http://localhost:8080/openboxes
+    description: Local Docker baseline (docs/migration/RUNNING_LOCALLY.md)
+security:
+  - cookieAuth: []
+paths:
+  /api/unitOfMeasureConversions:
+    get:
+      operationId: listUnitOfMeasureConversions
+      summary: Paginated list of unit of measure conversions
+      parameters:
+        - name: max
+          in: query
+          schema:
+            type: integer
+        - name: offset
+          in: query
+          schema:
+            type: integer
+        - name: sort
+          in: query
+          description: >
+            One of id, active, conversionRate, dateCreated, lastUpdated,
+            fromUnitOfMeasure, toUnitOfMeasure (associations sort by UoM name).
+            Anything else falls back to dateCreated.
+          schema:
+            type: string
+        - name: order
+          in: query
+          schema:
+            type: string
+            enum: [asc, desc]
+      responses:
+        '200':
+          description: Paginated unit of measure conversions.
+          content:
+            application/json:
+              schema:
+                type: object
+                required: [data, totalCount]
+                properties:
+                  data:
+                    type: array
+                    items:
+                      $ref: '#/components/schemas/UnitOfMeasureConversion'
+                  totalCount:
+                    type: integer
+    post:
+      operationId: createUnitOfMeasureConversion
+      summary: Create a unit of measure conversion
+      requestBody:
+        required: true
+        content:
+          application/json:
+            schema:
+              $ref: '#/components/schemas/UnitOfMeasureConversionRequest'
+      responses:
+        '201':
+          description: Created unit of measure conversion.
+          content:
+            application/json:
+              schema:
+                type: object
+                required: [data]
+                properties:
+                  data:
+                    $ref: '#/components/schemas/UnitOfMeasureConversion'
+        '400':
+          description: Validation errors (missing from/to UoM or conversion rate).
+          content:
+            application/json:
+              schema:
+                $ref: '../components/common.yaml#/components/schemas/ErrorResponse'
+  /api/unitOfMeasureConversions/{id}:
+    parameters:
+      - name: id
+        in: path
+        required: true
+        schema:
+          $ref: '../components/common.yaml#/components/schemas/Id'
+        description: Unit of measure conversion id.
+    get:
+      operationId: readUnitOfMeasureConversion
+      summary: Read a unit of measure conversion
+      responses:
+        '200':
+          description: The unit of measure conversion.
+          content:
+            application/json:
+              schema:
+                type: object
+                required: [data]
+                properties:
+                  data:
+                    $ref: '#/components/schemas/UnitOfMeasureConversion'
+        '404':
+          description: Unknown unit of measure conversion id.
+          content:
+            application/json:
+              schema:
+                $ref: '../components/common.yaml#/components/schemas/ErrorResponse'
+    put:
+      operationId: updateUnitOfMeasureConversion
+      summary: Update a unit of measure conversion
+      requestBody:
+        required: true
+        content:
+          application/json:
+            schema:
+              $ref: '#/components/schemas/UnitOfMeasureConversionRequest'
+      responses:
+        '200':
+          description: Updated unit of measure conversion.
+          content:
+            application/json:
+              schema:
+                type: object
+                required: [data]
+                properties:
+                  data:
+                    $ref: '#/components/schemas/UnitOfMeasureConversion'
+        '400':
+          description: Validation errors.
+          content:
+            application/json:
+              schema:
+                $ref: '../components/common.yaml#/components/schemas/ErrorResponse'
+        '404':
+          description: Unknown unit of measure conversion id.
+          content:
+            application/json:
+              schema:
+                $ref: '../components/common.yaml#/components/schemas/ErrorResponse'
+    delete:
+      operationId: deleteUnitOfMeasureConversion
+      summary: Delete a unit of measure conversion
+      responses:
+        '204':
+          description: Unit of measure conversion deleted.
+        '400':
+          description: Unit of measure conversion could not be deleted (data integrity violation).
+          content:
+            application/json:
+              schema:
+                $ref: '../components/common.yaml#/components/schemas/ErrorResponse'
+        '404':
+          description: Unknown unit of measure conversion id.
+          content:
+            application/json:
+              schema:
+                $ref: '../components/common.yaml#/components/schemas/ErrorResponse'
+components:
+  schemas:
+    UnitOfMeasure:
+      type: object
+      nullable: true
+      properties:
+        id:
+          $ref: '../components/common.yaml#/components/schemas/Id'
+        name:
+          type: string
+          nullable: true
+        code:
+          type: string
+          nullable: true
+    UnitOfMeasureConversion:
+      type: object
+      required: [id]
+      properties:
+        id:
+          $ref: '../components/common.yaml#/components/schemas/Id'
+        active:
+          type: boolean
+          nullable: true
+        fromUnitOfMeasure:
+          $ref: '#/components/schemas/UnitOfMeasure'
+        toUnitOfMeasure:
+          $ref: '#/components/schemas/UnitOfMeasure'
+        conversionRate:
+          type: number
+          nullable: true
+        dateCreated:
+          type: string
+          nullable: true
+        lastUpdated:
+          type: string
+          nullable: true
+      additionalProperties: true
+    UnitOfMeasureConversionRequest:
+      type: object
+      properties:
+        fromUnitOfMeasure:
+          type: object
+          nullable: true
+          properties:
+            id:
+              $ref: '../components/common.yaml#/components/schemas/Id'
+        toUnitOfMeasure:
+          type: object
+          nullable: true
+          properties:
+            id:
+              $ref: '../components/common.yaml#/components/schemas/Id'
+        conversionRate:
+          oneOf:
+            - type: number
+              nullable: true
+            - type: string
+              nullable: true
+        active:
+          type: boolean
+          nullable: true
+  securitySchemes:
+    cookieAuth:
+      $ref: '../components/common.yaml#/components/securitySchemes/cookieAuth'

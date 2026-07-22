@@ -54,13 +54,7 @@ class TagController {
     }
 
     def show() {
-        def tagInstance = Tag.get(params.id)
-        if (!tagInstance) {
-            flash.message = "${warehouse.message(code: 'default.not.found.message', args: [warehouse.message(code: 'tag.label', default: 'Tag'), params.id])}"
-            redirect(action: "list")
-        } else {
-            [tagInstance: tagInstance]
-        }
+        render(view: "/common/react", params: params)
     }
 
     def edit() {

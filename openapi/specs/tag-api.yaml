@@ -1,0 +1,119 @@
+openapi: 3.0.3
+info:
+  title: OpenBoxes - TagApiController
+  description: >
+    Read/delete endpoints for tags handled by
+    org.pih.warehouse.api.TagApiController, routed via "/api/tags/{id}".
+    Added in Phase 2 (Batch 13) for the migrated tag show screen. Tag
+    create/edit/list remain legacy GSP screens; tags can be created via the
+    generic API ("/api/generic/tag").
+  version: 0.1.0
+servers:
+  - url: http://localhost:8080/openboxes
+    description: Local Docker baseline (docs/migration/RUNNING_LOCALLY.md)
+security:
+  - cookieAuth: []
+paths:
+  /api/tags/{id}:
+    parameters:
+      - name: id
+        in: path
+        required: true
+        schema:
+          $ref: '../components/common.yaml#/components/schemas/Id'
+        description: Tag id.
+    get:
+      operationId: readTag
+      summary: Read a tag with its products
+      responses:
+        '200':
+          description: The tag, including its tagged products sorted by product code.
+          content:
+            application/json:
+              schema:
+                type: object
+                required: [data]
+                properties:
+                  data:
+                    $ref: '#/components/schemas/Tag'
+        '404':
+          description: Unknown tag id.
+          content:
+            application/json:
+              schema:
+                $ref: '../components/common.yaml#/components/schemas/ErrorResponse'
+    delete:
+      operationId: deleteTag
+      summary: Delete a tag
+      description: >
+        Removes all products from the tag before deleting it, like the legacy
+        TagController.delete action.
+      responses:
+        '204':
+          description: Tag deleted.
+        '400':
+          description: Tag could not be deleted (data integrity violation).
+          content:
+            application/json:
+              schema:
+                $ref: '../components/common.yaml#/components/schemas/ErrorResponse'
+        '404':
+          description: Unknown tag id.
+          content:
+            application/json:
+              schema:
+                $ref: '../components/common.yaml#/components/schemas/ErrorResponse'
+components:
+  schemas:
+    Tag:
+      type: object
+      required: [id, tag, products]
+      properties:
+        id:
+          $ref: '../components/common.yaml#/components/schemas/Id'
+        tag:
+          type: string
+        isActive:
+          type: boolean
+          nullable: true
+        createdBy:
+          type: object
+          nullable: true
+          properties:
+            id:
+              $ref: '../components/common.yaml#/components/schemas/Id'
+            name:
+              type: string
+              nullable: true
+        updatedBy:
+          type: object
+          nullable: true
+          properties:
+            id:
+              $ref: '../components/common.yaml#/components/schemas/Id'
+            name:
+              type: string
+              nullable: true
+        dateCreated:
+          type: string
+          nullable: true
+        lastUpdated:
+          type: string
+          nullable: true
+        products:
+          type: array
+          items:
+            type: object
+            properties:
+              id:
+                $ref: '../components/common.yaml#/components/schemas/Id'
+              productCode:
+                type: string
+                nullable: true
+              name:
+                type: string
+                nullable: true
+      additionalProperties: true
+  securitySchemes:
+    cookieAuth:
+      $ref: '../components/common.yaml#/components/securitySchemes/cookieAuth'

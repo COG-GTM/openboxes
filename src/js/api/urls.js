@@ -263,8 +263,15 @@ export const PRODUCT_SUPPLIER_PREFERENCES_BY_ID = (id) => `${PRODUCT_SUPPLIER_PR
 export const PRODUCT_SUPPLIER_EXPORT = `${PRODUCT_SUPPLIER_API}/export`;
 export const PRODUCT_SUPPLIER_DETAILS = (id) => `${PRODUCT_SUPPLIER_API}/${id}/details`;
 
+// TAG
+export const TAG_API = `${API}/tags`;
+export const TAG_BY_ID = (id) => `${TAG_API}/${id}`;
+
 // UNIT OF MEASURE
 export const UNIT_OF_MEASURE_API = `${API}/unitOfMeasures`;
+export const UNIT_OF_MEASURE_GENERIC_LIST = `${GENERIC_API}/unitOfMeasure/`;
+export const UNIT_OF_MEASURE_CONVERSION_API = `${API}/unitOfMeasureConversions`;
+export const UNIT_OF_MEASURE_CONVERSION_BY_ID = (id) => `${UNIT_OF_MEASURE_CONVERSION_API}/${id}`;
 export const UNIT_OF_MEASURE_OPTIONS = `${UNIT_OF_MEASURE_API}/options`;
 // Currencies don't use url in plural form, do not change it to UNIT_OF_MEASURE_API!
 export const CURRENCIES_OPTIONS = `${API}/unitOfMeasure/currencies`;

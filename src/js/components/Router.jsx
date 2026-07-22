@@ -193,6 +193,21 @@ const AsyncProductTypeForm = Loadable({
   loading: Loading,
 });
 
+const AsyncTagShow = Loadable({
+  loader: () => import('components/tag/TagShow'),
+  loading: Loading,
+});
+
+const AsyncUnitOfMeasureConversionList = Loadable({
+  loader: () => import('components/unitOfMeasureConversion/UnitOfMeasureConversionList'),
+  loading: Loading,
+});
+
+const AsyncUnitOfMeasureConversionForm = Loadable({
+  loader: () => import('components/unitOfMeasureConversion/UnitOfMeasureConversionForm'),
+  loading: Loading,
+});
+
 const AsyncProductSupplierCreatePage = Loadable({
   loader: () => import('components/productSupplier/create/ProductSupplierForm'),
   loading: Loading,
@@ -1078,6 +1093,10 @@ const Router = () => {
             <MainLayoutRoute path="**/productGroup/edit/:productGroupId" component={AsyncProductGroupForm} />
             <MainLayoutRoute path="**/productGroup/show/:productGroupId" component={AsyncProductGroupShow} />
             <MainLayoutRoute path="**/productType/create" component={AsyncProductTypeForm} />
+            <MainLayoutRoute path="**/tag/show/:tagId" component={AsyncTagShow} />
+            <MainLayoutRoute path="**/unitOfMeasureConversion/list" component={AsyncUnitOfMeasureConversionList} />
+            <MainLayoutRoute path="**/unitOfMeasureConversion/create" component={AsyncUnitOfMeasureConversionForm} />
+            <MainLayoutRoute path="**/unitOfMeasureConversion/edit/:unitOfMeasureConversionId" component={AsyncUnitOfMeasureConversionForm} />
             <MainLayoutRoute path="**/dashboard/:configId?" component={Dashboard} />
             <MainLayoutRoute path="**/" component={Dashboard} />
           </Switch>

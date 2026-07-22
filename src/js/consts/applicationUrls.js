@@ -381,6 +381,25 @@ const PRODUCT_TYPE_URL = {
   create: () => `${PRODUCT_TYPE_URL.base}/create`,
 };
 
+const TAG_URL = {
+  base: `${CONTEXT_PATH}/tag`,
+  list: () => `${TAG_URL.base}/list`,
+  edit: (id) => `${TAG_URL.base}/edit/${id}`,
+  show: (id) => `${TAG_URL.base}/show/${id}`,
+};
+
+const UNIT_OF_MEASURE_CONVERSION_URL = {
+  base: `${CONTEXT_PATH}/unitOfMeasureConversion`,
+  list: () => `${UNIT_OF_MEASURE_CONVERSION_URL.base}/list`,
+  create: () => `${UNIT_OF_MEASURE_CONVERSION_URL.base}/create`,
+  edit: (id) => `${UNIT_OF_MEASURE_CONVERSION_URL.base}/edit/${id}`,
+};
+
+const USER_URL = {
+  base: `${CONTEXT_PATH}/user`,
+  show: (id) => `${USER_URL.base}/show/${id}`,
+};
+
 const REQUISITION_URL = {
   base: `${CONTEXT_PATH}/requisition`,
   list: () => `${REQUISITION_URL.base}/list`,
@@ -499,5 +518,8 @@ export {
   STOCK_MOVEMENT_URL,
   STOCK_TRANSFER_URL,
   STOCKLIST_URL,
+  TAG_URL,
   TRANSACTION_ENTRY_URL,
+  UNIT_OF_MEASURE_CONVERSION_URL,
+  USER_URL,
 };
