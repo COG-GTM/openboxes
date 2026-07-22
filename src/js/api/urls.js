@@ -221,6 +221,20 @@ export const LOCATION_TYPE_API = `${API}/locationTypes`;
 export const LOCATION_TYPE_BY_ID = (id) => `${LOCATION_TYPE_API}/${id}`;
 export const LOCATION_TYPE_CODE_OPTIONS = `${API}/locationTypeCodeOptions`;
 
+// EVENT TYPES
+export const EVENT_TYPE_API = `${API}/eventTypes`;
+export const EVENT_TYPE_BY_ID = (id) => `${EVENT_TYPE_API}/${id}`;
+
+// LOCALIZATION OVERRIDES
+export const LOCALIZATION_OVERRIDE_API = `${API}/localizationOverrides`;
+export const LOCALIZATION_OVERRIDE_BY_ID = (id) => `${LOCALIZATION_OVERRIDE_API}/${id}`;
+export const LOCALIZATION_OVERRIDE_IMPORT = `${LOCALIZATION_OVERRIDE_API}/import`;
+export const LOCALE_OPTIONS = `${API}/localeOptions`;
+
+// JOBS
+export const JOBS_DETAILS_API = `${API}/jobs/details`;
+export const JOBS_TRIGGERS_API = `${API}/jobs/triggers`;
+
 // PUTAWAY
 export const PUTAWAY_GENERATE_PDF = (id) => `/putAway/generatePdf/${id}`;
 

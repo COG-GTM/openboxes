@@ -1,0 +1,142 @@
+openapi: 3.0.3
+info:
+  title: OpenBoxes - EventTypeApiController
+  description: >
+    Event type list/read/delete endpoints handled by
+    org.pih.warehouse.api.EventTypeApiController, routed via the explicit
+    "/api/eventTypes" and "/api/eventTypes/$id" mappings. Added in
+    Phase 2 (Batch 43) to back the React eventType list/show screens.
+    Create/update remain on the legacy GSP screens (Batch 42 scope).
+  version: 0.1.0
+servers:
+  - url: http://localhost:8080/openboxes
+    description: Local Docker baseline (docs/migration/RUNNING_LOCALLY.md)
+security:
+  - cookieAuth: []
+paths:
+  /api/eventTypes:
+    get:
+      operationId: listEventTypes
+      summary: List event types, optionally filtered
+      parameters:
+        - name: q
+          in: query
+          required: false
+          schema:
+            type: string
+          description: Case-insensitive prefix filter (ilike "q%") on name.
+        - name: sort
+          in: query
+          required: false
+          schema:
+            type: string
+            enum: [id, name, description, sortOrder, eventCode]
+          description: Sort property; defaults to sortOrder.
+        - name: order
+          in: query
+          required: false
+          schema:
+            type: string
+            enum: [asc, desc]
+        - $ref: '../components/common.yaml#/components/parameters/max'
+        - $ref: '../components/common.yaml#/components/parameters/offset'
+      responses:
+        '200':
+          description: Paged event types.
+          content:
+            application/json:
+              schema:
+                type: object
+                required: [data, totalCount]
+                properties:
+                  data:
+                    type: array
+                    items:
+                      $ref: '#/components/schemas/EventType'
+                  totalCount:
+                    type: integer
+  /api/eventTypes/{id}:
+    parameters:
+      - name: id
+        in: path
+        required: true
+        schema:
+          $ref: '../components/common.yaml#/components/schemas/Id'
+        description: >
+          Event type id. Unknown ids raise ObjectNotFoundException,
+          rendered as HTTP 404 by ErrorsController.handleNotFound.
+    get:
+      operationId: readEventType
+      summary: Read a single event type
+      responses:
+        '200':
+          description: The event type.
+          content:
+            application/json:
+              schema:
+                type: object
+                required: [data]
+                properties:
+                  data:
+                    $ref: '#/components/schemas/EventType'
+        '404':
+          $ref: '../components/common.yaml#/components/responses/NotFound'
+    delete:
+      operationId: deleteEventType
+      summary: Delete an event type
+      responses:
+        '204':
+          description: Deleted; no content.
+        '400':
+          description: >
+            Event type is referenced by other records (foreign key
+            constraint) and cannot be deleted.
+          content:
+            application/json:
+              schema:
+                $ref: '../components/common.yaml#/components/schemas/ValidationErrorResponse'
+        '404':
+          $ref: '../components/common.yaml#/components/responses/NotFound'
+        '500':
+          $ref: '../components/common.yaml#/components/responses/ServerError'
+components:
+  schemas:
+    EventType:
+      type: object
+      description: Event type rendering emitted by EventTypeApiController.toJson().
+      required: [id, active]
+      properties:
+        id:
+          $ref: '../components/common.yaml#/components/schemas/Id'
+        name:
+          type: string
+          nullable: true
+        description:
+          type: string
+          nullable: true
+        sortOrder:
+          type: integer
+          nullable: true
+        eventCode:
+          type: string
+          nullable: true
+          description: EventCode enum name (e.g. CREATED, SHIPPED, CUSTOM).
+        active:
+          type: boolean
+        optionValue:
+          type: string
+          nullable: true
+          description: Description when present, otherwise the name.
+        dateCreated:
+          type: string
+          nullable: true
+        lastUpdated:
+          type: string
+          nullable: true
+        version:
+          type: integer
+          nullable: true
+      additionalProperties: true
+  securitySchemes:
+    cookieAuth:
+      $ref: '../components/common.yaml#/components/securitySchemes/cookieAuth'

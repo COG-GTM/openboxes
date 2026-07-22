@@ -1,0 +1,191 @@
+openapi: 3.0.3
+info:
+  title: OpenBoxes - JobsApiController
+  description: >
+    Quartz scheduler read/schedule endpoints handled by
+    org.pih.warehouse.api.JobsApiController, routed via the explicit
+    "/api/jobs/details" and "/api/jobs/triggers" mappings. Added in
+    Phase 2 (Batch 43) to back the React jobs/show screen. Quartz job
+    names are fully-qualified class names (they contain dots), so job and
+    trigger identifiers are passed as query parameters / JSON body values
+    instead of path segments. Note: the legacy jobs/scheduleJob action was
+    broken (it never built a trigger); createTrigger implements the
+    intended cron scheduling behavior.
+  version: 0.1.0
+servers:
+  - url: http://localhost:8080/openboxes
+    description: Local Docker baseline (docs/migration/RUNNING_LOCALLY.md)
+security:
+  - cookieAuth: []
+paths:
+  /api/jobs/details:
+    get:
+      operationId: readJobDetails
+      summary: Read a Quartz job's detail and triggers
+      parameters:
+        - name: name
+          in: query
+          required: true
+          schema:
+            type: string
+          description: Quartz job name (fully-qualified job class name).
+        - name: group
+          in: query
+          required: false
+          schema:
+            type: string
+          description: Quartz job group; defaults to GRAILS_JOBS.
+      responses:
+        '200':
+          description: The job detail and its triggers.
+          content:
+            application/json:
+              schema:
+                type: object
+                required: [data]
+                properties:
+                  data:
+                    $ref: '#/components/schemas/JobDetail'
+        '400':
+          description: Missing job name.
+          content:
+            application/json:
+              schema:
+                $ref: '../components/common.yaml#/components/schemas/ErrorResponse'
+        '404':
+          description: No job detail for the given key.
+          content:
+            application/json:
+              schema:
+                $ref: '../components/common.yaml#/components/schemas/ErrorResponse'
+  /api/jobs/triggers:
+    post:
+      operationId: createJobTrigger
+      summary: Schedule a cron trigger for a Quartz job
+      requestBody:
+        required: true
+        content:
+          application/json:
+            schema:
+              type: object
+              required: [jobName, cronExpression]
+              properties:
+                jobName:
+                  type: string
+                jobGroup:
+                  type: string
+                  description: Defaults to GRAILS_JOBS.
+                cronExpression:
+                  type: string
+                  description: Quartz cron expression, e.g. "0 0 22 * * ?".
+      responses:
+        '201':
+          description: Trigger scheduled; returns the refreshed job detail.
+          content:
+            application/json:
+              schema:
+                type: object
+                required: [data]
+                properties:
+                  data:
+                    $ref: '#/components/schemas/JobDetail'
+        '400':
+          description: Invalid cron expression.
+          content:
+            application/json:
+              schema:
+                $ref: '../components/common.yaml#/components/schemas/ValidationErrorResponse'
+        '404':
+          description: No job detail for the given key.
+          content:
+            application/json:
+              schema:
+                $ref: '../components/common.yaml#/components/schemas/ErrorResponse'
+    delete:
+      operationId: deleteJobTrigger
+      summary: Unschedule a Quartz trigger
+      parameters:
+        - name: name
+          in: query
+          required: true
+          schema:
+            type: string
+          description: Quartz trigger name.
+        - name: group
+          in: query
+          required: false
+          schema:
+            type: string
+          description: Quartz trigger group; defaults to GRAILS_JOBS.
+      responses:
+        '204':
+          description: Unscheduled; no content.
+        '404':
+          description: No trigger for the given key.
+          content:
+            application/json:
+              schema:
+                $ref: '../components/common.yaml#/components/schemas/ErrorResponse'
+components:
+  schemas:
+    JobDetail:
+      type: object
+      description: Job detail rendering emitted by JobsApiController.toJson().
+      required: [name, group, key, triggers]
+      properties:
+        name:
+          type: string
+        group:
+          type: string
+        key:
+          type: string
+          description: Quartz JobKey toString ("group.name").
+        description:
+          type: string
+          nullable: true
+        jobClass:
+          type: string
+          nullable: true
+        durable:
+          type: boolean
+        concurrentExecutionDisallowed:
+          type: boolean
+        persistJobDataAfterExecution:
+          type: boolean
+        requestsRecovery:
+          type: boolean
+        triggers:
+          type: array
+          items:
+            $ref: '#/components/schemas/Trigger'
+      additionalProperties: true
+    Trigger:
+      type: object
+      description: Trigger rendering emitted by JobsApiController.toTriggerJson().
+      required: [name, group, key]
+      properties:
+        name:
+          type: string
+        group:
+          type: string
+        key:
+          type: string
+          description: Quartz TriggerKey toString ("group.name").
+        cronExpression:
+          type: string
+          nullable: true
+          description: Present for cron triggers only.
+        expressionSummary:
+          type: string
+          nullable: true
+          description: Present for cron triggers only.
+        previousFireTime:
+          type: string
+          nullable: true
+        nextFireTime:
+          type: string
+          nullable: true
+      additionalProperties: true
+  securitySchemes:
+    cookieAuth:
+      $ref: '../components/common.yaml#/components/securitySchemes/cookieAuth'

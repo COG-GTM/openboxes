@@ -355,6 +355,46 @@ class UrlMappings {
             action = [GET: "read", PUT: "update", DELETE: "delete"]
         }
 
+        "/api/eventTypes"(parseRequest: true) {
+            controller = { "eventTypeApi" }
+            action = [GET: "list"]
+        }
+
+        "/api/eventTypes/$id"(parseRequest: true) {
+            controller = { "eventTypeApi" }
+            action = [GET: "read", DELETE: "delete"]
+        }
+
+        "/api/localizationOverrides"(parseRequest: true) {
+            controller = { "localizationOverrideApi" }
+            action = [GET: "list", POST: "create"]
+        }
+
+        "/api/localizationOverrides/import"(parseRequest: false) {
+            controller = { "localizationOverrideApi" }
+            action = [POST: "importMessages"]
+        }
+
+        "/api/localizationOverrides/$id"(parseRequest: true) {
+            controller = { "localizationOverrideApi" }
+            action = [GET: "read", PUT: "update", DELETE: "delete"]
+        }
+
+        "/api/localeOptions"(parseRequest: true) {
+            controller = { "selectOptionsApi" }
+            action = [GET: "localeOptions"]
+        }
+
+        "/api/jobs/details"(parseRequest: true) {
+            controller = { "jobsApi" }
+            action = [GET: "read"]
+        }
+
+        "/api/jobs/triggers"(parseRequest: true) {
+            controller = { "jobsApi" }
+            action = [POST: "createTrigger", DELETE: "deleteTrigger"]
+        }
+
         "/api/paymentTermOptions"(parseRequest: true) {
             controller = { "selectOptionsApi" }
             action = [GET: "paymentTermOptions"]

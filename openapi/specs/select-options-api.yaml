@@ -107,6 +107,19 @@ paths:
       responses:
         '200':
           $ref: '#/components/responses/IdLabelValueOptionsOk'
+  /api/localeOptions:
+    get:
+      operationId: listLocaleOptions
+      summary: Supported locale options
+      description: >
+        Returns the configured supported locales
+        (openboxes.locale.supportedLocales), sorted, as {id, label} pairs
+        (id is the locale code, label the locale display name in the
+        current locale). Added in Phase 2 (Batch 43) for the React
+        localization screens.
+      responses:
+        '200':
+          $ref: '#/components/responses/IdLabelOptionsOk'
   /api/locationTypeCodeOptions:
     get:
       operationId: listLocationTypeCodeOptions

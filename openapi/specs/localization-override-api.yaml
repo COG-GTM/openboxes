@@ -1,0 +1,249 @@
+openapi: 3.0.3
+info:
+  title: OpenBoxes - LocalizationOverrideApiController
+  description: >
+    CRUD over the Localization domain (database translation overrides)
+    handled by org.pih.warehouse.api.LocalizationOverrideApiController,
+    routed via the explicit "/api/localizationOverrides",
+    "/api/localizationOverrides/import" and "/api/localizationOverrides/$id"
+    mappings. Added in Phase 2 (Batch 43) to back the React localization
+    list/create/edit screens. Distinct from the message-lookup API
+    ("/api/localizations", LocalizationApiController).
+  version: 0.1.0
+servers:
+  - url: http://localhost:8080/openboxes
+    description: Local Docker baseline (docs/migration/RUNNING_LOCALLY.md)
+security:
+  - cookieAuth: []
+paths:
+  /api/localizationOverrides:
+    get:
+      operationId: listLocalizationOverrides
+      summary: List localization overrides, filtered by locale and search term
+      description: >
+        Mirrors the legacy LocalizationController.list filters: when no
+        "locale" parameter is sent, results default to the session user's
+        locale (falling back to the configured default locale). An empty
+        "locale" parameter disables the locale filter entirely.
+      parameters:
+        - name: locale
+          in: query
+          required: false
+          schema:
+            type: string
+          description: Locale code filter; defaults to the session/default locale.
+        - name: q
+          in: query
+          required: false
+          schema:
+            type: string
+          description: >
+            Case-insensitive filter, matching code as a prefix (ilike "q%")
+            or text as a substring (ilike "%q%").
+        - name: sort
+          in: query
+          required: false
+          schema:
+            type: string
+            enum: [id, code, locale, text, dateCreated, lastUpdated]
+          description: Sort property; defaults to code.
+        - name: order
+          in: query
+          required: false
+          schema:
+            type: string
+            enum: [asc, desc]
+        - $ref: '../components/common.yaml#/components/parameters/max'
+        - $ref: '../components/common.yaml#/components/parameters/offset'
+      responses:
+        '200':
+          description: Paged localization overrides.
+          content:
+            application/json:
+              schema:
+                type: object
+                required: [data, totalCount]
+                properties:
+                  data:
+                    type: array
+                    items:
+                      $ref: '#/components/schemas/LocalizationOverride'
+                  totalCount:
+                    type: integer
+    post:
+      operationId: createLocalizationOverride
+      summary: Create a localization override
+      requestBody:
+        required: true
+        content:
+          application/json:
+            schema:
+              $ref: '#/components/schemas/LocalizationOverrideInput'
+      responses:
+        '201':
+          description: Created localization override.
+          content:
+            application/json:
+              schema:
+                type: object
+                required: [data]
+                properties:
+                  data:
+                    $ref: '#/components/schemas/LocalizationOverride'
+        '400':
+          $ref: '../components/common.yaml#/components/responses/ValidationError'
+  /api/localizationOverrides/import:
+    post:
+      operationId: importLocalizationOverrides
+      summary: Import a messages.properties file for a locale
+      description: >
+        Multipart upload mirroring the legacy LocalizationController.upload
+        action; upserts a Localization row per property in the file.
+      requestBody:
+        required: true
+        content:
+          multipart/form-data:
+            schema:
+              type: object
+              required: [locale, messageProperties]
+              properties:
+                locale:
+                  type: string
+                messageProperties:
+                  type: string
+                  format: binary
+      responses:
+        '200':
+          description: Import summary.
+          content:
+            application/json:
+              schema:
+                type: object
+                required: [data]
+                properties:
+                  data:
+                    type: object
+                    required: [importedCount]
+                    properties:
+                      importedCount:
+                        type: integer
+        '400':
+          description: Missing locale or empty file.
+          content:
+            application/json:
+              schema:
+                $ref: '../components/common.yaml#/components/schemas/ValidationErrorResponse'
+  /api/localizationOverrides/{id}:
+    parameters:
+      - name: id
+        in: path
+        required: true
+        schema:
+          $ref: '../components/common.yaml#/components/schemas/Id'
+        description: >
+          Localization id. Unknown ids raise ObjectNotFoundException,
+          rendered as HTTP 404 by ErrorsController.handleNotFound.
+    get:
+      operationId: readLocalizationOverride
+      summary: Read a single localization override
+      responses:
+        '200':
+          description: The localization override.
+          content:
+            application/json:
+              schema:
+                type: object
+                required: [data]
+                properties:
+                  data:
+                    $ref: '#/components/schemas/LocalizationOverride'
+        '404':
+          $ref: '../components/common.yaml#/components/responses/NotFound'
+    put:
+      operationId: updateLocalizationOverride
+      summary: Update a localization override
+      description: Partial update; only keys present in the body are bound.
+      requestBody:
+        required: true
+        content:
+          application/json:
+            schema:
+              $ref: '#/components/schemas/LocalizationOverrideInput'
+      responses:
+        '200':
+          description: The updated localization override.
+          content:
+            application/json:
+              schema:
+                type: object
+                required: [data]
+                properties:
+                  data:
+                    $ref: '#/components/schemas/LocalizationOverride'
+        '400':
+          $ref: '../components/common.yaml#/components/responses/ValidationError'
+        '404':
+          $ref: '../components/common.yaml#/components/responses/NotFound'
+    delete:
+      operationId: deleteLocalizationOverride
+      summary: Delete a localization override
+      responses:
+        '204':
+          description: Deleted; no content.
+        '400':
+          description: >
+            Localization is referenced by other records and cannot be
+            deleted.
+          content:
+            application/json:
+              schema:
+                $ref: '../components/common.yaml#/components/schemas/ValidationErrorResponse'
+        '404':
+          $ref: '../components/common.yaml#/components/responses/NotFound'
+components:
+  schemas:
+    LocalizationOverride:
+      type: object
+      description: >
+        Localization rendering emitted by
+        LocalizationOverrideApiController.toJson().
+      required: [id]
+      properties:
+        id:
+          $ref: '../components/common.yaml#/components/schemas/Id'
+        code:
+          type: string
+          nullable: true
+        locale:
+          type: string
+          nullable: true
+        text:
+          type: string
+          nullable: true
+        dateCreated:
+          type: string
+          nullable: true
+        lastUpdated:
+          type: string
+          nullable: true
+        version:
+          type: integer
+          nullable: true
+      additionalProperties: true
+    LocalizationOverrideInput:
+      type: object
+      description: Partial-update input; only keys present are bound.
+      properties:
+        code:
+          type: string
+          nullable: true
+        locale:
+          type: string
+          nullable: true
+        text:
+          type: string
+          nullable: true
+      additionalProperties: true
+  securitySchemes:
+    cookieAuth:
+      $ref: '../components/common.yaml#/components/securitySchemes/cookieAuth'

@@ -10,6 +10,7 @@
 package org.pih.warehouse.api
 
 import grails.converters.JSON
+import org.pih.warehouse.LocalizationUtil
 import org.pih.warehouse.core.DocumentType
 import org.pih.warehouse.core.GlAccount
 import org.pih.warehouse.core.GlAccountType
@@ -121,6 +122,14 @@ class SelectOptionsApiController {
     def productFieldOptions() {
         List options = ProductField.values().collect {
             [id: it.name(), label: g.message(code: "enum.ProductField.${it.name()}", default: it.name())]
+        }
+        render([data: options] as JSON)
+    }
+
+    def localeOptions() {
+        List<String> supportedLocales = grailsApplication.config.openboxes.locale.supportedLocales?.toSorted() ?: []
+        List options = supportedLocales.collect { String localeCode ->
+            [id: localeCode, label: LocalizationUtil.getLocale(localeCode).getDisplayName(LocalizationUtil.currentLocale)]
         }
         render([data: options] as JSON)
     }

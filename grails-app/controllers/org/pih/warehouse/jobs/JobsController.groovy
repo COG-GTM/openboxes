@@ -11,16 +11,12 @@ package org.pih.warehouse.jobs
 
 import grails.gorm.transactions.Transactional
 import grails.plugins.quartz.GrailsJobClassConstants
-import grails.plugins.quartz.JobDescriptor
 import grails.plugins.quartz.JobManagerService
 import org.quartz.JobDetail
 import org.quartz.JobKey
 import org.quartz.Scheduler
-import org.quartz.SchedulerException
 import org.quartz.Trigger
 import org.quartz.TriggerKey
-import org.quartz.core.QuartzScheduler
-import org.quartz.impl.StdScheduler
 import org.quartz.impl.matchers.GroupMatcher
 
 import java.text.ParseException
@@ -48,17 +44,7 @@ class JobsController {
     }
 
     def show() {
-        String jobGroup = params.group ?: GrailsJobClassConstants.DEFAULT_GROUP
-        JobKey jobKey = new JobKey(params.id, jobGroup)
-        JobDetail jobDetail = quartzScheduler.getJobDetail(jobKey)
-        JobDescriptor jobDescriptor = (jobDetail) ? JobDescriptor.build(jobDetail, quartzScheduler) : null
-        if (!jobDescriptor) {
-            throw new SchedulerException("No Job Detail for key ${params.id}")
-        }
-        def triggers = quartzScheduler.getTriggersOfJob(jobKey)
-        log.info "triggers " + triggers
-
-        [jobDescriptor: jobDescriptor, jobDetail: jobDetail, jobKey: jobKey, triggers: triggers]
+        render(view: "/common/react", params: params)
     }
 
 

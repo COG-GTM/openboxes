@@ -393,6 +393,31 @@ const AsyncLocationGroupShow = Loadable({
   loading: Loading,
 });
 
+const AsyncEventTypeList = Loadable({
+  loader: () => import('components/eventType/EventTypeList'),
+  loading: Loading,
+});
+
+const AsyncEventTypeShow = Loadable({
+  loader: () => import('components/eventType/EventTypeShow'),
+  loading: Loading,
+});
+
+const AsyncLocalizationList = Loadable({
+  loader: () => import('components/localization/LocalizationList'),
+  loading: Loading,
+});
+
+const AsyncLocalizationForm = Loadable({
+  loader: () => import('components/localization/LocalizationForm'),
+  loading: Loading,
+});
+
+const AsyncJobShow = Loadable({
+  loader: () => import('components/job/JobShow'),
+  loading: Loading,
+});
+
 const AsyncLocationTypeForm = Loadable({
   loader: () => import('components/locationType/LocationTypeForm'),
   loading: Loading,
@@ -1382,6 +1407,12 @@ const Router = () => {
             <MainLayoutRoute path="**/locationGroup/create" component={AsyncLocationGroupForm} />
             <MainLayoutRoute path="**/locationGroup/edit/:locationGroupId" component={AsyncLocationGroupForm} />
             <MainLayoutRoute path="**/locationGroup/show/:locationGroupId" component={AsyncLocationGroupShow} />
+            <MainLayoutRoute path="**/eventType/list" component={AsyncEventTypeList} />
+            <MainLayoutRoute path="**/eventType/show/:eventTypeId" component={AsyncEventTypeShow} />
+            <MainLayoutRoute path="**/localization/list" component={AsyncLocalizationList} />
+            <MainLayoutRoute path="**/localization/create" component={AsyncLocalizationForm} />
+            <MainLayoutRoute path="**/localization/edit/:localizationId" component={AsyncLocalizationForm} />
+            <MainLayoutRoute path="**/jobs/show/:jobName" component={AsyncJobShow} />
             <MainLayoutRoute path="**/locationType/list" component={AsyncLocationTypeList} />
             <MainLayoutRoute path="**/locationType/create" component={AsyncLocationTypeForm} />
             <MainLayoutRoute path="**/locationType/edit/:locationTypeId" component={AsyncLocationTypeForm} />

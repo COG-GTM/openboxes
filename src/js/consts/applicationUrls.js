@@ -365,6 +365,29 @@ const LOCATION_GROUP_URL = {
   show: (id) => `${LOCATION_GROUP_URL.base}/show/${id}`,
 };
 
+const EVENT_TYPE_URL = {
+  base: `${CONTEXT_PATH}/eventType`,
+  list: () => `${EVENT_TYPE_URL.base}/list`,
+  create: () => `${EVENT_TYPE_URL.base}/create`,
+  edit: (id) => `${EVENT_TYPE_URL.base}/edit/${id}`,
+  show: (id) => `${EVENT_TYPE_URL.base}/show/${id}`,
+};
+
+const LOCALIZATION_URL = {
+  base: `${CONTEXT_PATH}/localization`,
+  list: () => `${LOCALIZATION_URL.base}/list`,
+  create: () => `${LOCALIZATION_URL.base}/create`,
+  edit: (id) => `${LOCALIZATION_URL.base}/edit/${id}`,
+  export: (locale) => `${LOCALIZATION_URL.base}/export?locale=${locale}`,
+};
+
+const JOB_URL = {
+  base: `${CONTEXT_PATH}/jobs`,
+  show: (name) => `${JOB_URL.base}/show/${name}`,
+  quartzList: () => `${CONTEXT_PATH}/quartz/list`,
+  backgroundJobSettings: () => `${CONTEXT_PATH}/admin/showSettings#tab-5`,
+};
+
 const LOCATION_TYPE_URL = {
   base: `${CONTEXT_PATH}/locationType`,
   list: () => `${LOCATION_TYPE_URL.base}/list`,
@@ -611,6 +634,7 @@ export {
   DASHBOARD_URL,
   DELIVERY_NOTE_URL,
   DOCUMENT_URL,
+  EVENT_TYPE_URL,
   GL_ACCOUNT_TYPE_URL,
   GL_ACCOUNT_URL,
   GOODS_RECEIPT_NOTE_URL,
@@ -620,6 +644,8 @@ export {
   INVENTORY_SNAPSHOT_URL,
   INVENTORY_URL,
   INVOICE_URL,
+  JOB_URL,
+  LOCALIZATION_URL,
   LOCATION_CONFIGURATION_URL,
   LOCATION_GROUP_URL,
   LOCATION_TYPE_URL,

@@ -25,35 +25,11 @@ class LocalizationController {
     }
 
     def list() {
-        params.max = Math.min(params.max ? params.int('max') : 10, 100)
-
-        def localizationInstanceList
-        def localizationInstanceTotal
-
-        def defaultLocale = new Locale(grailsApplication.config.openboxes.locale.defaultLocale)
-        def currentLocale = session?.user?.locale ?: session.locale ?: defaultLocale
-        params.locale = params.locale ?: currentLocale?.language
-
-        localizationInstanceList = Localization.createCriteria().list(params) {
-            if (params.locale) {
-                eq("locale", params.locale)
-            }
-            if (params.q) {
-                or {
-                    ilike("code", params.q + "%")
-                    ilike("text", "%" + params.q + "%")
-                }
-            }
-        }
-        localizationInstanceTotal = localizationInstanceList.totalCount
-
-        [localizationInstanceList: localizationInstanceList, localizationInstanceTotal: localizationInstanceTotal]
+        render(view: "/common/react", params: params)
     }
 
     def create() {
-        def localizationInstance = new Localization()
-        localizationInstance.properties = params
-        return [localizationInstance: localizationInstance]
+        render(view: "/common/react", params: params)
     }
 
     def save() {
@@ -100,13 +76,7 @@ class LocalizationController {
     }
 
     def edit() {
-        def localizationInstance = Localization.get(params.id)
-        if (!localizationInstance) {
-            flash.message = "${warehouse.message(code: 'default.not.found.message', args: [warehouse.message(code: 'localization.label', default: 'Localization'), params.id])}"
-            redirect(action: "list")
-        } else {
-            return [localizationInstance: localizationInstance]
-        }
+        render(view: "/common/react", params: params)
     }
 
     def update() {

@@ -37,8 +37,9 @@ class RoleInterceptor {
     def static changeControllers = ['createProductFromTemplate']
 
     def static managerActions = [
-        'inventory'           : ['createOutboundTransfer'],
-        'stockMovementItemApi': ['eraseItem']
+        'inventory'               : ['createOutboundTransfer'],
+        'localizationOverrideApi' : ['importMessages'],
+        'stockMovementItemApi'    : ['eraseItem']
     ]
 
     def static adminControllers = ['createProduct', 'createProductFromTemplate', 'admin', 'adminApi']
@@ -65,7 +66,8 @@ class RoleInterceptor {
         'productsConfigurationApi'  : ['downloadCategories', 'importCategories'],
         'locationType'              : ['create', 'edit', 'delete', 'update', 'save'],
         'quartz'                    : ['*'],
-        'jobs'                      : ['*']
+        'jobs'                      : ['*'],
+        'jobsApi'                   : ['*']
     ]
 
     def static invoiceActions = [
