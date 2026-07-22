@@ -39,18 +39,12 @@ class PicklistController {
     }
 
     def print() {
-        def requisition = Requisition.get(params.id)
-        def picklist = Picklist.findByRequisition(requisition)
-        def location = Location.get(session.warehouse.id)
-        [requisition: requisition, picklist: picklist, location: location, sorted: params.sorted]
+        render(view: "/common/react")
     }
 
     // Order based picklist print
     def returnPrint() {
-        def order = Order.get(params.id)
-        def picklist = Picklist.findByOrder(order)
-        def location = Location.get(session.warehouse.id)
-        [order: order, picklist: picklist, location: location, sorted: params.sorted]
+        render(view: "/common/react")
     }
 
     def renderPdf() {

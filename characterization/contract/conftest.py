@@ -20,6 +20,15 @@ def client():
 
 
 @pytest.fixture(scope="session")
+def batch14_endpoints(client):
+    # The api-snapshot job runs against the pinned released image, which
+    # predates the Batch 14 requisition/picklist endpoints. Skip their tests
+    # there; they run against source builds (and locally per RUNNING_LOCALLY.md).
+    if client.request("GET", "/api/requisitions/documentTypes").status_code == 404:
+        pytest.skip("Batch 14 requisition/picklist endpoints not present in target build")
+
+
+@pytest.fixture(scope="session")
 def supplier_id(client):
     # Resolve a supplier organization by its stable seeded code (natural key)
     # from the seeded product sources - there is no organization list API.

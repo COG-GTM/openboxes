@@ -262,6 +262,36 @@ const AsyncStockTransferList = Loadable({
   loading: Loading,
 });
 
+const AsyncRequisitionCreate = Loadable({
+  loader: () => import('components/requisition/RequisitionCreate'),
+  loading: Loading,
+});
+
+const AsyncRequisitionChooseTemplate = Loadable({
+  loader: () => import('components/requisition/RequisitionChooseTemplate'),
+  loading: Loading,
+});
+
+const AsyncRequisitionConfirm = Loadable({
+  loader: () => import('components/requisition/RequisitionConfirm'),
+  loading: Loading,
+});
+
+const AsyncRequisitionAddDocument = Loadable({
+  loader: () => import('components/requisition/RequisitionAddDocument'),
+  loading: Loading,
+});
+
+const AsyncPicklistPrint = Loadable({
+  loader: () => import('components/requisition/PicklistPrint'),
+  loading: Loading,
+});
+
+const AsyncPicklistReturnPrint = Loadable({
+  loader: () => import('components/requisition/PicklistReturnPrint'),
+  loading: Loading,
+});
+
 const Router = () => {
   useConnectionListener();
 
@@ -314,6 +344,12 @@ const Router = () => {
             <Route path="**/resettingInstanceInfo/index">
               <AsyncResetInstancePage />
             </Route>
+            <MainLayoutRoute path="**/requisition/create" component={AsyncRequisitionCreate} />
+            <MainLayoutRoute path="**/requisition/chooseTemplate" component={AsyncRequisitionChooseTemplate} />
+            <MainLayoutRoute path="**/requisition/confirm/:requisitionId" component={AsyncRequisitionConfirm} />
+            <MainLayoutRoute path="**/requisition/addDocument/:requisitionId" component={AsyncRequisitionAddDocument} />
+            <MainLayoutRoute path="**/picklist/print/:requisitionId" component={AsyncPicklistPrint} />
+            <MainLayoutRoute path="**/picklist/returnPrint/:orderId" component={AsyncPicklistReturnPrint} />
             <MainLayoutRoute path="**/purchaseOrder/list" component={AsyncPurchaseOrderList} />
             <MainLayoutRoute path="**/requisitionTemplate/list" component={AsyncStockList} />
             <MainLayoutRoute path="**/product/list" component={AsyncProductsList} />

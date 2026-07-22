@@ -186,6 +186,17 @@ export const PRODUCT_CLASSIFICATIONS_API = (facilityId) => `${API}/facilities/${
 
 export const PICKLIST_API = `${API}/picklists`;
 export const PICKLIST_CLEAR = (id) => `${PICKLIST_API}/${id}/items`;
+export const PICKLIST_PRINT = (id) => `${PICKLIST_API}/print/${id}`;
+export const PICKLIST_RETURN_PRINT = (id) => `${PICKLIST_API}/returnPrint/${id}`;
+
+// REQUISITION (classic requisition flow)
+export const REQUISITION_API = `${API}/requisitions`;
+export const REQUISITION_BY_ID = (id) => `${REQUISITION_API}/${id}`;
+export const REQUISITION_TEMPLATES = `${REQUISITION_API}/templates`;
+export const REQUISITION_CONFIRM = (id) => `${REQUISITION_BY_ID(id)}/confirm`;
+export const REQUISITION_DETAILS = (id) => `${REQUISITION_BY_ID(id)}/details`;
+export const REQUISITION_DOCUMENTS = (id) => `${REQUISITION_BY_ID(id)}/documents`;
+export const REQUISITION_DOCUMENT_TYPES = `${REQUISITION_API}/documentTypes`;
 
 // FULL OUTBOUND IMPORT FEATURE
 export const FULFILLMENT_API = `${API}/fulfillments`;

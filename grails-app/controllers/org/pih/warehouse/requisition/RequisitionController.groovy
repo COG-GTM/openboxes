@@ -56,7 +56,7 @@ class RequisitionController {
     }
 
     def chooseTemplate() {
-        render(view: "chooseTemplate")
+        render(view: "/common/react")
     }
 
     def createStockFromTemplate() {
@@ -89,9 +89,11 @@ class RequisitionController {
     }
 
     def create() {
-        def requisition = new Requisition(status: RequisitionStatus.CREATED)
-        requisition.type = params.type as RequisitionType
-        render(view: "createNonStock", model: [requisition: requisition])
+        render(view: "/common/react")
+    }
+
+    def addDocument() {
+        render(view: "/common/react")
     }
 
     def save() {
@@ -254,26 +256,7 @@ class RequisitionController {
 
 
     def confirm() {
-        def requisition = Requisition.get(params?.id)
-        if (requisition) {
-
-            if (requisition.status < RequisitionStatus.CHECKING) {
-                requisition.status = RequisitionStatus.CHECKING
-                requisition.save(flush: true)
-            }
-
-            def currentInventory = Location.get(session.warehouse.id).inventory
-            def productInventoryItemsMap = [:]
-            def productInventoryItems = inventoryService.getInventoryItemsWithQuantity(requisition.requisitionItems?.collect {
-                it.product
-            }, currentInventory)
-            productInventoryItems.keySet().each { product ->
-                productInventoryItemsMap[product.id] = productInventoryItems[product].collect {
-                    it.toJson()
-                }
-            }
-        }
-        [requisition: requisition]
+        render(view: "/common/react")
     }
 
     def saveDetails() {

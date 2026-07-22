@@ -1,0 +1,18 @@
+.picklist-print {
+  background: white;
+
+  .picklist-items-table th,
+  .signature-table th {
+    background-color: #f5f5f5;
+  }
+
+  .signature-table td {
+    height: 3rem;
+  }
+}
+
+@media print {
+  .picklist-print .d-print-none {
+    display: none !important;
+  }
+}

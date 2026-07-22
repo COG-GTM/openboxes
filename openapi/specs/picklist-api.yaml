@@ -2,11 +2,14 @@ openapi: 3.0.3
 info:
   title: OpenBoxes - PicklistApiController
   description: >
-    Picklist-clearing endpoint handled by
-    org.pih.warehouse.api.PicklistApiController, routed via the
-    "/api/picklists/$id/items" URL mapping (DELETE -> clearPicklist). The
-    controller extends BaseDomainApiController but only clearPicklist() is
-    reachable through this mapping.
+    Picklist endpoints handled by org.pih.warehouse.api.PicklistApiController.
+    Routed via the "/api/picklists/$id/items" URL mapping
+    (DELETE -> clearPicklist) plus the print-screen data endpoints
+    "/api/picklists/print/$id" (GET -> print) and
+    "/api/picklists/returnPrint/$id" (GET -> returnPrint) added for the
+    migrated React picklist print screens. The controller extends
+    BaseDomainApiController but only these actions are reachable through
+    URL mappings.
   version: 0.1.0
 servers:
   - url: http://localhost:8080/openboxes
@@ -34,7 +37,313 @@ paths:
           description: Picklist cleared; empty body.
         '404':
           $ref: '../components/common.yaml#/components/responses/NotFound'
+
+  /api/picklists/print/{id}:
+    get:
+      operationId: printPicklist
+      summary: Data for the picklist print screen
+      description: >
+        Returns the requisition header, picklist metadata, and requisition
+        items (with nested picklist items) backing the migrated
+        /picklist/print React screen. The id is the requisition id. Unknown
+        ids return a 404 JSON error rendered by the controller itself.
+      parameters:
+        - name: id
+          in: path
+          required: true
+          schema:
+            $ref: '../components/common.yaml#/components/schemas/Id'
+          description: Requisition id backing the picklist.
+      responses:
+        '200':
+          description: Print screen data.
+          content:
+            application/json:
+              schema:
+                type: object
+                required: [data]
+                properties:
+                  data:
+                    type: object
+                    required: [requisition, requisitionItems]
+                    properties:
+                      requisition:
+                        $ref: '#/components/schemas/RequisitionHeader'
+                      picklist:
+                        $ref: '#/components/schemas/PicklistHeader'
+                      requisitionItems:
+                        type: array
+                        items:
+                          $ref: '#/components/schemas/PrintRequisitionItem'
+        '404':
+          $ref: '#/components/responses/ControllerNotFound'
+
+  /api/picklists/returnPrint/{id}:
+    get:
+      operationId: returnPrintPicklist
+      summary: Data for the return picklist print screen
+      description: >
+        Returns the order header, picklist metadata, and order items (with
+        nested picklist items) backing the migrated /picklist/returnPrint
+        React screen. The id is the order id. Unknown ids return a 404 JSON
+        error rendered by the controller itself.
+      parameters:
+        - name: id
+          in: path
+          required: true
+          schema:
+            $ref: '../components/common.yaml#/components/schemas/Id'
+          description: Order id backing the return picklist.
+      responses:
+        '200':
+          description: Return print screen data.
+          content:
+            application/json:
+              schema:
+                type: object
+                required: [data]
+                properties:
+                  data:
+                    type: object
+                    required: [order, orderItems]
+                    properties:
+                      order:
+                        $ref: '#/components/schemas/OrderHeader'
+                      picklist:
+                        $ref: '#/components/schemas/PicklistHeader'
+                      orderItems:
+                        type: array
+                        items:
+                          $ref: '#/components/schemas/PrintOrderItem'
+        '404':
+          $ref: '#/components/responses/ControllerNotFound'
 components:
   securitySchemes:
     cookieAuth:
       $ref: '../components/common.yaml#/components/securitySchemes/cookieAuth'
+
+  responses:
+    ControllerNotFound:
+      description: >
+        Unknown id. Rendered directly by the controller (not
+        ErrorsController), with errorCode and errorMessage.
+      content:
+        application/json:
+          schema:
+            type: object
+            required: [errorCode, errorMessage]
+            properties:
+              errorCode:
+                type: integer
+                enum: [404]
+              errorMessage:
+                type: string
+
+  schemas:
+    NamedReference:
+      type: object
+      required: [id, name]
+      properties:
+        id:
+          $ref: '../components/common.yaml#/components/schemas/Id'
+        name:
+          type: string
+          nullable: true
+
+    NullableNamedReference:
+      type: object
+      nullable: true
+      required: [id, name]
+      properties:
+        id:
+          $ref: '../components/common.yaml#/components/schemas/Id'
+        name:
+          type: string
+          nullable: true
+
+    RequisitionHeader:
+      type: object
+      required: [id, requestNumber]
+      properties:
+        id:
+          $ref: '../components/common.yaml#/components/schemas/Id'
+        requestNumber:
+          type: string
+        name:
+          type: string
+          nullable: true
+        type:
+          type: string
+          nullable: true
+        origin:
+          $ref: '#/components/schemas/NullableNamedReference'
+        destination:
+          $ref: '#/components/schemas/NullableNamedReference'
+        dateRequested:
+          type: string
+          nullable: true
+        dateCreated:
+          type: string
+          nullable: true
+        dateVerified:
+          type: string
+          nullable: true
+        dateChecked:
+          type: string
+          nullable: true
+        requestedBy:
+          $ref: '#/components/schemas/NullableNamedReference'
+        createdBy:
+          $ref: '#/components/schemas/NullableNamedReference'
+        verifiedBy:
+          $ref: '#/components/schemas/NullableNamedReference'
+        checkedBy:
+          $ref: '#/components/schemas/NullableNamedReference'
+
+    OrderHeader:
+      type: object
+      required: [id, orderNumber]
+      properties:
+        id:
+          $ref: '../components/common.yaml#/components/schemas/Id'
+        orderNumber:
+          type: string
+        name:
+          type: string
+          nullable: true
+        origin:
+          $ref: '#/components/schemas/NullableNamedReference'
+        destination:
+          $ref: '#/components/schemas/NullableNamedReference'
+        dateOrdered:
+          type: string
+          nullable: true
+        dateCreated:
+          type: string
+          nullable: true
+        orderedBy:
+          $ref: '#/components/schemas/NullableNamedReference'
+        createdBy:
+          $ref: '#/components/schemas/NullableNamedReference'
+
+    PicklistHeader:
+      type: object
+      nullable: true
+      required: [id]
+      properties:
+        id:
+          $ref: '../components/common.yaml#/components/schemas/Id'
+        picker:
+          $ref: '#/components/schemas/NullableNamedReference'
+        datePicked:
+          type: string
+          nullable: true
+
+    PrintProduct:
+      type: object
+      required: [productCode, name]
+      properties:
+        id:
+          $ref: '../components/common.yaml#/components/schemas/Id'
+        productCode:
+          type: string
+        name:
+          type: string
+          nullable: true
+        unitOfMeasure:
+          type: string
+          nullable: true
+        coldChain:
+          type: boolean
+        controlledSubstance:
+          type: boolean
+        hazardousMaterial:
+          type: boolean
+
+    PrintPicklistItem:
+      type: object
+      required: [id, quantity]
+      properties:
+        id:
+          $ref: '../components/common.yaml#/components/schemas/Id'
+        quantity:
+          type: integer
+        sortOrder:
+          type: integer
+          nullable: true
+        lotNumber:
+          type: string
+          nullable: true
+        expirationDate:
+          type: string
+          nullable: true
+        binLocation:
+          type: object
+          nullable: true
+          required: [id, name]
+          properties:
+            id:
+              $ref: '../components/common.yaml#/components/schemas/Id'
+            name:
+              type: string
+              nullable: true
+            zone:
+              $ref: '#/components/schemas/NullableNamedReference'
+
+    PrintRequisitionItem:
+      type: object
+      required: [id, quantity, product, picklistItems]
+      properties:
+        id:
+          $ref: '../components/common.yaml#/components/schemas/Id'
+        status:
+          type: string
+          nullable: true
+        quantity:
+          type: integer
+        isCanceled:
+          type: boolean
+        isChanged:
+          type: boolean
+        product:
+          $ref: '#/components/schemas/PrintProduct'
+        parentRequisitionItem:
+          type: object
+          nullable: true
+          properties:
+            isSubstituted:
+              type: boolean
+            isChanged:
+              type: boolean
+            quantity:
+              type: integer
+            product:
+              type: object
+              properties:
+                productCode:
+                  type: string
+                name:
+                  type: string
+                  nullable: true
+                unitOfMeasure:
+                  type: string
+                  nullable: true
+        picklistItems:
+          type: array
+          items:
+            $ref: '#/components/schemas/PrintPicklistItem'
+
+    PrintOrderItem:
+      type: object
+      required: [id, quantity, product, picklistItems]
+      properties:
+        id:
+          $ref: '../components/common.yaml#/components/schemas/Id'
+        quantity:
+          type: integer
+        product:
+          $ref: '#/components/schemas/PrintProduct'
+        picklistItems:
+          type: array
+          items:
+            $ref: '#/components/schemas/PrintPicklistItem'

@@ -158,6 +158,43 @@ const PRODUCT_SUPPLIER_URL = {
   export: () => `${PRODUCT_SUPPLIER_URL.base}/export?format=xls`,
 };
 
+const REQUISITION_URL = {
+  base: `${CONTEXT_PATH}/requisition`,
+  list: () => `${REQUISITION_URL.base}/list`,
+  create: (type) => stringifyUrl({
+    url: `${REQUISITION_URL.base}/create`,
+    query: type ? { type } : {},
+  }),
+  chooseTemplate: () => `${REQUISITION_URL.base}/chooseTemplate`,
+  createStockFromTemplate: (id) => stringifyUrl({
+    url: `${REQUISITION_URL.base}/createStockFromTemplate`,
+    query: { id },
+  }),
+  show: (id) => `${REQUISITION_URL.base}/show/${id}`,
+  edit: (id) => `${REQUISITION_URL.base}/edit/${id}`,
+  pick: (id) => `${REQUISITION_URL.base}/pick/${id}`,
+  confirm: (id) => `${REQUISITION_URL.base}/confirm/${id}`,
+  transfer: (id) => `${REQUISITION_URL.base}/transfer/${id}`,
+  addDocument: (id) => `${REQUISITION_URL.base}/addDocument/${id}`,
+};
+
+const PICKLIST_URL = {
+  base: `${CONTEXT_PATH}/picklist`,
+  print: (id) => `${PICKLIST_URL.base}/print/${id}`,
+  returnPrint: (id) => `${PICKLIST_URL.base}/returnPrint/${id}`,
+  pdf: (id) => `${PICKLIST_URL.base}/renderPdf/${id}`,
+  returnPdf: (id) => `${PICKLIST_URL.base}/renderReturnPdf/${id}`,
+};
+
+const BARCODE_URL = {
+  render: (data) => stringifyUrl({
+    url: `${CONTEXT_PATH}/product/barcode`,
+    query: {
+      data, width: 100, height: 30, format: 'CODE_128',
+    },
+  }),
+};
+
 const CYCLE_COUNT = {
   base: `${CONTEXT_PATH}/inventory/cycleCount`,
   list: (tab) => `${CYCLE_COUNT.base}?tab=${tab}`,
@@ -166,6 +203,7 @@ const CYCLE_COUNT = {
 };
 
 export {
+  BARCODE_URL,
   CATEGORY_URL,
   CYCLE_COUNT,
   DASHBOARD_URL,
@@ -175,6 +213,7 @@ export {
   LOCATION_CONFIGURATION_URL,
   LOCATION_URL,
   ORDER_URL,
+  PICKLIST_URL,
   PRODUCT_CONFIGURATION_URL,
   PRODUCT_SUPPLIER_URL,
   PRODUCT_URL,
@@ -182,6 +221,7 @@ export {
   PUTAWAY_URL,
   REPLENISHMENT_URL,
   REQUISITION_TEMPLATE_URL,
+  REQUISITION_URL,
   STOCK_MOVEMENT_URL,
   STOCK_TRANSFER_URL,
   STOCKLIST_URL,

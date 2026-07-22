@@ -439,6 +439,53 @@ class UrlMappings {
             action = [DELETE: "clearPicklist"]
         }
 
+        "/api/picklists/print/$id" {
+            controller = "picklistApi"
+            action = [GET: "print"]
+        }
+
+        "/api/picklists/returnPrint/$id" {
+            controller = "picklistApi"
+            action = [GET: "returnPrint"]
+        }
+
+        // Requisition API (classic requisition flow screens migrated to React)
+
+        "/api/requisitions"(parseRequest: true) {
+            controller = "requisitionApi"
+            action = [POST: "create"]
+        }
+
+        "/api/requisitions/templates" {
+            controller = "requisitionApi"
+            action = [GET: "templates"]
+        }
+
+        "/api/requisitions/$id" {
+            controller = "requisitionApi"
+            action = [GET: "read"]
+        }
+
+        "/api/requisitions/$id/confirm"(parseRequest: true) {
+            controller = "requisitionApi"
+            action = [POST: "confirm"]
+        }
+
+        "/api/requisitions/$id/details"(parseRequest: true) {
+            controller = "requisitionApi"
+            action = [POST: "saveDetails"]
+        }
+
+        "/api/requisitions/$id/documents" {
+            controller = "requisitionApi"
+            action = [POST: "uploadDocument"]
+        }
+
+        "/api/requisitions/documentTypes" {
+            controller = "requisitionApi"
+            action = [GET: "documentTypes"]
+        }
+
         // Partial Receiving API
 
         "/api/partialReceiving"(parseRequest: true) {

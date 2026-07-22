@@ -1,0 +1,490 @@
+openapi: 3.0.3
+info:
+  title: OpenBoxes - RequisitionApiController
+  description: >
+    Classic requisition flow endpoints handled by
+    org.pih.warehouse.api.RequisitionApiController, added for the React
+    migration of the legacy requisition screens (create, chooseTemplate,
+    confirm, addDocument). Routed via the "/api/requisitions/..." URL
+    mappings.
+  version: 0.1.0
+servers:
+  - url: http://localhost:8080/openboxes
+    description: Local Docker baseline (docs/migration/RUNNING_LOCALLY.md)
+security:
+  - cookieAuth: []
+paths:
+  /api/requisitions:
+    post:
+      operationId: createRequisition
+      summary: Create a requisition (classic flow)
+      description: >
+        Creates a requisition in CREATED status, mirroring the legacy
+        RequisitionController.save action. The name is generated from type,
+        destination, commodity class and date requested when not provided,
+        and a request number is generated. Validation errors return 400 with
+        an errors array.
+      requestBody:
+        required: true
+        content:
+          application/json:
+            schema:
+              type: object
+              properties:
+                type:
+                  type: string
+                  description: RequisitionType enum name (e.g. ADHOC, STOCK).
+                originId:
+                  type: string
+                  nullable: true
+                  description: Defaults to the session warehouse when omitted.
+                destinationId:
+                  type: string
+                  nullable: true
+                requestedById:
+                  type: string
+                  nullable: true
+                commodityClass:
+                  type: string
+                  nullable: true
+                  description: CommodityClass enum name.
+                dateRequested:
+                  type: string
+                  nullable: true
+                  description: yyyy-MM-dd
+                requestedDeliveryDate:
+                  type: string
+                  nullable: true
+                  description: yyyy-MM-dd
+                description:
+                  type: string
+                  nullable: true
+                name:
+                  type: string
+                  nullable: true
+      responses:
+        '201':
+          description: Requisition created.
+          content:
+            application/json:
+              schema:
+                type: object
+                required: [data]
+                properties:
+                  data:
+                    type: object
+                    required: [id, requestNumber]
+                    properties:
+                      id:
+                        $ref: '../components/common.yaml#/components/schemas/Id'
+                      requestNumber:
+                        type: string
+                      name:
+                        type: string
+                        nullable: true
+                      status:
+                        type: string
+                      type:
+                        type: string
+                        nullable: true
+        '400':
+          $ref: '#/components/responses/ValidationError'
+
+  /api/requisitions/templates:
+    get:
+      operationId: listRequisitionTemplates
+      summary: List requisition templates for the current warehouse
+      description: >
+        Returns published requisition templates whose origin is the session
+        warehouse, sorted by destination name. Mirrors the legacy
+        selectRequisitionTemplate tag used by the chooseTemplate screen.
+      responses:
+        '200':
+          description: Requisition templates.
+          content:
+            application/json:
+              schema:
+                type: object
+                required: [data]
+                properties:
+                  data:
+                    type: array
+                    items:
+                      type: object
+                      required: [id, name]
+                      properties:
+                        id:
+                          $ref: '../components/common.yaml#/components/schemas/Id'
+                        name:
+                          type: string
+                          nullable: true
+                        requestNumber:
+                          type: string
+                          nullable: true
+                        origin:
+                          $ref: '#/components/schemas/NullableNamedReference'
+                        destination:
+                          $ref: '#/components/schemas/NullableNamedReference'
+                        commodityClass:
+                          type: string
+                          nullable: true
+
+  /api/requisitions/documentTypes:
+    get:
+      operationId: listRequisitionDocumentTypes
+      summary: List document types for the add document screen
+      responses:
+        '200':
+          description: Document types sorted by name.
+          content:
+            application/json:
+              schema:
+                type: object
+                required: [data]
+                properties:
+                  data:
+                    type: array
+                    items:
+                      type: object
+                      required: [id, value, label]
+                      properties:
+                        id:
+                          $ref: '../components/common.yaml#/components/schemas/Id'
+                        value:
+                          $ref: '../components/common.yaml#/components/schemas/Id'
+                        label:
+                          type: string
+
+  /api/requisitions/{id}:
+    get:
+      operationId: readRequisition
+      summary: Read requisition details (classic flow)
+      parameters:
+        - $ref: '#/components/parameters/requisitionId'
+      responses:
+        '200':
+          $ref: '#/components/responses/RequisitionDetails'
+        '404':
+          $ref: '#/components/responses/ControllerNotFound'
+
+  /api/requisitions/{id}/confirm:
+    post:
+      operationId: confirmRequisition
+      summary: Move a requisition to CHECKING and return confirm-screen data
+      description: >
+        Mirrors the legacy RequisitionController.confirm action - transitions
+        the requisition status to CHECKING when it has not reached that
+        status yet, then returns the details needed by the confirm screen.
+      parameters:
+        - $ref: '#/components/parameters/requisitionId'
+      responses:
+        '200':
+          $ref: '#/components/responses/RequisitionDetails'
+        '404':
+          $ref: '#/components/responses/ControllerNotFound'
+
+  /api/requisitions/{id}/details:
+    post:
+      operationId: saveRequisitionDetails
+      summary: Save checked-by details from the confirm screen
+      description: >
+        Mirrors the legacy RequisitionController.saveDetails action. Only the
+        keys present in the body are updated.
+      parameters:
+        - $ref: '#/components/parameters/requisitionId'
+      requestBody:
+        required: true
+        content:
+          application/json:
+            schema:
+              type: object
+              properties:
+                checkedById:
+                  type: string
+                  nullable: true
+                dateChecked:
+                  type: string
+                  nullable: true
+                  description: yyyy-MM-dd
+      responses:
+        '200':
+          description: Updated details.
+          content:
+            application/json:
+              schema:
+                type: object
+                required: [data]
+                properties:
+                  data:
+                    type: object
+                    required: [id]
+                    properties:
+                      id:
+                        $ref: '../components/common.yaml#/components/schemas/Id'
+                      checkedBy:
+                        $ref: '#/components/schemas/NullableNamedReference'
+                      dateChecked:
+                        type: string
+                        nullable: true
+        '404':
+          $ref: '#/components/responses/ControllerNotFound'
+
+  /api/requisitions/{id}/documents:
+    post:
+      operationId: uploadRequisitionDocument
+      summary: Upload a document and attach it to a requisition
+      description: >
+        Mirrors the requisition branch of the legacy
+        DocumentController.uploadDocument action. Multipart upload with
+        fileContents plus optional name, typeId and documentNumber fields.
+        Empty files, disallowed extensions, oversized files (>= 10 MB) and
+        template document types are rejected with 400.
+      parameters:
+        - $ref: '#/components/parameters/requisitionId'
+      requestBody:
+        required: true
+        content:
+          multipart/form-data:
+            schema:
+              type: object
+              required: [fileContents]
+              properties:
+                fileContents:
+                  type: string
+                  format: binary
+                name:
+                  type: string
+                typeId:
+                  type: string
+                documentNumber:
+                  type: string
+      responses:
+        '201':
+          description: Document created and attached.
+          content:
+            application/json:
+              schema:
+                type: object
+                required: [data]
+                properties:
+                  data:
+                    type: object
+                    required: [id]
+                    properties:
+                      id:
+                        $ref: '../components/common.yaml#/components/schemas/Id'
+                      name:
+                        type: string
+                        nullable: true
+                      filename:
+                        type: string
+                        nullable: true
+                      documentNumber:
+                        type: string
+                        nullable: true
+                      documentType:
+                        $ref: '#/components/schemas/NullableNamedReference'
+        '400':
+          $ref: '#/components/responses/ValidationError'
+        '404':
+          $ref: '#/components/responses/ControllerNotFound'
+components:
+  securitySchemes:
+    cookieAuth:
+      $ref: '../components/common.yaml#/components/securitySchemes/cookieAuth'
+
+  parameters:
+    requisitionId:
+      name: id
+      in: path
+      required: true
+      schema:
+        $ref: '../components/common.yaml#/components/schemas/Id'
+      description: Requisition id.
+
+  responses:
+    ControllerNotFound:
+      description: >
+        Unknown requisition id. Rendered directly by the controller with
+        errorCode and errorMessage.
+      content:
+        application/json:
+          schema:
+            type: object
+            required: [errorCode, errorMessage]
+            properties:
+              errorCode:
+                type: integer
+                enum: [404]
+              errorMessage:
+                type: string
+
+    ValidationError:
+      description: Validation errors.
+      content:
+        application/json:
+          schema:
+            type: object
+            required: [errorCode, errorMessage]
+            properties:
+              errorCode:
+                type: integer
+                enum: [400]
+              errorMessage:
+                type: string
+              errors:
+                type: array
+                items:
+                  type: string
+
+    RequisitionDetails:
+      description: Requisition details for the classic flow screens.
+      content:
+        application/json:
+          schema:
+            type: object
+            required: [data]
+            properties:
+              data:
+                $ref: '#/components/schemas/RequisitionDetails'
+
+  schemas:
+    NamedReference:
+      type: object
+      required: [id, name]
+      properties:
+        id:
+          $ref: '../components/common.yaml#/components/schemas/Id'
+        name:
+          type: string
+          nullable: true
+
+    NullableNamedReference:
+      type: object
+      nullable: true
+      required: [id, name]
+      properties:
+        id:
+          $ref: '../components/common.yaml#/components/schemas/Id'
+        name:
+          type: string
+          nullable: true
+
+    RequisitionDetails:
+      type: object
+      required: [id, requestNumber, status, requisitionItems]
+      properties:
+        id:
+          $ref: '../components/common.yaml#/components/schemas/Id'
+        requestNumber:
+          type: string
+        name:
+          type: string
+          nullable: true
+        description:
+          type: string
+          nullable: true
+        status:
+          type: string
+        type:
+          type: string
+          nullable: true
+        commodityClass:
+          type: string
+          nullable: true
+        origin:
+          $ref: '#/components/schemas/NullableNamedReference'
+        destination:
+          $ref: '#/components/schemas/NullableNamedReference'
+        requestedBy:
+          $ref: '#/components/schemas/NullableNamedReference'
+        createdBy:
+          $ref: '#/components/schemas/NullableNamedReference'
+        verifiedBy:
+          $ref: '#/components/schemas/NullableNamedReference'
+        checkedBy:
+          $ref: '#/components/schemas/NullableNamedReference'
+        dateRequested:
+          type: string
+          nullable: true
+        requestedDeliveryDate:
+          type: string
+          nullable: true
+        dateCreated:
+          type: string
+          nullable: true
+        dateVerified:
+          type: string
+          nullable: true
+        dateChecked:
+          type: string
+          nullable: true
+        requisitionItems:
+          type: array
+          items:
+            type: object
+            required: [id, quantity, product, picklistItems]
+            properties:
+              id:
+                $ref: '../components/common.yaml#/components/schemas/Id'
+              status:
+                type: string
+                nullable: true
+              product:
+                type: object
+                properties:
+                  id:
+                    $ref: '../components/common.yaml#/components/schemas/Id'
+                  productCode:
+                    type: string
+                  name:
+                    type: string
+                    nullable: true
+                  unitOfMeasure:
+                    type: string
+                    nullable: true
+              quantity:
+                type: integer
+              quantityCanceled:
+                type: integer
+              quantityPicked:
+                type: integer
+              quantityRemaining:
+                type: integer
+              cancelReasonCode:
+                type: string
+                nullable: true
+              cancelComments:
+                type: string
+                nullable: true
+              picklistItems:
+                type: array
+                items:
+                  type: object
+                  required: [id, quantity]
+                  properties:
+                    id:
+                      $ref: '../components/common.yaml#/components/schemas/Id'
+                    quantity:
+                      type: integer
+                    lotNumber:
+                      type: string
+                      nullable: true
+                    binLocation:
+                      $ref: '#/components/schemas/NullableNamedReference'
+                    isSubstitution:
+                      type: boolean
+                    product:
+                      type: object
+                      properties:
+                        id:
+                          $ref: '../components/common.yaml#/components/schemas/Id'
+                        productCode:
+                          type: string
+                          nullable: true
+                        name:
+                          type: string
+                          nullable: true
+                        unitOfMeasure:
+                          type: string
+                          nullable: true
