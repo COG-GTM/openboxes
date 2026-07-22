@@ -32,8 +32,30 @@ class CreateShipmentWorkflowController {
 
     def index() {
         log.info "CreateShipmentWorkflowController.index() -> " + params
-        flash.type = params.type
-        redirect(action: 'createShipment')
+        redirect(action: 'details', params: params.type ? [type: params.type] : [:])
+    }
+
+    // React screens that replaced the legacy createShipment webflow GSPs.
+    // The webflow itself stays reachable under createShipment for GSP
+    // screens that still link into mid-flow states.
+    def details() {
+        render(view: "/common/react")
+    }
+
+    def tracking() {
+        render(view: "/common/react")
+    }
+
+    def packing() {
+        render(view: "/common/react")
+    }
+
+    def picking() {
+        render(view: "/common/react")
+    }
+
+    def sending() {
+        render(view: "/common/react")
     }
 
     def createShipmentFlow() {

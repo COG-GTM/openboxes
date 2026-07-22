@@ -1,0 +1,883 @@
+openapi: 3.0.3
+info:
+  title: OpenBoxes - ShipmentApiController
+  description: >
+    Create-shipment wizard endpoints handled by
+    org.pih.warehouse.api.ShipmentApiController, added for the React
+    migration of the legacy createShipmentWorkflow webflow screens
+    (enterShipmentDetails, enterTrackingDetails, enterContainerDetails,
+    pickShipmentItems, sendShipment). Routed via the "/api/shipments/..."
+    URL mappings.
+  version: 0.1.0
+servers:
+  - url: http://localhost:8080/openboxes
+    description: Local Docker baseline (docs/migration/RUNNING_LOCALLY.md)
+security:
+  - cookieAuth: []
+paths:
+  /api/shipments/wizardOptions:
+    get:
+      operationId: getShipmentWizardOptions
+      summary: Options for the create shipment wizard selects
+      description: >
+        Shipment types, allowed origins/destinations, shippers and container
+        types - mirrors the select taglibs used by the legacy wizard GSPs.
+      responses:
+        '200':
+          description: Wizard options.
+          content:
+            application/json:
+              schema:
+                type: object
+                required: [data]
+                properties:
+                  data:
+                    type: object
+                    required: [shipmentTypes, origins, destinations, shippers, containerTypes]
+                    properties:
+                      shipmentTypes:
+                        type: array
+                        items:
+                          $ref: '#/components/schemas/NamedReference'
+                      origins:
+                        type: array
+                        items:
+                          $ref: '#/components/schemas/LocationOption'
+                      destinations:
+                        type: array
+                        items:
+                          $ref: '#/components/schemas/LocationOption'
+                      shippers:
+                        type: array
+                        items:
+                          $ref: '#/components/schemas/NamedReference'
+                      containerTypes:
+                        type: array
+                        items:
+                          $ref: '#/components/schemas/NamedReference'
+        '403':
+          $ref: '#/components/responses/Forbidden'
+
+  /api/shipments:
+    post:
+      operationId: createShipment
+      summary: Create a shipment (wizard details step)
+      description: >
+        Mirrors the enterShipmentDetails transition of the legacy webflow for
+        a brand new shipment.
+      requestBody:
+        required: true
+        content:
+          application/json:
+            schema:
+              $ref: '#/components/schemas/ShipmentDetailsRequest'
+      responses:
+        '201':
+          $ref: '#/components/responses/WizardDetails'
+        '400':
+          $ref: '#/components/responses/ValidationError'
+
+  /api/shipments/{id}:
+    get:
+      operationId: readShipment
+      summary: Read shipment details and workflow metadata
+      parameters:
+        - $ref: '#/components/parameters/shipmentId'
+      responses:
+        '200':
+          $ref: '#/components/responses/WizardDetails'
+        '403':
+          $ref: '#/components/responses/Forbidden'
+        '404':
+          $ref: '#/components/responses/ControllerNotFound'
+
+  /api/shipments/{id}/details:
+    post:
+      operationId: saveShipmentDetails
+      summary: Update shipment details (wizard details step)
+      parameters:
+        - $ref: '#/components/parameters/shipmentId'
+      requestBody:
+        required: true
+        content:
+          application/json:
+            schema:
+              $ref: '#/components/schemas/ShipmentDetailsRequest'
+      responses:
+        '200':
+          $ref: '#/components/responses/WizardDetails'
+        '400':
+          $ref: '#/components/responses/ValidationError'
+        '404':
+          $ref: '#/components/responses/ControllerNotFound'
+
+  /api/shipments/{id}/tracking:
+    post:
+      operationId: saveShipmentTracking
+      summary: Update tracking details (wizard tracking step)
+      description: >
+        Mirrors the enterTrackingDetails transition, including the manual
+        binding of the shipper (nested in shipmentMethod) and the reference
+        numbers declared on the shipment workflow. A null shipperId removes
+        the shipment method entirely, like the legacy bindShipper.
+      parameters:
+        - $ref: '#/components/parameters/shipmentId'
+      requestBody:
+        required: true
+        content:
+          application/json:
+            schema:
+              type: object
+              properties:
+                carrierId:
+                  type: string
+                  nullable: true
+                shipperId:
+                  type: string
+                  nullable: true
+                trackingNumber:
+                  type: string
+                  nullable: true
+                recipientId:
+                  type: string
+                  nullable: true
+                referenceNumbers:
+                  type: object
+                  additionalProperties:
+                    type: string
+                    nullable: true
+                statedValue:
+                  type: number
+                  nullable: true
+                totalValue:
+                  type: number
+                  nullable: true
+                additionalInformation:
+                  type: string
+                  nullable: true
+      responses:
+        '200':
+          $ref: '#/components/responses/WizardDetails'
+        '400':
+          $ref: '#/components/responses/ValidationError'
+        '404':
+          $ref: '#/components/responses/ControllerNotFound'
+
+  /api/shipments/{id}/packing:
+    get:
+      operationId: getShipmentPacking
+      summary: Containers and items for the wizard packing step
+      parameters:
+        - $ref: '#/components/parameters/shipmentId'
+      responses:
+        '200':
+          description: Wizard details plus containers and unpacked items.
+          content:
+            application/json:
+              schema:
+                type: object
+                required: [data]
+                properties:
+                  data:
+                    allOf:
+                      - $ref: '#/components/schemas/WizardDetails'
+                      - type: object
+                        required: [containers, unpackedItems]
+                        properties:
+                          containers:
+                            type: array
+                            items:
+                              $ref: '#/components/schemas/ContainerDetails'
+                          unpackedItems:
+                            type: array
+                            items:
+                              $ref: '#/components/schemas/ItemDetails'
+        '403':
+          $ref: '#/components/responses/Forbidden'
+        '404':
+          $ref: '#/components/responses/ControllerNotFound'
+
+  /api/shipments/{id}/containers:
+    post:
+      operationId: createShipmentContainers
+      summary: Add containers to a shipment (wizard packing step)
+      description: >
+        Mirrors the addContainers flow event - creates one container per line
+        of containerText for the given container type, optionally nested
+        under parentContainerId.
+      parameters:
+        - $ref: '#/components/parameters/shipmentId'
+      requestBody:
+        required: true
+        content:
+          application/json:
+            schema:
+              type: object
+              required: [containerTypeId, containerText]
+              properties:
+                containerTypeId:
+                  type: string
+                containerText:
+                  type: string
+                parentContainerId:
+                  type: string
+                  nullable: true
+      responses:
+        '201':
+          $ref: '#/components/responses/ShipmentIdData'
+        '400':
+          $ref: '#/components/responses/ValidationError'
+        '404':
+          $ref: '#/components/responses/ControllerNotFound'
+
+  /api/shipments/{id}/containers/{containerId}:
+    delete:
+      operationId: deleteShipmentContainer
+      summary: Delete a container (wizard packing step)
+      description: >
+        Mirrors the deleteContainer / deleteContainersAndItems flow events.
+        With deleteItems=false the request fails if the container still
+        contains items; with deleteItems=true the items are deleted too.
+      parameters:
+        - $ref: '#/components/parameters/shipmentId'
+        - name: containerId
+          in: path
+          required: true
+          schema:
+            $ref: '../components/common.yaml#/components/schemas/Id'
+        - name: deleteItems
+          in: query
+          required: false
+          schema: { type: boolean }
+      responses:
+        '200':
+          $ref: '#/components/responses/ShipmentIdData'
+        '400':
+          $ref: '#/components/responses/ValidationError'
+        '404':
+          $ref: '#/components/responses/ControllerNotFound'
+
+  /api/shipments/{id}/items:
+    post:
+      operationId: addShipmentItem
+      summary: Add an inventory item to a shipment (wizard packing step)
+      parameters:
+        - $ref: '#/components/parameters/shipmentId'
+      requestBody:
+        required: true
+        content:
+          application/json:
+            schema:
+              type: object
+              required: [inventoryItemId, quantity]
+              properties:
+                inventoryItemId:
+                  type: string
+                containerId:
+                  type: string
+                  nullable: true
+                quantity:
+                  type: integer
+      responses:
+        '201':
+          $ref: '#/components/responses/ShipmentIdData'
+        '400':
+          $ref: '#/components/responses/ValidationError'
+        '404':
+          $ref: '#/components/responses/ControllerNotFound'
+
+  /api/shipments/{id}/items/{itemId}:
+    post:
+      operationId: updateShipmentItem
+      summary: Update a shipment item's quantity and/or container
+      parameters:
+        - $ref: '#/components/parameters/shipmentId'
+        - $ref: '#/components/parameters/itemId'
+      requestBody:
+        required: true
+        content:
+          application/json:
+            schema:
+              type: object
+              properties:
+                quantity:
+                  type: integer
+                containerId:
+                  type: string
+                  nullable: true
+      responses:
+        '200':
+          $ref: '#/components/responses/ItemData'
+        '400':
+          $ref: '#/components/responses/ValidationError'
+        '404':
+          $ref: '#/components/responses/ControllerNotFound'
+    delete:
+      operationId: deleteShipmentItem
+      summary: Delete a shipment item
+      parameters:
+        - $ref: '#/components/parameters/shipmentId'
+        - $ref: '#/components/parameters/itemId'
+      responses:
+        '200':
+          $ref: '#/components/responses/ShipmentIdData'
+        '400':
+          $ref: '#/components/responses/ValidationError'
+        '404':
+          $ref: '#/components/responses/ControllerNotFound'
+
+  /api/shipments/{id}/items/{itemId}/pick:
+    post:
+      operationId: pickShipmentItem
+      summary: Pick a shipment item (wizard picking step)
+      description: >
+        Mirrors the pickShipmentItem flow event - assigns the inventory item,
+        bin location and quantity of a picklist row.
+      parameters:
+        - $ref: '#/components/parameters/shipmentId'
+        - $ref: '#/components/parameters/itemId'
+      requestBody:
+        required: true
+        content:
+          application/json:
+            schema:
+              type: object
+              required: [inventoryItemId, quantity]
+              properties:
+                inventoryItemId:
+                  type: string
+                binLocationId:
+                  type: string
+                  nullable: true
+                quantity:
+                  type: integer
+      responses:
+        '200':
+          $ref: '#/components/responses/ItemData'
+        '400':
+          $ref: '#/components/responses/ValidationError'
+        '403':
+          $ref: '#/components/responses/Forbidden'
+        '404':
+          $ref: '#/components/responses/ControllerNotFound'
+
+  /api/shipments/{id}/items/{itemId}/split:
+    post:
+      operationId: splitShipmentItem
+      summary: Split a shipment item (wizard picking step)
+      description: >
+        Mirrors the splitShipmentItem2 flow event - clones the item with
+        quantity zero so a second bin/lot can be picked.
+      parameters:
+        - $ref: '#/components/parameters/shipmentId'
+        - $ref: '#/components/parameters/itemId'
+      responses:
+        '200':
+          $ref: '#/components/responses/ItemData'
+        '403':
+          $ref: '#/components/responses/Forbidden'
+        '404':
+          $ref: '#/components/responses/ControllerNotFound'
+
+  /api/shipments/{id}/picklist:
+    get:
+      operationId: getShipmentPicklist
+      summary: Picklist data for the wizard picking and sending steps
+      description: >
+        Shipment items in picklist order plus, for each product, the quantity
+        available in each bin location of the session warehouse.
+      parameters:
+        - $ref: '#/components/parameters/shipmentId'
+      responses:
+        '200':
+          description: Wizard details plus picklist data.
+          content:
+            application/json:
+              schema:
+                type: object
+                required: [data]
+                properties:
+                  data:
+                    allOf:
+                      - $ref: '#/components/schemas/WizardDetails'
+                      - type: object
+                        required: [shipmentItems, binLocationsByProduct, isOrigin]
+                        properties:
+                          shipmentItems:
+                            type: array
+                            items:
+                              $ref: '#/components/schemas/ItemDetails'
+                          binLocationsByProduct:
+                            type: object
+                            additionalProperties:
+                              type: array
+                              items:
+                                type: object
+                                properties:
+                                  binLocation:
+                                    $ref: '#/components/schemas/NullableNamedReference'
+                                  inventoryItem:
+                                    type: object
+                                    nullable: true
+                                    properties:
+                                      id:
+                                        $ref: '../components/common.yaml#/components/schemas/Id'
+                                      lotNumber:
+                                        type: string
+                                        nullable: true
+                                      expirationDate:
+                                        type: string
+                                        nullable: true
+                                  quantity:
+                                    type: integer
+                          isOrigin:
+                            type: boolean
+        '403':
+          $ref: '#/components/responses/Forbidden'
+        '404':
+          $ref: '#/components/responses/ControllerNotFound'
+
+  /api/shipments/{id}/validatePicklist:
+    post:
+      operationId: validateShipmentPicklist
+      summary: Validate the shipment's picklist (wizard picking step)
+      parameters:
+        - $ref: '#/components/parameters/shipmentId'
+      responses:
+        '200':
+          description: Validation result (valid flag plus error messages).
+          content:
+            application/json:
+              schema:
+                type: object
+                required: [data]
+                properties:
+                  data:
+                    type: object
+                    required: [valid, errors]
+                    properties:
+                      valid:
+                        type: boolean
+                      errors:
+                        type: array
+                        items:
+                          type: string
+        '403':
+          $ref: '#/components/responses/Forbidden'
+        '404':
+          $ref: '#/components/responses/ControllerNotFound'
+
+  /api/shipments/{id}/clearPicklist:
+    post:
+      operationId: clearShipmentPicklist
+      summary: Clear the shipment's picklist (superusers only)
+      parameters:
+        - $ref: '#/components/parameters/shipmentId'
+      responses:
+        '200':
+          $ref: '#/components/responses/ShipmentIdData'
+        '403':
+          $ref: '#/components/responses/Forbidden'
+        '404':
+          $ref: '#/components/responses/ControllerNotFound'
+
+  /api/shipments/{id}/send:
+    post:
+      operationId: sendShipment
+      summary: Send the shipment (wizard sending step)
+      description: >
+        Mirrors the sendShipmentAction flow state - validates the picklist,
+        sends the shipment (debiting stock at the origin) and triggers the
+        notification emails to the selected recipients. Cannot be undone.
+      parameters:
+        - $ref: '#/components/parameters/shipmentId'
+      requestBody:
+        required: true
+        content:
+          application/json:
+            schema:
+              type: object
+              properties:
+                actualShippingDate:
+                  type: string
+                  nullable: true
+                  description: Format yyyy-MM-dd HH:mm; defaults to now.
+                comments:
+                  type: string
+                  nullable: true
+                debitStockOnSend:
+                  type: boolean
+                  default: true
+                  description: >
+                    Whether sending debits stock from the origin warehouse
+                    (mirrors the legacy debitStockOnSend flag).
+                emailRecipientIds:
+                  type: array
+                  items:
+                    type: string
+      responses:
+        '200':
+          $ref: '#/components/responses/WizardDetails'
+        '400':
+          $ref: '#/components/responses/ValidationError'
+        '403':
+          $ref: '#/components/responses/Forbidden'
+        '404':
+          $ref: '#/components/responses/ControllerNotFound'
+
+components:
+  securitySchemes:
+    cookieAuth:
+      $ref: '../components/common.yaml#/components/securitySchemes/cookieAuth'
+
+  parameters:
+    shipmentId:
+      name: id
+      in: path
+      required: true
+      schema:
+        $ref: '../components/common.yaml#/components/schemas/Id'
+      description: Shipment id.
+
+    itemId:
+      name: itemId
+      in: path
+      required: true
+      schema:
+        $ref: '../components/common.yaml#/components/schemas/Id'
+      description: Shipment item id.
+
+  responses:
+    Forbidden:
+      description: The user does not have the role required for this action.
+      content:
+        application/json:
+          schema:
+            type: object
+            required: [errorCode, errorMessage]
+            properties:
+              errorCode:
+                type: integer
+                enum: [403]
+              errorMessage:
+                type: string
+    ControllerNotFound:
+      description: >
+        Unknown shipment (or container/item) id. Rendered directly by the
+        controller with errorCode and errorMessage.
+      content:
+        application/json:
+          schema:
+            type: object
+            required: [errorCode, errorMessage]
+            properties:
+              errorCode:
+                type: integer
+                enum: [404]
+              errorMessage:
+                type: string
+
+    ValidationError:
+      description: Validation or business errors.
+      content:
+        application/json:
+          schema:
+            type: object
+            required: [errorCode, errorMessage]
+            properties:
+              errorCode:
+                type: integer
+                enum: [400]
+              errorMessage:
+                type: string
+                nullable: true
+              errors:
+                type: array
+                items:
+                  type: string
+
+    WizardDetails:
+      description: Shipment details and workflow metadata.
+      content:
+        application/json:
+          schema:
+            type: object
+            required: [data]
+            properties:
+              data:
+                $ref: '#/components/schemas/WizardDetails'
+
+    ShipmentIdData:
+      description: Shipment id echo after a mutation.
+      content:
+        application/json:
+          schema:
+            type: object
+            required: [data]
+            properties:
+              data:
+                type: object
+                required: [id]
+                properties:
+                  id:
+                    $ref: '../components/common.yaml#/components/schemas/Id'
+
+    ItemData:
+      description: Shipment item details after a mutation.
+      content:
+        application/json:
+          schema:
+            type: object
+            required: [data]
+            properties:
+              data:
+                $ref: '#/components/schemas/ItemDetails'
+
+  schemas:
+    NamedReference:
+      type: object
+      required: [id, name]
+      properties:
+        id:
+          $ref: '../components/common.yaml#/components/schemas/Id'
+        name:
+          type: string
+          nullable: true
+
+    NullableNamedReference:
+      type: object
+      nullable: true
+      required: [id, name]
+      properties:
+        id:
+          $ref: '../components/common.yaml#/components/schemas/Id'
+        name:
+          type: string
+          nullable: true
+
+    LocationOption:
+      type: object
+      required: [id, name]
+      properties:
+        id:
+          $ref: '../components/common.yaml#/components/schemas/Id'
+        name:
+          type: string
+          nullable: true
+        locationType:
+          type: string
+          nullable: true
+
+    ShipmentDetailsRequest:
+      type: object
+      properties:
+        name:
+          type: string
+          nullable: true
+        shipmentTypeId:
+          type: string
+          nullable: true
+        originId:
+          type: string
+          nullable: true
+        destinationId:
+          type: string
+          nullable: true
+        expectedShippingDate:
+          type: string
+          nullable: true
+          description: Format yyyy-MM-dd.
+        expectedDeliveryDate:
+          type: string
+          nullable: true
+          description: Format yyyy-MM-dd.
+
+    WizardDetails:
+      type: object
+      required: [id, name, shipmentItemCount]
+      properties:
+        id:
+          $ref: '../components/common.yaml#/components/schemas/Id'
+        name:
+          type: string
+          nullable: true
+        shipmentNumber:
+          type: string
+          nullable: true
+        status:
+          type: string
+          nullable: true
+        hasShipped:
+          type: boolean
+        shipmentType:
+          $ref: '#/components/schemas/NullableNamedReference'
+        origin:
+          type: object
+          nullable: true
+          properties:
+            id:
+              $ref: '../components/common.yaml#/components/schemas/Id'
+            name:
+              type: string
+              nullable: true
+            isWarehouse:
+              type: boolean
+        destination:
+          $ref: '#/components/schemas/NullableNamedReference'
+        expectedShippingDate:
+          type: string
+          nullable: true
+        expectedDeliveryDate:
+          type: string
+          nullable: true
+        actualShippingDate:
+          type: string
+          nullable: true
+        carrier:
+          $ref: '#/components/schemas/PersonReference'
+        recipient:
+          $ref: '#/components/schemas/PersonReference'
+        shipper:
+          $ref: '#/components/schemas/NullableNamedReference'
+        trackingNumber:
+          type: string
+          nullable: true
+        statedValue:
+          type: number
+          nullable: true
+        totalValue:
+          type: number
+          nullable: true
+        additionalInformation:
+          type: string
+          nullable: true
+        referenceNumbers:
+          type: array
+          items:
+            type: object
+            properties:
+              id:
+                $ref: '../components/common.yaml#/components/schemas/Id'
+              identifier:
+                type: string
+                nullable: true
+              referenceNumberType:
+                $ref: '#/components/schemas/NullableNamedReference'
+        shipmentItemCount:
+          type: integer
+        itemRecipients:
+          type: array
+          items:
+            $ref: '#/components/schemas/PersonReference'
+        workflow:
+          type: object
+          nullable: true
+          properties:
+            id:
+              $ref: '../components/common.yaml#/components/schemas/Id'
+            name:
+              type: string
+              nullable: true
+            excludedFields:
+              type: array
+              items:
+                type: string
+            referenceNumberTypes:
+              type: array
+              items:
+                $ref: '#/components/schemas/NamedReference'
+
+    PersonReference:
+      type: object
+      nullable: true
+      required: [id, name]
+      properties:
+        id:
+          $ref: '../components/common.yaml#/components/schemas/Id'
+        name:
+          type: string
+          nullable: true
+        email:
+          type: string
+          nullable: true
+
+    ContainerDetails:
+      type: object
+      required: [id, name, shipmentItems, childContainers]
+      properties:
+        id:
+          $ref: '../components/common.yaml#/components/schemas/Id'
+        name:
+          type: string
+          nullable: true
+        sortOrder:
+          type: integer
+          nullable: true
+        containerType:
+          $ref: '#/components/schemas/NullableNamedReference'
+        itemCount:
+          type: integer
+        shipmentItems:
+          type: array
+          items:
+            $ref: '#/components/schemas/ItemDetails'
+        childContainers:
+          type: array
+          items:
+            type: object
+            properties:
+              id:
+                $ref: '../components/common.yaml#/components/schemas/Id'
+              name:
+                type: string
+                nullable: true
+              containerType:
+                $ref: '#/components/schemas/NullableNamedReference'
+              itemCount:
+                type: integer
+              shipmentItems:
+                type: array
+                items:
+                  $ref: '#/components/schemas/ItemDetails'
+
+    ItemDetails:
+      type: object
+      required: [id, quantity]
+      properties:
+        id:
+          $ref: '../components/common.yaml#/components/schemas/Id'
+        quantity:
+          type: integer
+        product:
+          type: object
+          nullable: true
+          properties:
+            id:
+              $ref: '../components/common.yaml#/components/schemas/Id'
+            productCode:
+              type: string
+              nullable: true
+            name:
+              type: string
+              nullable: true
+            unitOfMeasure:
+              type: string
+              nullable: true
+        inventoryItem:
+          type: object
+          nullable: true
+          properties:
+            id:
+              $ref: '../components/common.yaml#/components/schemas/Id'
+            lotNumber:
+              type: string
+              nullable: true
+            expirationDate:
+              type: string
+              nullable: true
+        binLocation:
+          $ref: '#/components/schemas/NullableNamedReference'
+        container:
+          $ref: '#/components/schemas/NullableNamedReference'
+        recipient:
+          $ref: '#/components/schemas/PersonReference'

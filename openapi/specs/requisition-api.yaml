@@ -627,6 +627,82 @@ paths:
         '404':
           $ref: '#/components/responses/ControllerNotFound'
 
+  /api/requisitions/{id}/deliveryNote:
+    get:
+      operationId: getRequisitionDeliveryNote
+      summary: Read delivery-note data for a requisition
+      description: >
+        Data backing the migrated deliveryNote/print screen - requisition
+        header and addresses, shipment notes, plus the non-canceled items
+        (grouped into COLD_CHAIN / CONTROLLED_SUBSTANCE / HAZARDOUS_MATERIAL /
+        GENERAL_GOODS like the legacy GSP) and canceled items, each with the
+        shipment-item or picklist rows shown on the printout.
+      parameters:
+        - $ref: '#/components/parameters/requisitionId'
+      responses:
+        '200':
+          description: Delivery note data.
+          content:
+            application/json:
+              schema:
+                type: object
+                required: [data]
+                properties:
+                  data:
+                    type: object
+                    required: [id, requisitionItems, canceledItems, notes]
+                    properties:
+                      id:
+                        $ref: '../components/common.yaml#/components/schemas/Id'
+                      requestNumber:
+                        type: string
+                        nullable: true
+                      name:
+                        type: string
+                        nullable: true
+                      origin:
+                        $ref: '#/components/schemas/DeliveryNoteLocation'
+                      destination:
+                        $ref: '#/components/schemas/DeliveryNoteLocation'
+                      requestedBy:
+                        type: string
+                        nullable: true
+                      dateRequested:
+                        type: string
+                        nullable: true
+                      shipDate:
+                        type: string
+                        nullable: true
+                      receivedDate:
+                        type: string
+                        nullable: true
+                      hasPackLevel1:
+                        type: boolean
+                      hasPackLevel2:
+                        type: boolean
+                      notes:
+                        type: object
+                        properties:
+                          trackingNumber:
+                            type: string
+                            nullable: true
+                          driverName:
+                            type: string
+                            nullable: true
+                          comments:
+                            type: string
+                            nullable: true
+                      requisitionItems:
+                        type: array
+                        items:
+                          $ref: '#/components/schemas/DeliveryNoteItem'
+                      canceledItems:
+                        type: array
+                        items:
+                          $ref: '#/components/schemas/DeliveryNoteItem'
+        '404':
+          $ref: '#/components/responses/ControllerNotFound'
+
   /api/requisitions/{id}/documents:
     post:
       operationId: uploadRequisitionDocument
@@ -971,6 +1047,132 @@ components:
                 $ref: '#/components/schemas/RequisitionDetails'
 
   schemas:
+    DeliveryNoteLocation:
+      type: object
+      nullable: true
+      required: [id, name]
+      properties:
+        id:
+          $ref: '../components/common.yaml#/components/schemas/Id'
+        name:
+          type: string
+          nullable: true
+        address:
+          type: object
+          nullable: true
+          properties:
+            address:
+              type: string
+              nullable: true
+            address2:
+              type: string
+              nullable: true
+            city:
+              type: string
+              nullable: true
+            stateOrProvince:
+              type: string
+              nullable: true
+            postalCode:
+              type: string
+              nullable: true
+            country:
+              type: string
+              nullable: true
+
+    DeliveryNoteItem:
+      type: object
+      required: [id, group, product, quantity, totalQuantityPicked, rows]
+      properties:
+        id:
+          $ref: '../components/common.yaml#/components/schemas/Id'
+        group:
+          type: string
+          enum: [COLD_CHAIN, CONTROLLED_SUBSTANCE, HAZARDOUS_MATERIAL, GENERAL_GOODS]
+        product:
+          type: object
+          properties:
+            id:
+              $ref: '../components/common.yaml#/components/schemas/Id'
+            productCode:
+              type: string
+              nullable: true
+            name:
+              type: string
+              nullable: true
+            unitOfMeasure:
+              type: string
+              nullable: true
+        status:
+          type: string
+          nullable: true
+        quantity:
+          type: integer
+        totalQuantityPicked:
+          type: integer
+        cancelReasonCode:
+          type: string
+          nullable: true
+        cancelComments:
+          type: string
+          nullable: true
+        pickReasonCode:
+          type: string
+          nullable: true
+        isCanceled:
+          type: boolean
+        parentItem:
+          type: object
+          nullable: true
+          properties:
+            productCode:
+              type: string
+              nullable: true
+            productName:
+              type: string
+              nullable: true
+            quantity:
+              type: integer
+            unitOfMeasure:
+              type: string
+              nullable: true
+            isSubstituted:
+              type: boolean
+            isChanged:
+              type: boolean
+            cancelReasonCode:
+              type: string
+              nullable: true
+            cancelComments:
+              type: string
+              nullable: true
+        rows:
+          type: array
+          items:
+            type: object
+            properties:
+              packLevel1:
+                type: string
+                nullable: true
+              packLevel2:
+                type: string
+                nullable: true
+              lotNumber:
+                type: string
+                nullable: true
+              expirationDate:
+                type: string
+                nullable: true
+              splitQuantity:
+                type: integer
+                nullable: true
+              quantityReceived:
+                type: integer
+                nullable: true
+              comments:
+                type: string
+                nullable: true
+
     NamedReference:
       type: object
       required: [id, name]

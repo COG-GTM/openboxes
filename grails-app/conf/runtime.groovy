@@ -261,7 +261,7 @@ openboxes {
                     defaultLabel: "Receiving",
                     enabled: false,
                     menuItems: [
-                        [label: "shipping.createIncomingShipment.label", defaultLabel: "Create inbound shipment", href: "/createShipmentWorkflow/createShipment?type=INCOMING"],
+                        [label: "shipping.createIncomingShipment.label", defaultLabel: "Create inbound shipment", href: "/createShipmentWorkflow/details?type=INCOMING"],
                         [label: "shipping.listIncoming.label", defaultLabel: "List Inbound Shipments", href: "/shipment/list?type=incoming"],
                         [label: "default.all.label", defaultLabel: "All", href: "/shipment/list?type=incoming"],
                     ]
@@ -291,7 +291,7 @@ openboxes {
                     defaultLabel: "Shipping",
                     enabled: false,
                     menuItems: [
-                        [label: "shipping.createOutgoingShipment.label", defaultLabel: "Create outbound shipment", href: "/createShipmentWorkflow/createShipment?type=OUTGOING"],
+                        [label: "shipping.createOutgoingShipment.label", defaultLabel: "Create outbound shipment", href: "/createShipmentWorkflow/details?type=OUTGOING"],
                         [label: "shipping.listOutgoing.label", defaultLabel: "List Outbound Shipments", href: "/shipment/list?type=outgoing"],
                         [label: "default.all.label", defaultLabel: "All", href: "/shipment/list?type=outgoing"],
                     ]

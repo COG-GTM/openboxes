@@ -33,14 +33,14 @@
 			<!-- you can only edit a shipment or it's packing list if you are at the origin warehouse, or if the origin is not a warehouse, and you are at the destination warehouse -->
 			<g:if test="${(session?.warehouse?.id == shipmentInstance?.origin?.id) || (!shipmentInstance?.origin?.isWarehouse() && session?.warehouse?.id == shipmentInstance?.destination?.id)}">
 				<div class="action-menu-item">
-					<g:link controller="createShipmentWorkflow" action="createShipment" id="${shipmentInstance.id}">
+					<g:link controller="createShipmentWorkflow" action="details" id="${shipmentInstance.id}">
 						<img src="${resource(dir:'images/icons/silk',file:'page_white_edit.png')}" alt="Edit Shipment" style="vertical-align: middle" />&nbsp;
 						<g:if test="${request.request.requestURL.toString().contains('createShipment')}"><warehouse:message code="shipping.editShipment.label"/></g:if>
 						<g:else><warehouse:message code="shipping.editShipment.label"/></g:else>
 					</g:link>
 				</div>
 				<div class="action-menu-item">
-					<g:link controller="createShipmentWorkflow" action="createShipment" event="enterContainerDetails"  id="${shipmentInstance?.id }" params="[skipTo:'Packing']">
+					<g:link controller="createShipmentWorkflow" action="packing"  id="${shipmentInstance?.id }">
 						<img src="${resource(dir:'images/icons/silk',file:'page_edit.png')}" alt="Edit Packing List" style="vertical-align: middle"/>&nbsp;
 						<warehouse:message code="shipping.editPackingList.label"/></g:link>
 				</div>

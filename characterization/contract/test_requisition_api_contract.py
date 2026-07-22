@@ -184,6 +184,22 @@ def test_print_draft_unknown(client):
     assert resp.status_code == 404
 
 
+def test_delivery_note(client, requisition_id):
+    resp = check(client, spec, "GET", "/api/requisitions/{id}/deliveryNote",
+                 path=f"/api/requisitions/{requisition_id}/deliveryNote")
+    assert resp.status_code == 200
+    data = resp.json()["data"]
+    assert data["id"] == requisition_id
+    assert isinstance(data["requisitionItems"], list)
+    assert isinstance(data["canceledItems"], list)
+
+
+def test_delivery_note_unknown(client):
+    resp = check(client, spec, "GET", "/api/requisitions/{id}/deliveryNote",
+                 path="/api/requisitions/doesnotexist0000/deliveryNote")
+    assert resp.status_code == 404
+
+
 def test_upload_document_empty(client, requisition_id):
     resp = check(client, spec, "POST", "/api/requisitions/{id}/documents",
                  path=f"/api/requisitions/{requisition_id}/documents",

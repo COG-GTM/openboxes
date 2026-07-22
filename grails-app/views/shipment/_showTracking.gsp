@@ -6,7 +6,7 @@
     </h2>
 
     <div class="buttons left">
-        <g:link class="button" controller="createShipmentWorkflow" action="createShipment" event="enterTrackingDetails" id="${shipmentInstance?.id }" params="[skipTo:'Tracking']">
+        <g:link class="button" controller="createShipmentWorkflow" action="tracking" id="${shipmentInstance?.id }">
             <img src="${resource(dir:'images/icons/silk',file:'pencil.png')}" />
             <warehouse:message code="default.edit.label" args="[warehouse.message(code: 'shipmentMethod.trackingNumber.label', default: 'Tracking Number')]"/>
         </g:link>

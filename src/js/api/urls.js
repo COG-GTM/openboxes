@@ -324,6 +324,25 @@ export const REQUISITION_PICK = (id) => `${REQUISITION_BY_ID(id)}/pick`;
 export const REQUISITION_PICKLIST = (id) => `${REQUISITION_BY_ID(id)}/picklist`;
 export const REQUISITION_PICKLIST_ITEMS = (id) => `${REQUISITION_BY_ID(id)}/picklistItems`;
 
+// SHIPMENT (create shipment wizard, classic shipping flow)
+export const SHIPMENT_API = `${API}/shipments`;
+export const SHIPMENT_BY_ID = (id) => `${SHIPMENT_API}/${id}`;
+export const SHIPMENT_WIZARD_OPTIONS = `${SHIPMENT_API}/wizardOptions`;
+export const SHIPMENT_DETAILS = (id) => `${SHIPMENT_BY_ID(id)}/details`;
+export const SHIPMENT_TRACKING = (id) => `${SHIPMENT_BY_ID(id)}/tracking`;
+export const SHIPMENT_PACKING = (id) => `${SHIPMENT_BY_ID(id)}/packing`;
+export const SHIPMENT_CONTAINERS = (id) => `${SHIPMENT_BY_ID(id)}/containers`;
+export const SHIPMENT_CONTAINER_BY_ID = (id, containerId) => `${SHIPMENT_CONTAINERS(id)}/${containerId}`;
+export const SHIPMENT_ITEMS = (id) => `${SHIPMENT_BY_ID(id)}/items`;
+export const SHIPMENT_ITEM_BY_ID = (id, itemId) => `${SHIPMENT_ITEMS(id)}/${itemId}`;
+export const SHIPMENT_ITEM_PICK = (id, itemId) => `${SHIPMENT_ITEM_BY_ID(id, itemId)}/pick`;
+export const SHIPMENT_ITEM_SPLIT = (id, itemId) => `${SHIPMENT_ITEM_BY_ID(id, itemId)}/split`;
+export const SHIPMENT_PICKLIST = (id) => `${SHIPMENT_BY_ID(id)}/picklist`;
+export const SHIPMENT_VALIDATE_PICKLIST = (id) => `${SHIPMENT_BY_ID(id)}/validatePicklist`;
+export const SHIPMENT_CLEAR_PICKLIST = (id) => `${SHIPMENT_BY_ID(id)}/clearPicklist`;
+export const SHIPMENT_SEND = (id) => `${SHIPMENT_BY_ID(id)}/send`;
+export const REQUISITION_DELIVERY_NOTE = (id) => `${REQUISITION_BY_ID(id)}/deliveryNote`;
+
 // REQUISITION TEMPLATE (stock list template screens)
 export const REQUISITION_TEMPLATE_API = `${API}/requisitionTemplates`;
 export const REQUISITION_TEMPLATE_BY_ID = (id) => `${REQUISITION_TEMPLATE_API}/${id}`;

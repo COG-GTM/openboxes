@@ -374,6 +374,142 @@ class RequisitionApiController extends BaseApiController {
     }
 
     /**
+     * Data backing the migrated delivery note print screen (legacy
+     * deliveryNote/print GSP): requisition header, addresses, shipment notes
+     * and the per-item rows (one per shipment item or picklist group) split
+     * into the same product groups as the legacy screen.
+     */
+    def deliveryNote() {
+        Requisition requisition = Requisition.get(params.id)
+        if (!requisition) {
+            response.status = 404
+            render([errorCode: 404, errorMessage: "Requisition ${params.id} not found"] as JSON)
+            return
+        }
+        Picklist picklist = Picklist.findByRequisition(requisition)
+        def shipment = requisition.shipment
+        def requisitionItems = requisition.requisitionItems.sort { it.product?.name }
+        def canceledItems = requisitionItems.findAll { it.isCanceled() }
+        def activeItems = requisitionItems.findAll { !it.isCanceled() && !it.isChanged() }
+
+        Closure itemGroup = { RequisitionItem item ->
+            if (item.product?.coldChain) return "COLD_CHAIN"
+            if (item.product?.controlledSubstance) return "CONTROLLED_SUBSTANCE"
+            if (item.product?.hazardousMaterial) return "HAZARDOUS_MATERIAL"
+            return "GENERAL_GOODS"
+        }
+
+        Closure itemDetails = { RequisitionItem requisitionItem ->
+            def shipmentItems = shipment?.shipmentItems?.findAll { it.requisitionItem == requisitionItem } ?: []
+            def picklistItemsGroup = picklist ? requisitionItem.retrievePicklistItems()
+                    ?.findAll { it.quantity > 0 }?.groupBy { it.inventoryItem }?.values()?.toList() : null
+            def rows = []
+            if (shipmentItems) {
+                rows = shipmentItems.collect { shipmentItem ->
+                    [
+                            packLevel1      : shipmentItem.container?.parentContainer?.name ?: shipmentItem.container?.name,
+                            packLevel2      : shipmentItem.container?.parentContainer ? shipmentItem.container?.name : null,
+                            lotNumber       : shipmentItem.inventoryItem?.lotNumber,
+                            expirationDate  : shipmentItem.inventoryItem?.expirationDate?.format("yyyy-MM-dd"),
+                            splitQuantity   : shipmentItem.quantity ?: 0,
+                            quantityReceived: shipmentItem.quantityReceived ?: 0,
+                            comments        : shipmentItem.comments ? shipmentItem.comments.join(', ') : null,
+                    ]
+                }
+            } else if (picklistItemsGroup) {
+                rows = picklistItemsGroup.collect { picklistItems ->
+                    [
+                            packLevel1      : null,
+                            packLevel2      : null,
+                            lotNumber       : picklistItems.first()?.inventoryItem?.lotNumber,
+                            expirationDate  : picklistItems.first()?.inventoryItem?.expirationDate?.format("yyyy-MM-dd"),
+                            splitQuantity   : picklistItems.sum { it.quantity } ?: 0,
+                            quantityReceived: null,
+                            comments        : null,
+                    ]
+                }
+            } else {
+                def inventoryItem = requisitionItem.shipmentItems ?
+                        requisitionItem.shipmentItems.toList().first().inventoryItem : null
+                rows = [[
+                        packLevel1      : null,
+                        packLevel2      : null,
+                        lotNumber       : inventoryItem?.lotNumber,
+                        expirationDate  : inventoryItem?.expirationDate?.format("yyyy-MM-dd"),
+                        splitQuantity   : null,
+                        quantityReceived: null,
+                        comments        : null,
+                ]]
+            }
+            def parent = requisitionItem.parentRequisitionItem
+            [
+                    id                : requisitionItem.id,
+                    group             : itemGroup(requisitionItem),
+                    product           : [
+                            id           : requisitionItem.product?.id,
+                            productCode  : requisitionItem.product?.productCode,
+                            name         : requisitionItem.product?.displayNameOrDefaultName,
+                            unitOfMeasure: requisitionItem.product?.unitOfMeasure ?: "EA",
+                    ],
+                    status            : requisitionItem.status?.toString(),
+                    quantity          : requisitionItem.quantity ?: 0,
+                    totalQuantityPicked: requisitionItem.totalQuantityPicked() ?: 0,
+                    cancelReasonCode  : reasonCodeLabel(requisitionItem.cancelReasonCode),
+                    cancelComments    : requisitionItem.cancelComments,
+                    pickReasonCode    : reasonCodeLabel(requisitionItem.pickReasonCode),
+                    isCanceled        : requisitionItem.isCanceled(),
+                    parentItem        : parent ? [
+                            productCode     : parent.product?.productCode,
+                            productName     : parent.product?.displayNameOrDefaultName,
+                            quantity        : parent.quantity ?: 0,
+                            unitOfMeasure   : parent.product?.unitOfMeasure ?: "EA",
+                            isSubstituted   : parent.isSubstituted(),
+                            isChanged       : parent.isChanged(),
+                            cancelReasonCode: reasonCodeLabel(parent.cancelReasonCode, true),
+                            cancelComments  : parent.cancelComments,
+                    ] : null,
+                    rows              : rows,
+            ]
+        }
+
+        Closure addressDetails = { location ->
+            location ? [
+                    id     : location.id,
+                    name   : location.name,
+                    address: location.address ? [
+                            address        : location.address.address,
+                            address2       : location.address.address2,
+                            city           : location.address.city,
+                            stateOrProvince: location.address.stateOrProvince,
+                            postalCode     : location.address.postalCode,
+                            country        : location.address.country,
+                    ] : null,
+            ] : null
+        }
+
+        render([data: [
+                id              : requisition.id,
+                requestNumber   : requisition.requestNumber,
+                name            : requisition.name,
+                origin          : addressDetails(requisition.origin),
+                destination     : addressDetails(requisition.destination),
+                requestedBy     : requisition.requestedBy?.name,
+                dateRequested   : requisition.dateRequested?.format("yyyy-MM-dd"),
+                shipDate        : shipment?.expectedShippingDate?.format("yyyy-MM-dd"),
+                receivedDate    : shipment?.receipt?.actualDeliveryDate?.format("yyyy-MM-dd"),
+                hasPackLevel1   : shipment?.shipmentItems?.any { it.container } ?: false,
+                hasPackLevel2   : shipment?.shipmentItems?.any { it.container && it.container.parentContainer } ?: false,
+                notes           : [
+                        trackingNumber: shipment?.referenceNumbers ? shipment.referenceNumbers.first()?.identifier : null,
+                        driverName    : shipment?.driverName,
+                        comments      : shipment?.additionalInformation,
+                ],
+                requisitionItems: activeItems.collect(itemDetails),
+                canceledItems   : canceledItems.collect(itemDetails),
+        ]] as JSON)
+    }
+
+    /**
      * Mirrors the legacy RequisitionController.edit action: transitions the
      * requisition to EDITING when it has not reached that status yet, then
      * returns the details needed for the edit screen.
@@ -703,6 +839,21 @@ class RequisitionApiController extends BaseApiController {
                        filename: documentInstance.filename,
                        documentNumber: documentInstance.documentNumber,
                        documentType: documentType ? [id: documentType.id, name: documentType.name] : null]] as JSON)
+    }
+
+    /**
+     * Localizes a reason code like the legacy delivery note GSP: the message
+     * key uses the raw code (item-level codes) or, when splitParenthetical is
+     * set (parent cancel reason), the token inside parentheses (e.g.
+     * "SUBSTITUTION(CANCELED)" -> enum.ReasonCode.CANCELED).
+     */
+    private String reasonCodeLabel(String reasonCode, boolean splitParenthetical = false) {
+        if (!reasonCode) {
+            return reasonCode
+        }
+        String code = splitParenthetical && reasonCode.contains("(") ?
+                reasonCode.split("\\(", 2)[1].replace(")", "") : reasonCode
+        return g.message(code: "enum.ReasonCode." + code, default: reasonCode)
     }
 
     private Map getDetails(Requisition requisition) {

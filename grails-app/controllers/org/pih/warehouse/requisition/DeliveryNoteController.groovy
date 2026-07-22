@@ -10,18 +10,13 @@
 package org.pih.warehouse.requisition
 
 import grails.gorm.transactions.Transactional
-import org.pih.warehouse.picklist.Picklist
-import org.pih.warehouse.core.Location
 import org.pih.warehouse.shipping.Shipment
 
 @Transactional
 class DeliveryNoteController {
 
     def print() {
-        def requisition = Requisition.get(params.id)
-        def picklist = Picklist.findByRequisition(requisition)
-        def location = Location.get(session.warehouse.id)
-        [requisition: requisition, picklist: picklist, location: location, sortOrder: params.sortOrder]
+        render(view: "/common/react")
     }
 
     def printOutboundReturn() {

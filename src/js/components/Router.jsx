@@ -863,6 +863,36 @@ const AsyncPicklistReturnPrint = Loadable({
   loading: Loading,
 });
 
+const AsyncCreateShipmentDetails = Loadable({
+  loader: () => import('components/shipment/CreateShipmentDetails'),
+  loading: Loading,
+});
+
+const AsyncCreateShipmentTracking = Loadable({
+  loader: () => import('components/shipment/CreateShipmentTracking'),
+  loading: Loading,
+});
+
+const AsyncCreateShipmentPacking = Loadable({
+  loader: () => import('components/shipment/CreateShipmentPacking'),
+  loading: Loading,
+});
+
+const AsyncCreateShipmentPicking = Loadable({
+  loader: () => import('components/shipment/CreateShipmentPicking'),
+  loading: Loading,
+});
+
+const AsyncCreateShipmentSending = Loadable({
+  loader: () => import('components/shipment/CreateShipmentSending'),
+  loading: Loading,
+});
+
+const AsyncDeliveryNotePrint = Loadable({
+  loader: () => import('components/shipment/DeliveryNotePrint'),
+  loading: Loading,
+});
+
 const AsyncRequisitionList = Loadable({
   loader: () => import('components/requisition/RequisitionList'),
   loading: Loading,
@@ -1022,6 +1052,13 @@ const Router = () => {
             <MainLayoutRoute path="**/requisitionItem/list" component={AsyncRequisitionItemList} />
             <MainLayoutRoute path="**/picklist/print/:requisitionId" component={AsyncPicklistPrint} />
             <MainLayoutRoute path="**/picklist/returnPrint/:orderId" component={AsyncPicklistReturnPrint} />
+            <MainLayoutRoute path="**/createShipmentWorkflow/details/:shipmentId" component={AsyncCreateShipmentDetails} />
+            <MainLayoutRoute path="**/createShipmentWorkflow/details" component={AsyncCreateShipmentDetails} />
+            <MainLayoutRoute path="**/createShipmentWorkflow/tracking/:shipmentId" component={AsyncCreateShipmentTracking} />
+            <MainLayoutRoute path="**/createShipmentWorkflow/packing/:shipmentId" component={AsyncCreateShipmentPacking} />
+            <MainLayoutRoute path="**/createShipmentWorkflow/picking/:shipmentId" component={AsyncCreateShipmentPicking} />
+            <MainLayoutRoute path="**/createShipmentWorkflow/sending/:shipmentId" component={AsyncCreateShipmentSending} />
+            <MainLayoutRoute path="**/deliveryNote/print/:requisitionId" component={AsyncDeliveryNotePrint} />
             <MainLayoutRoute path="**/purchaseOrder/list" component={AsyncPurchaseOrderList} />
             <MainLayoutRoute path="**/requisitionTemplate/list" component={AsyncStockList} />
             <MainLayoutRoute path="**/requisitionTemplate/show/:requisitionTemplateId" component={AsyncRequisitionTemplateShow} />

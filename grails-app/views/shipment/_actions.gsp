@@ -47,7 +47,7 @@
         <g:if test="${shipmentInstance.hasShipped()}">
             <g:isUserInRole roles="[org.pih.warehouse.core.RoleType.ROLE_ADMIN]">
                 <div class="action-menu-item">
-                    <g:link controller="createShipmentWorkflow" action="createShipment" id="${shipmentInstance.id}">
+                    <g:link controller="createShipmentWorkflow" action="details" id="${shipmentInstance.id}">
                         <img src="${resource(dir: 'images/icons/silk', file: 'pencil.png')}" class="middle"/>&nbsp;
                         <g:if test="${request.request.requestURL.toString().contains('createShipment')}">
                             <warehouse:message code="shipping.editShipment.label"/>
@@ -62,7 +62,7 @@
             <!-- you can only edit a shipment or its packing list if you are at the origin warehouse, or if the origin is not a warehouse, and you are at the destination warehouse -->
             <g:if test="${shipmentInstance?.origin?.id == session?.warehouse?.id || shipmentInstance?.destination?.id == session?.warehouse?.id}">
                 <div class="action-menu-item">
-                    <g:link controller="createShipmentWorkflow" action="createShipment" id="${shipmentInstance.id}">
+                    <g:link controller="createShipmentWorkflow" action="details" id="${shipmentInstance.id}">
                         <img src="${resource(dir: 'images/icons/silk', file: 'pencil.png')}" class="middle"/>&nbsp;
                         <g:if test="${request.request.requestURL.toString().contains('createShipment')}"><warehouse:message
                                 code="shipping.editShipment.label"/></g:if>
@@ -71,7 +71,7 @@
                 </div>
 
                 <div class="action-menu-item">
-                    <g:link controller="createShipmentWorkflow" action="createShipment" event="enterTrackingDetails"
+                    <g:link controller="createShipmentWorkflow" action="tracking"
                             id="${shipmentInstance.id}">
                         <img src="${resource(dir: 'images/icons/silk', file: 'map.png')}" class="middle"/>&nbsp;
                         <warehouse:message code="shipping.enterTrackingDetails.label"/>
@@ -79,8 +79,8 @@
                 </div>
 
                 <div class="action-menu-item">
-                    <g:link controller="createShipmentWorkflow" action="createShipment" event="enterContainerDetails"
-                            id="${shipmentInstance?.id}" params="[skipTo: 'Packing']">
+                    <g:link controller="createShipmentWorkflow" action="packing"
+                            id="${shipmentInstance?.id}">
                         <img src="${resource(dir: 'images/icons/silk', file: 'package_add.png')}"
                              class="middle"/>&nbsp;
                         <warehouse:message code="shipping.editPackingList.label"/></g:link>
@@ -128,8 +128,8 @@
 
                 <div class="action-menu-item">
                     <g:if test="${shipmentInstance?.isSendAllowed()}">
-                        <g:link controller="createShipmentWorkflow" action="createShipment" event="sendShipment"
-                                id="${shipmentInstance.id}" params="[skipTo: 'Sending']">
+                        <g:link controller="createShipmentWorkflow" action="sending"
+                                id="${shipmentInstance.id}">
                             <img src="${resource(dir: 'images/icons', file: 'truck.png')}" class="middle"/>&nbsp;
                             <warehouse:message code="shipping.sendShipment.label"/>
                         </g:link>

@@ -805,6 +805,91 @@ class UrlMappings {
             action = [GET: "printDraft"]
         }
 
+        "/api/requisitions/$id/deliveryNote" {
+            controller = "requisitionApi"
+            action = [GET: "deliveryNote"]
+        }
+
+        "/api/shipments/wizardOptions" {
+            controller = "shipmentApi"
+            action = [GET: "wizardOptions"]
+        }
+
+        "/api/shipments"(parseRequest: true) {
+            controller = "shipmentApi"
+            action = [POST: "saveDetails"]
+        }
+
+        "/api/shipments/$id" {
+            controller = "shipmentApi"
+            action = [GET: "read"]
+        }
+
+        "/api/shipments/$id/details"(parseRequest: true) {
+            controller = "shipmentApi"
+            action = [POST: "saveDetails"]
+        }
+
+        "/api/shipments/$id/tracking"(parseRequest: true) {
+            controller = "shipmentApi"
+            action = [POST: "saveTracking"]
+        }
+
+        "/api/shipments/$id/packing" {
+            controller = "shipmentApi"
+            action = [GET: "packing"]
+        }
+
+        "/api/shipments/$id/containers"(parseRequest: true) {
+            controller = "shipmentApi"
+            action = [POST: "createContainers"]
+        }
+
+        "/api/shipments/$id/containers/$containerId" {
+            controller = "shipmentApi"
+            action = [DELETE: "deleteContainer"]
+        }
+
+        "/api/shipments/$id/items"(parseRequest: true) {
+            controller = "shipmentApi"
+            action = [POST: "addItem"]
+        }
+
+        "/api/shipments/$id/items/$itemId"(parseRequest: true) {
+            controller = "shipmentApi"
+            action = [POST: "updateItem", DELETE: "deleteItem"]
+        }
+
+        "/api/shipments/$id/items/$itemId/pick"(parseRequest: true) {
+            controller = "shipmentApi"
+            action = [POST: "pickItem"]
+        }
+
+        "/api/shipments/$id/items/$itemId/split"(parseRequest: true) {
+            controller = "shipmentApi"
+            action = [POST: "splitItem"]
+        }
+
+        "/api/shipments/$id/picklist" {
+            controller = "shipmentApi"
+            action = [GET: "picklist"]
+        }
+
+        "/api/shipments/$id/validatePicklist"(parseRequest: true) {
+            controller = "shipmentApi"
+            action = [POST: "validatePicklist"]
+        }
+
+        "/api/shipments/$id/clearPicklist"(parseRequest: true) {
+            controller = "shipmentApi"
+            action = [POST: "clearPicklist"]
+        }
+
+        "/api/shipments/$id/send"(parseRequest: true) {
+            controller = "shipmentApi"
+            action = [POST: "send"]
+        }
+
         // Requisition Template API (requisitionTemplate screens migrated to React)
 
         "/api/requisitionTemplates"(parseRequest: true) {
