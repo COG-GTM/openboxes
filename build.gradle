@@ -23,20 +23,10 @@ String targetWebServer() {
 }
 
 buildscript {
-    configurations.configureEach {
-        /*
-         * The gradle-git-properties plugin pulls in JGit 6.x, which
-         * requires Java 11+; for our builds to succeed we need 5.x.
-         *
-         * See https://github.com/n0mer/gradle-git-properties/issues/195
-         */
-        resolutionStrategy.force 'org.eclipse.jgit:org.eclipse.jgit:5.13.1.202206130422-r'
-    }
     dependencies {
         classpath "com.bertramlabs.plugins:asset-pipeline-gradle:${assetPipelineVersion}"
         classpath "org.grails:grails-gradle-plugin:${grailsGradlePluginVersion}"
         classpath "org.grails.plugins:database-migration:${databaseMigrationVersion}"
-        classpath "org.grails.plugins:views-gradle:${grailsViewsVersion}"
         classpath "org.owasp:dependency-check-gradle:${owaspVersion}"
         classpath "org.grails.plugins:hibernate5:${gormHibernateVersion}"
     }
@@ -66,8 +56,10 @@ plugins {
     id 'com.github.ben-manes.versions' version '0.27.0'
 
     // Generates a "git.properties" file that provides info on the current git commit. Used by SpringBoot Actuator's
-    // "info" endpoint and by Sentry to tag issues with a release. Version 2.3.0+ requires Gradle 5.1+
-    id 'com.gorylenko.gradle-git-properties' version '2.2.4'
+    // "info" endpoint and by Sentry to tag issues with a release. 2.4.x is needed for the
+    // Groovy 3.0.2x runtime the grails-gradle-plugin 6.x puts on the buildscript classpath
+    // (2.2.4 fails in NormalizeEOLOutputStream) and uses JGit 6, which needs Java 11+.
+    id 'com.gorylenko.gradle-git-properties' version '2.4.2'
 
     // enable `npmInstall` and `npm_run_*` targets, and the `node` block below
     id 'com.github.node-gradle.node' version '3.5.1'
@@ -92,10 +84,13 @@ apply plugin: 'asset-pipeline'  // enable `assets` block, but see deps below
 apply plugin: 'org.grails.grails-gsp'
 
 /*
- * This plugin must load *after* the core grails/gradle plugins.
- * http://views.grails.org/latest/#_installation
+ * NOTE: the views-gradle plugin (`org.grails.plugins.views-json`), which
+ * precompiles .gson files under grails-app/views at build time, is no longer
+ * applied: the app has no .gson views (JSON is rendered via `render as JSON`
+ * and grails-plugin-rest converters), and views-gradle 3.2.3 (the Grails 6
+ * line) cannot create its compiler task under Gradle 8. The runtime
+ * views-json plugin dependencies below are unchanged.
  */
-apply plugin: 'org.grails.plugins.views-json'
 
 // enable `grails gradle dependencyCheckAnalyze` (security checker)
 apply plugin: 'org.owasp.dependencycheck'
@@ -307,8 +302,8 @@ configurations {
              * consume their API's directly.
              */
             force 'com.google.errorprone:error_prone_annotations:2.19.1'  // use consistent version
-            force 'io.micronaut:micronaut-aop:3.8.5'  // use the version from grails-bom 5.3.6
-            force 'io.micronaut.spring:micronaut-spring:4.5.0'  // use the version from grails-bom 5.3.6
+            force 'io.micronaut:micronaut-aop:3.10.4'  // use the version from grails-bom 6.2.3
+            force 'io.micronaut.spring:micronaut-spring:4.5.1'  // use the version from grails-bom 6.2.3
             force 'org.junit:junit-bom:5.9.2'  // use consistent version
             force "org.testcontainers:testcontainers-bom:${testContainersVersion}"  // match our direct testcontainers deps
             force 'io.opentelemetry:opentelemetry-bom:1.18.0'  // use consistent version
@@ -745,10 +740,10 @@ dependencies {
      *
      * N.B., these libraries needlessly duplicate Grails' imports.
      */
-    testImplementation('org.spockframework:spock-core:2.1-groovy-3.0') {
+    testImplementation('org.spockframework:spock-core:2.3-groovy-3.0') {
         exclude group: 'org.codehaus.groovy', module: 'groovy-all'
     }
-    testImplementation('org.spockframework:spock-spring:2.1-groovy-3.0') {
+    testImplementation('org.spockframework:spock-spring:2.3-groovy-3.0') {
         exclude group: 'org.codehaus.groovy', module: 'groovy-all'
     }
 
@@ -781,9 +776,9 @@ dependencies {
 
     implementation 'com.github.albfernandez:juniversalchardet:2.4.0'
 
-    // security patch
-    implementation 'org.yaml:snakeyaml:1.33'
-    console 'org.yaml:snakeyaml:1.33'
+    // Grails 6 parses config with SnakeYAML 2.x
+    implementation 'org.yaml:snakeyaml:2.2'
+    console 'org.yaml:snakeyaml:2.2'
 
     // For integration tests
     testImplementation 'org.apache.commons:commons-compress:1.21'  // Needed to avoid a dependency conflict
@@ -802,41 +797,44 @@ dependencies {
  *
  * https://grails.org/blog/2017-04-02.html
  */
-buildProperties.doLast {
-    File grailsBuildInfoFile = it.outputs.files.files.find {
-        it.name == 'grails.build.info'
-    }
-
-    Map<String, String> env = System.getenv()
-    Properties properties = new Properties()
-
-    // load any information created by the build itself
-    if (grailsBuildInfoFile?.canRead()) {
-        grailsBuildInfoFile?.withInputStream {
-            properties.load(it)
+// the grails-gradle-plugin 6.x registers buildProperties lazily, so configure it by name
+tasks.matching { it.name == 'buildProperties' }.configureEach {
+    doLast {
+        File grailsBuildInfoFile = it.outputs.files.files.find {
+            it.name == 'grails.build.info'
         }
-    }
 
-    properties.with {
-        setProperty('build.host', InetAddress.localHost.hostName)
-        setProperty('build.java.version', System.getProperty('java.version'))
-        setProperty('build.tag', env.BUILD_TAG ?: 'N/A')
-        setProperty('build.time', LocalDateTime.now().format(DateTimeFormatter.ISO_DATE_TIME))
-        setProperty('build.username', System.properties['user.name'])
+        Map<String, String> env = System.getenv()
+        Properties properties = new Properties()
 
-        if (env.bamboo_planRepository_branch) {
-            setProperty('build.git.branch.default', env.bamboo_planRepository_branch)
+        // load any information created by the build itself
+        if (grailsBuildInfoFile?.canRead()) {
+            grailsBuildInfoFile?.withInputStream {
+                properties.load(it)
+            }
         }
-        if (env.bamboo_customRevision) {
-            setProperty('build.git.revision.custom', env.bamboo_customRevision)
-        }
-        if (env.bamboo_repository_revision_number) {
-            setProperty('build.git.sha', env.bamboo_repository_revision_number)
-        }
-    }
 
-    grailsBuildInfoFile.withOutputStream {
-        properties.store(it, null)
+        properties.with {
+            setProperty('build.host', InetAddress.localHost.hostName)
+            setProperty('build.java.version', System.getProperty('java.version'))
+            setProperty('build.tag', env.BUILD_TAG ?: 'N/A')
+            setProperty('build.time', LocalDateTime.now().format(DateTimeFormatter.ISO_DATE_TIME))
+            setProperty('build.username', System.properties['user.name'])
+
+            if (env.bamboo_planRepository_branch) {
+                setProperty('build.git.branch.default', env.bamboo_planRepository_branch)
+            }
+            if (env.bamboo_customRevision) {
+                setProperty('build.git.revision.custom', env.bamboo_customRevision)
+            }
+            if (env.bamboo_repository_revision_number) {
+                setProperty('build.git.sha', env.bamboo_repository_revision_number)
+            }
+        }
+
+        grailsBuildInfoFile.withOutputStream {
+            properties.store(it, null)
+        }
     }
 }
 
@@ -893,7 +891,7 @@ task writePom(dependsOn: 'generatePomFileForMavenPublication') {
 // Running "./gradlew jacocoTestReport" will execute all unit and integration tests, then generate a code
 // coverage report under the "/build/reports/jacoco" folder.
 jacoco {
-    // Jacoco 0.8.7+ is required for the agent to instrument classes on Java 11.
+    // Jacoco 0.8.7+ is required for the agent to instrument classes on Java 11+ (bytecode target stays 11).
     // The agent jar shades its own ASM, so this doesn't conflict with asmVersion.
     toolVersion = '0.8.7'
 }
@@ -913,8 +911,8 @@ jacocoTestReport {
     executionData test, integrationTest
 
     reports {
-        xml.enabled true  // Needed so that we can upload to Codecov.
-        html.enabled true  // Useful for verifying locally during development.
+        xml.required = true  // Needed so that we can upload to Codecov.
+        html.required = true  // Useful for verifying locally during development.
     }
 
     // Our source code builds to both "build/classes/groovy" and "build/classes/java" so we need to filter one of

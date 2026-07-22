@@ -1,26 +1,27 @@
-name: Characterization (Java 11 build)
+name: Characterization (Java 21 build)
 
-# Builds the app from source on JDK 11, packages it into the Java 11 JRE
+# Builds the app from source on JDK 21, packages it into the Java 21 JRE
 # Docker image, and runs the Playwright characterization suite (golden-path
-# UI flows) against it. This proves behavioral parity of the Java 11 build
+# UI flows) against it. This proves behavioral parity of the Java 21 build
 # with the recorded baseline.
 #
 # The API JSON snapshot suite is NOT run here: its snapshots were recorded
 # against the pinned released image (see characterization-tests.yml) and
 # currently drift from ANY source build of develop (verified identical
-# failures on Java 8 and Java 11 source builds), so it only runs against
-# the pinned image until the snapshots are re-baselined.
+# failures on Java 8 and Java 11 source builds, and again on the Grails 5
+# and Grails 6 builds), so it only runs against the pinned image until the
+# snapshots are re-baselined.
 on:
   pull_request:
   push:
     branches: [ 'master', 'develop' ]
 
 concurrency:
-  group: characterization-java11-${{ github.ref }}
+  group: characterization-java21-${{ github.ref }}
   cancel-in-progress: true
 
 jobs:
-  characterization-java11:
+  characterization-java21:
     runs-on: ubuntu-latest
     timeout-minutes: 60
 
@@ -31,19 +32,19 @@ jobs:
       - name: Set up JDK
         uses: actions/setup-java@v4
         with:
-          java-version: 11
+          java-version: 21
           distribution: temurin
           cache: gradle
 
-      - name: Build WAR and Docker context on Java 11
+      - name: Build WAR and Docker context on Java 21
         run: ./gradlew prepareDocker -Dgrails.env=prod --console=plain --no-daemon
 
-      - name: Build Docker image (Java 11 JRE)
-        run: docker build -t openboxes/openboxes:java11-ci build/docker
+      - name: Build Docker image (Java 21 JRE)
+        run: docker build -t openboxes/openboxes:java21-ci build/docker
 
-      - name: Boot OpenBoxes stack with the Java 11 image
+      - name: Boot OpenBoxes stack with the Java 21 image
         working-directory: docker
-        run: OB_IMAGE_REPOSITORY="" OB_VERSION=java11-ci docker compose up -d
+        run: OB_IMAGE_REPOSITORY="" OB_VERSION=java21-ci docker compose up -d
 
       - name: Verify container Java version
         run: docker exec openboxes-app java -version
@@ -89,7 +90,7 @@ jobs:
         if: always()
         uses: actions/upload-artifact@v4
         with:
-          name: characterization-java11-report
+          name: characterization-java21-report
           path: |
             characterization/playwright-report/
             characterization/test-results/

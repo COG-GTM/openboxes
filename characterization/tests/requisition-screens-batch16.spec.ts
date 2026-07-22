@@ -13,7 +13,7 @@ import { captureStep, resetStepCounter } from '../fixtures/screenshots';
  */
 
 // The pinned released image (characterization job) predates the Batch 16
-// endpoints/screens; these tests run against source builds (characterization-java11).
+// endpoints/screens; these tests run against source builds (characterization-java21).
 async function skipUnlessBatch16(page): Promise<void> {
   const res = await page.request.get(url('/api/requisitions/documentTypes'));
   test.skip(res.status() === 404, 'Batch 16 endpoints not present in target build');

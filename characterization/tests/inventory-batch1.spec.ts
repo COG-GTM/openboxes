@@ -16,7 +16,7 @@ test.describe('inventory & stock batch 1 (React screens)', () => {
     resetStepCounter();
     await login(page);
     // The pinned released image (characterization.yml) predates these
-    // screens; only the source-built app (characterization-java11.yml)
+    // screens; only the source-built app (characterization-java21.yml)
     // serves them. Skip when the new API surface is absent.
     const probe = await page.request.get(url('/api/consumption/aggregate'));
     test.skip(probe.status() === 404, 'app image predates the Batch 1 React screens');

@@ -130,15 +130,15 @@ class IndicatorDataService {
         String extraCondition = ''
         String conditionStarter = 'where'
 
-        if( listFiltersSelected.contains('category') && listValues.size > 0) {
+        if( listFiltersSelected.contains('category') && listValues.size() > 0) {
             extraCondition = """
             join product as p on fr.product_id = p.id 
             join category as c on p.category_id = c.id
             where (
             """
-            for(int i = 0; i < listValues.size; i ++) {
+            for(int i = 0; i < listValues.size(); i ++) {
                 extraCondition = "${extraCondition} c.id = '${listValues[i]}'"
-                extraCondition = i<listValues.size - 1 ? "${extraCondition} or" : extraCondition
+                extraCondition = i<listValues.size() - 1 ? "${extraCondition} or" : extraCondition
             }
             conditionStarter = ') and'
         }
@@ -254,15 +254,15 @@ class IndicatorDataService {
         String extraCondition = ''
         String conditionStarter = 'where'
 
-        if( listFiltersSelected.contains('category') && listValues.size > 0) {
+        if( listFiltersSelected.contains('category') && listValues.size() > 0) {
             extraCondition = """
             join product as p on fr.product_id = p.id 
             join category as c on p.category_id = c.id
             where (
             """
-            for(int i = 0; i < listValues.size; i ++) {
+            for(int i = 0; i < listValues.size(); i ++) {
                 extraCondition = "${extraCondition} c.id = '${listValues[i]}'"
-                extraCondition = i<listValues.size - 1 ? "${extraCondition} or" : extraCondition
+                extraCondition = i<listValues.size() - 1 ? "${extraCondition} or" : extraCondition
             }
             conditionStarter = ') and'
         }
@@ -300,7 +300,7 @@ class IndicatorDataService {
                 new IndicatorDatasets('Average Fill Rate', averageFillRateResult, null, 'line'),
         ];
 
-        int averageLastMonth = averageFillRateResult[averageFillRateResult.size - 1]
+        int averageLastMonth = averageFillRateResult[averageFillRateResult.size() - 1]
 
         ColorNumber colorNumber = new ColorNumber(averageLastMonth, 'Fill Rate Last Month', null, null, 90)
         colorNumber.setConditionalColors(87, colorNumber.value2)
