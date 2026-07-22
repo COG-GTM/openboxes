@@ -228,6 +228,58 @@ def test_expiring_stock_status_filter(client, batch2_endpoints):
           params={"status": "within30Days"})
 
 
+@pytest.fixture(scope="module")
+def batch3_endpoints(client):
+    main = client.location_id("Main Warehouse")
+    if client.request(
+            "GET", f"/api/facilities/{main}/inventories/binLocations").status_code == 404:
+        pytest.skip("inventory batch 3 endpoints not present in this build")
+    return main
+
+
+def test_inventory_summary_reorder_stock(client, batch3_endpoints):
+    main = batch3_endpoints
+    resp = check(client, spec, "GET",
+                 "/api/facilities/{facilityId}/inventories/summary",
+                 path=f"/api/facilities/{main}/inventories/summary",
+                 params={"status": "reorderStock"})
+    all_rows = client.get_json(
+        f"/api/facilities/{main}/inventories/summary")["data"]
+    assert len(resp.json()["data"]) <= len(all_rows)
+
+
+def test_bin_locations(client, batch3_endpoints):
+    main = batch3_endpoints
+    resp = check(client, spec, "GET",
+                 "/api/facilities/{facilityId}/inventories/binLocations",
+                 path=f"/api/facilities/{main}/inventories/binLocations")
+    body = resp.json()
+    assert body["data"], "seeded Main Warehouse should have stock rows"
+    assert body["totalCount"] == len(body["data"])
+
+
+def test_products_without_default_inventory_item(client, batch3_endpoints):
+    resp = check(client, spec, "GET",
+                 "/api/inventories/productsWithoutDefaultInventoryItem")
+    body = resp.json()
+    assert body["totalCount"] == len(body["data"])
+
+
+# createDefaultInventoryItems is not exercised - a successful call would
+# mutate the seeded dataset by creating blank-lot inventory items.
+
+
+def test_upload_inventory_missing_file(client, batch3_endpoints):
+    # A real upload only parses the file (no mutation), but building a valid
+    # Excel workbook here would add a test dependency, so only the
+    # missing-file error branch is exercised.
+    main = batch3_endpoints
+    check(client, spec, "POST",
+          "/api/facilities/{facilityId}/inventories/upload",
+          path=f"/api/facilities/{main}/inventories/upload",
+          files={"other": ("empty.txt", b"")})
+
+
 def test_import_csv_empty_body(client):
     # A successful import would mutate the seeded inventory, so only the
     # empty-body error branch is exercised (IllegalArgumentException -> 500).

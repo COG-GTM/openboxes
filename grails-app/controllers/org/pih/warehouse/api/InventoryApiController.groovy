@@ -29,6 +29,10 @@ import org.pih.warehouse.product.Product
 import org.pih.warehouse.product.ProductCatalog
 import org.pih.warehouse.core.UserService
 import org.pih.warehouse.report.InventoryReportCommand
+import org.springframework.web.multipart.MultipartFile
+import org.springframework.web.multipart.MultipartHttpServletRequest
+import org.apache.commons.io.FilenameUtils
+import org.pih.warehouse.importer.InventoryExcelImporter
 
 import java.text.NumberFormat
 
@@ -39,6 +43,7 @@ class InventoryApiController {
     InventoryService inventoryService
     UserService userService
     def productAvailabilityService
+    def uploadService
     def productService
     def reportService
 
@@ -85,9 +90,17 @@ class InventoryApiController {
             categories = inventoryService.getExplodedCategories(categories)
         }
 
-        List inventoryItems = params.status == "lowStock" ?
-                dashboardService.getLowStock(location, categories) :
-                dashboardService.getInventoryItems(location, categories)
+        List inventoryItems
+        switch (params.status) {
+            case "lowStock":
+                inventoryItems = dashboardService.getLowStock(location, categories)
+                break
+            case "reorderStock":
+                inventoryItems = dashboardService.getReorderStock(location, categories)
+                break
+            default:
+                inventoryItems = dashboardService.getInventoryItems(location, categories)
+        }
 
         Boolean hasRoleFinance = userService.hasRoleFinance(AuthService.currentUser)
         List data = inventoryItems.collect {
@@ -213,6 +226,91 @@ class InventoryApiController {
                 categories: categories.collect { [id: it.id, name: it.name] },
                 totalCount: data.size(),
         ]
+    }
+
+    def getBinLocations() {
+        Location location = Location.get(params.facilityId ?: session?.warehouse?.id)
+        if (!location) {
+            renderMissingLocation()
+            return
+        }
+
+        List binLocations = productAvailabilityService.getQuantityOnHandByBinLocation(location)
+        List data = binLocations.collect {
+            [
+                    product       : [
+                            id         : it?.inventoryItem?.product?.id,
+                            productCode: it?.inventoryItem?.product?.productCode,
+                            name       : it?.inventoryItem?.product?.name,
+                    ],
+                    inventoryItem : [
+                            id            : it?.inventoryItem?.id,
+                            lotNumber     : it?.inventoryItem?.lotNumber,
+                            expirationDate: it?.inventoryItem?.expirationDate?.format("yyyy-MM-dd"),
+                    ],
+                    binLocation   : it?.binLocation ? [id: it.binLocation.id, name: it.binLocation.name] : null,
+                    quantityOnHand: it?.quantity,
+            ]
+        }
+
+        render([data: data, totalCount: data.size()] as JSON)
+    }
+
+    def getProductsWithoutDefaultInventoryItem() {
+        List<Product> products = inventoryService.findProductsWithoutEmptyLotNumber()
+        List data = products.collect {
+            [
+                    id         : it.id,
+                    productCode: it.productCode,
+                    name       : it.name,
+                    category   : it.category?.name,
+            ]
+        }
+        render([data: data, totalCount: data.size()] as JSON)
+    }
+
+    def createDefaultInventoryItems() {
+        if (!userService.isUserAdmin(session?.user)) {
+            response.status = 403
+            render([errorMessage: "You are not authorized to create default inventory items"] as JSON)
+            return
+        }
+        Integer created = inventoryService.createDefaultInventoryItems()
+        render([data: [created: created]] as JSON)
+    }
+
+    def uploadInventory() {
+        if (!(request instanceof MultipartHttpServletRequest)) {
+            response.status = 400
+            render([errorMessage: "File is required - submit as multipart/form-data with a 'file' part"] as JSON)
+            return
+        }
+        MultipartFile uploadFile = ((MultipartHttpServletRequest) request).getFile("file")
+        if (!uploadFile || uploadFile.empty) {
+            response.status = 400
+            render([errorMessage: "File cannot be empty"] as JSON)
+            return
+        }
+
+        String filename = FilenameUtils.getName(uploadFile.originalFilename)
+        File localFile = uploadService.createLocalFile(filename)
+        uploadFile.transferTo(localFile)
+
+        InventoryExcelImporter excelImporter = new InventoryExcelImporter(localFile.absolutePath)
+        List<Map> rows = excelImporter.data.collect {
+            [
+                    productCode   : it.productCode,
+                    product       : it.product,
+                    lotNumber     : it.lotNumber,
+                    expirationDate: it.expirationDate instanceof Date ? it.expirationDate.format("yyyy-MM-dd") : it.expirationDate,
+                    binLocation   : it.binLocation,
+                    quantityOnHand: it.quantityOnHand,
+                    quantity      : it.quantity,
+                    comments      : it.comments,
+            ]
+        }
+
+        render([data: rows, totalCount: rows.size()] as JSON)
     }
 
     def getReorderReport(ReorderReportFilterCommand command) {

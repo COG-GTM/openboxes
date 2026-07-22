@@ -17,9 +17,17 @@ info:
     "/api/facilities/$facilityId/inventories/expiredStock"
     (GET -> getExpiredStock),
     "/api/facilities/$facilityId/inventories/expiringStock"
-    (GET -> getExpiringStock) and
+    (GET -> getExpiringStock),
     "/api/facilities/$facilityId/inventories/productGroupSummary"
-    (GET -> getProductGroupSummary) mappings.
+    (GET -> getProductGroupSummary),
+    "/api/facilities/$facilityId/inventories/binLocations"
+    (GET -> getBinLocations),
+    "/api/facilities/$facilityId/inventories/upload"
+    (POST -> uploadInventory),
+    "/api/inventories/productsWithoutDefaultInventoryItem"
+    (GET -> getProductsWithoutDefaultInventoryItem) and
+    "/api/inventories/createDefaultInventoryItems"
+    (POST -> createDefaultInventoryItems) mappings.
   version: 0.1.0
 servers:
   - url: http://localhost:8080/openboxes
@@ -57,12 +65,15 @@ paths:
   /api/facilities/{facilityId}/inventories/summary:
     get:
       operationId: getInventorySummary
-      summary: Inventory summary rows for the facility (all products or low stock)
+      summary: Inventory summary rows for the facility (all, low stock or reorder stock)
       description: >
-        Backs the React inventory/list and inventory/listLowStock screens.
-        Returns one row per stocked product with quantities, inventory-level
-        thresholds and pricing. With status=lowStock only rows below their
-        minimum/reorder levels are returned (legacy getLowStock behavior).
+        Backs the React inventory/list, inventory/listLowStock and
+        inventory/listReorderStock screens. Returns one row per stocked
+        product with quantities, inventory-level thresholds and pricing.
+        With status=lowStock only rows below their minimum/reorder levels
+        are returned (legacy getLowStock behavior); with status=reorderStock
+        only rows at or below their reorder level (legacy getReorderStock
+        behavior).
         Parity quirk - if the facilityId cannot be resolved and there is no
         session warehouse the endpoint responds 400 with an errorMessage.
       parameters:
@@ -84,8 +95,10 @@ paths:
           required: false
           schema:
             type: string
-            enum: [lowStock]
-          description: When lowStock, only rows below minimum/reorder level.
+            enum: [lowStock, reorderStock]
+          description: >
+            lowStock - only rows below minimum/reorder level; reorderStock -
+            only rows at or below reorder level.
       responses:
         '200':
           description: Inventory summary rows.
@@ -103,6 +116,154 @@ paths:
                     type: integer
         '400':
           description: No location could be resolved.
+          content:
+            application/json:
+              schema:
+                type: object
+                properties:
+                  errorMessage:
+                    type: string
+  /api/facilities/{facilityId}/inventories/binLocations:
+    get:
+      operationId: getBinLocations
+      summary: Quantity on hand by bin location for the facility
+      description: >
+        Backs the React inventory/manage screen. Returns one row per
+        product/lot/bin combination with quantity on hand
+        (productAvailabilityService.getQuantityOnHandByBinLocation),
+        replacing the legacy DataTables aaData rendering of
+        inventory/binLocations.
+      parameters:
+        - $ref: '#/components/parameters/facilityId'
+      responses:
+        '200':
+          description: Bin location rows.
+          content:
+            application/json:
+              schema:
+                type: object
+                required: [data, totalCount]
+                properties:
+                  data:
+                    type: array
+                    items:
+                      $ref: '#/components/schemas/BinLocationItem'
+                  totalCount:
+                    type: integer
+        '400':
+          description: No location could be resolved.
+          content:
+            application/json:
+              schema:
+                type: object
+                properties:
+                  errorMessage:
+                    type: string
+  /api/facilities/{facilityId}/inventories/upload:
+    post:
+      operationId: uploadInventory
+      summary: Parse an uploaded inventory Excel file
+      description: >
+        Backs the React inventory/upload screen. Accepts a multipart upload
+        (field name "file"), parses it with InventoryExcelImporter and
+        returns the parsed rows without applying them - matching the legacy
+        inventory/upload GSP, which only displayed the parsed file contents.
+      parameters:
+        - $ref: '#/components/parameters/facilityId'
+      requestBody:
+        required: true
+        content:
+          multipart/form-data:
+            schema:
+              type: object
+              required: [file]
+              properties:
+                file:
+                  type: string
+                  format: binary
+      responses:
+        '200':
+          description: Parsed inventory rows.
+          content:
+            application/json:
+              schema:
+                type: object
+                required: [data, totalCount]
+                properties:
+                  data:
+                    type: array
+                    items:
+                      $ref: '#/components/schemas/InventoryUploadRow'
+                  totalCount:
+                    type: integer
+        '400':
+          description: Missing or empty file, or not a multipart request.
+          content:
+            application/json:
+              schema:
+                type: object
+                properties:
+                  errorMessage:
+                    type: string
+  /api/inventories/productsWithoutDefaultInventoryItem:
+    get:
+      operationId: getProductsWithoutDefaultInventoryItem
+      summary: Products missing a default (empty lot number) inventory item
+      description: >
+        Backs the React inventory/showProducts screen
+        (inventoryService.findProductsWithoutEmptyLotNumber).
+      responses:
+        '200':
+          description: Products without a default inventory item.
+          content:
+            application/json:
+              schema:
+                type: object
+                required: [data, totalCount]
+                properties:
+                  data:
+                    type: array
+                    items:
+                      type: object
+                      properties:
+                        id:
+                          type: string
+                        productCode:
+                          type: string
+                          nullable: true
+                        name:
+                          type: string
+                          nullable: true
+                        category:
+                          type: string
+                          nullable: true
+                  totalCount:
+                    type: integer
+  /api/inventories/createDefaultInventoryItems:
+    post:
+      operationId: createDefaultInventoryItems
+      summary: Create default (empty lot number) inventory items
+      description: >
+        Creates a blank-lot InventoryItem for every product returned by
+        findProductsWithoutEmptyLotNumber, mirroring the legacy
+        inventory/createDefaultInventoryItems action. Requires an admin
+        (or superuser); returns 403 otherwise.
+      responses:
+        '200':
+          description: Number of inventory items created.
+          content:
+            application/json:
+              schema:
+                type: object
+                required: [data]
+                properties:
+                  data:
+                    type: object
+                    properties:
+                      created:
+                        type: integer
+        '403':
+          description: Caller is not an admin.
           content:
             application/json:
               schema:
@@ -688,6 +849,75 @@ components:
         $ref: '../components/common.yaml#/components/schemas/Id'
       description: Facility (warehouse) id.
   schemas:
+    BinLocationItem:
+      type: object
+      properties:
+        product:
+          type: object
+          properties:
+            id:
+              type: string
+              nullable: true
+            productCode:
+              type: string
+              nullable: true
+            name:
+              type: string
+              nullable: true
+        inventoryItem:
+          type: object
+          properties:
+            id:
+              type: string
+              nullable: true
+            lotNumber:
+              type: string
+              nullable: true
+            expirationDate:
+              type: string
+              nullable: true
+              description: yyyy-MM-dd
+        binLocation:
+          type: object
+          nullable: true
+          properties:
+            id:
+              type: string
+            name:
+              type: string
+              nullable: true
+        quantityOnHand:
+          type: number
+          nullable: true
+    InventoryUploadRow:
+      type: object
+      description: One parsed row from the uploaded inventory Excel file.
+      properties:
+        productCode:
+          type: string
+          nullable: true
+        product:
+          type: string
+          nullable: true
+        lotNumber:
+          type: string
+          nullable: true
+        expirationDate:
+          type: string
+          nullable: true
+          description: yyyy-MM-dd
+        binLocation:
+          type: string
+          nullable: true
+        quantityOnHand:
+          type: number
+          nullable: true
+        quantity:
+          type: number
+          nullable: true
+        comments:
+          type: string
+          nullable: true
     BrowseProduct:
       type: object
       description: One inventory browser row (product plus quantity on hand).

@@ -1684,6 +1684,24 @@ class InventoryService implements ApplicationContextAware {
     }
 
     /**
+     * Creates a default (blank lot number) inventory item for every product
+     * that does not have one yet.
+     *
+     * @return the number of inventory items created
+     */
+    Integer createDefaultInventoryItems() {
+        List<Product> products = findProductsWithoutEmptyLotNumber()
+        products.each { Product product ->
+            InventoryItem inventoryItem = new InventoryItem()
+            inventoryItem.product = product
+            inventoryItem.lotNumber = null
+            inventoryItem.expirationDate = null
+            inventoryItem.save()
+        }
+        return products.size()
+    }
+
+    /**
      * Finds the inventory item for the given product and lot number.
      *
      * @param product the product of the desired inventory item

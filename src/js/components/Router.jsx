@@ -432,6 +432,31 @@ const AsyncEditTransactionPage = Loadable({
   loading: Loading,
 });
 
+const AsyncTransactionsList = Loadable({
+  loader: () => import('components/inventory/TransactionsList'),
+  loading: Loading,
+});
+
+const AsyncShowTransactionPage = Loadable({
+  loader: () => import('components/inventory/ShowTransactionPage'),
+  loading: Loading,
+});
+
+const AsyncManageInventoryList = Loadable({
+  loader: () => import('components/inventory/ManageInventoryList'),
+  loading: Loading,
+});
+
+const AsyncProductsWithoutDefaultItemList = Loadable({
+  loader: () => import('components/inventory/ProductsWithoutDefaultItemList'),
+  loading: Loading,
+});
+
+const AsyncInventoryUploadPage = Loadable({
+  loader: () => import('components/inventory/InventoryUploadPage'),
+  loading: Loading,
+});
+
 const AsyncInventoryBrowserList = Loadable({
   loader: () => import('components/inventory/InventoryBrowserList'),
   loading: Loading,
@@ -463,6 +488,7 @@ const AsyncEditInventoryLevelPage = Loadable({
 });
 
 const InventoryLowStockList = (props) => <AsyncInventorySummaryList {...props} lowStock />;
+const InventoryReorderStockList = (props) => <AsyncInventorySummaryList {...props} reorderStock />;
 const ExpiredStockList = (props) => <AsyncExpirationStockList {...props} expired />;
 
 const AsyncRequisitionCreate = Loadable({
@@ -527,6 +553,12 @@ const Router = () => {
             <MainLayoutRoute path="**/consumption/pivot" component={AsyncConsumptionPivot} />
             <MainLayoutRoute path="**/consumption/show" component={AsyncConsumptionShow} />
             <MainLayoutRoute path="**/inventory/listLowStock" component={InventoryLowStockList} />
+            <MainLayoutRoute path="**/inventory/listReorderStock" component={InventoryReorderStockList} />
+            <MainLayoutRoute path="**/inventory/listTransactions" component={AsyncTransactionsList} />
+            <MainLayoutRoute path="**/inventory/showTransaction/:id" component={AsyncShowTransactionPage} />
+            <MainLayoutRoute path="**/inventory/manage" component={AsyncManageInventoryList} />
+            <MainLayoutRoute path="**/inventory/showProducts" component={AsyncProductsWithoutDefaultItemList} />
+            <MainLayoutRoute path="**/inventory/upload" component={AsyncInventoryUploadPage} />
             <MainLayoutRoute path="**/inventory/listExpiredStock" component={ExpiredStockList} />
             <MainLayoutRoute path="**/inventory/listExpiringStock" component={AsyncExpirationStockList} />
             <MainLayoutRoute path="**/inventory/listDailyTransactions" component={AsyncDailyTransactionsList} />

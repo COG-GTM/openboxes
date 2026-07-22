@@ -17,7 +17,7 @@ import PageWrapper from 'wrappers/PageWrapper';
 
 import 'components/inventory/styles.scss';
 
-const InventorySummaryList = ({ lowStock }) => {
+const InventorySummaryList = ({ lowStock, reorderStock }) => {
   useTranslation('inventory', 'reactTable');
 
   const [categories, setCategories] = useState([]);
@@ -35,6 +35,12 @@ const InventorySummaryList = ({ lowStock }) => {
   // follows the data rather than duplicating the server-side role check
   const hasRoleFinance = useMemo(() => data.some((row) => row.unitPrice != null), [data]);
 
+  const statusFilter = useMemo(() => {
+    if (lowStock) return 'lowStock';
+    if (reorderStock) return 'reorderStock';
+    return null;
+  }, [lowStock, reorderStock]);
+
   const fetchData = async (categoriesToFilter = selectedCategories) => {
     setLoading(true);
     try {
@@ -42,7 +48,7 @@ const InventorySummaryList = ({ lowStock }) => {
         params: {
           categories: categoriesToFilter.map((it) => it.id),
           includeSubcategories,
-          status: lowStock ? 'lowStock' : null,
+          status: statusFilter,
         },
         paramsSerializer: (params) => {
           const searchParams = new URLSearchParams();
@@ -73,7 +79,7 @@ const InventorySummaryList = ({ lowStock }) => {
     } else {
       setLoading(false);
     }
-  }, [currentLocation?.id, lowStock]);
+  }, [currentLocation?.id, statusFilter]);
 
   const downloadUrl = useMemo(() => {
     const searchParams = new URLSearchParams();
@@ -83,9 +89,11 @@ const InventorySummaryList = ({ lowStock }) => {
       searchParams.append('includeSubcategories', 'on');
     }
     selectedCategories.forEach((it) => searchParams.append('categories', it.id));
-    const base = lowStock ? INVENTORY_URL.listLowStock() : INVENTORY_URL.list();
+    let base = INVENTORY_URL.list();
+    if (lowStock) base = INVENTORY_URL.listLowStock();
+    if (reorderStock) base = INVENTORY_URL.listReorderStock();
     return `${base}?${searchParams.toString()}`;
-  }, [lowStock, includeSubcategories, selectedCategories]);
+  }, [lowStock, reorderStock, includeSubcategories, selectedCategories]);
 
   const totalValue = useMemo(
     () => data.reduce((acc, row) => acc + (row.totalValue || 0), 0),
@@ -183,8 +191,11 @@ const InventorySummaryList = ({ lowStock }) => {
       <div className="list-page-header p-3 d-flex align-items-center justify-content-between">
         <h5 className="m-0">
           {lowStock
-            ? <Translate id="react.inventory.listLowStock.title.label" defaultMessage="Items that are below minimum level" />
-            : <Translate id="react.inventory.list.title.label" defaultMessage="Inventory summary" />}
+            && <Translate id="react.inventory.listLowStock.title.label" defaultMessage="Items that are below minimum level" />}
+          {reorderStock
+            && <Translate id="react.inventory.listReorderStock.title.label" defaultMessage="Items that are below reorder level" />}
+          {!lowStock && !reorderStock
+            && <Translate id="react.inventory.list.title.label" defaultMessage="Inventory summary" />}
         </h5>
       </div>
       <div className="list-page-filters d-flex align-items-end p-3">
@@ -249,8 +260,10 @@ export default InventorySummaryList;
 
 InventorySummaryList.propTypes = {
   lowStock: PropTypes.bool,
+  reorderStock: PropTypes.bool,
 };
 
 InventorySummaryList.defaultProps = {
   lowStock: false,
+  reorderStock: false,
 };

@@ -59,7 +59,7 @@ class InventoryController {
     }
 
     def manage(ManageInventoryCommand command) {
-        [command: command]
+        render(view: "/common/react")
     }
 
     def cycleCount() {
@@ -474,7 +474,11 @@ class InventoryController {
     }
 
     def listReorderStock() {
-        this.listStock(params, "getReorderStock", "Reorder stock - ")
+        if (params.button == "download") {
+            this.listStock(params, "getReorderStock", "Reorder stock - ")
+            return
+        }
+        render(view: "/common/react")
     }
 
     def reorderReport() {
@@ -592,48 +596,11 @@ class InventoryController {
 
 
     def showProducts() {
-        def products = inventoryService.findProductsWithoutEmptyLotNumber()
-        [products: products]
-
+        render(view: "/common/react")
     }
 
     def listTransactions() {
-
-        Location location = Location.get(session.warehouse.id)
-        def currentInventory = location.inventory
-
-        Date transactionDateFrom = params.transactionDateFrom ? Date.parse("MM/dd/yyyy", params.transactionDateFrom) : null
-        Date transactionDateTo = params.transactionDateTo ? Date.parse("MM/dd/yyyy", params.transactionDateTo) : null
-
-        // we are only showing transactions for the inventory associated with the current warehouse
-        params.max = Math.min(params.max ? params.int('max') : 10, 100)
-        params.sort = params?.sort ?: "dateCreated"
-        params.order = params?.order ?: "desc"
-
-
-        def transactionType = TransactionType.get(params?.transactionType?.id)
-        def transactions = Transaction.createCriteria().list(params) {
-            and {
-                eq("inventory", currentInventory)
-                if (transactionType) {
-                    eq("transactionType", transactionType)
-                }
-                if (params.transactionNumber) {
-                    ilike("transactionNumber", "%" + params.transactionNumber + "%")
-                }
-                if (params.transactionDateFrom) {
-                    ge("transactionDate", transactionDateFrom)
-                }
-                if (params.transactionDateTo) {
-                    le("transactionDate", transactionDateTo)
-                }
-            }
-            maxResults(params.max)
-            order(params.sort, params.order)
-        }
-
-        render(view: "listTransactions", model: [transactionInstanceList: transactions,
-                                                 transactionCount       : transactions.totalCount, transactionTypeSelected: transactionType])
+        render(view: "/common/react")
     }
 
     def listAllTransactions() {
@@ -716,8 +683,7 @@ class InventoryController {
             transactionInstance = new Transaction()
         }
 
-        def model = [transactionInstance: transactionInstance]
-        render(view: "showTransaction", model: model)
+        render(view: "/common/react")
     }
 
     /**
@@ -1128,29 +1094,7 @@ class InventoryController {
 
 
     def upload() {
-        def inventoryList = [:]
-        if (request.method == "POST") {
-            File localFile = null
-            MultipartHttpServletRequest mpr = (MultipartHttpServletRequest) request
-            CommonsMultipartFile uploadFile = (CommonsMultipartFile) mpr.getFile("file")
-            if (!uploadFile?.empty) {
-                try {
-                    localFile = uploadService.createLocalFile(uploadFile.originalFilename)
-                    uploadFile.transferTo(localFile)
-                } catch (Exception e) {
-                    throw new RuntimeException(e)
-                }
-            }
-
-            //Iterate through bookList and create/persists your domain instances
-            def excelImporter = new InventoryExcelImporter(localFile.absolutePath)
-            inventoryList = excelImporter.data
-            println inventoryList
-        }
-
-
-        [inventoryList: inventoryList]
-
+        render(view: "/common/react")
     }
 
     def downloadTemplate() {

@@ -95,6 +95,36 @@ def transaction_id(client, daily):
     pytest.fail("no transactions found on any listed date")
 
 
+def test_list(client):
+    resp = check(client, spec, "GET", "/api/transactions")
+    body = resp.json()
+    assert body["data"], "seeded dataset should have transactions"
+    assert body["totalCount"] >= len(body["data"])
+
+
+def test_list_pagination(client):
+    resp = check(client, spec, "GET", "/api/transactions",
+                 params={"max": 1, "offset": 0})
+    assert len(resp.json()["data"]) == 1
+
+
+def test_list_transaction_number_filter(client):
+    resp = check(client, spec, "GET", "/api/transactions")
+    number = next((t["transactionNumber"] for t in resp.json()["data"]
+                   if t.get("transactionNumber")), None)
+    if number is None:
+        pytest.skip("no seeded transaction has a transaction number")
+    filtered = check(client, spec, "GET", "/api/transactions",
+                     params={"transactionNumber": number})
+    assert all(number.lower() in (t["transactionNumber"] or "").lower()
+               for t in filtered.json()["data"])
+
+
+def test_list_unknown_facility(client):
+    check(client, spec, "GET", "/api/transactions",
+          params={"facilityId": "ZZ-contract-missing"})
+
+
 def test_list_daily_default(client, daily):
     assert daily["dateSelected"]
     assert isinstance(daily["dates"], list)
@@ -161,6 +191,13 @@ def test_update_roundtrip(client, transaction_id):
 def test_update_not_found(client):
     check(client, spec, "PUT", "/api/transactions/{id}",
           path="/api/transactions/ZZ-contract-missing", json={})
+
+
+def test_delete_not_found(client):
+    # A successful delete would mutate the seeded dataset, so only the
+    # 404 branch is exercised.
+    check(client, spec, "DELETE", "/api/transactions/{id}",
+          path="/api/transactions/ZZ-contract-missing")
 
 
 def test_delete_entry_not_found(client, transaction_id):

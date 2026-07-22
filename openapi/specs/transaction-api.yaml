@@ -4,15 +4,18 @@ info:
   description: >
     Transaction read/edit endpoints handled by
     org.pih.warehouse.api.TransactionApiController, routed via the explicit
+    "/api/transactions" (GET -> list),
     "/api/transactions/daily" (GET -> listDaily), "/api/transactions/types"
     (GET -> transactionTypes), "/api/transactions/locationOptions"
     (GET -> locationOptions), "/api/transactions/$id" (GET -> read,
-    PUT -> update) and "/api/transactions/$id/entries/$entryId"
-    (DELETE -> deleteEntry) mappings. Added for the React migration of the
-    inventory/listDailyTransactions and inventory/editTransaction screens,
-    plus the generic "/api/${resource}s" mapping ("/api/transactions",
-    POST -> create) backing the React record-transaction screen migrated from
-    the legacy inventory/createTransaction GSP.
+    PUT -> update, DELETE -> delete) and
+    "/api/transactions/$id/entries/$entryId" (DELETE -> deleteEntry)
+    mappings, plus the generic "/api/${resource}s" mapping
+    ("/api/transactions", POST -> create) backing the React
+    record-transaction screen migrated from the legacy
+    inventory/createTransaction GSP. Added for the React migration of the
+    inventory/listDailyTransactions, inventory/editTransaction,
+    inventory/listTransactions and inventory/showTransaction screens.
   version: 0.1.0
 servers:
   - url: http://localhost:8080/openboxes
@@ -21,6 +24,92 @@ security:
   - cookieAuth: []
 paths:
   /api/transactions:
+    get:
+      operationId: listTransactions
+      summary: Paginated transactions for a facility's inventory
+      description: >
+        Mirrors the legacy inventory/listTransactions screen - transactions
+        scoped to the facility's inventory, filtered by transaction number
+        (contains, case-insensitive), transaction type and transaction date
+        range, sorted by dateCreated descending by default. Dates are ISO
+        yyyy-MM-dd only. Defaults to the session warehouse when facilityId
+        is not given.
+      parameters:
+        - name: facilityId
+          in: query
+          required: false
+          schema:
+            type: string
+          description: Facility (location) id. Defaults to the session warehouse.
+        - name: transactionNumber
+          in: query
+          required: false
+          schema:
+            type: string
+        - name: transactionTypeId
+          in: query
+          required: false
+          schema:
+            type: string
+        - name: transactionDateFrom
+          in: query
+          required: false
+          schema:
+            type: string
+          description: yyyy-MM-dd
+        - name: transactionDateTo
+          in: query
+          required: false
+          schema:
+            type: string
+          description: yyyy-MM-dd
+        - name: max
+          in: query
+          required: false
+          schema:
+            type: integer
+          description: Page size, capped at 100. Defaults to 10 (legacy default).
+        - name: offset
+          in: query
+          required: false
+          schema:
+            type: integer
+        - name: sort
+          in: query
+          required: false
+          schema:
+            type: string
+          description: Sort property. Defaults to dateCreated.
+        - name: order
+          in: query
+          required: false
+          schema:
+            type: string
+          description: asc or desc. Defaults to desc.
+      responses:
+        '200':
+          description: Page of transactions with the unpaged total count.
+          content:
+            application/json:
+              schema:
+                type: object
+                required: [data, totalCount]
+                properties:
+                  data:
+                    type: array
+                    items:
+                      $ref: '#/components/schemas/TransactionSummary'
+                  totalCount:
+                    type: integer
+        '400':
+          description: No location - not signed in and no facilityId given.
+          content:
+            application/json:
+              schema:
+                type: object
+                properties:
+                  errorMessage:
+                    type: string
     post:
       operationId: createTransaction
       summary: Create an inventory transaction with one or more entries
@@ -314,6 +403,50 @@ paths:
           $ref: '#/components/responses/TransactionNotFound'
         '500':
           $ref: '../components/common.yaml#/components/responses/ServerError'
+    delete:
+      operationId: deleteTransaction
+      summary: Delete a transaction and its entries
+      description: >
+        Deletes the transaction via InventoryService.deleteTransaction,
+        mirroring the legacy inventory/deleteTransaction action. Requires a
+        superuser; returns 403 otherwise. Returns 400 when the transaction
+        cannot be deleted due to integrity constraints.
+      parameters:
+        - $ref: '#/components/parameters/transactionId'
+      responses:
+        '200':
+          description: The id of the deleted transaction.
+          content:
+            application/json:
+              schema:
+                type: object
+                required: [data]
+                properties:
+                  data:
+                    type: object
+                    properties:
+                      id:
+                        type: string
+        '400':
+          description: Transaction could not be deleted.
+          content:
+            application/json:
+              schema:
+                type: object
+                properties:
+                  errorMessage:
+                    type: string
+        '403':
+          description: Caller is not a superuser.
+          content:
+            application/json:
+              schema:
+                type: object
+                properties:
+                  errorMessage:
+                    type: string
+        '404':
+          $ref: '#/components/responses/TransactionNotFound'
   /api/transactions/{id}/entries/{entryId}:
     delete:
       operationId: deleteTransactionEntry
@@ -358,6 +491,70 @@ components:
               errorMessage:
                 type: string
   schemas:
+    TransactionSummary:
+      type: object
+      description: Lightweight transaction rendering for the list endpoint.
+      properties:
+        id:
+          type: string
+        transactionNumber:
+          type: string
+          nullable: true
+        transactionDate:
+          type: string
+          nullable: true
+        dateCreated:
+          type: string
+          nullable: true
+        transactionType:
+          type: object
+          nullable: true
+          properties:
+            id:
+              type: string
+              nullable: true
+            name:
+              type: string
+              nullable: true
+        inventory:
+          type: object
+          nullable: true
+          properties:
+            id:
+              type: string
+              nullable: true
+            name:
+              type: string
+              nullable: true
+        source:
+          type: object
+          nullable: true
+          properties:
+            id:
+              type: string
+            name:
+              type: string
+              nullable: true
+        destination:
+          type: object
+          nullable: true
+          properties:
+            id:
+              type: string
+            name:
+              type: string
+              nullable: true
+        createdBy:
+          type: object
+          nullable: true
+          properties:
+            id:
+              type: string
+            name:
+              type: string
+              nullable: true
+        entryCount:
+          type: integer
     Transaction:
       type: object
       description: Transaction rendering shared by listDaily and read.
@@ -469,6 +666,87 @@ components:
                     name:
                       type: string
                       nullable: true
+                createdBy:
+                  type: object
+                  nullable: true
+                  properties:
+                    id:
+                      type: string
+                    name:
+                      type: string
+                      nullable: true
+                updatedBy:
+                  type: object
+                  nullable: true
+                  properties:
+                    id:
+                      type: string
+                    name:
+                      type: string
+                      nullable: true
+                lastUpdated:
+                  type: string
+                  nullable: true
+                outgoingShipment:
+                  type: object
+                  nullable: true
+                  properties:
+                    id:
+                      type: string
+                    shipmentNumber:
+                      type: string
+                      nullable: true
+                incomingShipment:
+                  type: object
+                  nullable: true
+                  properties:
+                    id:
+                      type: string
+                    shipmentNumber:
+                      type: string
+                      nullable: true
+                receipt:
+                  type: object
+                  nullable: true
+                  properties:
+                    id:
+                      type: string
+                    receiptNumber:
+                      type: string
+                      nullable: true
+                order:
+                  type: object
+                  nullable: true
+                  properties:
+                    id:
+                      type: string
+                    name:
+                      type: string
+                      nullable: true
+                localTransfer:
+                  type: object
+                  nullable: true
+                  properties:
+                    id:
+                      type: string
+                    sourceTransaction:
+                      type: object
+                      nullable: true
+                      properties:
+                        id:
+                          type: string
+                        transactionNumber:
+                          type: string
+                          nullable: true
+                    destinationTransaction:
+                      type: object
+                      nullable: true
+                      properties:
+                        id:
+                          type: string
+                        transactionNumber:
+                          type: string
+                          nullable: true
                 inventoryItemsByProduct:
                   type: object
                   additionalProperties:

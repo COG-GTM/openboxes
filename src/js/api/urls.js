@@ -286,6 +286,10 @@ export const REORDER_REPORT = (id) => `${INVENTORY_API(id)}/reorderReport`;
 export const INVENTORY_SUMMARY = (id) => `${INVENTORY_API(id)}/summary`;
 export const EXPIRED_STOCK = (id) => `${INVENTORY_API(id)}/expiredStock`;
 export const EXPIRING_STOCK = (id) => `${INVENTORY_API(id)}/expiringStock`;
+export const INVENTORY_BIN_LOCATIONS = (id) => `${INVENTORY_API(id)}/binLocations`;
+export const INVENTORY_UPLOAD = (id) => `${INVENTORY_API(id)}/upload`;
+export const PRODUCTS_WITHOUT_DEFAULT_INVENTORY_ITEM = `${API}/inventories/productsWithoutDefaultInventoryItem`;
+export const CREATE_DEFAULT_INVENTORY_ITEMS = `${API}/inventories/createDefaultInventoryItems`;
 export const PRODUCT_GROUP_SUMMARY = (id) => `${INVENTORY_API(id)}/productGroupSummary`;
 
 // STOCK CARD

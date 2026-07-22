@@ -148,6 +148,14 @@ const INVENTORY_URL = {
   editTransaction: (id) => `${INVENTORY_URL.base}/editTransaction/${id}`,
   browse: () => `${INVENTORY_URL.base}/browse`,
   createTransaction: () => `${INVENTORY_URL.base}/create`,
+  listReorderStock: () => `${INVENTORY_URL.base}/listReorderStock`,
+  manage: () => `${INVENTORY_URL.base}/manage`,
+  showProducts: () => `${INVENTORY_URL.base}/showProducts`,
+  upload: () => `${INVENTORY_URL.base}/upload`,
+  editBinLocation: (params) => stringifyUrl({
+    url: `${INVENTORY_URL.base}/editBinLocation`,
+    query: { ...params },
+  }),
 };
 
 const CONSUMPTION_URL = {

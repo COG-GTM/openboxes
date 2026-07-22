@@ -20,12 +20,15 @@ import org.pih.warehouse.core.Constants
 import org.pih.warehouse.core.Location
 import org.pih.warehouse.core.User
 import org.pih.warehouse.inventory.InventoryItem
+import org.pih.warehouse.inventory.InventoryService
+import org.pih.warehouse.inventory.LocalTransfer
 import org.pih.warehouse.inventory.Transaction
 import org.pih.warehouse.inventory.TransactionCode
 import org.pih.warehouse.inventory.TransactionEntry
 import org.pih.warehouse.inventory.TransactionSource
 import org.pih.warehouse.inventory.TransactionType
 import org.pih.warehouse.product.Product
+import org.springframework.dao.DataIntegrityViolationException
 
 import java.text.SimpleDateFormat
 
@@ -35,6 +38,48 @@ class TransactionApiController {
 
     private static final String DATE_FORMAT = "yyyy-MM-dd"
     private static final String DATE_TIME_FORMAT = "yyyy-MM-dd HH:mm:ss"
+
+    InventoryService inventoryService
+    def userService
+
+    def list() {
+        Location location = Location.get(params.facilityId ?: session?.warehouse?.id)
+        if (!location) {
+            response.status = 400
+            render([errorMessage: "Location is required - sign in or provide facilityId as a request parameter"] as JSON)
+            return
+        }
+
+        Integer max = Math.min(params.int('max') ?: 10, 100)
+        Integer offset = params.int('offset') ?: 0
+        TransactionType transactionType = params.transactionTypeId ? TransactionType.get(params.transactionTypeId) : null
+        SimpleDateFormat dateFormat = new SimpleDateFormat(DATE_FORMAT)
+        Date transactionDateFrom = params.transactionDateFrom ? dateFormat.parse(params.transactionDateFrom) : null
+        Date transactionDateTo = params.transactionDateTo ? dateFormat.parse(params.transactionDateTo) : null
+
+        def transactions = Transaction.createCriteria().list(max: max, offset: offset) {
+            eq("inventory", location.inventory)
+            if (transactionType) {
+                eq("transactionType", transactionType)
+            }
+            if (params.transactionNumber) {
+                ilike("transactionNumber", "%" + params.transactionNumber + "%")
+            }
+            if (transactionDateFrom) {
+                ge("transactionDate", transactionDateFrom)
+            }
+            if (transactionDateTo) {
+                le("transactionDate", transactionDateTo)
+            }
+            order(params.sort ?: "dateCreated", params.order ?: "desc")
+        }
+
+        Map<String, Long> entryCounts = transactions ? TransactionEntry.executeQuery(
+                "select te.transaction.id, count(te.id) from TransactionEntry te where te.transaction in (:transactions) group by te.transaction.id",
+                [transactions: transactions.toList()]).collectEntries { [(it[0]): it[1]] } : [:]
+
+        render([data: transactions.collect { toSummaryJson(it, entryCounts[it.id] ?: 0L) }, totalCount: transactions.totalCount] as JSON)
+    }
 
     def listDaily() {
         SimpleDateFormat dateFormat = new SimpleDateFormat(DATE_FORMAT)
@@ -120,6 +165,27 @@ class TransactionApiController {
         render([data: toDetailedJson(transaction)] as JSON)
     }
 
+    def delete() {
+        if (!userService.isSuperuser(session?.user)) {
+            response.status = 403
+            render([errorMessage: "You are not authorized to delete transactions"] as JSON)
+            return
+        }
+        Transaction transaction = Transaction.get(params.id)
+        if (!transaction) {
+            response.status = 404
+            render([errorMessage: "No transaction found with ID ${params.id}"] as JSON)
+            return
+        }
+        try {
+            inventoryService.deleteTransaction(transaction)
+            render([data: [id: params.id]] as JSON)
+        } catch (DataIntegrityViolationException e) {
+            response.status = 400
+            render([errorMessage: "Transaction ${params.id} could not be deleted"] as JSON)
+        }
+    }
+
     def deleteEntry() {
         Transaction transaction = Transaction.get(params.id)
         TransactionEntry entry = TransactionEntry.get(params.entryId)
@@ -147,6 +213,24 @@ class TransactionApiController {
     def locationOptions() {
         List<Location> locations = Location.findAllByParentLocationIsNull()
         render([data: locations.sort { it.name?.toLowerCase() }.collect { [id: it.id, name: it.name] }] as JSON)
+    }
+
+    private Map toSummaryJson(Transaction transaction, Long entryCount) {
+        [
+                id               : transaction.id,
+                transactionNumber: transaction.transactionNumber,
+                transactionDate  : transaction.transactionDate?.format(DATE_TIME_FORMAT),
+                dateCreated      : transaction.dateCreated?.format(DATE_TIME_FORMAT),
+                transactionType  : [
+                        id  : transaction.transactionType?.id,
+                        name: transaction.transactionType ? LocalizationUtil.getLocalizedString(transaction.transactionType.name) : null,
+                ],
+                inventory        : [id: transaction.inventory?.id, name: transaction.inventory?.warehouse?.name],
+                source           : transaction.source ? [id: transaction.source.id, name: transaction.source.name] : null,
+                destination      : transaction.destination ? [id: transaction.destination.id, name: transaction.destination.name] : null,
+                createdBy        : transaction.createdBy ? [id: transaction.createdBy.id, name: transaction.createdBy.name] : null,
+                entryCount       : entryCount,
+        ]
     }
 
     private Map toJson(Transaction transaction) {
@@ -188,6 +272,29 @@ class TransactionApiController {
         Map json = toJson(transaction)
         json.confirmed = transaction.confirmed
         json.inventory = [id: transaction.inventory?.id, name: transaction.inventory?.warehouse?.name]
+        json.createdBy = transaction.createdBy ? [id: transaction.createdBy.id, name: transaction.createdBy.name] : null
+        json.updatedBy = transaction.updatedBy ? [id: transaction.updatedBy.id, name: transaction.updatedBy.name] : null
+        json.lastUpdated = transaction.lastUpdated?.format(DATE_TIME_FORMAT)
+        json.outgoingShipment = transaction.outgoingShipment ?
+                [id: transaction.outgoingShipment.id, shipmentNumber: transaction.outgoingShipment.shipmentNumber] : null
+        json.incomingShipment = transaction.incomingShipment ?
+                [id: transaction.incomingShipment.id, shipmentNumber: transaction.incomingShipment.shipmentNumber] : null
+        json.receipt = transaction.receipt ?
+                [id: transaction.receipt.id, receiptNumber: transaction.receipt.receiptNumber] : null
+        json.order = transaction.order ?
+                [id: transaction.order.id, name: transaction.order.name] : null
+        LocalTransfer localTransfer = transaction.localTransfer
+        json.localTransfer = localTransfer ? [
+                id                    : localTransfer.id,
+                sourceTransaction     : localTransfer.sourceTransaction ? [
+                        id               : localTransfer.sourceTransaction.id,
+                        transactionNumber: localTransfer.sourceTransaction.transactionNumber,
+                ] : null,
+                destinationTransaction: localTransfer.destinationTransaction ? [
+                        id               : localTransfer.destinationTransaction.id,
+                        transactionNumber: localTransfer.destinationTransaction.transactionNumber,
+                ] : null,
+        ] : null
         json.inventoryItemsByProduct = inventoryItems.groupBy { it.product.id }.collectEntries { productId, items ->
             [(productId): items.collect {
                 [
@@ -212,7 +319,6 @@ class TransactionApiController {
             (Constants.TRANSFER_OUT_TRANSACTION_TYPE_ID)     : ActivityCode.SEND_STOCK,
     ].asImmutable()
 
-    def inventoryService
     def adjustInventoryService
     def transactionIdentifierService
 
