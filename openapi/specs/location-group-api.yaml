@@ -10,6 +10,9 @@ info:
     raises IllegalArgumentException (500) while update()/delete() surface
     Hibernate's ObjectNotFoundException as a 404; deleting a group that is
     still assigned to locations raises IllegalStateException (500).
+    Phase 2 (Batch 32) adds "/api/locationGroups/search" (paged rows for the
+    React list screen) and "/api/locationGroups/{id}/details" (form/show
+    screen payload).
   version: 0.1.0
 servers:
   - url: http://localhost:8080/openboxes
@@ -65,6 +68,65 @@ paths:
                         $ref: '../components/common.yaml#/components/schemas/Id'
         '400':
           $ref: '../components/common.yaml#/components/responses/ValidationError'
+  /api/locationGroups/search:
+    get:
+      operationId: searchLocationGroups
+      summary: Paged location group rows for the React list screen
+      description: >
+        Added in Phase 2 (Batch 32). Case-insensitive prefix filter on id or
+        name via "q"; sorted by name (order=asc|desc); max defaults to 10 and
+        caps at 100.
+      parameters:
+        - name: q
+          in: query
+          required: false
+          schema:
+            type: string
+        - name: order
+          in: query
+          required: false
+          schema:
+            type: string
+            enum: [asc, desc]
+        - $ref: '../components/common.yaml#/components/parameters/max'
+        - $ref: '../components/common.yaml#/components/parameters/offset'
+      responses:
+        '200':
+          description: Paged rows with the overall match count.
+          content:
+            application/json:
+              schema:
+                type: object
+                required: [data, totalCount]
+                properties:
+                  data:
+                    type: array
+                    items:
+                      $ref: '#/components/schemas/LocationGroupRow'
+                  totalCount:
+                    type: integer
+  /api/locationGroups/{id}/details:
+    get:
+      operationId: readLocationGroupDetails
+      summary: Location group details for the React form/show screens
+      description: >
+        Added in Phase 2 (Batch 32). Unknown ids raise
+        ObjectNotFoundException, rendered as 404.
+      parameters:
+        - $ref: '#/components/parameters/locationGroupId'
+      responses:
+        '200':
+          description: The location group details inside the "data" envelope.
+          content:
+            application/json:
+              schema:
+                type: object
+                required: [data]
+                properties:
+                  data:
+                    $ref: '#/components/schemas/LocationGroupDetails'
+        '404':
+          $ref: '../components/common.yaml#/components/responses/NotFound'
   /api/locationGroups/{id}:
     get:
       operationId: readLocationGroup
@@ -162,6 +224,71 @@ components:
               data:
                 $ref: '#/components/schemas/LocationGroup'
   schemas:
+    LocationGroupRow:
+      type: object
+      required: [id, locationsCount]
+      properties:
+        id:
+          $ref: '../components/common.yaml#/components/schemas/Id'
+        name:
+          type: string
+          nullable: true
+        description:
+          type: string
+          nullable: true
+          description: The address description of the group, if any.
+        locationsCount:
+          type: integer
+    LocationGroupDetails:
+      type: object
+      required: [id, version, locations]
+      properties:
+        id:
+          $ref: '../components/common.yaml#/components/schemas/Id'
+        name:
+          type: string
+          nullable: true
+        version:
+          type: integer
+        address:
+          type: object
+          nullable: true
+          properties:
+            id:
+              type: string
+              nullable: true
+            address:
+              type: string
+              nullable: true
+            address2:
+              type: string
+              nullable: true
+            city:
+              type: string
+              nullable: true
+            stateOrProvince:
+              type: string
+              nullable: true
+            postalCode:
+              type: string
+              nullable: true
+            country:
+              type: string
+              nullable: true
+            description:
+              type: string
+              nullable: true
+        locations:
+          type: array
+          items:
+            type: object
+            required: [id]
+            properties:
+              id:
+                $ref: '../components/common.yaml#/components/schemas/Id'
+              name:
+                type: string
+                nullable: true
     LocationGroup:
       type: object
       description: >

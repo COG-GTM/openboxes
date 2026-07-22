@@ -137,6 +137,14 @@ export const LOCATION_ZONE_LOCATIONS = (id) => `${LOCATION_API}/${id}/zoneLocati
 export const LOCATION_CONTENTS = (id) => `${LOCATION_API}/${id}/contents`;
 export const LOCATION_LOGO = (id) => `${LOCATION_API}/${id}/logo`;
 export const LOCATION_GROUPS_API = `${API}/locationGroups`;
+export const LOCATION_GROUP_BY_ID = (id) => `${LOCATION_GROUPS_API}/${id}`;
+export const LOCATION_GROUP_SEARCH_API = `${LOCATION_GROUPS_API}/search`;
+export const LOCATION_GROUP_DETAILS = (id) => `${LOCATION_GROUPS_API}/${id}/details`;
+
+// LOCATION TYPES
+export const LOCATION_TYPE_API = `${API}/locationTypes`;
+export const LOCATION_TYPE_BY_ID = (id) => `${LOCATION_TYPE_API}/${id}`;
+export const LOCATION_TYPE_CODE_OPTIONS = `${API}/locationTypeCodeOptions`;
 
 // PUTAWAY
 export const PUTAWAY_GENERATE_PDF = (id) => `/putAway/generatePdf/${id}`;

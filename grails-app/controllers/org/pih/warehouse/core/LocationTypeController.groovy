@@ -13,7 +13,7 @@ class LocationTypeController {
 
     LocationTypeDataService locationTypeDataService
 
-    static allowedMethods = [save: "POST", update: "POST", delete: "POST"]
+    static allowedMethods = [delete: "POST"]
 
     def index() {
         redirect(action: "list", params: params)
@@ -25,20 +25,7 @@ class LocationTypeController {
     }
 
     def create() {
-        def locationTypeInstance = new LocationType()
-        locationTypeInstance.properties = params
-        return [locationTypeInstance: locationTypeInstance]
-    }
-
-    def save() {
-        LocationType locationTypeInstance = new LocationType(params)
-        if (locationTypeInstance.validate() && locationTypeDataService.save(locationTypeInstance)) {
-            flash.message = "${warehouse.message(code: 'default.created.message', args: [warehouse.message(code: 'locationType.label', default: 'LocationType'), locationTypeInstance.id])}"
-            redirect(action: "list", id: locationTypeInstance.id)
-        }
-        else {
-            render(view: "create", model: [locationTypeInstance: locationTypeInstance])
-        }
+        render(view: "/common/react", params: params)
     }
 
     def show() {
@@ -53,41 +40,13 @@ class LocationTypeController {
     }
 
     def edit() {
-        LocationType locationTypeInstance = locationTypeDataService.get(params.id)
-        if (!locationTypeInstance) {
-            flash.message = "${warehouse.message(code: 'default.not.found.message', args: [warehouse.message(code: 'locationType.label', default: 'LocationType'), params.id])}"
-            redirect(action: "list")
+        // The legacy show screen posts to this action with the id as a request
+        // parameter; redirect so the id lands in the path for the React route.
+        if (request.method == "POST" && params.id) {
+            redirect(action: "edit", id: params.id)
+            return
         }
-        else {
-            return [locationTypeInstance: locationTypeInstance]
-        }
-    }
-
-    def update() {
-        LocationType locationTypeInstance = locationTypeDataService.get(params.id)
-        if (locationTypeInstance) {
-            if (params.version) {
-                def version = params.version.toLong()
-                if (locationTypeInstance.version > version) {
-
-                    locationTypeInstance.errors.rejectValue("version", "default.optimistic.locking.failure", [warehouse.message(code: 'locationType.label', default: 'LocationType')] as Object[], "Another user has updated this LocationType while you were editing")
-                    render(view: "edit", model: [locationTypeInstance: locationTypeInstance])
-                    return
-                }
-            }
-            locationTypeInstance.properties = params
-            if (locationTypeInstance.validate() && locationTypeDataService.save(locationTypeInstance)) {
-                flash.message = "${warehouse.message(code: 'default.updated.message', args: [warehouse.message(code: 'locationType.label', default: 'LocationType'), locationTypeInstance.id])}"
-                redirect(action: "list", id: locationTypeInstance.id)
-            }
-            else {
-                render(view: "edit", model: [locationTypeInstance: locationTypeInstance])
-            }
-        }
-        else {
-            flash.message = "${warehouse.message(code: 'default.not.found.message', args: [warehouse.message(code: 'locationType.label', default: 'LocationType'), params.id])}"
-            redirect(action: "list")
-        }
+        render(view: "/common/react", params: params)
     }
 
     def delete() {

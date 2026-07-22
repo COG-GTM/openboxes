@@ -1,0 +1,214 @@
+openapi: 3.0.3
+info:
+  title: OpenBoxes - LocationTypeApiController
+  description: >
+    Location type list/read/create/update/delete endpoints handled by
+    org.pih.warehouse.api.LocationTypeApiController, routed via the explicit
+    "/api/locationTypes" and "/api/locationTypes/$id" mappings. Added in
+    Phase 2 (Batch 32) to back the React locationType create/edit screens.
+    Parity quirks: an unknown locationTypeCode value in the body raises
+    IllegalArgumentException (500).
+  version: 0.1.0
+servers:
+  - url: http://localhost:8080/openboxes
+    description: Local Docker baseline (docs/migration/RUNNING_LOCALLY.md)
+security:
+  - cookieAuth: []
+paths:
+  /api/locationTypes:
+    get:
+      operationId: listLocationTypes
+      summary: List location types, optionally filtered
+      parameters:
+        - name: q
+          in: query
+          required: false
+          schema:
+            type: string
+          description: Case-insensitive prefix filter (ilike "q%") on name.
+        - name: sort
+          in: query
+          required: false
+          schema:
+            type: string
+            enum: [name, sortOrder]
+          description: Sort property; defaults to sortOrder.
+        - name: order
+          in: query
+          required: false
+          schema:
+            type: string
+            enum: [asc, desc]
+        - $ref: '../components/common.yaml#/components/parameters/max'
+        - $ref: '../components/common.yaml#/components/parameters/offset'
+      responses:
+        '200':
+          description: Paged location types.
+          content:
+            application/json:
+              schema:
+                type: object
+                required: [data, totalCount]
+                properties:
+                  data:
+                    type: array
+                    items:
+                      $ref: '#/components/schemas/LocationType'
+                  totalCount:
+                    type: integer
+    post:
+      operationId: createLocationType
+      summary: Create a location type
+      requestBody:
+        required: true
+        content:
+          application/json:
+            schema:
+              $ref: '#/components/schemas/LocationTypeInput'
+      responses:
+        '201':
+          description: Created location type.
+          content:
+            application/json:
+              schema:
+                type: object
+                required: [data]
+                properties:
+                  data:
+                    $ref: '#/components/schemas/LocationType'
+        '400':
+          $ref: '../components/common.yaml#/components/responses/ValidationError'
+  /api/locationTypes/{id}:
+    parameters:
+      - name: id
+        in: path
+        required: true
+        schema:
+          $ref: '../components/common.yaml#/components/schemas/Id'
+        description: >
+          Location type id. Unknown ids raise ObjectNotFoundException,
+          rendered as HTTP 404 by ErrorsController.handleNotFound.
+    get:
+      operationId: readLocationType
+      summary: Read a single location type
+      responses:
+        '200':
+          description: The location type.
+          content:
+            application/json:
+              schema:
+                type: object
+                required: [data]
+                properties:
+                  data:
+                    $ref: '#/components/schemas/LocationType'
+        '404':
+          $ref: '../components/common.yaml#/components/responses/NotFound'
+    put:
+      operationId: updateLocationType
+      summary: Update a location type
+      description: Partial update; only keys present in the body are bound.
+      requestBody:
+        required: true
+        content:
+          application/json:
+            schema:
+              $ref: '#/components/schemas/LocationTypeInput'
+      responses:
+        '200':
+          description: The updated location type.
+          content:
+            application/json:
+              schema:
+                type: object
+                required: [data]
+                properties:
+                  data:
+                    $ref: '#/components/schemas/LocationType'
+        '400':
+          $ref: '../components/common.yaml#/components/responses/ValidationError'
+        '404':
+          $ref: '../components/common.yaml#/components/responses/NotFound'
+    delete:
+      operationId: deleteLocationType
+      summary: Delete a location type
+      responses:
+        '204':
+          description: Deleted; no content.
+        '400':
+          description: >
+            Location type is referenced by other records (foreign key
+            constraint) and cannot be deleted.
+          content:
+            application/json:
+              schema:
+                $ref: '../components/common.yaml#/components/schemas/ValidationErrorResponse'
+        '404':
+          $ref: '../components/common.yaml#/components/responses/NotFound'
+        '500':
+          $ref: '../components/common.yaml#/components/responses/ServerError'
+components:
+  schemas:
+    LocationType:
+      type: object
+      description: Location type rendering emitted by LocationTypeApiController.toJson().
+      required: [id, supportedActivities]
+      properties:
+        id:
+          $ref: '../components/common.yaml#/components/schemas/Id'
+        name:
+          type: string
+          nullable: true
+        description:
+          type: string
+          nullable: true
+        locationTypeCode:
+          type: string
+          nullable: true
+          description: LocationTypeCode enum name (e.g. DEPOT, ZONE, INTERNAL).
+        supportedActivities:
+          type: array
+          items:
+            type: string
+        sortOrder:
+          type: integer
+          nullable: true
+        dateCreated:
+          type: string
+          nullable: true
+        lastUpdated:
+          type: string
+          nullable: true
+        version:
+          type: integer
+          nullable: true
+      additionalProperties: true
+    LocationTypeInput:
+      type: object
+      description: >
+        Partial-update input; only keys present are bound. supportedActivities
+        replaces the persisted set. An unknown locationTypeCode enum name
+        raises IllegalArgumentException (500).
+      properties:
+        name:
+          type: string
+          nullable: true
+        description:
+          type: string
+          nullable: true
+        locationTypeCode:
+          type: string
+          nullable: true
+          description: LocationTypeCode enum name; null clears it (fails validation).
+        supportedActivities:
+          type: array
+          nullable: true
+          items:
+            type: string
+        sortOrder:
+          type: integer
+          nullable: true
+      additionalProperties: true
+  securitySchemes:
+    cookieAuth:
+      $ref: '../components/common.yaml#/components/securitySchemes/cookieAuth'

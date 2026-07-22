@@ -80,6 +80,16 @@ class UrlMappings {
             action = [GET: "list", POST: "create"]
         }
 
+        "/api/locationGroups/search"(parseRequest: true) {
+            controller = { "locationGroupApi" }
+            action = [GET: "search"]
+        }
+
+        "/api/locationGroups/$id/details"(parseRequest: true) {
+            controller = { "locationGroupApi" }
+            action = [GET: "details"]
+        }
+
         "/api/locationGroups/$id"(parseRequest: true) {
             controller = { "locationGroupApi" }
             action = [GET: "read", PUT: "update", DELETE: "delete"]
@@ -107,6 +117,22 @@ class UrlMappings {
         "/api/glAccountTypeOptions"(parseRequest: true) {
             controller = { "selectOptionsApi" }
             action = [GET: "glAccountTypeOptions"]
+        }
+
+        // Location type code options for the location type form
+        "/api/locationTypeCodeOptions"(parseRequest: true) {
+            controller = { "selectOptionsApi" }
+            action = [GET: "locationTypeCodeOptions"]
+        }
+
+        "/api/locationTypes"(parseRequest: true) {
+            controller = { "locationTypeApi" }
+            action = [GET: "list", POST: "create"]
+        }
+
+        "/api/locationTypes/$id"(parseRequest: true) {
+            controller = { "locationTypeApi" }
+            action = [GET: "read", PUT: "update", DELETE: "delete"]
         }
 
         "/api/paymentTermOptions"(parseRequest: true) {

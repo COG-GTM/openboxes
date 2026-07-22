@@ -10,6 +10,7 @@
 package org.pih.warehouse.api
 
 import grails.converters.JSON
+import org.pih.warehouse.core.Location
 import org.pih.warehouse.core.LocationGroup
 import org.pih.warehouse.core.LocationGroupCommand
 import org.pih.warehouse.core.LocationGroupService
@@ -21,6 +22,50 @@ class LocationGroupApiController extends BaseDomainApiController {
     def list() {
         List<LocationGroup> locationGroups = locationGroupService.getLocationGroups(params)
         render ([data:locationGroups] as JSON)
+    }
+
+    def search() {
+        Integer max = Math.min(params.max ? params.int('max') : 10, 100)
+        Integer offset = params.offset ? params.int('offset') : 0
+        String sortOrder = params.order == 'desc' ? 'desc' : 'asc'
+        def results = LocationGroup.createCriteria().list(max: max, offset: offset) {
+            if (params.q) {
+                or {
+                    ilike("id", "${params.q}%")
+                    ilike("name", "${params.q}%")
+                }
+            }
+            order("name", sortOrder)
+        }
+        List data = results.collect { LocationGroup locationGroup ->
+            [
+                    id            : locationGroup.id,
+                    name          : locationGroup.name,
+                    description   : locationGroup.address?.description,
+                    locationsCount: Location.countByLocationGroup(locationGroup),
+            ]
+        }
+        render([data: data, totalCount: results.totalCount] as JSON)
+    }
+
+    def details() {
+        LocationGroup locationGroup = locationGroupService.getLocationGroup(params.id)
+        render([data: [
+                id       : locationGroup.id,
+                name     : locationGroup.name,
+                version  : locationGroup.version,
+                address  : locationGroup.address ? [
+                        id             : locationGroup.address.id,
+                        address        : locationGroup.address.address,
+                        address2       : locationGroup.address.address2,
+                        city           : locationGroup.address.city,
+                        stateOrProvince: locationGroup.address.stateOrProvince,
+                        postalCode     : locationGroup.address.postalCode,
+                        country        : locationGroup.address.country,
+                        description    : locationGroup.address.description,
+                ] : null,
+                locations: locationGroup.locations.collect { [id: it.id, name: it.name] }.sort { it.name },
+        ]] as JSON)
     }
 
     def read() {

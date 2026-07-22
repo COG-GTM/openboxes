@@ -268,6 +268,26 @@ const AsyncExpirationHistoryReport = Loadable({
   loading: Loading,
 });
 
+const AsyncLocationGroupList = Loadable({
+  loader: () => import('components/locationGroup/LocationGroupList'),
+  loading: Loading,
+});
+
+const AsyncLocationGroupForm = Loadable({
+  loader: () => import('components/locationGroup/LocationGroupForm'),
+  loading: Loading,
+});
+
+const AsyncLocationGroupShow = Loadable({
+  loader: () => import('components/locationGroup/LocationGroupShow'),
+  loading: Loading,
+});
+
+const AsyncLocationTypeForm = Loadable({
+  loader: () => import('components/locationType/LocationTypeForm'),
+  loading: Loading,
+});
+
 const AsyncBudgetCodeList = Loadable({
   loader: () => import('components/budgetCode/BudgetCodeList'),
   loading: Loading,
@@ -464,6 +484,12 @@ const Router = () => {
             <MainLayoutRoute path="**/requisitionTemplate/list" component={AsyncStockList} />
             <MainLayoutRoute path="**/product/list" component={AsyncProductsList} />
             <MainLayoutRoute path="**/stockTransfer/list" component={AsyncStockTransferList} />
+            <MainLayoutRoute path="**/locationGroup/list" component={AsyncLocationGroupList} />
+            <MainLayoutRoute path="**/locationGroup/create" component={AsyncLocationGroupForm} />
+            <MainLayoutRoute path="**/locationGroup/edit/:locationGroupId" component={AsyncLocationGroupForm} />
+            <MainLayoutRoute path="**/locationGroup/show/:locationGroupId" component={AsyncLocationGroupShow} />
+            <MainLayoutRoute path="**/locationType/create" component={AsyncLocationTypeForm} />
+            <MainLayoutRoute path="**/locationType/edit/:locationTypeId" component={AsyncLocationTypeForm} />
             <MainLayoutRoute path="**/budgetCode/list" component={AsyncBudgetCodeList} />
             <MainLayoutRoute path="**/budgetCode/create" component={AsyncBudgetCodeForm} />
             <MainLayoutRoute path="**/budgetCode/edit/:budgetCodeId" component={AsyncBudgetCodeForm} />
