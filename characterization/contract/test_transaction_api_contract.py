@@ -203,3 +203,55 @@ def test_delete_not_found(client):
 def test_delete_entry_not_found(client, transaction_id):
     check(client, spec, "DELETE", "/api/transactions/{id}/entries/{entryId}",
           path=f"/api/transactions/{transaction_id}/entries/ZZ-contract-missing")
+
+
+@pytest.fixture(scope="module")
+def entry_id(client, transaction_id):
+    data = client.get_json(f"/api/transactions/{transaction_id}")["data"]
+    assert data["transactionEntries"], "seeded transaction should have entries"
+    eid = data["transactionEntries"][0]["id"]
+    # The standalone entry endpoint was added in Batch 6; skip against
+    # builds (e.g. the pinned baseline image) that predate it.
+    if client.request("GET", f"/api/transactionEntries/{eid}").status_code == 404:
+        pytest.skip("transactionEntries endpoint not present in target build")
+    return eid
+
+
+def test_read_entry(client, entry_id):
+    resp = check(client, spec, "GET", "/api/transactionEntries/{id}",
+                 path=f"/api/transactionEntries/{entry_id}")
+    data = resp.json()["data"]
+    assert data["id"] == entry_id
+    assert isinstance(data["availableInventoryItems"], list)
+    assert isinstance(data["availableBinLocations"], list)
+    assert data["inventoryItem"]["id"] in {
+        item["id"] for item in data["availableInventoryItems"]
+    }
+
+
+def test_read_entry_not_found(client, entry_id):
+    check(client, spec, "GET", "/api/transactionEntries/{id}",
+          path="/api/transactionEntries/ZZ-contract-missing")
+
+
+def test_update_entry_roundtrip(client, entry_id):
+    # No-op update: PUT the entry's own values back so the seeded dataset
+    # stays unchanged.
+    data = client.get_json(f"/api/transactionEntries/{entry_id}")["data"]
+    payload = {
+        "binLocation": ({"id": data["binLocation"]["id"]}
+                        if data.get("binLocation") else None),
+        "inventoryItem": {"id": data["inventoryItem"]["id"]},
+        "quantity": data["quantity"],
+        "comments": data.get("comments") or "",
+    }
+    resp = check(client, spec, "PUT", "/api/transactionEntries/{id}",
+                 path=f"/api/transactionEntries/{entry_id}", json=payload)
+    updated = resp.json()["data"]
+    assert updated["quantity"] == data["quantity"]
+    assert updated["inventoryItem"]["id"] == data["inventoryItem"]["id"]
+
+
+def test_update_entry_not_found(client, entry_id):
+    check(client, spec, "PUT", "/api/transactionEntries/{id}",
+          path="/api/transactionEntries/ZZ-contract-missing", json={})

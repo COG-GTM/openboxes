@@ -1,0 +1,92 @@
+openapi: 3.0.3
+info:
+  title: OpenBoxes - InventorySnapshotApiController
+  description: >
+    Inventory snapshot listing handled by
+    org.pih.warehouse.api.InventorySnapshotApiController, routed via the
+    explicit "/api/inventorySnapshots" (GET -> list) mapping. Added for the
+    React migration of the legacy inventorySnapshot/list analytics screen -
+    the JSON mirrors the rows the legacy screen loaded from
+    InventorySnapshotController.findByDateAndLocation
+    (InventorySnapshotService.findInventorySnapshotByDateAndLocation).
+  version: 0.1.0
+servers:
+  - url: http://localhost:8080/openboxes
+    description: Local Docker baseline (docs/migration/RUNNING_LOCALLY.md)
+security:
+  - cookieAuth: []
+paths:
+  /api/inventorySnapshots:
+    get:
+      operationId: listInventorySnapshots
+      summary: Inventory snapshot rows for a date and location
+      description: >
+        Product-level quantity-on-hand snapshot rows for the given date and
+        location. Defaults to the session warehouse when location.id is not
+        given and to today when date is not given. Dates are MM/dd/yyyy
+        (legacy datepicker format). Returns an empty data array when no
+        snapshot exists for the date.
+      parameters:
+        - name: date
+          in: query
+          required: false
+          schema:
+            type: string
+          description: MM/dd/yyyy. Defaults to today.
+        - name: location.id
+          in: query
+          required: false
+          schema:
+            type: string
+          description: Location id. Defaults to the session warehouse.
+      responses:
+        '200':
+          description: Snapshot rows.
+          content:
+            application/json:
+              schema:
+                type: object
+                required: [data]
+                properties:
+                  data:
+                    type: array
+                    items:
+                      type: object
+                      properties:
+                        location:
+                          type: string
+                          nullable: true
+                        productCode:
+                          type: string
+                          nullable: true
+                        product:
+                          type: string
+                          nullable: true
+                        productGroup:
+                          type: string
+                          nullable: true
+                        category:
+                          type: string
+                          nullable: true
+                        tags:
+                          type: string
+                          nullable: true
+                        quantityOnHand:
+                          type: integer
+                          nullable: true
+                        unitOfMeasure:
+                          type: string
+                          nullable: true
+        '400':
+          description: No location (not signed in and no location.id) or unparseable date.
+          content:
+            application/json:
+              schema:
+                type: object
+                properties:
+                  errorMessage:
+                    type: string
+components:
+  securitySchemes:
+    cookieAuth:
+      $ref: '../components/common.yaml#/components/securitySchemes/cookieAuth'

@@ -9,7 +9,8 @@ info:
     (GET -> transactionTypes), "/api/transactions/locationOptions"
     (GET -> locationOptions), "/api/transactions/$id" (GET -> read,
     PUT -> update, DELETE -> delete) and
-    "/api/transactions/$id/entries/$entryId" (DELETE -> deleteEntry)
+    "/api/transactions/$id/entries/$entryId" (DELETE -> deleteEntry) and
+    "/api/transactionEntries/$id" (GET -> readEntry, PUT -> updateEntry)
     mappings, plus the generic "/api/${resource}s" mapping
     ("/api/transactions", POST -> create) backing the React
     record-transaction screen migrated from the legacy
@@ -468,6 +469,72 @@ paths:
                 $ref: '#/components/schemas/TransactionDetailResponse'
         '404':
           $ref: '#/components/responses/TransactionNotFound'
+  /api/transactionEntries/{id}:
+    get:
+      operationId: readTransactionEntry
+      summary: Read a single transaction entry with edit candidates
+      description: >
+        Backs the React transactionEntry/edit screen migrated from the legacy
+        transactionEntry/edit GSP. Returns the entry with its transaction
+        summary plus the selectable candidates the legacy form offered -
+        availableInventoryItems (all lots of the entry's product) and
+        availableBinLocations (active bin locations of the transaction's own
+        warehouse, falling back to the session warehouse; empty when that
+        warehouse has no bin-location support).
+      parameters:
+        - $ref: '#/components/parameters/transactionEntryId'
+      responses:
+        '200':
+          description: Transaction entry details.
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/TransactionEntryDetailResponse'
+        '404':
+          $ref: '#/components/responses/TransactionNotFound'
+    put:
+      operationId: updateTransactionEntry
+      summary: Update a single transaction entry
+      description: >
+        Partial update - only keys present in the body are applied
+        (binLocation, inventoryItem, quantity, comments). Mirrors the legacy
+        scaffold update on TransactionEntryController.
+      parameters:
+        - $ref: '#/components/parameters/transactionEntryId'
+      requestBody:
+        required: true
+        content:
+          application/json:
+            schema:
+              type: object
+              properties:
+                binLocation:
+                  type: object
+                  nullable: true
+                  properties:
+                    id:
+                      type: string
+                inventoryItem:
+                  type: object
+                  nullable: true
+                  properties:
+                    id:
+                      type: string
+                quantity:
+                  type: integer
+                  nullable: true
+                comments:
+                  type: string
+                  nullable: true
+      responses:
+        '200':
+          description: Updated transaction entry details.
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/TransactionEntryDetailResponse'
+        '404':
+          $ref: '#/components/responses/TransactionNotFound'
 components:
   securitySchemes:
     cookieAuth:
@@ -480,6 +547,13 @@ components:
       schema:
         $ref: '../components/common.yaml#/components/schemas/Id'
       description: Transaction id.
+    transactionEntryId:
+      name: id
+      in: path
+      required: true
+      schema:
+        $ref: '../components/common.yaml#/components/schemas/Id'
+      description: Transaction entry id.
   responses:
     TransactionNotFound:
       description: No transaction (or entry) with the given id.
@@ -762,3 +836,134 @@ components:
                         expirationDate:
                           type: string
                           nullable: true
+    TransactionEntryDetailResponse:
+      type: object
+      required: [data]
+      properties:
+        data:
+          type: object
+          required: [id, transaction, availableInventoryItems, availableBinLocations]
+          properties:
+            id:
+              type: string
+            quantity:
+              type: integer
+              nullable: true
+            comments:
+              type: string
+              nullable: true
+            binLocation:
+              type: object
+              nullable: true
+              properties:
+                id:
+                  type: string
+                name:
+                  type: string
+                  nullable: true
+            inventoryItem:
+              type: object
+              nullable: true
+              properties:
+                id:
+                  type: string
+                lotNumber:
+                  type: string
+                  nullable: true
+                expirationDate:
+                  type: string
+                  nullable: true
+                  description: yyyy-MM-dd
+            product:
+              type: object
+              nullable: true
+              properties:
+                id:
+                  type: string
+                productCode:
+                  type: string
+                  nullable: true
+                name:
+                  type: string
+                  nullable: true
+                unitOfMeasure:
+                  type: string
+                  nullable: true
+            transaction:
+              type: object
+              properties:
+                id:
+                  type: string
+                  nullable: true
+                transactionNumber:
+                  type: string
+                  nullable: true
+                transactionDate:
+                  type: string
+                  nullable: true
+                  description: yyyy-MM-dd HH:mm:ss
+                transactionType:
+                  type: object
+                  nullable: true
+                  properties:
+                    id:
+                      type: string
+                      nullable: true
+                    name:
+                      type: string
+                      nullable: true
+                source:
+                  type: object
+                  nullable: true
+                  properties:
+                    id:
+                      type: string
+                    name:
+                      type: string
+                      nullable: true
+                destination:
+                  type: object
+                  nullable: true
+                  properties:
+                    id:
+                      type: string
+                    name:
+                      type: string
+                      nullable: true
+                inventory:
+                  type: object
+                  nullable: true
+                  properties:
+                    id:
+                      type: string
+                      nullable: true
+                    name:
+                      type: string
+                      nullable: true
+                comment:
+                  type: string
+                  nullable: true
+            availableInventoryItems:
+              type: array
+              items:
+                type: object
+                properties:
+                  id:
+                    type: string
+                  lotNumber:
+                    type: string
+                    nullable: true
+                  expirationDate:
+                    type: string
+                    nullable: true
+                    description: yyyy-MM-dd
+            availableBinLocations:
+              type: array
+              items:
+                type: object
+                properties:
+                  id:
+                    type: string
+                  name:
+                    type: string
+                    nullable: true

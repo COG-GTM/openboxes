@@ -16,6 +16,10 @@ class TransactionEntryController {
 
     static scaffold = TransactionEntry
 
+    def edit() {
+        render(view: "/common/react", params: params)
+    }
+
     def delete() {
         def transactionEntryInstance = TransactionEntry.get(params.id)
         if (!transactionEntryInstance) {

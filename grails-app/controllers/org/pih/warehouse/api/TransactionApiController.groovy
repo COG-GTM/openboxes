@@ -186,6 +186,98 @@ class TransactionApiController {
         }
     }
 
+    def readEntry() {
+        TransactionEntry entry = TransactionEntry.get(params.id)
+        if (!entry) {
+            response.status = 404
+            render([errorMessage: "No transaction entry found with ID ${params.id}"] as JSON)
+            return
+        }
+        render([data: toEntryDetailJson(entry)] as JSON)
+    }
+
+    def updateEntry() {
+        TransactionEntry entry = TransactionEntry.get(params.id)
+        if (!entry) {
+            response.status = 404
+            render([errorMessage: "No transaction entry found with ID ${params.id}"] as JSON)
+            return
+        }
+
+        JSONObject jsonObject = request.JSON
+
+        if (jsonObject.has("binLocation")) {
+            String binLocationId = jsonObject.optJSONObject("binLocation")?.opt("id")
+            entry.binLocation = binLocationId ? Location.get(binLocationId) : null
+        }
+        if (jsonObject.has("inventoryItem")) {
+            InventoryItem inventoryItem = InventoryItem.get(jsonObject.optJSONObject("inventoryItem")?.opt("id"))
+            if (inventoryItem) {
+                entry.inventoryItem = inventoryItem
+            }
+        }
+        if (jsonObject.has("quantity")) {
+            entry.quantity = jsonObject.isNull("quantity") ? null : jsonObject.optInt("quantity")
+        }
+        if (jsonObject.has("comments")) {
+            entry.comments = jsonObject.optString("comments") ?: null
+        }
+
+        if (!entry.validate() || entry.hasErrors()) {
+            throw new ValidationException("Invalid transaction entry", entry.errors)
+        }
+        entry.save(flush: true)
+
+        render([data: toEntryDetailJson(entry)] as JSON)
+    }
+
+    private Map toEntryDetailJson(TransactionEntry entry) {
+        Transaction transaction = entry.transaction
+        Product product = entry.inventoryItem?.product
+        Location transactionLocation = transaction?.inventory?.warehouse ?: Location.get(session?.warehouse?.id)
+        List<Location> binLocations = transactionLocation?.hasBinLocationSupport() ?
+                Location.findAllByParentLocationAndActive(transactionLocation, true).sort { it?.name?.toLowerCase() } : []
+        List<InventoryItem> inventoryItems = product ? InventoryItem.findAllByProduct(product) : []
+        [
+                id                    : entry.id,
+                quantity              : entry.quantity,
+                comments              : entry.comments,
+                binLocation           : entry.binLocation ? [id: entry.binLocation.id, name: entry.binLocation.name] : null,
+                inventoryItem         : entry.inventoryItem ? [
+                        id            : entry.inventoryItem.id,
+                        lotNumber     : entry.inventoryItem.lotNumber,
+                        expirationDate: entry.inventoryItem.expirationDate?.format(DATE_FORMAT),
+                ] : null,
+                product               : product ? [
+                        id           : product.id,
+                        productCode  : product.productCode,
+                        name         : product.name,
+                        unitOfMeasure: product.unitOfMeasure,
+                ] : null,
+                transaction           : [
+                        id               : transaction?.id,
+                        transactionNumber: transaction?.transactionNumber,
+                        transactionDate  : transaction?.transactionDate?.format(DATE_TIME_FORMAT),
+                        transactionType  : [
+                                id  : transaction?.transactionType?.id,
+                                name: transaction?.transactionType ? LocalizationUtil.getLocalizedString(transaction.transactionType.name) : null,
+                        ],
+                        source           : transaction?.source ? [id: transaction.source.id, name: transaction.source.name] : null,
+                        destination      : transaction?.destination ? [id: transaction.destination.id, name: transaction.destination.name] : null,
+                        inventory        : [id: transaction?.inventory?.id, name: transaction?.inventory?.warehouse?.name],
+                        comment          : transaction?.comment,
+                ],
+                availableInventoryItems: inventoryItems.collect {
+                    [
+                            id            : it.id,
+                            lotNumber     : it.lotNumber,
+                            expirationDate: it.expirationDate?.format(DATE_FORMAT),
+                    ]
+                },
+                availableBinLocations : binLocations.collect { [id: it.id, name: it.name] },
+        ]
+    }
+
     def deleteEntry() {
         Transaction transaction = Transaction.get(params.id)
         TransactionEntry entry = TransactionEntry.get(params.entryId)

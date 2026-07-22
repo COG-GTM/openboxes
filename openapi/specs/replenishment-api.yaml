@@ -256,6 +256,94 @@ paths:
           description: Picklist cleared (empty body).
         '500':
           $ref: '../components/common.yaml#/components/responses/ServerError'
+  /api/replenishments/{id}/print:
+    get:
+      operationId: printReplenishment
+      summary: Print payload for a transfer order picklist
+      description: >
+        Backs the React replenishment/print screen migrated from the legacy
+        replenishment/print GSP. Returns the transfer order header plus
+        picklist items grouped by bin-location zone and by product handling
+        group (cold chain, controlled substance, hazardous material, general
+        goods), mirroring the grouping the legacy GSP computed in
+        ReplenishmentController.print. Zones are sorted by name with the
+        null (no zone) group last.
+      parameters:
+        - $ref: '#/components/parameters/replenishmentId'
+      responses:
+        '200':
+          description: Print payload.
+          content:
+            application/json:
+              schema:
+                type: object
+                required: [data]
+                properties:
+                  data:
+                    type: object
+                    required: [order, zones]
+                    properties:
+                      order:
+                        type: object
+                        required: [id, orderNumber]
+                        properties:
+                          id:
+                            $ref: '../components/common.yaml#/components/schemas/Id'
+                          orderNumber:
+                            type: string
+                          createdBy:
+                            type: object
+                            nullable: true
+                            properties:
+                              id:
+                                $ref: '../components/common.yaml#/components/schemas/Id'
+                              name:
+                                type: string
+                                nullable: true
+                          dateCreated:
+                            type: string
+                            nullable: true
+                            description: MM/dd/yyyy
+                      zones:
+                        type: array
+                        items:
+                          type: object
+                          required: [lineItems]
+                          properties:
+                            zoneName:
+                              type: string
+                              nullable: true
+                            lineItems:
+                              type: object
+                              required: [coldChain, controlledSubstance, hazardousMaterial, generalGoods]
+                              properties:
+                                coldChain:
+                                  type: array
+                                  items:
+                                    $ref: '#/components/schemas/PrintLineItem'
+                                controlledSubstance:
+                                  type: array
+                                  items:
+                                    $ref: '#/components/schemas/PrintLineItem'
+                                hazardousMaterial:
+                                  type: array
+                                  items:
+                                    $ref: '#/components/schemas/PrintLineItem'
+                                generalGoods:
+                                  type: array
+                                  items:
+                                    $ref: '#/components/schemas/PrintLineItem'
+        '404':
+          description: No order with the given id.
+          content:
+            application/json:
+              schema:
+                type: object
+                properties:
+                  errorCode:
+                    type: integer
+                  errorMessage:
+                    type: string
   /api/replenishments/{id}/picklistItem:
     post:
       operationId: createReplenishmentPicklistItem
@@ -366,6 +454,75 @@ components:
             description: ReplenishmentItem.toJson() rendering.
             additionalProperties: true
       additionalProperties: true
+    PrintLineItem:
+      type: object
+      required: [id, product, picklistItems]
+      properties:
+        id:
+          $ref: '../components/common.yaml#/components/schemas/Id'
+        product:
+          type: object
+          properties:
+            id:
+              $ref: '../components/common.yaml#/components/schemas/Id'
+            productCode:
+              type: string
+              nullable: true
+            name:
+              type: string
+              nullable: true
+            unitOfMeasure:
+              type: string
+              nullable: true
+            coldChain:
+              type: boolean
+            controlledSubstance:
+              type: boolean
+            hazardousMaterial:
+              type: boolean
+        quantity:
+          type: integer
+          nullable: true
+        destinationBinLocation:
+          type: object
+          nullable: true
+          properties:
+            id:
+              $ref: '../components/common.yaml#/components/schemas/Id'
+            name:
+              type: string
+              nullable: true
+        picklistItems:
+          type: array
+          items:
+            type: object
+            properties:
+              id:
+                $ref: '../components/common.yaml#/components/schemas/Id'
+              quantity:
+                type: integer
+              binLocation:
+                type: object
+                nullable: true
+                properties:
+                  id:
+                    $ref: '../components/common.yaml#/components/schemas/Id'
+                  name:
+                    type: string
+                    nullable: true
+              inventoryItem:
+                type: object
+                nullable: true
+                properties:
+                  id:
+                    $ref: '../components/common.yaml#/components/schemas/Id'
+                  lotNumber:
+                    type: string
+                    nullable: true
+                  expirationDate:
+                    type: string
+                    nullable: true
+                    description: MM/dd/yyyy
   securitySchemes:
     cookieAuth:
       $ref: '../components/common.yaml#/components/securitySchemes/cookieAuth'

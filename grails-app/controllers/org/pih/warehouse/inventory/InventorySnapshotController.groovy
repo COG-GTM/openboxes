@@ -27,12 +27,18 @@ class InventorySnapshotController {
     InventorySnapshotService inventorySnapshotService
 
     def index() {
-        redirect(action: "list")
+        // Redirect by uri: redirecting by action resolves to the /snapshot/$action
+        // UrlMapping, which the React router does not match
+        redirect(uri: "/inventorySnapshot/list")
     }
 
-    def list() {}
+    def list() {
+        render(view: "/common/react", params: params)
+    }
 
-    def show() {}
+    def show() {
+        redirect(uri: "/inventorySnapshot/list")
+    }
 
     def edit() {}
 

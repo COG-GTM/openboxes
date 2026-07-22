@@ -22,6 +22,7 @@ import org.pih.warehouse.order.OrderIdentifierService
 import org.pih.warehouse.order.OrderItem
 import org.pih.warehouse.order.OrderType
 import org.pih.warehouse.order.OrderTypeCode
+import org.pih.warehouse.picklist.Picklist
 
 class ReplenishmentApiController {
 
@@ -43,6 +44,82 @@ class ReplenishmentApiController {
         Replenishment replenishment = Replenishment.createFromOrder(order)
         replenishmentService.fillCalculatedData(replenishment)
         render([data: replenishment?.toJson()] as JSON)
+    }
+
+    def print() {
+        Order transferOrder = Order.get(params.id)
+        if (!transferOrder) {
+            response.status = 404
+            render([errorCode: 404, errorMessage: "Order ${params.id} not found"] as JSON)
+            return
+        }
+
+        def picklist = Picklist.findByOrder(transferOrder)
+        def picklistItems = picklist?.picklistItems ?: []
+        def zoneNames = picklistItems.collect { it?.binLocation?.zone?.name }?.unique()?.sort { a, b -> !a ? !b ? 0 : 1 : !b ? -1 : a <=> b }
+        def pickListByZone = picklistItems.groupBy { it.binLocation?.zone?.name }
+
+        def toLineItemJson = { OrderItem orderItem, List zonePicklistItems ->
+            [
+                    id                    : orderItem.id,
+                    product               : [
+                            id                 : orderItem.product?.id,
+                            productCode        : orderItem.product?.productCode,
+                            name               : orderItem.product?.name,
+                            unitOfMeasure      : orderItem.product?.unitOfMeasure,
+                            coldChain          : orderItem.product?.coldChain ? true : false,
+                            controlledSubstance: orderItem.product?.controlledSubstance ? true : false,
+                            hazardousMaterial  : orderItem.product?.hazardousMaterial ? true : false,
+                    ],
+                    quantity              : orderItem.quantity,
+                    destinationBinLocation: orderItem.destinationBinLocation ? [
+                            id  : orderItem.destinationBinLocation.id,
+                            name: orderItem.destinationBinLocation.name,
+                    ] : null,
+                    picklistItems         : zonePicklistItems.findAll { it.orderItem?.id == orderItem.id }.collect {
+                        [
+                                id            : it.id,
+                                quantity      : it.quantity ?: 0,
+                                binLocation   : it.binLocation ? [id: it.binLocation.id, name: it.binLocation.name] : null,
+                                inventoryItem : it.inventoryItem ? [
+                                        id            : it.inventoryItem.id,
+                                        lotNumber     : it.inventoryItem.lotNumber,
+                                        expirationDate: it.inventoryItem.expirationDate?.format("MM/dd/yyyy"),
+                                ] : null,
+                        ]
+                    },
+            ]
+        }
+
+        def zones = zoneNames.collect { zoneName ->
+            def zonePicklistItems = pickListByZone[zoneName]
+            def coldChain = zonePicklistItems.findAll { it.orderItem.product['coldChain'] }.collect { it.orderItem }?.unique()
+            def controlledSubstance = zonePicklistItems.findAll { it.orderItem.product['controlledSubstance'] }.collect { it.orderItem }?.unique()
+            def hazardousMaterial = zonePicklistItems.findAll { it.orderItem.product['hazardousMaterial'] }.collect { it.orderItem }?.unique()
+            def generalGoods = zonePicklistItems.findAll {
+                !it?.orderItem.product['coldChain'] && !it?.orderItem.product['controlledSubstance'] && !it?.orderItem.product['hazardousMaterial']
+            }.collect { it.orderItem }?.unique()
+
+            [
+                    zoneName : zoneName,
+                    lineItems: [
+                            coldChain          : coldChain.collect { toLineItemJson(it, zonePicklistItems) },
+                            controlledSubstance: controlledSubstance.collect { toLineItemJson(it, zonePicklistItems) },
+                            hazardousMaterial  : hazardousMaterial.collect { toLineItemJson(it, zonePicklistItems) },
+                            generalGoods       : generalGoods.collect { toLineItemJson(it, zonePicklistItems) },
+                    ],
+            ]
+        }
+
+        render([data: [
+                order: [
+                        id         : transferOrder.id,
+                        orderNumber: transferOrder.orderNumber,
+                        createdBy  : transferOrder.createdBy ? [id: transferOrder.createdBy.id, name: transferOrder.createdBy.name] : null,
+                        dateCreated: transferOrder.dateCreated?.format("MM/dd/yyyy"),
+                ],
+                zones: zones,
+        ]] as JSON)
     }
 
     def create() {

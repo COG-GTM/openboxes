@@ -452,6 +452,21 @@ const AsyncDailyTransactionsList = Loadable({
   loading: Loading,
 });
 
+const AsyncInventorySnapshotList = Loadable({
+  loader: () => import('components/inventory/InventorySnapshotList'),
+  loading: Loading,
+});
+
+const AsyncEditTransactionEntryPage = Loadable({
+  loader: () => import('components/inventory/EditTransactionEntryPage'),
+  loading: Loading,
+});
+
+const AsyncReplenishmentPrintPage = Loadable({
+  loader: () => import('components/replenishment/ReplenishmentPrintPage'),
+  loading: Loading,
+});
+
 const AsyncEditTransactionPage = Loadable({
   loader: () => import('components/inventory/EditTransactionPage'),
   loading: Loading,
@@ -619,6 +634,8 @@ const Router = () => {
             <MainLayoutRoute path="**/inventory/listDailyTransactions" component={AsyncDailyTransactionsList} />
             <MainLayoutRoute path="**/inventory/list" component={AsyncInventorySummaryList} />
             <MainLayoutRoute path="**/inventory/editTransaction/:id" component={AsyncEditTransactionPage} />
+            <MainLayoutRoute path="**/inventorySnapshot/list" component={AsyncInventorySnapshotList} />
+            <MainLayoutRoute path="**/transactionEntry/edit/:id" component={AsyncEditTransactionEntryPage} />
             <MainLayoutRoute path="**/inventoryBrowser/list" component={AsyncInventoryBrowserList} />
             <MainLayoutRoute path="**/inventoryBrowser/index" component={AsyncInventoryBrowserList} />
             <MainLayoutRoute path="**/inventoryItem/showStockCard/:id?" component={AsyncStockCardPage} />
@@ -646,6 +663,7 @@ const Router = () => {
             <MainLayoutRoute path="**/stockTransfer/createOutboundReturn/:outboundReturnId?" component={AsyncOutboundReturns} />
             <MainLayoutRoute path="**/stockTransfer/createInboundReturn/:inboundReturnId?" component={AsyncInboundReturns} />
             <MainLayoutRoute path="**/replenishment/create/:replenishmentId?" component={AsyncReplenishment} />
+            <MainLayoutRoute path="**/replenishment/print/:id" component={AsyncReplenishmentPrintPage} />
             <MainLayoutRoute path="**/productsConfiguration/index" component={AsyncProductsConfiguration} />
             <MainLayoutRoute path="**/locationsConfiguration/create/:locationId?" component={AsyncLocationsConfiguration} />
             <MainLayoutRoute path="**/locationsConfiguration/upload" component={AsyncImportLocations} />

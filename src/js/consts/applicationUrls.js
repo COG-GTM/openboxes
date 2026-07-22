@@ -170,6 +170,17 @@ const INVENTORY_URL = {
   }),
 };
 
+const INVENTORY_SNAPSHOT_URL = {
+  base: `${CONTEXT_PATH}/inventorySnapshot`,
+  list: () => `${INVENTORY_SNAPSHOT_URL.base}/list`,
+  download: () => `${INVENTORY_SNAPSHOT_URL.base}/download`,
+};
+
+const TRANSACTION_ENTRY_URL = {
+  base: `${CONTEXT_PATH}/transactionEntry`,
+  edit: (id) => `${TRANSACTION_ENTRY_URL.base}/edit/${id}`,
+};
+
 const CONSUMPTION_URL = {
   base: `${CONTEXT_PATH}/consumption`,
   list: () => `${CONSUMPTION_URL.base}/list`,
@@ -335,6 +346,7 @@ export {
   GL_ACCOUNT_URL,
   INVENTORY_BROWSER_URL,
   INVENTORY_ITEM_URL,
+  INVENTORY_SNAPSHOT_URL,
   INVENTORY_URL,
   INVOICE_URL,
   LOCATION_CONFIGURATION_URL,
@@ -355,4 +367,5 @@ export {
   STOCK_MOVEMENT_URL,
   STOCK_TRANSFER_URL,
   STOCKLIST_URL,
+  TRANSACTION_ENTRY_URL,
 };

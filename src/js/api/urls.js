@@ -337,6 +337,13 @@ export const TRANSACTION_TYPE_OPTIONS = `${TRANSACTION_API}/types`;
 export const TRANSACTION_LOCATION_OPTIONS = `${TRANSACTION_API}/locationOptions`;
 export const TRANSACTION_BY_ID = (id) => `${TRANSACTION_API}/${id}`;
 export const TRANSACTION_ENTRY_BY_ID = (id, entryId) => `${TRANSACTION_API}/${id}/entries/${entryId}`;
+export const TRANSACTION_ENTRY_API_BY_ID = (id) => `${API}/transactionEntries/${id}`;
+
+// INVENTORY SNAPSHOT
+export const INVENTORY_SNAPSHOT_API = `${API}/inventorySnapshots`;
+
+// REPLENISHMENT
+export const REPLENISHMENT_PRINT = (id) => `${API}/replenishments/${id}/print`;
 export const EXPIRATION_HISTORY_REPORT = `${API}/inventories/expirationHistoryReport`;
 export const INVENTORY_BROWSE = `${API}/inventories/browse`;
 export const INVENTORY_TRANSACTION_CANDIDATES = `${API}/inventories/transactionCandidates`;
