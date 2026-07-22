@@ -1,0 +1,70 @@
+openapi: 3.0.3
+info:
+  title: OpenBoxes - LoadDataApiController
+  description: >
+    Configuration-wizard demo-data loading handled by
+    org.pih.warehouse.api.LoadDataApiController, routed via the explicit
+    "/api/loadData/listOfDemoData" and "/api/config/data/demo" mappings.
+    Parity quirk: load() is a GET that performs a large data import
+    (organizations, locations, products, inventory, users, stocklists per
+    the openboxes.configurationWizard.dataInit config) and renders an empty
+    JSON array on success.
+  version: 0.1.0
+servers:
+  - url: http://localhost:8080/openboxes
+    description: Local Docker baseline (docs/migration/RUNNING_LOCALLY.md)
+security:
+  - cookieAuth: []
+paths:
+  /api/loadData/listOfDemoData:
+    get:
+      operationId: listOfDemoData
+      summary: Describe the demo dataset the configuration wizard would load
+      description: >
+        Renders openboxes.configurationWizard.listOfDemoData from application
+        config verbatim (a title and an HTML description).
+      responses:
+        '200':
+          description: Demo-data summary from application config.
+          content:
+            application/json:
+              schema:
+                type: object
+                required: [data]
+                properties:
+                  data:
+                    type: object
+                    properties:
+                      title:
+                        type: string
+                      description:
+                        type: string
+                        description: HTML markup describing the dataset.
+                    additionalProperties: true
+  /api/config/data/demo:
+    get:
+      operationId: loadDemoData
+      summary: Import the demo dataset (mutating GET)
+      description: >
+        Imports every dataset enabled under
+        openboxes.configurationWizard.dataInit by downloading the configured
+        source URLs. Non-REST quirks pinned for parity - a GET with heavy
+        side effects that responds 200 with a bare empty JSON array "[]"
+        (no "data" envelope). Import failures surface as 500 via
+        ErrorsController.handleException. Not exercised by the contract
+        suite (it would re-import demo data into the seeded baseline).
+      responses:
+        '200':
+          description: Empty JSON array rendered after all enabled imports complete.
+          content:
+            application/json:
+              schema:
+                type: array
+                items: {}
+                maxItems: 0
+        '500':
+          $ref: '../components/common.yaml#/components/responses/ServerError'
+components:
+  securitySchemes:
+    cookieAuth:
+      $ref: '../components/common.yaml#/components/securitySchemes/cookieAuth'

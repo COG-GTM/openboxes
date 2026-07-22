@@ -1,0 +1,432 @@
+openapi: 3.0.3
+info:
+  title: OpenBoxes - LocationApiController
+  description: >
+    Location management handled by
+    org.pih.warehouse.api.LocationApiController. Routed via the standard
+    "/api/${resource}s" REST mappings (list/create on /api/locations,
+    read/update/delete on /api/locations/{id}) plus the explicit
+    "/api/locations/..." mappings (locationTypes, supportedActivities,
+    template downloads, CSV/bin-location imports) and the catch-all
+    "/api/locations/$id/$action" mapping (productSummary). Parity quirks:
+    create/update respond 200 with the location in a "data" envelope;
+    read() of an unknown id responds 200 with {"data": null}; list() with a
+    "name" shorter than the typeahead minimum renders an empty non-JSON body.
+  version: 0.1.0
+servers:
+  - url: http://localhost:8080/openboxes
+    description: Local Docker baseline (docs/migration/RUNNING_LOCALLY.md)
+security:
+  - cookieAuth: []
+paths:
+  /api/locations:
+    get:
+      operationId: listLocations
+      summary: List locations visible to the current user
+      description: >
+        Role-dependent listing used by the location chooser and typeahead
+        components. Parity quirk: when "name" is present but shorter than
+        openboxes.typeahead.minLength (3), the controller calls
+        render([data: []]) without a JSON converter, producing an empty
+        text/html body (status 200).
+      parameters:
+        - name: name
+          in: query
+          required: false
+          description: Typeahead filter; values shorter than 3 chars trigger the empty-body quirk.
+          schema:
+            type: string
+        - name: locationChooser
+          in: query
+          required: false
+          description: Truthy string enables the role-based location-chooser branches.
+          schema:
+            type: string
+        - name: direction
+          in: query
+          required: false
+          description: INBOUND or OUTBOUND filter passed to locationService.getLocations.
+          schema:
+            type: string
+        - name: fields
+          in: query
+          required: false
+          description: Comma-separated list of fields passed to locationService.getLocations.
+          schema:
+            type: string
+        - name: presentation
+          in: query
+          required: false
+          description: When "toBaseJson", each location is rendered via Location.toBaseJson().
+          schema:
+            type: string
+      responses:
+        '200':
+          description: >
+            Locations in a "data" envelope, or an empty text/html body for
+            the short-name typeahead quirk.
+          content:
+            application/json:
+              schema:
+                type: object
+                required: [data]
+                properties:
+                  data:
+                    type: array
+                    items:
+                      $ref: '../components/common.yaml#/components/schemas/Location'
+            text/html:
+              schema:
+                type: string
+                maxLength: 0
+                description: Empty body (short-name typeahead quirk).
+    post:
+      operationId: createLocation
+      summary: Create a location
+      parameters:
+        - $ref: '#/components/parameters/useDefaultActivities'
+        - name: assignCurrentLocationGroup
+          in: query
+          required: false
+          description: When "true", assigns the session warehouse's location group.
+          schema:
+            type: string
+      requestBody:
+        $ref: '#/components/requestBodies/LocationBody'
+      responses:
+        '200':
+          $ref: '#/components/responses/LocationOk'
+        '400':
+          $ref: '../components/common.yaml#/components/responses/ValidationError'
+  /api/locations/{id}:
+    get:
+      operationId: readLocation
+      summary: Read a location
+      description: >
+        Parity quirk: an unknown id responds 200 with {"data": null} (no
+        404).
+      parameters:
+        - $ref: '#/components/parameters/locationId'
+      responses:
+        '200':
+          description: The location, or null for unknown ids.
+          content:
+            application/json:
+              schema:
+                type: object
+                required: [data]
+                properties:
+                  data:
+                    type: object
+                    nullable: true
+                    description: >
+                      The Location rendering (see
+                      common.yaml#/components/schemas/Location), or null for
+                      unknown ids (nullable + $ref cannot be combined in
+                      OpenAPI 3.0, so the shape is kept loose here).
+                    additionalProperties: true
+    post:
+      operationId: updateLocationPost
+      summary: Update a location (POST variant)
+      parameters:
+        - $ref: '#/components/parameters/locationId'
+        - $ref: '#/components/parameters/useDefaultActivities'
+      requestBody:
+        $ref: '#/components/requestBodies/LocationBody'
+      responses:
+        '200':
+          $ref: '#/components/responses/LocationOk'
+        '400':
+          $ref: '../components/common.yaml#/components/responses/ValidationError'
+        '500':
+          description: Unknown id (IllegalArgumentException).
+          content:
+            application/json:
+              schema:
+                $ref: '../components/common.yaml#/components/schemas/ErrorResponse'
+    put:
+      operationId: updateLocationPut
+      summary: Update a location (PUT variant)
+      parameters:
+        - $ref: '#/components/parameters/locationId'
+        - $ref: '#/components/parameters/useDefaultActivities'
+      requestBody:
+        $ref: '#/components/requestBodies/LocationBody'
+      responses:
+        '200':
+          $ref: '#/components/responses/LocationOk'
+        '400':
+          $ref: '../components/common.yaml#/components/responses/ValidationError'
+        '500':
+          description: Unknown id (IllegalArgumentException).
+          content:
+            application/json:
+              schema:
+                $ref: '../components/common.yaml#/components/schemas/ErrorResponse'
+    delete:
+      operationId: deleteLocation
+      summary: Delete a location
+      description: >
+        Unknown ids and zones still assigned to bin locations raise
+        IllegalArgumentException (500, not 404).
+      parameters:
+        - $ref: '#/components/parameters/locationId'
+      responses:
+        '204':
+          description: Location deleted (empty body).
+        '500':
+          description: >
+            Unknown id, zone still assigned to bin locations, or deletion
+            blocked by an existing association.
+          content:
+            application/json:
+              schema:
+                $ref: '../components/common.yaml#/components/schemas/ErrorResponse'
+  /api/locations/{id}/productSummary:
+    get:
+      operationId: getLocationProductSummary
+      summary: Quantity-on-hand summary per product for the session warehouse
+      description: >
+        Parity quirk: despite the path id, the summary is computed for the
+        session warehouse (the {id} segment is ignored).
+      parameters:
+        - $ref: '#/components/parameters/locationId'
+      responses:
+        '200':
+          description: One row per product with stock records in the session warehouse.
+          content:
+            application/json:
+              schema:
+                type: object
+                required: [data]
+                properties:
+                  data:
+                    type: array
+                    items:
+                      type: object
+                      properties:
+                        productId:
+                          $ref: '../components/common.yaml#/components/schemas/Id'
+                        productName:
+                          type: string
+                        productCode:
+                          type: string
+                        quantityOnHand:
+                          type: number
+                      additionalProperties: true
+  /api/locations/locationTypes:
+    get:
+      operationId: listLocationTypes
+      summary: List location types
+      parameters:
+        - name: activityCode
+          in: query
+          required: false
+          description: Only return location types supporting any of these activities (repeatable).
+          schema:
+            type: array
+            items:
+              type: string
+          style: form
+          explode: true
+      responses:
+        '200':
+          description: Location types with their supported activities.
+          content:
+            application/json:
+              schema:
+                type: object
+                required: [data]
+                properties:
+                  data:
+                    type: array
+                    items:
+                      type: object
+                      properties:
+                        id:
+                          $ref: '../components/common.yaml#/components/schemas/Id'
+                        name:
+                          type: string
+                          nullable: true
+                        description:
+                          type: string
+                          nullable: true
+                        locationTypeCode:
+                          type: string
+                          nullable: true
+                        supportedActivities:
+                          type: array
+                          items:
+                            type: string
+                      additionalProperties: true
+  /api/locations/supportedActivities:
+    get:
+      operationId: listSupportedActivities
+      summary: List every ActivityCode enum value
+      responses:
+        '200':
+          description: All activity codes.
+          content:
+            application/json:
+              schema:
+                type: object
+                required: [data]
+                properties:
+                  data:
+                    type: array
+                    items:
+                      type: string
+  /api/locations/template:
+    get:
+      operationId: downloadLocationTemplate
+      summary: Download the location import CSV template
+      responses:
+        '200':
+          description: CSV header row (BOM-prefixed), served as an attachment.
+          content:
+            text/csv:
+              schema:
+                type: string
+  /api/locations/binLocations/template:
+    get:
+      operationId: downloadBinLocationTemplate
+      summary: Download the bin-location import XLS template
+      description: >
+        Streams templates/binLocations.xls when present. In the Docker
+        baseline the template file is absent, so this responds 404
+        (ErrorsController.handleNotFound). The 200 branch is therefore
+        unverified against the baseline.
+      responses:
+        '200':
+          description: The XLS template file (attachment).
+          content:
+            application/octet-stream:
+              schema:
+                type: string
+                format: binary
+        '404':
+          $ref: '../components/common.yaml#/components/responses/NotFound'
+  /api/locations/importCsv:
+    post:
+      operationId: importLocationsCsv
+      summary: Import locations from a CSV file
+      description: >
+        Multipart upload bound to ImportDataCommand (file part "importFile").
+        Empty or non-CSV files raise IllegalArgumentException (500). Not
+        exercised by the contract suite (multipart import mutating seeded
+        data).
+      requestBody:
+        required: true
+        content:
+          multipart/form-data:
+            schema:
+              type: object
+              properties:
+                importFile:
+                  type: string
+                  format: binary
+      responses:
+        '200':
+          description: Import succeeded (empty body).
+        '500':
+          description: Empty file, wrong content type, or import failure.
+          content:
+            application/json:
+              schema:
+                $ref: '../components/common.yaml#/components/schemas/ErrorResponse'
+  /api/locations/{id}/binLocations/import:
+    post:
+      operationId: importBinLocations
+      summary: Import bin locations for a location from an XLS file
+      description: >
+        Multipart upload (file part "fileContents"). Errors are caught in
+        the controller and rendered as a bare {errorCode: 500, errorMessage}
+        body with status 500. Not exercised by the contract suite (multipart
+        import mutating seeded data).
+      parameters:
+        - $ref: '#/components/parameters/locationId'
+      requestBody:
+        required: true
+        content:
+          multipart/form-data:
+            schema:
+              type: object
+              properties:
+                fileContents:
+                  type: string
+                  format: binary
+      responses:
+        '200':
+          description: Import succeeded (empty body).
+        '500':
+          description: Controller-rendered error body (not ErrorsController).
+          content:
+            application/json:
+              schema:
+                $ref: '../components/common.yaml#/components/schemas/ErrorResponse'
+components:
+  parameters:
+    locationId:
+      name: id
+      in: path
+      required: true
+      schema:
+        $ref: '../components/common.yaml#/components/schemas/Id'
+    useDefaultActivities:
+      name: useDefaultActivities
+      in: query
+      required: false
+      description: >
+        When "true", create() applies the location type's default activities;
+        update() clears the location's own supported activities.
+      schema:
+        type: string
+  requestBodies:
+    LocationBody:
+      required: true
+      content:
+        application/json:
+          schema:
+            type: object
+            description: >
+              Bound onto the Location domain with bindData (logo and zoneId
+              excluded; logo accepts a base64 string). locationNumber and
+              inventory are generated when absent. supportedActivities, when
+              present but empty, is coerced to ["NONE"].
+            properties:
+              name:
+                type: string
+              locationNumber:
+                type: string
+              locationType:
+                type: object
+                properties:
+                  id:
+                    $ref: '../components/common.yaml#/components/schemas/Id'
+              organization:
+                type: object
+                properties:
+                  id:
+                    $ref: '../components/common.yaml#/components/schemas/Id'
+              supportedActivities:
+                type: array
+                items:
+                  type: string
+              logo:
+                type: string
+                description: Base64-encoded image bytes.
+            additionalProperties: true
+  responses:
+    LocationOk:
+      description: The location inside the "data" envelope.
+      content:
+        application/json:
+          schema:
+            type: object
+            required: [data]
+            properties:
+              data:
+                $ref: '../components/common.yaml#/components/schemas/Location'
+  securitySchemes:
+    cookieAuth:
+      $ref: '../components/common.yaml#/components/securitySchemes/cookieAuth'

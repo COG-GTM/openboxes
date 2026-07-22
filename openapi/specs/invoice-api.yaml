@@ -1,0 +1,725 @@
+openapi: 3.0.3
+info:
+  title: OpenBoxes - InvoiceApiController
+  description: >
+    Invoice management handled by org.pih.warehouse.api.InvoiceApiController.
+    Routed via the standard "/api/${resource}s" REST mappings (list/create on
+    /api/invoices, read/update on /api/invoices/{id}) plus the explicit
+    invoice mappings (items, invoiceItemCandidates, orders, shipments,
+    removeItem, submit, post, prepaymentItems), /api/invoiceStatuses,
+    /api/invoiceTypeCodes and /api/invoiceItems/{id}/validation. There is no
+    delete action. Parity quirks: create/update respond 200 with the invoice
+    in a "data" envelope; unknown invoice ids raise IllegalArgumentException
+    (500, not 404) on read/update/submit/post; the demo dataset contains no
+    invoices, so list() is pinned against an empty result.
+  version: 0.1.0
+servers:
+  - url: http://localhost:8080/openboxes
+    description: Local Docker baseline (docs/migration/RUNNING_LOCALLY.md)
+security:
+  - cookieAuth: []
+paths:
+  /api/invoices:
+    get:
+      operationId: listInvoices
+      summary: List invoices issued by the session warehouse's organization
+      description: >
+        Filters InvoiceList by partyFromId = the session warehouse's
+        organization. With format=csv the response is a CSV attachment
+        (invoices, or invoice items when invoiceItems=true).
+      parameters:
+        - $ref: '../components/common.yaml#/components/parameters/max'
+        - $ref: '../components/common.yaml#/components/parameters/offset'
+        - name: invoiceItems
+          in: query
+          required: false
+          description: When "true", fetches invoice items eagerly (and drives the CSV variant).
+          schema:
+            type: string
+        - name: format
+          in: query
+          required: false
+          description: When "csv", renders a CSV attachment instead of JSON.
+          schema:
+            type: string
+        - name: invoiceNumber
+          in: query
+          required: false
+          description: Filter by invoice or vendor invoice number (partial match).
+          schema:
+            type: string
+        - name: status
+          in: query
+          required: false
+          description: Filter by InvoiceStatus name.
+          schema:
+            type: string
+      responses:
+        '200':
+          description: Paged invoice list rows, or a CSV attachment with format=csv.
+          content:
+            application/json:
+              schema:
+                type: object
+                required: [data]
+                properties:
+                  data:
+                    type: array
+                    items:
+                      $ref: '#/components/schemas/InvoiceListItem'
+                  totalCount:
+                    type: integer
+                    nullable: true
+            text/csv:
+              schema:
+                type: string
+    post:
+      operationId: createInvoice
+      summary: Create an invoice
+      description: >
+        Requires a session warehouse. invoiceNumber, partyFrom and
+        invoiceType default when absent; "vendor" (an Organization id) is
+        bound to the invoice's party. Not exercised by the contract suite -
+        there is no delete endpoint, so a created invoice could not be
+        cleaned up and would break the snapshot suite's empty-list pin.
+      requestBody:
+        $ref: '#/components/requestBodies/InvoiceBody'
+      responses:
+        '200':
+          $ref: '#/components/responses/InvoiceOk'
+        '400':
+          $ref: '../components/common.yaml#/components/responses/ValidationError'
+        '500':
+          $ref: '../components/common.yaml#/components/responses/ServerError'
+  /api/invoices/{id}:
+    get:
+      operationId: readInvoice
+      summary: Read an invoice
+      parameters:
+        - $ref: '#/components/parameters/invoiceId'
+      responses:
+        '200':
+          $ref: '#/components/responses/InvoiceOk'
+        '500':
+          $ref: '#/components/responses/UnknownInvoiceError'
+    post:
+      operationId: updateInvoicePost
+      summary: Update an invoice (POST variant)
+      parameters:
+        - $ref: '#/components/parameters/invoiceId'
+      requestBody:
+        $ref: '#/components/requestBodies/InvoiceBody'
+      responses:
+        '200':
+          $ref: '#/components/responses/InvoiceOk'
+        '400':
+          $ref: '../components/common.yaml#/components/responses/ValidationError'
+        '500':
+          $ref: '#/components/responses/UnknownInvoiceError'
+    put:
+      operationId: updateInvoicePut
+      summary: Update an invoice (PUT variant)
+      parameters:
+        - $ref: '#/components/parameters/invoiceId'
+      requestBody:
+        $ref: '#/components/requestBodies/InvoiceBody'
+      responses:
+        '200':
+          $ref: '#/components/responses/InvoiceOk'
+        '400':
+          $ref: '../components/common.yaml#/components/responses/ValidationError'
+        '500':
+          $ref: '#/components/responses/UnknownInvoiceError'
+  /api/invoices/{id}/items:
+    get:
+      operationId: getInvoiceItems
+      summary: List an invoice's items (paged)
+      description: >
+        Parity quirk: an unknown invoice id responds 200 with an empty
+        "data" array (no 404).
+      parameters:
+        - $ref: '#/components/parameters/invoiceId'
+        - $ref: '../components/common.yaml#/components/parameters/max'
+        - $ref: '../components/common.yaml#/components/parameters/offset'
+      responses:
+        '200':
+          description: Invoice items with total count.
+          content:
+            application/json:
+              schema:
+                type: object
+                required: [data]
+                properties:
+                  data:
+                    type: array
+                    items:
+                      $ref: '#/components/schemas/InvoiceItem'
+                  totalCount:
+                    type: integer
+    post:
+      operationId: updateInvoiceItems
+      summary: Update an invoice's items in bulk
+      description: >
+        Body carries an "invoiceItems" array ({id, quantity, unitPrice}).
+        Responds 204 with no body; an unknown invoice id still responds 204
+        when the array is empty.
+      parameters:
+        - $ref: '#/components/parameters/invoiceId'
+      requestBody:
+        required: true
+        content:
+          application/json:
+            schema:
+              type: object
+              properties:
+                invoiceItems:
+                  type: array
+                  items:
+                    type: object
+                    properties:
+                      id:
+                        $ref: '../components/common.yaml#/components/schemas/Id'
+                      quantity:
+                        type: number
+                      unitPrice:
+                        type: number
+                    additionalProperties: true
+              additionalProperties: true
+      responses:
+        '204':
+          description: Items updated (empty body).
+        '500':
+          $ref: '../components/common.yaml#/components/responses/ServerError'
+  /api/invoices/{id}/invoiceItemCandidates:
+    post:
+      operationId: getInvoiceItemCandidates
+      summary: List order/shipment items that could be invoiced
+      description: >
+        Body optionally narrows candidates by orderNumbers/shipmentNumbers.
+        An unknown invoice id raises a NullPointerException (500).
+      parameters:
+        - $ref: '#/components/parameters/invoiceId'
+      requestBody:
+        required: true
+        content:
+          application/json:
+            schema:
+              type: object
+              properties:
+                orderNumbers:
+                  type: array
+                  items:
+                    type: string
+                shipmentNumbers:
+                  type: array
+                  items:
+                    type: string
+              additionalProperties: true
+      responses:
+        '200':
+          description: Invoice item candidates.
+          content:
+            application/json:
+              schema:
+                type: object
+                required: [data]
+                properties:
+                  data:
+                    type: array
+                    items:
+                      $ref: '#/components/schemas/InvoiceItemCandidate'
+        '500':
+          $ref: '../components/common.yaml#/components/responses/ServerError'
+  /api/invoices/{id}/orders:
+    get:
+      operationId: getInvoiceOrderNumbers
+      summary: Distinct order numbers among the invoice's item candidates
+      description: >
+        Parity quirk: an unknown invoice id responds 200 with an empty
+        "data" array.
+      parameters:
+        - $ref: '#/components/parameters/invoiceId'
+      responses:
+        '200':
+          $ref: '#/components/responses/StringListOk'
+  /api/invoices/{id}/shipments:
+    get:
+      operationId: getInvoiceShipmentNumbers
+      summary: Distinct shipment numbers among the invoice's item candidates
+      description: >
+        Parity quirk: an unknown invoice id responds 200 with an empty
+        "data" array.
+      parameters:
+        - $ref: '#/components/parameters/invoiceId'
+      responses:
+        '200':
+          $ref: '#/components/responses/StringListOk'
+  /api/invoices/{id}/removeItem:
+    delete:
+      operationId: removeInvoiceItem
+      summary: Remove a single invoice item
+      description: >
+        Parity quirk: despite living under /api/invoices, the {id} segment
+        is the invoice ITEM id (invoiceService.removeInvoiceItem(params.id)).
+        Unknown item ids raise IllegalArgumentException (500).
+      parameters:
+        - name: id
+          in: path
+          required: true
+          description: The invoice item id (not the invoice id).
+          schema:
+            $ref: '../components/common.yaml#/components/schemas/Id'
+      responses:
+        '204':
+          description: Item removed (empty body).
+        '500':
+          $ref: '../components/common.yaml#/components/responses/ServerError'
+  /api/invoices/{id}/submit:
+    post:
+      operationId: submitInvoice
+      summary: Mark an invoice as submitted
+      description: Sets dateSubmitted to now and re-renders the invoice.
+      parameters:
+        - $ref: '#/components/parameters/invoiceId'
+      responses:
+        '200':
+          $ref: '#/components/responses/InvoiceOk'
+        '500':
+          $ref: '#/components/responses/UnknownInvoiceError'
+  /api/invoices/{id}/post:
+    post:
+      operationId: postInvoice
+      summary: Mark an invoice as posted
+      description: Sets datePosted to now and re-renders the invoice.
+      parameters:
+        - $ref: '#/components/parameters/invoiceId'
+      responses:
+        '200':
+          $ref: '#/components/responses/InvoiceOk'
+        '500':
+          $ref: '#/components/responses/UnknownInvoiceError'
+  /api/invoices/{id}/prepaymentItems:
+    get:
+      operationId: getPrepaymentItems
+      summary: List an invoice's prepayment items (deprecated)
+      description: >
+        Deprecated in the controller source. An unknown invoice id raises a
+        NullPointerException (500).
+      deprecated: true
+      parameters:
+        - $ref: '#/components/parameters/invoiceId'
+      responses:
+        '200':
+          description: Prepayment invoice items with total count.
+          content:
+            application/json:
+              schema:
+                type: object
+                required: [data]
+                properties:
+                  data:
+                    type: array
+                    items:
+                      $ref: '#/components/schemas/InvoiceItem'
+                  totalCount:
+                    type: integer
+        '500':
+          $ref: '../components/common.yaml#/components/responses/ServerError'
+  /api/invoiceStatuses:
+    get:
+      operationId: listInvoiceStatusOptions
+      summary: List InvoiceStatus enum options
+      responses:
+        '200':
+          description: One option per InvoiceStatus value.
+          content:
+            application/json:
+              schema:
+                type: object
+                required: [data]
+                properties:
+                  data:
+                    type: array
+                    items:
+                      type: object
+                      required: [id, value, label]
+                      properties:
+                        id:
+                          type: string
+                        value:
+                          type: string
+                        label:
+                          type: string
+                        variant:
+                          type: string
+                          nullable: true
+  /api/invoiceTypeCodes:
+    get:
+      operationId: listInvoiceTypeCodes
+      summary: List InvoiceTypeCode enum options
+      responses:
+        '200':
+          description: One option per InvoiceTypeCode value.
+          content:
+            application/json:
+              schema:
+                type: object
+                required: [data]
+                properties:
+                  data:
+                    type: array
+                    items:
+                      type: object
+                      required: [id, value, label]
+                      properties:
+                        id:
+                          type: string
+                        value:
+                          type: string
+                        label:
+                          type: string
+  /api/invoiceItems/{id}/validation:
+    post:
+      operationId: validateInvoiceItem
+      summary: Validate an invoice item command object
+      description: >
+        Binds the request onto an InvoiceItem domain command object (Grails
+        resolves the {id} path segment against the InvoiceItem table) and
+        validates it; responds 200 with an empty body when valid, 400
+        (ValidationException) when invalid. Parity quirk: an unknown item
+        id leaves the command object null, so validate() raises a
+        NullPointerException (500).
+      parameters:
+        - name: id
+          in: path
+          required: true
+          description: The invoice item id (bound but not used for lookup).
+          schema:
+            $ref: '../components/common.yaml#/components/schemas/Id'
+      requestBody:
+        required: true
+        content:
+          application/json:
+            schema:
+              type: object
+              description: InvoiceItem properties to bind and validate.
+              additionalProperties: true
+      responses:
+        '200':
+          description: Item is valid (empty body).
+        '400':
+          $ref: '../components/common.yaml#/components/responses/ValidationError'
+        '500':
+          description: Unknown invoice item id (NullPointerException on the null command).
+          content:
+            application/json:
+              schema:
+                $ref: '../components/common.yaml#/components/schemas/ErrorResponse'
+components:
+  parameters:
+    invoiceId:
+      name: id
+      in: path
+      required: true
+      schema:
+        $ref: '../components/common.yaml#/components/schemas/Id'
+  requestBodies:
+    InvoiceBody:
+      required: true
+      content:
+        application/json:
+          schema:
+            type: object
+            description: >
+              Bound onto the Invoice domain with bindData. "vendor" is an
+              Organization id bound to invoice.party;
+              "vendorInvoiceNumber" is stored as a reference number.
+            properties:
+              invoiceNumber:
+                type: string
+              name:
+                type: string
+              description:
+                type: string
+              dateInvoiced:
+                type: string
+              vendor:
+                $ref: '../components/common.yaml#/components/schemas/Id'
+              vendorInvoiceNumber:
+                type: string
+              currencyUom:
+                type: object
+                properties:
+                  id:
+                    $ref: '../components/common.yaml#/components/schemas/Id'
+            additionalProperties: true
+  responses:
+    InvoiceOk:
+      description: The invoice (Invoice.toJson()) inside the "data" envelope.
+      content:
+        application/json:
+          schema:
+            type: object
+            required: [data]
+            properties:
+              data:
+                $ref: '#/components/schemas/Invoice'
+    UnknownInvoiceError:
+      description: >
+        Unknown invoice id (IllegalArgumentException, rendered by
+        ErrorsController.handleException).
+      content:
+        application/json:
+          schema:
+            $ref: '../components/common.yaml#/components/schemas/ErrorResponse'
+    StringListOk:
+      description: Distinct values in a "data" envelope.
+      content:
+        application/json:
+          schema:
+            type: object
+            required: [data]
+            properties:
+              data:
+                type: array
+                items:
+                  type: string
+                  nullable: true
+  schemas:
+    Invoice:
+      type: object
+      description: Invoice.toJson() rendering.
+      properties:
+        id:
+          $ref: '../components/common.yaml#/components/schemas/Id'
+        invoiceNumber:
+          type: string
+          nullable: true
+        vendorInvoiceNumber:
+          type: string
+          nullable: true
+        name:
+          type: string
+          nullable: true
+        description:
+          type: string
+          nullable: true
+        partyFrom:
+          type: object
+          nullable: true
+          description: Default Grails Organization rendering.
+          additionalProperties: true
+        dateInvoiced:
+          type: string
+          description: Formatted MM/dd/yyyy (throws if dateInvoiced is null).
+        dateSubmitted:
+          type: string
+          nullable: true
+        datePosted:
+          type: string
+          nullable: true
+        dateDue:
+          type: string
+          nullable: true
+        datePaid:
+          type: string
+          nullable: true
+        currencyUom:
+          type: object
+          nullable: true
+          additionalProperties: true
+        vendor:
+          type: string
+          nullable: true
+          description: Organization id of the invoice's party.
+        vendorName:
+          type: string
+          nullable: true
+        totalCount:
+          type: integer
+        totalValue:
+          type: number
+          nullable: true
+        invoiceType:
+          type: string
+          nullable: true
+        hasPrepaymentInvoice:
+          type: boolean
+          nullable: true
+        isPrepaymentInvoice:
+          type: boolean
+          nullable: true
+        status:
+          type: string
+          nullable: true
+        documents:
+          type: array
+          nullable: true
+          items:
+            type: object
+            additionalProperties: true
+      additionalProperties: true
+    InvoiceListItem:
+      type: object
+      description: Registered InvoiceList JSON marshaller rendering.
+      properties:
+        id:
+          type: string
+          nullable: true
+        invoiceNumber:
+          type: string
+          nullable: true
+        invoiceTypeCode:
+          type: string
+          nullable: true
+        status:
+          type: string
+          nullable: true
+        partyCode:
+          type: string
+          nullable: true
+          description: GString of "partyCode partyName".
+        vendorInvoiceNumber:
+          type: string
+          nullable: true
+        totalValue:
+          type: number
+          nullable: true
+        currency:
+          type: string
+          nullable: true
+        itemCount:
+          type: string
+          nullable: true
+      additionalProperties: true
+    InvoiceItem:
+      type: object
+      description: InvoiceItem.toJson() rendering.
+      properties:
+        id:
+          $ref: '../components/common.yaml#/components/schemas/Id'
+        orderNumber:
+          type: string
+          nullable: true
+        orderId:
+          type: string
+          nullable: true
+        shipmentNumber:
+          type: string
+          nullable: true
+        shipmentId:
+          type: string
+          nullable: true
+        budgetCode:
+          type: string
+          nullable: true
+        glCode:
+          type: string
+          nullable: true
+        productCode:
+          type: string
+          nullable: true
+        description:
+          type: string
+          nullable: true
+        quantity:
+          type: number
+          nullable: true
+        uom:
+          type: string
+          nullable: true
+        amount:
+          type: number
+          nullable: true
+        unitPrice:
+          type: number
+          nullable: true
+        orderAdjustment:
+          type: object
+          nullable: true
+          additionalProperties: true
+        productName:
+          type: string
+          nullable: true
+        displayNames:
+          type: object
+          nullable: true
+          additionalProperties: true
+        inverse:
+          type: boolean
+          nullable: true
+        isCanceled:
+          type: boolean
+          nullable: true
+        quantityAvailableToInvoice:
+          type: number
+          nullable: true
+        unitPriceAvailableToInvoice:
+          type: number
+          nullable: true
+        totalAmount:
+          type: number
+          nullable: true
+        totalPrepaymentAmount:
+          type: number
+          nullable: true
+      additionalProperties: true
+    InvoiceItemCandidate:
+      type: object
+      description: InvoiceItemCandidate.toJson() rendering.
+      properties:
+        id:
+          $ref: '../components/common.yaml#/components/schemas/Id'
+        orderNumber:
+          type: string
+          nullable: true
+        orderId:
+          type: string
+          nullable: true
+        shipmentNumber:
+          type: string
+          nullable: true
+        shipmentId:
+          type: string
+          nullable: true
+        budgetCode:
+          type: string
+          nullable: true
+        glCode:
+          type: string
+          nullable: true
+        productCode:
+          type: string
+          nullable: true
+        supplierCode:
+          type: string
+          nullable: true
+        description:
+          type: string
+          nullable: true
+        quantity:
+          type: number
+          nullable: true
+        quantityToInvoice:
+          type: number
+          nullable: true
+        uom:
+          type: string
+          nullable: true
+        unitPrice:
+          type: number
+          nullable: true
+        isAdjustment:
+          type: boolean
+          nullable: true
+        productName:
+          type: string
+          nullable: true
+        displayNames:
+          type: object
+          nullable: true
+          additionalProperties: true
+      additionalProperties: true
+  securitySchemes:
+    cookieAuth:
+      $ref: '../components/common.yaml#/components/securitySchemes/cookieAuth'

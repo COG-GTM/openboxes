@@ -1,0 +1,79 @@
+openapi: 3.0.3
+info:
+  title: OpenBoxes - NoopApiController
+  description: >
+    Placeholder controller org.pih.warehouse.api.NoopApiController, reachable
+    via the standard "/api/${resource}s" REST mappings as the "noop" resource
+    (/api/noops). Every action (list, create, read, update, delete) throws
+    org.apache.commons.lang.NotImplementedException, so every request responds
+    500 via ErrorsController.handleException (JSON body for AJAX/JSON
+    requests, HTML error page otherwise). Pinned for parity.
+  version: 0.1.0
+servers:
+  - url: http://localhost:8080/openboxes
+    description: Local Docker baseline (docs/migration/RUNNING_LOCALLY.md)
+security:
+  - cookieAuth: []
+paths:
+  /api/noops:
+    get:
+      operationId: listNoops
+      summary: list() - always throws NotImplementedException
+      description: >
+        Responds 500 with errorMessage "Action ... not implemented" (the
+        interpolated params.actionName is null at this point, so the message
+        reads "Action null not implemented").
+      responses:
+        '500':
+          $ref: '../components/common.yaml#/components/responses/ServerError'
+    post:
+      operationId: createNoop
+      summary: create() - always throws NotImplementedException
+      responses:
+        '500':
+          $ref: '../components/common.yaml#/components/responses/ServerError'
+  /api/noops/{id}:
+    get:
+      operationId: readNoop
+      summary: read() - always throws NotImplementedException
+      parameters:
+        - $ref: '#/components/parameters/noopId'
+      responses:
+        '500':
+          $ref: '../components/common.yaml#/components/responses/ServerError'
+    post:
+      operationId: updateNoopPost
+      summary: update() (POST variant) - always throws NotImplementedException
+      parameters:
+        - $ref: '#/components/parameters/noopId'
+      responses:
+        '500':
+          $ref: '../components/common.yaml#/components/responses/ServerError'
+    put:
+      operationId: updateNoopPut
+      summary: update() (PUT variant) - always throws NotImplementedException
+      parameters:
+        - $ref: '#/components/parameters/noopId'
+      responses:
+        '500':
+          $ref: '../components/common.yaml#/components/responses/ServerError'
+    delete:
+      operationId: deleteNoop
+      summary: delete() - always throws NotImplementedException
+      parameters:
+        - $ref: '#/components/parameters/noopId'
+      responses:
+        '500':
+          $ref: '../components/common.yaml#/components/responses/ServerError'
+components:
+  parameters:
+    noopId:
+      name: id
+      in: path
+      required: true
+      description: Ignored; every action throws before reading it.
+      schema:
+        $ref: '../components/common.yaml#/components/schemas/Id'
+  securitySchemes:
+    cookieAuth:
+      $ref: '../components/common.yaml#/components/securitySchemes/cookieAuth'

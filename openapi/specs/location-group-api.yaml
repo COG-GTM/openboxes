@@ -1,0 +1,186 @@
+openapi: 3.0.3
+info:
+  title: OpenBoxes - LocationGroupApiController
+  description: >
+    Location group CRUD handled by
+    org.pih.warehouse.api.LocationGroupApiController, routed via the explicit
+    "/api/locationGroups" mappings. Parity quirks: create() responds 200
+    (not 201) with only the new id; update is PUT-only (POST on
+    /api/locationGroups/{id} is not mapped); read() of an unknown id
+    raises IllegalArgumentException (500) while update()/delete() surface
+    Hibernate's ObjectNotFoundException as a 404; deleting a group that is
+    still assigned to locations raises IllegalStateException (500).
+  version: 0.1.0
+servers:
+  - url: http://localhost:8080/openboxes
+    description: Local Docker baseline (docs/migration/RUNNING_LOCALLY.md)
+security:
+  - cookieAuth: []
+paths:
+  /api/locationGroups:
+    get:
+      operationId: listLocationGroups
+      summary: List location groups
+      parameters:
+        - name: q
+          in: query
+          required: false
+          description: Case-insensitive prefix filter on id or name.
+          schema:
+            type: string
+        - $ref: '../components/common.yaml#/components/parameters/max'
+        - $ref: '../components/common.yaml#/components/parameters/offset'
+      responses:
+        '200':
+          description: Location groups (registered LocationGroup JSON marshaller).
+          content:
+            application/json:
+              schema:
+                type: object
+                required: [data]
+                properties:
+                  data:
+                    type: array
+                    items:
+                      $ref: '#/components/schemas/LocationGroup'
+    post:
+      operationId: createLocationGroup
+      summary: Create a location group
+      requestBody:
+        $ref: '#/components/requestBodies/LocationGroupBody'
+      responses:
+        '200':
+          description: Only the generated id is returned.
+          content:
+            application/json:
+              schema:
+                type: object
+                required: [data]
+                properties:
+                  data:
+                    type: object
+                    required: [id]
+                    properties:
+                      id:
+                        $ref: '../components/common.yaml#/components/schemas/Id'
+        '400':
+          $ref: '../components/common.yaml#/components/responses/ValidationError'
+  /api/locationGroups/{id}:
+    get:
+      operationId: readLocationGroup
+      summary: Read a location group
+      parameters:
+        - $ref: '#/components/parameters/locationGroupId'
+      responses:
+        '200':
+          $ref: '#/components/responses/LocationGroupOk'
+        '500':
+          $ref: '#/components/responses/UnknownLocationGroupError'
+    put:
+      operationId: updateLocationGroup
+      summary: Update a location group
+      description: >
+        Optimistic locking quirk: when the body carries a "version" lower
+        than the persisted version, IllegalArgumentException is thrown
+        (500).
+      parameters:
+        - $ref: '#/components/parameters/locationGroupId'
+      requestBody:
+        $ref: '#/components/requestBodies/LocationGroupBody'
+      responses:
+        '200':
+          $ref: '#/components/responses/LocationGroupOk'
+        '400':
+          $ref: '../components/common.yaml#/components/responses/ValidationError'
+        '404':
+          $ref: '../components/common.yaml#/components/responses/NotFound'
+        '500':
+          description: >
+            Optimistic-locking version conflict (IllegalArgumentException),
+            rendered by ErrorsController.handleException.
+          content:
+            application/json:
+              schema:
+                $ref: '../components/common.yaml#/components/schemas/ErrorResponse'
+    delete:
+      operationId: deleteLocationGroup
+      summary: Delete a location group
+      parameters:
+        - $ref: '#/components/parameters/locationGroupId'
+      responses:
+        '204':
+          description: Location group deleted (empty body).
+        '404':
+          $ref: '../components/common.yaml#/components/responses/NotFound'
+        '500':
+          description: >
+            Group still assigned to locations (IllegalStateException),
+            rendered by ErrorsController.handleException.
+          content:
+            application/json:
+              schema:
+                $ref: '../components/common.yaml#/components/schemas/ErrorResponse'
+components:
+  parameters:
+    locationGroupId:
+      name: id
+      in: path
+      required: true
+      schema:
+        $ref: '../components/common.yaml#/components/schemas/Id'
+  requestBodies:
+    LocationGroupBody:
+      required: true
+      content:
+        application/json:
+          schema:
+            type: object
+            properties:
+              name:
+                type: string
+              version:
+                type: integer
+                description: Optional optimistic-locking version (update only).
+            additionalProperties: true
+  responses:
+    UnknownLocationGroupError:
+      description: >
+        Unknown location group id (IllegalArgumentException, rendered by
+        ErrorsController.handleException).
+      content:
+        application/json:
+          schema:
+            $ref: '../components/common.yaml#/components/schemas/ErrorResponse'
+    LocationGroupOk:
+      description: The location group inside the "data" envelope.
+      content:
+        application/json:
+          schema:
+            type: object
+            required: [data]
+            properties:
+              data:
+                $ref: '#/components/schemas/LocationGroup'
+  schemas:
+    LocationGroup:
+      type: object
+      description: >
+        Registered LocationGroup JSON marshaller rendering (id, name,
+        address).
+      required:
+        - id
+        - name
+      properties:
+        id:
+          $ref: '../components/common.yaml#/components/schemas/Id'
+        name:
+          type: string
+        address:
+          type: object
+          nullable: true
+          allOf:
+            - $ref: '../components/common.yaml#/components/schemas/Address'
+      additionalProperties: true
+  securitySchemes:
+    cookieAuth:
+      $ref: '../components/common.yaml#/components/securitySchemes/cookieAuth'

@@ -11,6 +11,9 @@ rules:
   # Several legacy endpoints legitimately respond only 200 (errors surface
   # as HTML error pages or 200-with-null bodies); don't require 4xx.
   operation-4xx-response: off
+  # NoopApiController's actions all throw NotImplementedException, so its
+  # operations legitimately respond only 500; don't require a 2xx.
+  operation-2xx-response: off
   # The legacy UrlMappings freely mix literal and $id segments under the
   # same prefix (e.g. /api/stocklists/sendMail/$id vs /api/stocklists/$id/export,
   # /api/stockTransfers/candidates vs /api/stockTransfers/$id); Grails resolves

@@ -1,0 +1,109 @@
+openapi: 3.0.3
+info:
+  title: OpenBoxes - LocalizationApiController
+  description: >
+    Localized-message lookup handled by
+    org.pih.warehouse.api.LocalizationApiController, routed via the standard
+    "/api/${resource}s" REST mappings as the "localization" resource
+    (only list() and read() exist). Responses are the bare DTO renderings
+    (LocalizedMessagesDto/LocalizedMessageDto.toJson()) with no "data"
+    envelope.
+  version: 0.1.0
+servers:
+  - url: http://localhost:8080/openboxes
+    description: Local Docker baseline (docs/migration/RUNNING_LOCALLY.md)
+security:
+  - cookieAuth: []
+paths:
+  /api/localizations:
+    get:
+      operationId: listLocalizedMessages
+      summary: List all localized messages for a locale
+      description: >
+        Merges database overrides, the requested locale's properties and
+        fallback locales into a single message map.
+      parameters:
+        - name: languageCode
+          in: query
+          required: false
+          description: Locale code (e.g. "en", "fr"); defaults to the session/default locale.
+          schema:
+            type: string
+        - name: prefix
+          in: query
+          required: false
+          description: Only return message codes starting with this prefix.
+          schema:
+            type: string
+      responses:
+        '200':
+          description: LocalizedMessagesDto.toJson() - bare object, no "data" envelope.
+          content:
+            application/json:
+              schema:
+                type: object
+                required: [messages, supportedLocales, currentLocale]
+                properties:
+                  messages:
+                    type: object
+                    description: Message code -> localized text.
+                    additionalProperties:
+                      type: string
+                  supportedLocales:
+                    type: array
+                    items:
+                      type: string
+                  currentLocale:
+                    type: string
+                    description: Locale rendered as its language tag (e.g. "en").
+  /api/localizations/{id}:
+    get:
+      operationId: readLocalizedMessage
+      summary: Localize a single message code
+      description: >
+        Resolves one message code, optionally interpolating "args" values.
+        Unknown codes still respond 200; the message falls back to the code
+        itself.
+      parameters:
+        - name: id
+          in: path
+          required: true
+          description: The message code (e.g. "default.button.save.label").
+          schema:
+            type: string
+        - name: lang
+          in: query
+          required: false
+          description: Locale code; defaults to the session/default locale.
+          schema:
+            type: string
+        - name: args
+          in: query
+          required: false
+          description: Message arguments interpolated into {0}, {1}, ... placeholders (repeatable).
+          schema:
+            type: array
+            items:
+              type: string
+          style: form
+          explode: true
+      responses:
+        '200':
+          description: LocalizedMessageDto.toJson() - bare object, no "data" envelope.
+          content:
+            application/json:
+              schema:
+                type: object
+                required: [code, currentLocale]
+                properties:
+                  code:
+                    type: string
+                  message:
+                    type: string
+                    nullable: true
+                  currentLocale:
+                    type: string
+components:
+  securitySchemes:
+    cookieAuth:
+      $ref: '../components/common.yaml#/components/securitySchemes/cookieAuth'
