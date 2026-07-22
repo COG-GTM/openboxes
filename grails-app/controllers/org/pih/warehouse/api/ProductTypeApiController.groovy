@@ -20,6 +20,63 @@ class ProductTypeApiController {
 
     ProductTypeService productTypeService
 
+    def list() {
+        Integer max = Math.min(params.max ? params.int('max') : 10, 100)
+        Integer offset = params.offset ? params.int('offset') : 0
+        List<String> sortable = ['id', 'name', 'productTypeCode', 'productIdentifierFormat',
+                                 'sequenceNumber', 'dateCreated', 'lastUpdated']
+        String sort = params.sort in sortable ? params.sort : 'name'
+        String sortOrder = params.order == 'desc' ? 'desc' : 'asc'
+        def results = ProductType.createCriteria().list(max: max, offset: offset) {
+            order(sort, sortOrder)
+        }
+        // Skip productCount here: the list screen never shows it and computing
+        // it would cost one count query per row.
+        render([data: results.collect { toJson(it, false) }, totalCount: results.totalCount] as JSON)
+    }
+
+    def read() {
+        ProductType productType = ProductType.get(params.id)
+        if (!productType) {
+            throw new ObjectNotFoundException(params.id, ProductType.class.toString())
+        }
+        render([data: toJson(productType)] as JSON)
+    }
+
+    def update() {
+        ProductType productType = ProductType.get(params.id)
+        if (!productType) {
+            throw new ObjectNotFoundException(params.id, ProductType.class.toString())
+        }
+        def json = request.JSON
+        // The legacy edit form only exposes name, sequenceNumber,
+        // supportedActivities and displayedFields; productTypeCode,
+        // requiredFields, code and productIdentifierFormat are read-only.
+        if (json.containsKey("name")) {
+            productType.name = json.name ?: null
+        }
+        if (json.containsKey("sequenceNumber")) {
+            productType.sequenceNumber = json.sequenceNumber != null && json.sequenceNumber != "" ?
+                    json.sequenceNumber as Integer : 0
+        }
+        if (json.containsKey("supportedActivities")) {
+            productType.supportedActivities?.clear()
+            (json.supportedActivities ?: []).each {
+                productType.addToSupportedActivities(it as ProductActivityCode)
+            }
+        }
+        if (json.containsKey("displayedFields")) {
+            productType.displayedFields?.clear()
+            (json.displayedFields ?: []).each {
+                productType.addToDisplayedFields(it as ProductField)
+            }
+        }
+        if (!productType.validate() || !productTypeService.saveProductType(productType)) {
+            throw new ValidationException("Invalid product type", productType.errors)
+        }
+        render([data: toJson(productType)] as JSON)
+    }
+
     def create() {
         def json = request.JSON
         ProductType productType = new ProductType()
@@ -80,8 +137,8 @@ class ProductTypeApiController {
         render status: HttpStatus.NO_CONTENT.value()
     }
 
-    private static Map toJson(ProductType productType) {
-        [
+    private static Map toJson(ProductType productType, boolean includeProductCount = true) {
+        Map json = [
                 id                     : productType.id,
                 name                   : productType.name,
                 code                   : productType.code,
@@ -94,5 +151,9 @@ class ProductTypeApiController {
                 dateCreated            : productType.dateCreated,
                 lastUpdated            : productType.lastUpdated,
         ]
+        if (includeProductCount) {
+            json.productCount = Product.countByProductType(productType)
+        }
+        json
     }
 }

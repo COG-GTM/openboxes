@@ -221,12 +221,33 @@ class UrlMappings {
 
         "/api/productTypes"(parseRequest: true) {
             controller = { "productTypeApi" }
-            action = [POST: "create"]
+            action = [GET: "list", POST: "create"]
         }
 
         "/api/productTypes/$id"(parseRequest: true) {
             controller = { "productTypeApi" }
-            action = [DELETE: "delete"]
+            action = [GET: "read", PUT: "update", DELETE: "delete"]
+        }
+
+        // Tag endpoints for the React tag screens
+        "/api/tags"(parseRequest: true) {
+            controller = { "tagApi" }
+            action = [GET: "list", POST: "create"]
+        }
+
+        "/api/tags/$id"(parseRequest: true) {
+            controller = { "tagApi" }
+            action = [GET: "read", PUT: "update", DELETE: "delete"]
+        }
+
+        "/api/tags/$id/products"(parseRequest: true) {
+            controller = { "tagApi" }
+            action = [POST: "addProducts"]
+        }
+
+        "/api/tags/$id/products/$productId"(parseRequest: true) {
+            controller = { "tagApi" }
+            action = [DELETE: "removeProduct"]
         }
 
         // Product activity / field options for the productType create screen
@@ -238,11 +259,6 @@ class UrlMappings {
         "/api/productFieldOptions"(parseRequest: true) {
             controller = { "selectOptionsApi" }
             action = [GET: "productFieldOptions"]
-        }
-
-        "/api/tags/$id"(parseRequest: true) {
-            controller = { "tagApi" }
-            action = [GET: "read", DELETE: "delete"]
         }
 
         "/api/unitOfMeasureConversions"(parseRequest: true) {

@@ -5,8 +5,9 @@ info:
     Product type create/delete endpoints handled by
     org.pih.warehouse.api.ProductTypeApiController, routed via the explicit
     "/api/productTypes" and "/api/productTypes/$id" mappings. Added in
-    Phase 2 (Batch 11) to back the React productType create screen. Parity
-    quirks preserved from the legacy save action: productTypeCode is always
+    Phase 2 (Batch 11) to back the React productType create screen and
+    extended in Batch 12 with list/read/update for the React productType
+    list/edit/show screens. Parity quirks preserved from the legacy save action: productTypeCode is always
     forced to GOOD and requiredFields to [PRODUCT_CODE, NAME, CATEGORY,
     GL_ACCOUNT] regardless of input; a request with neither code nor
     productIdentifierFormat is rejected with the
@@ -20,6 +21,49 @@ security:
   - cookieAuth: []
 paths:
   /api/productTypes:
+    get:
+      operationId: listProductTypes
+      summary: List product types
+      description: >
+        Paged listing backing the React productType list screen. Sortable by
+        id, name, productTypeCode, productIdentifierFormat, sequenceNumber,
+        dateCreated and lastUpdated (default name asc).
+      parameters:
+        - name: max
+          in: query
+          schema:
+            type: integer
+            default: 10
+            maximum: 100
+        - name: offset
+          in: query
+          schema:
+            type: integer
+            default: 0
+        - name: sort
+          in: query
+          schema:
+            type: string
+        - name: order
+          in: query
+          schema:
+            type: string
+            enum: [asc, desc]
+      responses:
+        '200':
+          description: Page of product types.
+          content:
+            application/json:
+              schema:
+                type: object
+                required: [data, totalCount]
+                properties:
+                  data:
+                    type: array
+                    items:
+                      $ref: '#/components/schemas/ProductType'
+                  totalCount:
+                    type: integer
     post:
       operationId: createProductType
       summary: Create a product type
@@ -76,6 +120,68 @@ paths:
         description: >
           Product type id. Unknown ids raise ObjectNotFoundException,
           rendered as HTTP 404 by ErrorsController.handleNotFound.
+    get:
+      operationId: readProductType
+      summary: Read a product type
+      responses:
+        '200':
+          description: The product type.
+          content:
+            application/json:
+              schema:
+                type: object
+                required: [data]
+                properties:
+                  data:
+                    $ref: '#/components/schemas/ProductType'
+        '404':
+          $ref: '../components/common.yaml#/components/responses/NotFound'
+    put:
+      operationId: updateProductType
+      summary: Update a product type
+      description: >
+        Only the fields the legacy edit form exposes are updatable: name,
+        sequenceNumber, supportedActivities and displayedFields.
+        productTypeCode, requiredFields, code and productIdentifierFormat
+        are read-only. Keys absent from the payload are left unchanged.
+      requestBody:
+        required: true
+        content:
+          application/json:
+            schema:
+              type: object
+              properties:
+                name:
+                  type: string
+                sequenceNumber:
+                  type: integer
+                  nullable: true
+                  description: Reset to 0 when null or empty.
+                supportedActivities:
+                  type: array
+                  items:
+                    type: string
+                  description: ProductActivityCode enum names (replaces the set).
+                displayedFields:
+                  type: array
+                  items:
+                    type: string
+                  description: ProductField enum names (replaces the set).
+      responses:
+        '200':
+          description: Updated product type.
+          content:
+            application/json:
+              schema:
+                type: object
+                required: [data]
+                properties:
+                  data:
+                    $ref: '#/components/schemas/ProductType'
+        '400':
+          $ref: '../components/common.yaml#/components/responses/ValidationError'
+        '404':
+          $ref: '../components/common.yaml#/components/responses/NotFound'
     delete:
       operationId: deleteProductType
       summary: Delete a product type
@@ -135,6 +241,12 @@ components:
         lastUpdated:
           type: string
           nullable: true
+        productCount:
+          type: integer
+          description: >
+            Number of products of this type (drives the legacy edit screen's
+            conditional identifier-format row). Included on read/create/update
+            responses; omitted from list rows to avoid a per-row count query.
   securitySchemes:
     cookieAuth:
       $ref: '../components/common.yaml#/components/securitySchemes/cookieAuth'

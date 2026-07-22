@@ -2,11 +2,15 @@ openapi: 3.0.3
 info:
   title: OpenBoxes - TagApiController
   description: >
-    Read/delete endpoints for tags handled by
-    org.pih.warehouse.api.TagApiController, routed via "/api/tags/{id}".
-    Added in Phase 2 (Batch 13) for the migrated tag show screen. Tag
-    create/edit/list remain legacy GSP screens; tags can be created via the
-    generic API ("/api/generic/tag").
+    Tag CRUD and product-association endpoints handled by
+    org.pih.warehouse.api.TagApiController, routed via the explicit
+    "/api/tags" mappings. Added in Phase 2 (Batch 12) to back the React tag
+    list/create/edit screens. Parity quirks preserved from the legacy
+    TagController: list filtering uses a contains match (ilike "%q%") on the
+    tag name; addProducts resolves each comma-separated code with
+    findByProductCodeLike and silently skips unknown codes and products
+    already associated; delete removes all product associations before
+    deleting the tag.
   version: 0.1.0
 servers:
   - url: http://localhost:8080/openboxes
@@ -14,6 +18,80 @@ servers:
 security:
   - cookieAuth: []
 paths:
+  /api/tags:
+    get:
+      operationId: listTags
+      summary: List tags
+      description: >
+        Paged listing backing the React tag list screen. Optional q filter
+        does a contains match on the tag name. Sortable by id, tag,
+        dateCreated and lastUpdated (default tag asc).
+      parameters:
+        - name: q
+          in: query
+          schema:
+            type: string
+          description: Contains match on the tag name (legacy ilike "%q%").
+        - name: max
+          in: query
+          schema:
+            type: integer
+            default: 10
+            maximum: 100
+        - name: offset
+          in: query
+          schema:
+            type: integer
+            default: 0
+        - name: sort
+          in: query
+          schema:
+            type: string
+        - name: order
+          in: query
+          schema:
+            type: string
+            enum: [asc, desc]
+      responses:
+        '200':
+          description: Page of tags.
+          content:
+            application/json:
+              schema:
+                type: object
+                required: [data, totalCount]
+                properties:
+                  data:
+                    type: array
+                    items:
+                      $ref: '#/components/schemas/TagSummary'
+                  totalCount:
+                    type: integer
+    post:
+      operationId: createTag
+      summary: Create a tag
+      requestBody:
+        required: true
+        content:
+          application/json:
+            schema:
+              type: object
+              required: [tag]
+              properties:
+                tag:
+                  type: string
+                isActive:
+                  type: boolean
+                  description: Defaults to true when absent.
+      responses:
+        '201':
+          description: Created tag.
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/TagResponse'
+        '400':
+          $ref: '../components/common.yaml#/components/responses/ValidationError'
   /api/tags/{id}:
     parameters:
       - name: id
@@ -21,53 +99,131 @@ paths:
         required: true
         schema:
           $ref: '../components/common.yaml#/components/schemas/Id'
-        description: Tag id.
+        description: >
+          Tag id. Unknown ids raise ObjectNotFoundException, rendered as
+          HTTP 404 by ErrorsController.handleNotFound.
     get:
       operationId: readTag
-      summary: Read a tag with its products
+      summary: Read a tag
       responses:
         '200':
-          description: The tag, including its tagged products sorted by product code.
+          description: The tag.
           content:
             application/json:
               schema:
-                type: object
-                required: [data]
-                properties:
-                  data:
-                    $ref: '#/components/schemas/Tag'
+                $ref: '#/components/schemas/TagResponse'
         '404':
-          description: Unknown tag id.
+          $ref: '../components/common.yaml#/components/responses/NotFound'
+    put:
+      operationId: updateTag
+      summary: Update a tag
+      description: >
+        Only tag and isActive are updatable (the fields the legacy edit form
+        exposes). Keys absent from the payload are left unchanged.
+      requestBody:
+        required: true
+        content:
+          application/json:
+            schema:
+              type: object
+              properties:
+                tag:
+                  type: string
+                isActive:
+                  type: boolean
+      responses:
+        '200':
+          description: Updated tag.
           content:
             application/json:
               schema:
-                $ref: '../components/common.yaml#/components/schemas/ErrorResponse'
+                $ref: '#/components/schemas/TagResponse'
+        '400':
+          $ref: '../components/common.yaml#/components/responses/ValidationError'
+        '404':
+          $ref: '../components/common.yaml#/components/responses/NotFound'
     delete:
       operationId: deleteTag
       summary: Delete a tag
       description: >
-        Removes all products from the tag before deleting it, like the legacy
-        TagController.delete action.
+        Removes all product associations then deletes the tag, like the
+        legacy delete action.
       responses:
         '204':
           description: Tag deleted.
         '400':
-          description: Tag could not be deleted (data integrity violation).
+          description: Tag cannot be deleted.
           content:
             application/json:
               schema:
                 $ref: '../components/common.yaml#/components/schemas/ErrorResponse'
         '404':
-          description: Unknown tag id.
+          $ref: '../components/common.yaml#/components/responses/NotFound'
+  /api/tags/{id}/products:
+    parameters:
+      - name: id
+        in: path
+        required: true
+        schema:
+          $ref: '../components/common.yaml#/components/schemas/Id'
+    post:
+      operationId: addTagProducts
+      summary: Add products to a tag by product code
+      description: >
+        Accepts a comma-separated productCodes string, mirroring the legacy
+        addToProducts action. Each code is resolved with
+        findByProductCodeLike; unknown codes and already-associated products
+        are skipped silently.
+      requestBody:
+        required: true
+        content:
+          application/json:
+            schema:
+              type: object
+              required: [productCodes]
+              properties:
+                productCodes:
+                  type: string
+                  description: Comma-separated product codes.
+      responses:
+        '200':
+          description: The tag with its updated product associations.
           content:
             application/json:
               schema:
-                $ref: '../components/common.yaml#/components/schemas/ErrorResponse'
+                $ref: '#/components/schemas/TagResponse'
+        '400':
+          description: No product codes supplied.
+        '404':
+          $ref: '../components/common.yaml#/components/responses/NotFound'
+  /api/tags/{id}/products/{productId}:
+    parameters:
+      - name: id
+        in: path
+        required: true
+        schema:
+          $ref: '../components/common.yaml#/components/schemas/Id'
+      - name: productId
+        in: path
+        required: true
+        schema:
+          $ref: '../components/common.yaml#/components/schemas/Id'
+    delete:
+      operationId: removeTagProduct
+      summary: Remove a product from a tag
+      responses:
+        '200':
+          description: The tag with its updated product associations.
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/TagResponse'
+        '404':
+          $ref: '../components/common.yaml#/components/responses/NotFound'
 components:
   schemas:
-    Tag:
+    TagSummary:
       type: object
-      required: [id, tag, products]
       properties:
         id:
           $ref: '../components/common.yaml#/components/schemas/Id'
@@ -75,25 +231,35 @@ components:
           type: string
         isActive:
           type: boolean
-          nullable: true
+        productCount:
+          type: integer
         createdBy:
-          type: object
+          type: string
           nullable: true
-          properties:
-            id:
-              $ref: '../components/common.yaml#/components/schemas/Id'
-            name:
-              type: string
-              nullable: true
         updatedBy:
-          type: object
+          type: string
           nullable: true
-          properties:
-            id:
-              $ref: '../components/common.yaml#/components/schemas/Id'
-            name:
-              type: string
-              nullable: true
+        dateCreated:
+          type: string
+          nullable: true
+        lastUpdated:
+          type: string
+          nullable: true
+    Tag:
+      type: object
+      properties:
+        id:
+          $ref: '../components/common.yaml#/components/schemas/Id'
+        tag:
+          type: string
+        isActive:
+          type: boolean
+        createdBy:
+          $ref: '#/components/schemas/UserSummary'
+        updatedBy:
+          $ref: '#/components/schemas/UserSummary'
+        version:
+          type: integer
         dateCreated:
           type: string
           nullable: true
@@ -109,11 +275,22 @@ components:
                 $ref: '../components/common.yaml#/components/schemas/Id'
               productCode:
                 type: string
-                nullable: true
               name:
                 type: string
-                nullable: true
-      additionalProperties: true
+    UserSummary:
+      type: object
+      nullable: true
+      properties:
+        id:
+          $ref: '../components/common.yaml#/components/schemas/Id'
+        name:
+          type: string
+    TagResponse:
+      type: object
+      required: [data]
+      properties:
+        data:
+          $ref: '#/components/schemas/Tag'
   securitySchemes:
     cookieAuth:
       $ref: '../components/common.yaml#/components/securitySchemes/cookieAuth'

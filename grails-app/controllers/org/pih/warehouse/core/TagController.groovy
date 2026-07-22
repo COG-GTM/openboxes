@@ -9,91 +9,40 @@
  **/
 package org.pih.warehouse.core
 
-import grails.gorm.PagedResultList
 import grails.gorm.transactions.Transactional
-import org.pih.warehouse.product.Product
-// TODO: Fix CacheFlush
-// import grails.plugin.springcache.annotations.CacheFlush
 
 @Transactional
 class TagController {
 
-    static allowedMethods = [save: "POST", update: "POST", delete: "POST"]
+    static allowedMethods = [delete: "POST"]
 
     def index() {
         redirect(action: "list", params: params)
     }
 
     def list() {
-        params.max = Math.min(params.max ? params.int('max') : 10, 100)
-
-        PagedResultList tags = Tag.createCriteria().list(params) {
-            if (params.tag) {
-                ilike("tag", "%${params.tag}%")
-            }
-        } as PagedResultList
-
-        [tagInstanceList: tags, tagInstanceTotal: tags.totalCount]
+        render(view: "/common/react", params: params)
     }
 
     def create() {
-        def tagInstance = new Tag()
-        tagInstance.properties = params
-        return [tagInstance: tagInstance]
+        render(view: "/common/react", params: params)
     }
 
-    //  @CacheFlush("selectTagsCache")
-    def save() {
-        def tagInstance = new Tag(params)
-        if (tagInstance.save(flush: true)) {
-            flash.message = "${warehouse.message(code: 'default.created.message', args: [warehouse.message(code: 'tag.label', default: 'Tag'), tagInstance.id])}"
-            redirect(action: "edit", id: tagInstance.id)
-        } else {
-            render(view: "create", model: [tagInstance: tagInstance])
+    def edit() {
+        // The legacy show screen posts to this action with the id as a form
+        // parameter; redirect so the React route sees /tag/edit/<id>.
+        if (request.method == "POST" && params.id) {
+            redirect(action: "edit", id: params.id)
+            return
         }
+        render(view: "/common/react", params: params)
     }
 
     def show() {
         render(view: "/common/react", params: params)
     }
 
-    def edit() {
-        def tagInstance = Tag.get(params.id)
-        if (!tagInstance) {
-            flash.message = "${warehouse.message(code: 'default.not.found.message', args: [warehouse.message(code: 'tag.label', default: 'Tag'), params.id])}"
-            redirect(action: "list")
-        } else {
-            return [tagInstance: tagInstance]
-        }
-    }
-
-    //  @CacheFlush("selectTagsCache")
-    def update() {
-        def tagInstance = Tag.get(params.id)
-        if (tagInstance) {
-            if (params.version) {
-                def version = params.version.toLong()
-                if (tagInstance.version > version) {
-
-                    tagInstance.errors.rejectValue("version", "default.optimistic.locking.failure", [warehouse.message(code: 'tag.label', default: 'Tag')] as Object[], "Another user has updated this Tag while you were editing")
-                    render(view: "edit", model: [tagInstance: tagInstance])
-                    return
-                }
-            }
-            tagInstance.properties = params
-            if (!tagInstance.hasErrors() && tagInstance.save(flush: true)) {
-                flash.message = "${warehouse.message(code: 'default.updated.message', args: [warehouse.message(code: 'tag.label', default: 'Tag'), tagInstance.id])}"
-                redirect(action: "list", id: tagInstance.id)
-            } else {
-                render(view: "edit", model: [tagInstance: tagInstance])
-            }
-        } else {
-            flash.message = "${warehouse.message(code: 'default.not.found.message', args: [warehouse.message(code: 'tag.label', default: 'Tag'), params.id])}"
-            redirect(action: "list")
-        }
-    }
-
-    //  @CacheFlush("selectTagsCache")
+    // Kept for the legacy show screen's delete button
     def delete() {
         def tagInstance = Tag.get(params.id)
         if (tagInstance) {
@@ -114,63 +63,4 @@ class TagController {
             redirect(action: "list")
         }
     }
-
-    //  @CacheFlush("selectTagsCache")
-    def addToProducts() {
-        println "add to products " + params
-        Tag tag = Tag.get(params.id)
-
-        if (tag) {
-            if (params.productCodesToBeAdded) {
-                flash.message = "Added products " + params
-                def productCodes = params.productCodesToBeAdded.split(",")
-                productCodes.each { productCode ->
-                    def product = Product.findByProductCodeLike(productCode)
-                    if (!tag.products.contains(product)) {
-                        tag.addToProducts(product)
-                        tag.save(flush: true)
-                    }
-                }
-
-            } else {
-                flash.message = "Please enter at least one product code " + params
-
-            }
-        } else {
-            flash.message = "Could not find tag with ID " + params.id
-            redirect(action: "list")
-        }
-
-        redirect(action: "edit", id: tag.id)
-
-    }
-
-    //  @CacheFlush("selectTagsCache")
-    def removeFromProducts() {
-        println "remove from products " + params
-        Tag tag = Tag.get(params.id)
-
-        if (tag) {
-            def productIds = params.list("product.id")
-            if (productIds) {
-                flash.message = "Removed product ids " + productIds
-                productIds.each { productId ->
-                    def product = Product.get(productId)
-                    tag.removeFromProducts(product)
-                    tag.save(flush: true)
-                }
-                flash.message = "Removed products " + productIds
-            } else {
-                flash.message = "Please choose at least one product to remove"
-            }
-        } else {
-            flash.message = "Could not find tag with ID " + params.id
-            redirect(action: "list")
-        }
-
-        redirect(action: "edit", id: tag.id)
-
-    }
-
-
 }

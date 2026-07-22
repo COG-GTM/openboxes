@@ -54,6 +54,57 @@ def test_create_and_delete(client):
         assert resp.status_code == 204
 
 
+def test_list_read_update_round_trip(client):
+    resp = check(client, spec, "POST", "/api/productTypes",
+                 json={"name": TEST_NAME, "code": "ZZCT"})
+    assert resp.status_code == 201
+    created = resp.json()["data"]
+    try:
+        # list includes the created type
+        resp = check(client, spec, "GET", "/api/productTypes",
+                     params={"max": "100"})
+        assert resp.status_code == 200
+        body = resp.json()
+        assert body["totalCount"] >= 1
+        assert any(pt["id"] == created["id"] for pt in body["data"])
+
+        # read
+        resp = check(client, spec, "GET", "/api/productTypes/{id}",
+                     path=f"/api/productTypes/{created['id']}")
+        assert resp.status_code == 200
+        assert resp.json()["data"]["name"] == TEST_NAME
+        assert resp.json()["data"]["productCount"] == 0
+
+        # update the fields exposed by the legacy edit form
+        resp = check(client, spec, "PUT", "/api/productTypes/{id}",
+                     path=f"/api/productTypes/{created['id']}",
+                     json={
+                         "name": TEST_NAME + " Updated",
+                         "sequenceNumber": 7,
+                         "supportedActivities": ["SEARCHABLE"],
+                         "displayedFields": ["NAME"],
+                     })
+        assert resp.status_code == 200
+        data = resp.json()["data"]
+        assert data["name"] == TEST_NAME + " Updated"
+        assert data["sequenceNumber"] == 7
+        assert data["supportedActivities"] == ["SEARCHABLE"]
+        assert data["displayedFields"] == ["NAME"]
+        # read-only fields untouched
+        assert data["productTypeCode"] == "GOOD"
+        assert data["code"] == "ZZCT"
+    finally:
+        resp = check(client, spec, "DELETE", "/api/productTypes/{id}",
+                     path=f"/api/productTypes/{created['id']}")
+        assert resp.status_code == 204
+
+
+def test_read_unknown(client):
+    resp = check(client, spec, "GET", "/api/productTypes/{id}",
+                 path="/api/productTypes/doesnotexist0000")
+    assert resp.status_code == 404
+
+
 def test_create_without_code_or_identifier_rejected(client):
     resp = check(client, spec, "POST", "/api/productTypes",
                  json={"name": TEST_NAME})

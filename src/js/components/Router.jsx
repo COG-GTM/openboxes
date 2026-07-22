@@ -203,6 +203,36 @@ const AsyncProductTypeForm = Loadable({
   loading: Loading,
 });
 
+const AsyncProductTypeList = Loadable({
+  loader: () => import('components/productType/ProductTypeList'),
+  loading: Loading,
+});
+
+const AsyncProductTypeEdit = Loadable({
+  loader: () => import('components/productType/ProductTypeEdit'),
+  loading: Loading,
+});
+
+const AsyncProductTypeShow = Loadable({
+  loader: () => import('components/productType/ProductTypeShow'),
+  loading: Loading,
+});
+
+const AsyncTagList = Loadable({
+  loader: () => import('components/tag/TagList'),
+  loading: Loading,
+});
+
+const AsyncTagCreate = Loadable({
+  loader: () => import('components/tag/TagCreate'),
+  loading: Loading,
+});
+
+const AsyncTagEdit = Loadable({
+  loader: () => import('components/tag/TagEdit'),
+  loading: Loading,
+});
+
 const AsyncTagShow = Loadable({
   loader: () => import('components/tag/TagShow'),
   loading: Loading,
@@ -1142,6 +1172,12 @@ const Router = () => {
             <MainLayoutRoute path="**/productGroup/edit/:productGroupId" component={AsyncProductGroupForm} />
             <MainLayoutRoute path="**/productGroup/show/:productGroupId" component={AsyncProductGroupShow} />
             <MainLayoutRoute path="**/productType/create" component={AsyncProductTypeForm} />
+            <MainLayoutRoute path="**/productType/list" component={AsyncProductTypeList} />
+            <MainLayoutRoute path="**/productType/edit/:productTypeId" component={AsyncProductTypeEdit} />
+            <MainLayoutRoute path="**/productType/show/:productTypeId" component={AsyncProductTypeShow} />
+            <MainLayoutRoute path="**/tag/list" component={AsyncTagList} />
+            <MainLayoutRoute path="**/tag/create" component={AsyncTagCreate} />
+            <MainLayoutRoute path="**/tag/edit/:tagId" component={AsyncTagEdit} />
             <MainLayoutRoute path="**/tag/show/:tagId" component={AsyncTagShow} />
             <MainLayoutRoute path="**/unitOfMeasureConversion/list" component={AsyncUnitOfMeasureConversionList} />
             <MainLayoutRoute path="**/unitOfMeasureConversion/create" component={AsyncUnitOfMeasureConversionForm} />

@@ -9,22 +9,14 @@
 **/
 package org.pih.warehouse.product
 
-import grails.util.Holders
-import org.springframework.dao.DataIntegrityViolationException
-
 class ProductTypeController {
-
-    ProductTypeService productTypeService
-
-    static allowedMethods = [update: "POST", delete: "POST"]
 
     def index() {
         redirect(action: "list", params: params)
     }
 
     def list() {
-        params.max = Math.min(params.max ? params.int('max') : 10, 100)
-        [productTypeInstanceList: ProductType.list(params), productTypeInstanceTotal: ProductType.count()]
+        render(view: "/common/react", params: params)
     }
 
     def create() {
@@ -32,85 +24,10 @@ class ProductTypeController {
     }
 
     def show() {
-        def productTypeInstance = ProductType.get(params.id)
-        if (!productTypeInstance) {
-            flash.message = "${warehouse.message(code: 'default.not.found.message', args: [warehouse.message(code: 'productType.label', default: 'ProductType'), params.id])}"
-            redirect(action: "list")
-        }
-        else {
-            [productTypeInstance: productTypeInstance]
-        }
+        render(view: "/common/react", params: params)
     }
 
     def edit() {
-        def productTypeInstance = ProductType.get(params.id)
-        if (!productTypeInstance) {
-            flash.message = "${warehouse.message(code: 'default.not.found.message', args: [warehouse.message(code: 'productType.label', default: 'ProductType'), params.id])}"
-            redirect(action: "list")
-        }
-        else {
-            return [productTypeInstance: productTypeInstance]
-        }
-    }
-
-    def update() {
-        ProductType productTypeInstance = ProductType.get(params.id)
-        if (productTypeInstance) {
-            if (params.version) {
-                def version = params.version.toLong()
-                if (productTypeInstance.version > version) {
-
-                    productTypeInstance.errors.rejectValue("version", "default.optimistic.locking.failure", [warehouse.message(code: 'productType.label', default: 'ProductType')] as Object[], "Another user has updated this ProductType while you were editing")
-                    render(view: "edit", model: [productTypeInstance: productTypeInstance])
-                    return
-                }
-            }
-            params.supportedActivities = params.list("supportedActivities")
-            params.displayedFields = params.list("displayedFields")
-            bindData(productTypeInstance, params)
-
-            if (productTypeService.saveProductType(productTypeInstance)) {
-                flash.message = "${warehouse.message(code: 'default.updated.message', args: [warehouse.message(code: 'productType.label', default: 'ProductType'), productTypeInstance.id])}"
-                redirect(action: "list", id: productTypeInstance.id)
-            }
-            else {
-                render(view: "edit", model: [productTypeInstance: productTypeInstance])
-            }
-        }
-        else {
-            flash.message = "${warehouse.message(code: 'default.not.found.message', args: [warehouse.message(code: 'productType.label', default: 'ProductType'), params.id])}"
-            redirect(action: "list")
-        }
-    }
-
-    def delete() {
-        if (params.id == Holders.config.openboxes.productType.default.id) {
-            flash.message = "${warehouse.message(code: 'productType.cannotDeleteDefaultProductType.message')}"
-            redirect(action: "list", id: params.id)
-            return
-        }
-
-        ProductType productTypeInstance = ProductType.get(params.id)
-        if (productTypeInstance) {
-            def existingProducts = Product.countByProductType(productTypeInstance)
-            if (existingProducts) {
-                flash.message = "${warehouse.message(code: 'productType.deleteWithExistingProducts.message')}"
-                redirect(action: "list", id: params.id)
-            }
-
-            try {
-                productTypeService.delete(productTypeInstance)
-                flash.message = "${warehouse.message(code: 'default.deleted.message', args: [warehouse.message(code: 'productType.label', default: 'ProductType'), params.id])}"
-                redirect(action: "list")
-            }
-            catch (DataIntegrityViolationException e) {
-                flash.message = "${warehouse.message(code: 'default.not.deleted.message', args: [warehouse.message(code: 'productType.label', default: 'ProductType'), params.id])}"
-                redirect(action: "list", id: params.id)
-            }
-        }
-        else {
-            flash.message = "${warehouse.message(code: 'default.not.found.message', args: [warehouse.message(code: 'productType.label', default: 'ProductType'), params.id])}"
-            redirect(action: "list")
-        }
+        render(view: "/common/react", params: params)
     }
 }

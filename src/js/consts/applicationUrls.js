@@ -379,11 +379,14 @@ const PRODUCT_TYPE_URL = {
   base: `${CONTEXT_PATH}/productType`,
   list: () => `${PRODUCT_TYPE_URL.base}/list`,
   create: () => `${PRODUCT_TYPE_URL.base}/create`,
+  edit: (id) => `${PRODUCT_TYPE_URL.base}/edit/${id}`,
+  show: (id) => `${PRODUCT_TYPE_URL.base}/show/${id}`,
 };
 
 const TAG_URL = {
   base: `${CONTEXT_PATH}/tag`,
   list: () => `${TAG_URL.base}/list`,
+  create: () => `${TAG_URL.base}/create`,
   edit: (id) => `${TAG_URL.base}/edit/${id}`,
   show: (id) => `${TAG_URL.base}/show/${id}`,
 };

@@ -165,6 +165,12 @@ export const PRODUCT_TYPE_BY_ID = (id) => `${PRODUCT_TYPE_API}/${id}`;
 export const PRODUCT_ACTIVITY_CODE_OPTIONS = `${API}/productActivityCodeOptions`;
 export const PRODUCT_FIELD_OPTIONS = `${API}/productFieldOptions`;
 
+// TAGS
+export const TAG_API = `${API}/tags`;
+export const TAG_BY_ID = (id) => `${TAG_API}/${id}`;
+export const TAG_PRODUCTS = (id) => `${TAG_API}/${id}/products`;
+export const TAG_PRODUCT_BY_ID = (id, productId) => `${TAG_PRODUCTS(id)}/${productId}`;
+
 // SHIPMENT TYPES
 export const SHIPMENT_TYPES = `${GENERIC_API}/shipmentType`;
 
@@ -263,10 +269,6 @@ export const PRODUCT_SUPPLIER_PREFERENCES_API = `${API}/productSupplierPreferenc
 export const PRODUCT_SUPPLIER_PREFERENCES_BY_ID = (id) => `${PRODUCT_SUPPLIER_PREFERENCES_API}/${id}`;
 export const PRODUCT_SUPPLIER_EXPORT = `${PRODUCT_SUPPLIER_API}/export`;
 export const PRODUCT_SUPPLIER_DETAILS = (id) => `${PRODUCT_SUPPLIER_API}/${id}/details`;
-
-// TAG
-export const TAG_API = `${API}/tags`;
-export const TAG_BY_ID = (id) => `${TAG_API}/${id}`;
 
 // UNIT OF MEASURE
 export const UNIT_OF_MEASURE_API = `${API}/unitOfMeasures`;
