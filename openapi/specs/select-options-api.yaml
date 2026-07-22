@@ -8,7 +8,8 @@ info:
     "/api/productGroupOptions", "/api/tagOptions", "/api/glAccountOptions",
     "/api/paymentTermOptions", "/api/users", "/api/preferenceTypeOptions",
     "/api/ratingTypeCodeOptions", "/api/handlingRequirementsOptions",
-    "/api/productTypeOptions", "/api/documentTypeOptions" and
+    "/api/productTypeOptions", "/api/documentTypeOptions",
+    "/api/productAssociationTypeCodeOptions" and
     "/api/stockMovements/shipmentStatusCodes", "/api/glAccountTypeOptions",
     "/api/locationTypeCodeOptions").
     All endpoints are GET-only and
@@ -219,6 +220,36 @@ paths:
       responses:
         '200':
           $ref: '#/components/responses/IdLabelOptionsOk'
+  /api/productAssociationTypeCodeOptions:
+    get:
+      operationId: productAssociationTypeCodeOptions
+      summary: Product association type code (enum) options
+      description: >
+        Returns the ProductAssociationTypeCode enum values in sortOrder as
+        {id, value, label} triples (id/value are the enum name, label is the
+        localized enum.ProductAssociationTypeCode.* message). Added in
+        Phase 2 (Batch 9) for the React productAssociation screens.
+      responses:
+        '200':
+          description: Option list.
+          content:
+            application/json:
+              schema:
+                type: object
+                required: [data]
+                properties:
+                  data:
+                    type: array
+                    items:
+                      type: object
+                      required: [id, value, label]
+                      properties:
+                        id:
+                          type: string
+                        value:
+                          type: string
+                        label:
+                          type: string
   /api/stockMovements/shipmentStatusCodes:
     get:
       operationId: shipmentStatusCodesOptions

@@ -406,6 +406,72 @@ class ProductApiController extends BaseDomainApiController {
     }
 
     /**
+     * Product rows backing the React product/search screen. Mirrors legacy
+     * ProductController.search (productService.findProducts on the query).
+     */
+    def productSearch() {
+        if (!params.q) {
+            render([data: [], totalCount: 0] as JSON)
+            return
+        }
+        List<String> searchTerms = params.q.split(/[ ,]+/).findAll { it } as List<String>
+        List<Product> products = productService.findProducts(searchTerms)
+        def data = products.collect { Product product ->
+            [
+                    id          : product.id,
+                    productCode : product.productCode,
+                    name        : product.name,
+                    description : product.description,
+                    category    : [id: product.category?.id, name: product.category?.name],
+                    manufacturer: product.manufacturer,
+                    upc         : product.upc,
+            ]
+        }
+        render([data: data, totalCount: data.size()] as JSON)
+    }
+
+    /**
+     * UPN database rows backing the React product/upnDatabase screen.
+     * Mirrors legacy ProductController.upnDatabase: parses the fixed-width
+     * HIBCC UPN download file from the same hardcoded path and returns an
+     * empty list when the file is missing (as the legacy screen did).
+     */
+    def upnDatabase() {
+        def file = new File("/home/jmiranda/Dropbox/OpenBoxes/Product Databases/HIBCC/UPNDownload.txt")
+        def rows = []
+        try {
+            def line = ""
+            file.withReader { reader ->
+                while ((line = reader.readLine()) != null) {
+                    rows << [
+                            upn                   : line[0..19].trim(),
+                            supplier              : line[20..54].trim(),
+                            division              : line[55..89].trim(),
+                            tradeName             : line[90..124].trim(),
+                            description           : line[125..204].trim(),
+                            uom                   : line[205..206].trim(),
+                            qty                   : line[207..214].trim(),
+                            partno                : line[215..234].trim(),
+                            saleable              : line[235..235].trim(),
+                            upnQualifierCode      : line[236..237].trim(),
+                            srcCode               : line[238..239].trim(),
+                            trackingRequired      : line[240..240].trim(),
+                            upnCreateDate         : line[241..248].trim(),
+                            upnEditDate           : line[249..256].trim(),
+                            statusCode            : line[257..258].trim(),
+                            actionCode            : line[259..260].trim(),
+                            reference             : line[261..280].trim(),
+                            referenceQualifierCode: line[281..282].trim()
+                    ]
+                }
+            }
+        } catch (Exception e) {
+            log.error(e.message)
+        }
+        render([data: rows, totalCount: rows.size()] as JSON)
+    }
+
+    /**
      * Filtered product listing backing the React product/batchEdit screen.
      * Mirrors legacy ProductController.batchEdit: results only load once a
      * category or tag filter is chosen.

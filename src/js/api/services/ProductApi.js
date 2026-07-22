@@ -13,6 +13,8 @@ import {
   PRODUCT_DOCUMENTS,
   PRODUCT_IMPORT_CSV,
   PRODUCT_MERGE_LOGS,
+  PRODUCT_SCREEN_SEARCH,
+  PRODUCT_UPN_DATABASE,
   PRODUCT_VALIDATE_IMPORT,
 } from 'api/urls';
 import apiClient from 'utils/apiClient';
@@ -57,4 +59,6 @@ export default {
     headers: { 'Content-Type': 'multipart/form-data' },
   }),
   deleteDocument: (id, documentId) => apiClient.delete(PRODUCT_DOCUMENT_BY_ID(id, documentId)),
+  getUpnDatabase: () => apiClient.get(PRODUCT_UPN_DATABASE),
+  productSearch: (config) => apiClient.get(PRODUCT_SCREEN_SEARCH, config),
 };

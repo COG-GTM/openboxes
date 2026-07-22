@@ -24,6 +24,7 @@ import org.pih.warehouse.core.UserService
 import org.pih.warehouse.data.ProductSupplierService
 import org.pih.warehouse.glAccount.GlAccountService
 import org.pih.warehouse.product.Category
+import org.pih.warehouse.product.ProductAssociationTypeCode
 import org.pih.warehouse.product.ProductCatalog
 import org.pih.warehouse.product.ProductField
 import org.pih.warehouse.product.ProductGroup
@@ -188,6 +189,13 @@ class SelectOptionsApiController {
                     [id: it.id, label: it.name]
                 }
         render([data: documentTypes] as JSON)
+    }
+
+    def productAssociationTypeCodeOptions() {
+        List<Map<String, String>> options = ProductAssociationTypeCode.list().collect {
+            [id: it.name(), value: it.name(), label: g.message(code: "enum.ProductAssociationTypeCode.${it.name()}", default: it.name())]
+        }
+        render([data: options] as JSON)
     }
 
     def handlingRequirementsOptions() {

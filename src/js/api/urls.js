@@ -94,6 +94,11 @@ export const PRODUCT_DOCUMENT_BY_ID = (id, documentId) => `${PRODUCT_API}/${id}/
 export const PRODUCT_MERGE_LOGS = `${PRODUCT_API}/mergeLogs`;
 export const PRODUCT_BATCH_EDIT = `${PRODUCT_API}/batchEdit`;
 export const PRODUCT_VALIDATE_IMPORT = `${PRODUCT_API}/validateImport`;
+export const PRODUCT_SCREEN_SEARCH = `${PRODUCT_API}/productSearch`;
+export const PRODUCT_UPN_DATABASE = `${PRODUCT_API}/upnDatabase`;
+export const PRODUCT_ASSOCIATION_API = `${API}/productAssociations`;
+export const PRODUCT_ASSOCIATION_BY_ID = (id) => `${PRODUCT_ASSOCIATION_API}/${id}`;
+export const PRODUCT_ASSOCIATION_TYPE_CODE_OPTIONS = `${API}/productAssociationTypeCodeOptions`;
 export const PRODUCT_IMPORT_CSV = `${PRODUCT_API}/import`;
 export const PRODUCT_TYPE_OPTIONS = `${API}/productTypeOptions`;
 export const DOCUMENT_TYPE_OPTIONS = `${API}/documentTypeOptions`;

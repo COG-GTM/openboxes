@@ -176,6 +176,21 @@ class UrlMappings {
             action = [GET: "documentTypeOptions"]
         }
 
+        "/api/productAssociationTypeCodeOptions" {
+            controller = { "selectOptionsApi" }
+            action = [GET: "productAssociationTypeCodeOptions"]
+        }
+
+        "/api/productAssociations"(parseRequest: true) {
+            controller = { "productAssociationApi" }
+            action = [GET: "list", POST: "create"]
+        }
+
+        "/api/productAssociations/$id"(parseRequest: true) {
+            controller = { "productAssociationApi" }
+            action = [GET: "read", PUT: "update", DELETE: "delete"]
+        }
+
         "/api/stockMovements/shipmentStatusCodes" {
             controller = { "selectOptionsApi" }
             action = [GET: "shipmentStatusCodesOptions"]
@@ -194,6 +209,16 @@ class UrlMappings {
         "/api/products/mergeLogs"(parseRequest: true) {
             controller = { "productApi" }
             action = [GET: "mergeLogs"]
+        }
+
+        "/api/products/productSearch" {
+            controller = { "productApi" }
+            action = [GET: "productSearch"]
+        }
+
+        "/api/products/upnDatabase" {
+            controller = { "productApi" }
+            action = [GET: "upnDatabase"]
         }
 
         "/api/products/batchEdit"(parseRequest: true) {

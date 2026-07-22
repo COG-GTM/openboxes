@@ -700,6 +700,88 @@ paths:
                           nullable: true
                   totalCount:
                     type: integer
+  /api/products/productSearch:
+    get:
+      operationId: productSearchScreen
+      summary: Product rows for the React product/search screen
+      description: >
+        Mirrors legacy ProductController.search - runs
+        productService.findProducts on the space/comma-split query and renders
+        explicit rows with the columns the legacy screen showed (category,
+        manufacturer, upc). Without "q" renders {"data": [], "totalCount": 0}.
+      parameters:
+        - name: q
+          in: query
+          required: false
+          schema:
+            type: string
+      responses:
+        '200':
+          description: Matching products.
+          content:
+            application/json:
+              schema:
+                type: object
+                required: [data, totalCount]
+                properties:
+                  data:
+                    type: array
+                    items:
+                      type: object
+                      required: [id, name]
+                      properties:
+                        id:
+                          $ref: '../components/common.yaml#/components/schemas/Id'
+                        productCode:
+                          type: string
+                          nullable: true
+                        name:
+                          type: string
+                        description:
+                          type: string
+                          nullable: true
+                        category:
+                          type: object
+                          properties:
+                            id:
+                              type: string
+                              nullable: true
+                            name:
+                              type: string
+                              nullable: true
+                        manufacturer:
+                          type: string
+                          nullable: true
+                        upc:
+                          type: string
+                          nullable: true
+                  totalCount:
+                    type: integer
+  /api/products/upnDatabase:
+    get:
+      operationId: getUpnDatabase
+      summary: HIBCC UPN database rows (React product/upnDatabase screen)
+      description: >
+        Mirrors legacy ProductController.upnDatabase - parses a fixed-width
+        HIBCC UPN download file from a hardcoded developer path. The file is
+        absent in every deployed environment, so this always renders
+        {"data": [], "totalCount": 0} in practice.
+      responses:
+        '200':
+          description: Parsed UPN rows (empty when the source file is absent).
+          content:
+            application/json:
+              schema:
+                type: object
+                required: [data, totalCount]
+                properties:
+                  data:
+                    type: array
+                    items:
+                      type: object
+                      additionalProperties: true
+                  totalCount:
+                    type: integer
   /api/products/batchEdit:
     get:
       operationId: listBatchEditProducts

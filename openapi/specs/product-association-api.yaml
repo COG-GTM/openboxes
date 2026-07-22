@@ -1,0 +1,263 @@
+openapi: 3.0.3
+info:
+  title: OpenBoxes - ProductAssociationApiController
+  description: >
+    Product association list/read/create/update/delete endpoints handled by
+    org.pih.warehouse.api.ProductAssociationApiController, routed via the
+    explicit "/api/productAssociations" and "/api/productAssociations/$id"
+    mappings. Added in Phase 2 (Batch 9) to back the React productAssociation
+    list/create/edit screens; mirrors the legacy ProductAssociationController
+    (list criteria, mutual-association handling on save/update/delete).
+  version: 0.1.0
+servers:
+  - url: http://localhost:8080/openboxes
+    description: Local Docker baseline (docs/migration/RUNNING_LOCALLY.md)
+security:
+  - cookieAuth: []
+paths:
+  /api/productAssociations:
+    get:
+      operationId: listProductAssociations
+      summary: List product associations, optionally filtered
+      description: >
+        Mirrors the legacy list criteria: "q" is matched as a prefix ilike on
+        the association id OR against products (product/associatedProduct)
+        found by ProductService.searchProducts; "code" filters by association
+        type (may be repeated). Default max=10 (capped at 100), offset=0.
+      parameters:
+        - name: q
+          in: query
+          required: false
+          schema:
+            type: string
+        - name: code
+          in: query
+          required: false
+          schema:
+            type: string
+          description: ProductAssociationTypeCode enum name (may be repeated).
+        - $ref: '../components/common.yaml#/components/parameters/max'
+        - $ref: '../components/common.yaml#/components/parameters/offset'
+      responses:
+        '200':
+          description: Paged product associations.
+          content:
+            application/json:
+              schema:
+                type: object
+                required: [data, totalCount]
+                properties:
+                  data:
+                    type: array
+                    items:
+                      $ref: '#/components/schemas/ProductAssociation'
+                  totalCount:
+                    type: integer
+    post:
+      operationId: createProductAssociation
+      summary: Create a product association
+      description: >
+        When hasMutualAssociation is true, a reciprocal association is also
+        created (product/associatedProduct swapped, quantity inverted),
+        mirroring the legacy save action. Responds 200 (not 201).
+      requestBody:
+        required: true
+        content:
+          application/json:
+            schema:
+              $ref: '#/components/schemas/ProductAssociationInput'
+      responses:
+        '200':
+          description: Created product association.
+          content:
+            application/json:
+              schema:
+                type: object
+                required: [data]
+                properties:
+                  data:
+                    $ref: '#/components/schemas/ProductAssociation'
+        '400':
+          $ref: '#/components/responses/AssociationValidationError'
+  /api/productAssociations/{id}:
+    parameters:
+      - name: id
+        in: path
+        required: true
+        schema:
+          $ref: '../components/common.yaml#/components/schemas/Id'
+    get:
+      operationId: readProductAssociation
+      summary: Read a single product association
+      responses:
+        '200':
+          description: The product association.
+          content:
+            application/json:
+              schema:
+                type: object
+                required: [data]
+                properties:
+                  data:
+                    $ref: '#/components/schemas/ProductAssociation'
+        '404':
+          $ref: '#/components/responses/AssociationNotFound'
+    put:
+      operationId: updateProductAssociation
+      summary: Update a product association
+      description: >
+        Mirrors the legacy update action: toggling hasMutualAssociation on
+        creates (or rebinds) the reciprocal association; toggling it off
+        deletes it. A stale "version" in the body responds 409.
+      requestBody:
+        required: true
+        content:
+          application/json:
+            schema:
+              $ref: '#/components/schemas/ProductAssociationInput'
+      responses:
+        '200':
+          description: The updated product association.
+          content:
+            application/json:
+              schema:
+                type: object
+                required: [data]
+                properties:
+                  data:
+                    $ref: '#/components/schemas/ProductAssociation'
+        '400':
+          $ref: '#/components/responses/AssociationValidationError'
+        '404':
+          $ref: '#/components/responses/AssociationNotFound'
+        '409':
+          description: Optimistic locking failure (stale version).
+          content:
+            application/json:
+              schema:
+                type: object
+                properties:
+                  errorMessage:
+                    type: string
+    delete:
+      operationId: deleteProductAssociation
+      summary: Delete a product association
+      description: >
+        When the association has a mutual association, mutualDelete=true also
+        deletes the reciprocal association (otherwise it is detached and
+        kept), mirroring the legacy delete action.
+      parameters:
+        - name: mutualDelete
+          in: query
+          required: false
+          schema:
+            type: boolean
+      responses:
+        '204':
+          description: Deleted (no content).
+        '404':
+          $ref: '#/components/responses/AssociationNotFound'
+components:
+  securitySchemes:
+    cookieAuth:
+      $ref: '../components/common.yaml#/components/securitySchemes/cookieAuth'
+  responses:
+    AssociationNotFound:
+      description: No product association with the given id.
+      content:
+        application/json:
+          schema:
+            type: object
+            required: [errorMessage]
+            properties:
+              errorMessage:
+                type: string
+    AssociationValidationError:
+      description: Validation failure.
+      content:
+        application/json:
+          schema:
+            type: object
+            required: [errorCode, errorMessage]
+            properties:
+              errorCode:
+                type: integer
+              errorMessage:
+                type: string
+              errorMessages:
+                type: array
+                items:
+                  type: string
+  schemas:
+    ProductRef:
+      type: object
+      nullable: true
+      required: [id]
+      properties:
+        id:
+          $ref: '../components/common.yaml#/components/schemas/Id'
+        productCode:
+          type: string
+          nullable: true
+        name:
+          type: string
+          nullable: true
+    ProductAssociation:
+      type: object
+      required: [id, code, product, associatedProduct, hasMutualAssociation]
+      properties:
+        id:
+          $ref: '../components/common.yaml#/components/schemas/Id'
+        version:
+          type: integer
+        code:
+          type: string
+          nullable: true
+          description: ProductAssociationTypeCode enum name.
+        product:
+          $ref: '#/components/schemas/ProductRef'
+        associatedProduct:
+          $ref: '#/components/schemas/ProductRef'
+        quantity:
+          type: number
+          nullable: true
+        comments:
+          type: string
+          nullable: true
+        hasMutualAssociation:
+          type: boolean
+        dateCreated:
+          type: string
+          nullable: true
+        lastUpdated:
+          type: string
+          nullable: true
+    ProductAssociationInput:
+      type: object
+      properties:
+        code:
+          type: string
+          nullable: true
+        product:
+          type: object
+          nullable: true
+          properties:
+            id:
+              $ref: '../components/common.yaml#/components/schemas/Id'
+        associatedProduct:
+          type: object
+          nullable: true
+          properties:
+            id:
+              $ref: '../components/common.yaml#/components/schemas/Id'
+        quantity:
+          type: number
+          nullable: true
+        comments:
+          type: string
+          nullable: true
+        hasMutualAssociation:
+          type: boolean
+        version:
+          type: integer
+          nullable: true

@@ -31,6 +31,18 @@ const PRODUCT_URL = {
   batchEdit: () => `${PRODUCT_URL.base}/batchEdit`,
   batchEditProperties: () => `${PRODUCT_URL.base}/batchEditProperties`,
   mergeLogs: () => `${PRODUCT_URL.base}/productMergeLogs`,
+  search: () => `${PRODUCT_URL.base}/search`,
+  show: (id) => `${PRODUCT_URL.base}/show/${id}`,
+  upnDatabase: () => `${PRODUCT_URL.base}/upnDatabase`,
+  barcode: (data) => `${PRODUCT_URL.base}/barcode?data=${encodeURIComponent(data)}&width=100&height=10&format=CODE_128`,
+};
+
+const PRODUCT_ASSOCIATION_URL = {
+  base: `${CONTEXT_PATH}/productAssociation`,
+  list: () => `${PRODUCT_ASSOCIATION_URL.base}/list`,
+  create: () => `${PRODUCT_ASSOCIATION_URL.base}/create`,
+  edit: (id) => `${PRODUCT_ASSOCIATION_URL.base}/edit/${id}`,
+  exportXls: () => `${PRODUCT_ASSOCIATION_URL.base}/list?format=xls`,
 };
 
 const LOCATION_URL = {
@@ -315,6 +327,7 @@ export {
   LOCATION_URL,
   ORDER_URL,
   PICKLIST_URL,
+  PRODUCT_ASSOCIATION_URL,
   PRODUCT_CONFIGURATION_URL,
   PRODUCT_SUPPLIER_URL,
   PRODUCT_URL,
