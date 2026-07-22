@@ -257,7 +257,7 @@ def test_add_comment(client, batch22_endpoints, shipment_id):
     resp = check(client, spec, "POST", "/api/shipments/{id}/comments",
                  path=f"/api/shipments/{shipment_id}/comments",
                  json={"comment": "ZZ contract comment"})
-    assert resp.status_code == 200
+    assert resp.status_code == 201
 
     resp = client.get_json(f"/api/shipments/{shipment_id}/showDetails")
     comments = resp["data"]["comments"]
@@ -271,7 +271,7 @@ def test_add_event(client, batch22_endpoints, shipment_id):
                  path=f"/api/shipments/{shipment_id}/events",
                  json={"eventTypeId": event_type_id,
                        "eventDate": "2026-07-01 10:00"})
-    assert resp.status_code == 200
+    assert resp.status_code == 201
 
     details = client.get_json(f"/api/shipments/{shipment_id}/showDetails")["data"]
     assert details["events"], "expected the added event"

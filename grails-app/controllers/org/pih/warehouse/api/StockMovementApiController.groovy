@@ -247,6 +247,145 @@ class StockMovementApiController {
         render([data: stockMovement?.status] as JSON)
     }
 
+    /**
+     * Full payload for the migrated returns show screen (mirrors the model of
+     * the legacy StockMovementController.show action when it rendered
+     * /returns/show.gsp for order-based stock movements): header details,
+     * auditing info, packing list, receipt items and documents.
+     */
+    def returnsShow() {
+        Location currentLocation = Location.get(session?.warehouse?.id)
+        def stockMovement = outboundStockMovementService.getStockMovement(params.id)
+        if (!stockMovement) {
+            stockMovement = stockMovementService.getStockMovement(params.id)
+        }
+        if (!stockMovement) {
+            response.status = 404
+            render([errorCode: 404, errorMessage: "Stock movement ${params.id} not found"] as JSON)
+            return
+        }
+        stockMovement.documents = stockMovementService.getDocuments(stockMovement)
+        def receiptItems = stockMovementService.getStockMovementReceiptItems(stockMovement)
+        def shipment = stockMovement.shipment
+        User user = User.get(session.user.id)
+        boolean hasRoleFinance = userService.hasRoleFinance(user)
+        boolean isUserAdmin = userService.isUserAdmin(user)
+        boolean isSuperuser = userService.isSuperuser(user)
+
+        def shipmentItems = shipment?.sortShipmentItemsBySortOrder()?.collect { shipmentItem ->
+            [
+                    id              : shipmentItem.id,
+                    container       : shipmentItem.container ? [
+                            id  : shipmentItem.container.id,
+                            name: shipmentItem.container.parentContainer ?
+                                    "${shipmentItem.container.parentContainer.name} \u203A ${shipmentItem.container.name}".toString() :
+                                    shipmentItem.container.name,
+                    ] : null,
+                    orderNumber     : shipmentItem.orderNumber,
+                    product         : shipmentItem.inventoryItem?.product ? [
+                            id         : shipmentItem.inventoryItem.product.id,
+                            productCode: shipmentItem.inventoryItem.product.productCode,
+                            name       : shipmentItem.inventoryItem.product.name,
+                    ] : null,
+                    binLocation     : shipmentItem.binLocation?.name,
+                    lotNumber       : shipmentItem.inventoryItem?.lotNumber,
+                    expirationDate  : shipmentItem.inventoryItem?.expirationDate?.format("MMM yyyy"),
+                    quantityShipped : shipmentItem.quantity,
+                    quantityReceived: shipmentItem.quantityReceived(),
+                    quantityCanceled: shipmentItem.quantityCanceled(),
+                    unitOfMeasure   : shipmentItem.inventoryItem?.product?.unitOfMeasure ?: "EA",
+                    recipient       : shipmentItem.recipient?.name,
+                    isFullyReceived : shipmentItem.isFullyReceived(),
+            ]
+        } ?: []
+
+        render([data: [
+                id                  : stockMovement.id,
+                identifier          : stockMovement.identifier,
+                name                : stockMovement.name,
+                displayStatus       : stockMovement.displayStatus?.label,
+                origin              : stockMovement.origin ? [id: stockMovement.origin.id, name: stockMovement.origin.name, isDepot: stockMovement.origin.isDepot()] : null,
+                destination         : stockMovement.destination ? [id: stockMovement.destination.id, name: stockMovement.destination.name] : null,
+                comments            : stockMovement.comments,
+                trackingNumber      : stockMovement.trackingNumber,
+                driverName          : stockMovement.driverName,
+                shipmentType        : stockMovement.shipmentType?.name,
+                totalValue          : hasRoleFinance ? (shipment?.calculateTotalValue() ?: 0.00) : null,
+                currencyCode        : grailsApplication.config.openboxes.locale.defaultCurrencyCode,
+                order               : stockMovement.order ? [
+                        id         : stockMovement.order.id,
+                        orderNumber: stockMovement.order.orderNumber,
+                        orderType  : stockMovement.order.orderType?.name,
+                ] : null,
+                shipment            : shipment ? [
+                        id            : shipment.id,
+                        shipmentNumber: shipment.shipmentNumber,
+                        hasShipped    : shipment.hasShipped(),
+                        currentStatus : shipment.currentStatus?.name(),
+                ] : null,
+                inboundTransactions : isSuperuser ? shipment?.incomingTransactions?.collect {
+                    [id: it.id, transactionNumber: it.transactionNumber ?: it.id]
+                } ?: [] : [],
+                outboundTransactions: isSuperuser ? shipment?.outgoingTransactions?.collect {
+                    [id: it.id, transactionNumber: it.transactionNumber ?: it.id]
+                } ?: [] : [],
+                dateShipped         : shipment?.hasShipped() ? stockMovement.dateShipped?.format("MMMM dd, yyyy") : null,
+                shippedBy           : shipment?.hasShipped() ? shipment?.shippedBy?.name : null,
+                receipts            : shipment?.receipts?.collect {
+                    [
+                            actualDeliveryDate: it.actualDeliveryDate?.format("MMMM dd, yyyy"),
+                            recipient         : it.recipient?.name,
+                    ]
+                } ?: [],
+                dateCreated         : stockMovement.dateCreated?.format("MMMM dd, yyyy"),
+                createdBy           : stockMovement.createdBy?.name,
+                lastUpdated         : stockMovement.lastUpdated?.format("MMMM dd, yyyy"),
+                updatedBy           : stockMovement.updatedBy?.name,
+                hasBeenShipped      : stockMovement.hasBeenShipped(),
+                hasBeenPartiallyReceived: stockMovement.hasBeenPartiallyReceived(),
+                hasBeenReceived     : stockMovement.hasBeenReceived(),
+                isPending           : stockMovement.isPending(),
+                isSameOrigin        : stockMovement.origin?.id == currentLocation?.id,
+                isSameDestination   : stockMovement.destination?.id == currentLocation?.id,
+                isUserAdmin         : isUserAdmin,
+                isSuperuser         : isSuperuser,
+                hasRoleFinance      : hasRoleFinance,
+                documents           : stockMovement.documents?.collect {
+                    [
+                            id          : it.id,
+                            name        : it.name,
+                            uri         : it.uri,
+                            hidden      : it.hidden,
+                            contentType : it.contentType,
+                            documentType: it.documentType?.toString(),
+                    ]
+                } ?: [],
+                packingList         : shipmentItems,
+                receiptItems        : receiptItems?.collect { receiptItem ->
+                    [
+                            receiptStatusCode: receiptItem.receipt?.receiptStatusCode?.name(),
+                            receiptNumber    : receiptItem.receipt?.receiptNumber ?: receiptItem.receipt?.id,
+                            shipmentNumber   : receiptItem.receipt?.shipment?.shipmentNumber,
+                            transaction      : receiptItem.receipt?.transaction ? [
+                                    id               : receiptItem.receipt.transaction.id,
+                                    transactionNumber: receiptItem.receipt.transaction.transactionNumber ?: receiptItem.receipt.transaction.id,
+                            ] : null,
+                            product          : receiptItem.product ? [
+                                    id         : receiptItem.product.id,
+                                    productCode: receiptItem.product.productCode,
+                                    name       : receiptItem.product.name,
+                            ] : null,
+                            lotNumber        : receiptItem.inventoryItem?.lotNumber,
+                            expirationDate   : receiptItem.inventoryItem?.expirationDate?.format("MMM yyyy"),
+                            binLocation      : receiptItem.binLocation?.name,
+                            quantityCanceled : receiptItem.quantityCanceled ?: 0,
+                            quantityPending  : receiptItem.quantityPending ?: 0,
+                            quantityReceived : receiptItem.quantityReceived ?: 0,
+                    ]
+                } ?: [],
+        ]] as JSON)
+    }
+
     def deleteStatus() {
         stockMovementService.rollbackStockMovement(params.id)
         redirect(action: "read", params: params)

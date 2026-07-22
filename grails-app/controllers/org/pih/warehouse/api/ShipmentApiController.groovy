@@ -5,6 +5,15 @@ import grails.gorm.transactions.Transactional
 import grails.validation.ValidationException
 import org.apache.commons.lang.text.StrSubstitutor
 import org.springframework.http.HttpStatus
+import org.springframework.web.multipart.MultipartFile
+import org.springframework.web.multipart.MultipartHttpServletRequest
+import util.FileUtil
+
+import org.pih.warehouse.core.Comment
+import org.pih.warehouse.core.Constants
+import org.pih.warehouse.core.Document
+import org.pih.warehouse.core.DocumentCode
+import org.pih.warehouse.core.DocumentType
 import org.pih.warehouse.core.Event
 import org.pih.warehouse.core.EventType
 import org.pih.warehouse.core.Location
@@ -19,11 +28,14 @@ import org.pih.warehouse.receiving.Receipt
 import org.pih.warehouse.receiving.ReceiptItem
 import org.pih.warehouse.shipping.Container
 import org.pih.warehouse.shipping.ContainerType
+import org.pih.warehouse.shipping.ItemCommand
+import org.pih.warehouse.shipping.ItemListCommand
 import org.pih.warehouse.shipping.ReferenceNumber
 import org.pih.warehouse.shipping.ReferenceNumberType
 import org.pih.warehouse.shipping.Shipment
 import org.pih.warehouse.shipping.ShipmentException
 import org.pih.warehouse.shipping.ShipmentItem
+import org.pih.warehouse.shipping.ShipmentItemException
 import org.pih.warehouse.shipping.ShipmentMethod
 import org.pih.warehouse.shipping.ShipmentStatusCode
 import org.pih.warehouse.shipping.ShipmentType
@@ -176,6 +188,7 @@ class ShipmentApiController {
     def locationService
     def userService
     def mailService
+    def documentService
     def shipmentEventManager
 
     /**
@@ -673,6 +686,386 @@ class ShipmentApiController {
         render([data: getWizardDetails(shipment)] as JSON)
     }
 
+    /**
+     * Mirrors the legacy ShipmentController.deleteShipment POST branch for the
+     * migrated delete shipment screen.
+     */
+    def delete() {
+        if (!requireManager()) {
+            return
+        }
+        Shipment shipment = Shipment.get(params.id)
+        if (!shipment) {
+            renderNotFound()
+            return
+        }
+        try {
+            shipmentService.deleteShipment(shipment)
+        } catch (Exception e) {
+            renderError(e.message)
+            return
+        }
+        render(status: 204)
+    }
+
+    /**
+     * Mirrors the legacy ShipmentController.saveComment action for the
+     * migrated add comment screen.
+     */
+    def createComment() {
+        if (!requireManager()) {
+            return
+        }
+        Shipment shipment = Shipment.get(params.id)
+        if (!shipment) {
+            renderNotFound()
+            return
+        }
+        def jsonObject = request.JSON
+        User sender = User.get(session.user.id)
+        String recipientId = jsonObject.recipient?.id ?: jsonObject.recipientId
+        User recipient = recipientId ? User.get(recipientId) : null
+        Comment comment = new Comment(comment: jsonObject.comment ?: null, sender: sender, recipient: recipient)
+        comment.validate()
+        if (comment.hasErrors()) {
+            response.status = 400
+            render([errorCode: 400, errorMessage: "Validation errors",
+                    errors: comment.errors.allErrors.collect { g.message(error: it) }] as JSON)
+            return
+        }
+        comment.save()
+        shipment.addToComments(comment)
+        if (shipment.hasErrors() || !shipment.save(flush: true)) {
+            transactionStatus.setRollbackOnly()
+            renderValidationErrors(shipment)
+            return
+        }
+        response.status = 201
+        render([data: [
+                id       : comment.id,
+                comment  : comment.comment,
+                sender   : comment.sender ? [id: comment.sender.id, name: comment.sender.name] : null,
+                recipient: comment.recipient ? [id: comment.recipient.id, name: comment.recipient.name] : null,
+        ]] as JSON)
+    }
+
+    /**
+     * Non-template document types for the migrated add document screen
+     * (mirrors documentService.getNonTemplateDocumentTypes used by the legacy
+     * ShipmentController.addDocument action).
+     */
+    def documentTypes() {
+        if (!requireManager()) {
+            return
+        }
+        List<DocumentType> documentTypeList = documentService.getNonTemplateDocumentTypes().sort { it.name }
+        render([data: documentTypeList.collect {
+            [id: it.id, value: it.id, label: it.name]
+        }] as JSON)
+    }
+
+    /**
+     * Mirrors the shipment branch of DocumentController.uploadDocument for the
+     * migrated add document screen. Accepts either an uploaded file or a URL
+     * (fileUri), like the legacy form.
+     */
+    def uploadDocument() {
+        if (!requireManager()) {
+            return
+        }
+        Shipment shipment = Shipment.get(params.id)
+        if (!shipment) {
+            renderNotFound()
+            return
+        }
+        MultipartFile file = request instanceof MultipartHttpServletRequest ? request.getFile("fileContents") : null
+        String fileUri = params.fileUri
+        if (!file?.size && !fileUri) {
+            renderError(g.message(code: 'document.documentCannotBeEmpty.message') as String)
+            return
+        }
+        String typeId = params.typeId ?: Constants.DEFAULT_DOCUMENT_TYPE_ID
+        DocumentType documentType = DocumentType.get(typeId)
+        Document documentInstance
+        if (file?.size) {
+            if (!Document.isAllowedFile(file.originalFilename, file.contentType, file.inputStream)) {
+                renderError(g.message(code: 'document.uploadNotAllowed.message',
+                        args: [Document.allowedExtensions().join(', ')]) as String)
+                return
+            }
+            if (file.size >= 10 * 1024 * 1000) {
+                renderError(g.message(code: 'document.documentTooLarge.message') as String)
+                return
+            }
+            documentInstance = new Document(
+                    size: file.size,
+                    name: params.name ?: file.originalFilename,
+                    filename: file.originalFilename,
+                    fileContents: file.bytes,
+                    contentType: file.contentType,
+                    extension: file.originalFilename ? FileUtil.getExtension(file.originalFilename) : null,
+                    documentNumber: params.documentNumber,
+                    documentType: documentType)
+        } else {
+            documentInstance = new Document(
+                    size: 0,
+                    name: params.name ?: fileUri,
+                    fileUri: fileUri,
+                    documentNumber: params.documentNumber,
+                    documentType: documentType)
+        }
+        documentInstance.validate()
+        List<DocumentCode> forbiddenDocumentCodes = DocumentCode.templateList()
+        if (documentType && forbiddenDocumentCodes.contains(documentType.documentCode)) {
+            documentInstance.errors.reject("documentType", "Template types are not allowed for this document upload")
+        }
+        if (documentInstance.hasErrors()) {
+            transactionStatus.setRollbackOnly()
+            response.status = 400
+            render([errorCode: 400, errorMessage: "Validation errors",
+                    errors: documentInstance.errors.allErrors.collect { g.message(error: it) }] as JSON)
+            return
+        }
+        shipment.addToDocuments(documentInstance)
+        if (shipment.hasErrors() || !shipment.save(flush: true)) {
+            transactionStatus.setRollbackOnly()
+            renderValidationErrors(shipment)
+            return
+        }
+        response.status = 201
+        render([data: [
+                id            : documentInstance.id,
+                name          : documentInstance.name,
+                filename      : documentInstance.filename,
+                documentNumber: documentInstance.documentNumber,
+                documentType  : documentInstance.documentType ? [id: documentInstance.documentType.id, name: documentInstance.documentType.name] : null,
+                fileUri       : documentInstance.fileUri,
+        ]] as JSON)
+    }
+
+    /**
+     * Select options for the migrated edit event screen (mirrors the
+     * EventType.list() and Location.list() selects on the legacy GSP).
+     */
+    def eventOptions() {
+        if (!requireManager()) {
+            return
+        }
+        render([data: [
+                eventTypes: EventType.list().collect { [id: it.id, name: it.name] },
+                locations : Location.list().collect { [id: it.id, name: it.name] },
+        ]] as JSON)
+    }
+
+    /**
+     * Event details for the migrated edit event screen.
+     */
+    def readEvent() {
+        if (!requireManager()) {
+            return
+        }
+        Shipment shipment = Shipment.get(params.id)
+        if (!shipment) {
+            renderNotFound()
+            return
+        }
+        Event event = Event.get(params.eventId)
+        if (!event) {
+            response.status = 404
+            render([errorCode: 404, errorMessage: "Event ${params.eventId} not found"] as JSON)
+            return
+        }
+        render([data: getEventDetails(event)] as JSON)
+    }
+
+    /**
+     * Mirrors the legacy ShipmentController.saveEvent action: creates a new
+     * event (no eventId) via the shipment event manager or updates an
+     * existing one.
+     */
+    def saveEvent() {
+        if (!requireManager()) {
+            return
+        }
+        Shipment shipment = Shipment.get(params.id)
+        if (!shipment) {
+            renderNotFound()
+            return
+        }
+        def jsonObject = request.JSON
+        Event event = params.eventId ? Event.get(params.eventId) : new Event()
+        if (!event) {
+            response.status = 404
+            render([errorCode: 404, errorMessage: "Event ${params.eventId} not found"] as JSON)
+            return
+        }
+        // the event type is only editable while the event has none (the legacy
+        // GSP only rendered the select in that case)
+        if (jsonObject.containsKey("eventTypeId") && !event.eventType) {
+            event.eventType = jsonObject.eventTypeId ? EventType.get(jsonObject.eventTypeId) : null
+        }
+        if (jsonObject.containsKey("eventDate")) {
+            event.eventDate = jsonObject.eventDate ?
+                    Date.parse("yyyy-MM-dd HH:mm", jsonObject.eventDate as String) : null
+        }
+        if (jsonObject.containsKey("eventLocationId")) {
+            event.eventLocation = jsonObject.eventLocationId ? Location.get(jsonObject.eventLocationId) : null
+        }
+        if (!params.eventId) {
+            // new events default to the current warehouse and now, like the
+            // legacy showDetails add-event form
+            event.eventLocation = event.eventLocation ?: Location.get(session.warehouse.id)
+            event.eventDate = event.eventDate ?: new Date()
+        }
+        event.validate()
+        if (event.hasErrors()) {
+            response.status = 400
+            render([errorCode: 400, errorMessage: "Validation errors",
+                    errors: event.errors.allErrors.collect { g.message(error: it) }] as JSON)
+            return
+        }
+        try {
+            if (params.eventId) {
+                event.save(flush: true)
+            } else {
+                shipmentEventManager.createEvent(shipment, event)
+                shipment.save(flush: true)
+            }
+        } catch (ValidationException e) {
+            renderValidationException(e)
+            return
+        }
+        response.status = params.eventId ? 200 : 201
+        render([data: getEventDetails(event)] as JSON)
+    }
+
+    /**
+     * Mirrors the legacy ShipmentController.deleteEvent action (rolls the
+     * event back through the shipment event manager).
+     */
+    def deleteEvent() {
+        if (!requireManager()) {
+            return
+        }
+        Shipment shipment = Shipment.get(params.id)
+        if (!shipment) {
+            renderNotFound()
+            return
+        }
+        Event event = Event.get(params.eventId)
+        if (!event) {
+            response.status = 404
+            render([errorCode: 404, errorMessage: "Event ${params.eventId} not found"] as JSON)
+            return
+        }
+        shipmentEventManager.rollbackEvent(shipment, event)
+        shipment.save()
+        render(status: 204)
+    }
+
+    /**
+     * Candidate inventory items and pending shipments/containers for the
+     * migrated add-to-shipment screen (mirrors
+     * shipmentService.getAddToShipmentCommand and the selectContainer taglib).
+     */
+    def addToShipmentCandidates() {
+        if (!requireManager()) {
+            return
+        }
+        List<String> productIds = params.list("product.id").collect { String.valueOf(it) }
+        Location location = Location.get(session.warehouse.id)
+        ItemListCommand command = shipmentService.getAddToShipmentCommand(productIds, location)
+        List<Shipment> pendingShipments = shipmentService.getPendingShipments(location)
+        render([data: [
+                items           : command.items.collect { ItemCommand item ->
+                    [
+                            inventoryItem    : item.inventoryItem ? [
+                                    id            : item.inventoryItem.id,
+                                    lotNumber     : item.inventoryItem.lotNumber,
+                                    expirationDate: item.inventoryItem.expirationDate?.format("yyyy-MM-dd"),
+                            ] : null,
+                            product          : item.product ? [
+                                    id         : item.product.id,
+                                    productCode: item.product.productCode,
+                                    name       : item.product.name,
+                            ] : null,
+                            lotNumber        : item.lotNumber,
+                            quantityOnHand   : item.quantityOnHand ?: 0,
+                            quantityShipping : item.quantityShipping ?: 0,
+                            quantityReceiving: item.quantityReceiving ?: 0,
+                    ]
+                },
+                pendingShipments: pendingShipments.collect { Shipment shipment ->
+                    [
+                            id                  : shipment.id,
+                            name                : shipment.name,
+                            shipmentNumber      : shipment.shipmentNumber,
+                            destination         : shipment.destination ? [id: shipment.destination.id, name: shipment.destination.name] : null,
+                            expectedShippingDate: shipment.expectedShippingDate?.format("yyyy-MM-dd"),
+                            looseItemCount      : shipment.shipmentItems?.count { it.container == null } ?: 0,
+                            containers          : shipment.containers?.collect { Container container ->
+                                [
+                                        id       : container.id,
+                                        name     : container.name,
+                                        itemCount: shipment.shipmentItems?.count { it.container?.id == container.id } ?: 0,
+                                ]
+                            } ?: [],
+                    ]
+                },
+        ]] as JSON)
+    }
+
+    /**
+     * Mirrors the legacy ShipmentController.addToShipmentPost action: adds
+     * the selected inventory item quantities to a pending shipment/container.
+     */
+    def addToShipment() {
+        if (!requireManager()) {
+            return
+        }
+        def jsonObject = request.JSON
+        Shipment shipment = jsonObject.shipmentId ? Shipment.get(jsonObject.shipmentId) : null
+        if (!shipment) {
+            renderError(g.message(code: 'addToShipment.container.invalid') as String)
+            return
+        }
+        Container container = jsonObject.containerId ? Container.get(jsonObject.containerId) : null
+        ItemListCommand command = new ItemListCommand()
+        jsonObject.items?.each { itemInput ->
+            ItemCommand item = new ItemCommand()
+            item.inventoryItem = itemInput.inventoryItemId ? InventoryItem.get(itemInput.inventoryItemId) : null
+            item.product = item.inventoryItem?.product
+            item.lotNumber = item.inventoryItem?.lotNumber
+            item.quantity = itemInput.quantity ? itemInput.quantity as Integer : 0
+            item.shipment = shipment
+            item.container = container
+            command.items << item
+        }
+        try {
+            boolean atLeastOneUpdate = shipmentService.addToShipment(command)
+            render([data: [
+                    atLeastOneUpdate: atLeastOneUpdate,
+                    shipmentId      : shipment.id,
+                    containerId     : container?.id,
+            ]] as JSON)
+        } catch (ShipmentItemException e) {
+            response.status = 400
+            render([errorCode: 400, errorMessage: "Validation errors",
+                    errors: e.shipmentItem.errors.allErrors.collect { g.message(error: it) }] as JSON)
+        } catch (ValidationException e) {
+            renderValidationException(e)
+        }
+    }
+
+    private Map getEventDetails(Event event) {
+        [
+                id           : event.id,
+                eventType    : event.eventType ? [id: event.eventType.id, name: event.eventType.name] : null,
+                eventDate    : event.eventDate?.format("yyyy-MM-dd HH:mm"),
+                eventLocation: event.eventLocation ? [id: event.eventLocation.id, name: event.eventLocation.name] : null,
+        ]
+    }
+
     // ------------------------------------------------------------------
     // Batch 22: classic shipping screens (shipment/list, showDetails,
     // showPackingList, receiveShipment, sendShipment, shipmentItem/create)
@@ -809,51 +1202,6 @@ class ShipmentApiController {
                 eventLocations      : Location.list().sort { it?.name?.toLowerCase() }.collect { [id: it.id, name: it.name] },
         ])
         render([data: details] as JSON)
-    }
-
-    /**
-     * Adds a comment to a shipment (mirrors ShipmentController.saveComment).
-     */
-    def addComment() {
-        if (!requireManager()) {
-            return
-        }
-        Shipment shipment = Shipment.get(params.id)
-        if (!shipment) {
-            renderNotFound()
-            return
-        }
-        def jsonObject = request.JSON
-        User recipient = jsonObject.recipientId ? User.get(jsonObject.recipientId) : null
-        shipmentService.addShipmentComment(shipment.id, jsonObject.comment as String, session.user, recipient)
-        render([data: [success: true]] as JSON)
-    }
-
-    /**
-     * Adds an event to a shipment (mirrors the add-event form on the legacy
-     * showDetails events tab / ShipmentController.saveEvent).
-     */
-    def addEvent() {
-        if (!requireManager()) {
-            return
-        }
-        Shipment shipment = Shipment.get(params.id)
-        if (!shipment) {
-            renderNotFound()
-            return
-        }
-        def jsonObject = request.JSON
-        EventType eventType = EventType.get(jsonObject.eventTypeId)
-        Location eventLocation = jsonObject.eventLocationId ? Location.get(jsonObject.eventLocationId) : Location.get(session.warehouse.id)
-        Date eventDate = jsonObject.eventDate ? Date.parse("yyyy-MM-dd HH:mm", jsonObject.eventDate as String) : new Date()
-        if (!eventType) {
-            renderError("Event type is required")
-            return
-        }
-        Event event = new Event(eventType: eventType, eventLocation: eventLocation, eventDate: eventDate)
-        shipmentEventManager.createEvent(shipment, event)
-        shipment.save(flush: true)
-        render([data: [success: true]] as JSON)
     }
 
     /**

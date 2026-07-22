@@ -742,6 +742,11 @@ class UrlMappings {
             action = [GET: "getDocuments"]
         }
 
+        "/api/stockMovements/$id/returnsShow" {
+            controller = "stockMovementApi"
+            action = [GET: "returnsShow"]
+        }
+
         // Stock movement detail API (migrated stockMovement show / addComment / addDocument screens)
         "/api/stockMovements/documentTypes" {
             controller = "stockMovementDetailApi"
@@ -926,9 +931,49 @@ class UrlMappings {
             action = [POST: "bulkAction"]
         }
 
+        "/api/shipments/documentTypes" {
+            controller = "shipmentApi"
+            action = [GET: "documentTypes"]
+        }
+
+        "/api/shipments/eventOptions" {
+            controller = "shipmentApi"
+            action = [GET: "eventOptions"]
+        }
+
+        "/api/shipments/addToShipmentCandidates" {
+            controller = "shipmentApi"
+            action = [GET: "addToShipmentCandidates"]
+        }
+
+        "/api/shipments/addToShipment"(parseRequest: true) {
+            controller = "shipmentApi"
+            action = [POST: "addToShipment"]
+        }
+
         "/api/shipments/$id" {
             controller = "shipmentApi"
-            action = [GET: "read"]
+            action = [GET: "read", DELETE: "delete"]
+        }
+
+        "/api/shipments/$id/comments"(parseRequest: true) {
+            controller = "shipmentApi"
+            action = [POST: "createComment"]
+        }
+
+        "/api/shipments/$id/documents" {
+            controller = "shipmentApi"
+            action = [POST: "uploadDocument"]
+        }
+
+        "/api/shipments/$id/events"(parseRequest: true) {
+            controller = "shipmentApi"
+            action = [POST: "saveEvent"]
+        }
+
+        "/api/shipments/$id/events/$eventId"(parseRequest: true) {
+            controller = "shipmentApi"
+            action = [GET: "readEvent", POST: "saveEvent", DELETE: "deleteEvent"]
         }
 
         "/api/shipments/$id/details"(parseRequest: true) {
@@ -1006,16 +1051,6 @@ class UrlMappings {
         "/api/shipments/$id/packingList" {
             controller = "shipmentApi"
             action = [GET: "packingList"]
-        }
-
-        "/api/shipments/$id/comments"(parseRequest: true) {
-            controller = "shipmentApi"
-            action = [POST: "addComment"]
-        }
-
-        "/api/shipments/$id/events"(parseRequest: true) {
-            controller = "shipmentApi"
-            action = [POST: "addEvent"]
         }
 
         "/api/shipments/$id/receipt"(parseRequest: true) {

@@ -137,6 +137,32 @@ paths:
           $ref: '#/components/responses/ErrorMessageBadRequest'
         '404':
           $ref: '../components/common.yaml#/components/responses/NotFound'
+  /api/stockMovements/{id}/returnsShow:
+    get:
+      operationId: getReturnsShow
+      summary: Read-only data for the migrated returns show screen
+      description: >
+        Backs the React screen that replaced the legacy /returns/show GSP
+        (Phase 2, Batch 21) - details, auditing, action/permission flags,
+        documents, packing list and receipt items of an order-based
+        (return) stock movement. Falls back from the outbound stock movement
+        lookup to the regular stock movement lookup like the legacy
+        StockMovementController.show action.
+      parameters:
+        - $ref: '#/components/parameters/stockMovementId'
+      responses:
+        '200':
+          description: Returns show screen data.
+          content:
+            application/json:
+              schema:
+                type: object
+                required: [data]
+                properties:
+                  data:
+                    $ref: '#/components/schemas/ReturnsShow'
+        '404':
+          $ref: '../components/common.yaml#/components/responses/NotFound'
   /api/stockMovements/{id}/status:
     get:
       operationId: getStockMovementStatus
@@ -621,6 +647,285 @@ components:
           schema:
             $ref: '#/components/schemas/ErrorMessageResponse'
   schemas:
+    ReturnsShow:
+      type: object
+      required: [id, isUserAdmin, isSuperuser, hasRoleFinance, documents, packingList, receiptItems]
+      properties:
+        id:
+          type: string
+        identifier:
+          type: string
+          nullable: true
+        name:
+          type: string
+          nullable: true
+        displayStatus:
+          type: string
+          nullable: true
+        origin:
+          type: object
+          nullable: true
+          properties:
+            id:
+              type: string
+            name:
+              type: string
+              nullable: true
+            isDepot:
+              type: boolean
+        destination:
+          type: object
+          nullable: true
+          properties:
+            id:
+              type: string
+            name:
+              type: string
+              nullable: true
+        comments:
+          type: string
+          nullable: true
+        trackingNumber:
+          type: string
+          nullable: true
+        driverName:
+          type: string
+          nullable: true
+        shipmentType:
+          type: string
+          nullable: true
+        totalValue:
+          type: number
+          nullable: true
+          description: Null when the user lacks the finance role.
+        currencyCode:
+          type: string
+          nullable: true
+        order:
+          type: object
+          nullable: true
+          properties:
+            id:
+              type: string
+            orderNumber:
+              type: string
+              nullable: true
+            orderType:
+              type: string
+              nullable: true
+        shipment:
+          type: object
+          nullable: true
+          properties:
+            id:
+              type: string
+            shipmentNumber:
+              type: string
+              nullable: true
+            hasShipped:
+              type: boolean
+            currentStatus:
+              type: string
+              nullable: true
+        inboundTransactions:
+          type: array
+          items:
+            $ref: '#/components/schemas/TransactionReference'
+        outboundTransactions:
+          type: array
+          items:
+            $ref: '#/components/schemas/TransactionReference'
+        dateShipped:
+          type: string
+          nullable: true
+        shippedBy:
+          type: string
+          nullable: true
+        receipts:
+          type: array
+          items:
+            type: object
+            properties:
+              actualDeliveryDate:
+                type: string
+                nullable: true
+              recipient:
+                type: string
+                nullable: true
+        dateCreated:
+          type: string
+          nullable: true
+        createdBy:
+          type: string
+          nullable: true
+        lastUpdated:
+          type: string
+          nullable: true
+        updatedBy:
+          type: string
+          nullable: true
+        hasBeenShipped:
+          type: boolean
+        hasBeenPartiallyReceived:
+          type: boolean
+        hasBeenReceived:
+          type: boolean
+        isPending:
+          type: boolean
+        isSameOrigin:
+          type: boolean
+        isSameDestination:
+          type: boolean
+        isUserAdmin:
+          type: boolean
+        isSuperuser:
+          type: boolean
+        hasRoleFinance:
+          type: boolean
+        documents:
+          type: array
+          items:
+            type: object
+            properties:
+              id:
+                type: string
+                nullable: true
+              name:
+                type: string
+                nullable: true
+              uri:
+                type: string
+                nullable: true
+              hidden:
+                type: boolean
+                nullable: true
+              contentType:
+                type: string
+                nullable: true
+              documentType:
+                type: string
+                nullable: true
+        packingList:
+          type: array
+          items:
+            $ref: '#/components/schemas/ReturnsShowPackingListItem'
+        receiptItems:
+          type: array
+          items:
+            $ref: '#/components/schemas/ReturnsShowReceiptItem'
+    TransactionReference:
+      type: object
+      required: [id]
+      properties:
+        id:
+          type: string
+        transactionNumber:
+          type: string
+          nullable: true
+    ReturnsShowPackingListItem:
+      type: object
+      required: [id]
+      properties:
+        id:
+          type: string
+        container:
+          type: object
+          nullable: true
+          properties:
+            id:
+              type: string
+            name:
+              type: string
+              nullable: true
+        orderNumber:
+          type: string
+          nullable: true
+        product:
+          type: object
+          nullable: true
+          properties:
+            id:
+              type: string
+            productCode:
+              type: string
+              nullable: true
+            name:
+              type: string
+              nullable: true
+        binLocation:
+          type: string
+          nullable: true
+        lotNumber:
+          type: string
+          nullable: true
+        expirationDate:
+          type: string
+          nullable: true
+        quantityShipped:
+          type: integer
+          nullable: true
+        quantityReceived:
+          type: integer
+          nullable: true
+        quantityCanceled:
+          type: integer
+          nullable: true
+        unitOfMeasure:
+          type: string
+          nullable: true
+        recipient:
+          type: string
+          nullable: true
+        isFullyReceived:
+          type: boolean
+    ReturnsShowReceiptItem:
+      type: object
+      properties:
+        receiptStatusCode:
+          type: string
+          nullable: true
+        receiptNumber:
+          type: string
+          nullable: true
+        shipmentNumber:
+          type: string
+          nullable: true
+        transaction:
+          type: object
+          nullable: true
+          properties:
+            id:
+              type: string
+            transactionNumber:
+              type: string
+              nullable: true
+        product:
+          type: object
+          nullable: true
+          properties:
+            id:
+              type: string
+            productCode:
+              type: string
+              nullable: true
+            name:
+              type: string
+              nullable: true
+        lotNumber:
+          type: string
+          nullable: true
+        expirationDate:
+          type: string
+          nullable: true
+        binLocation:
+          type: string
+          nullable: true
+        quantityCanceled:
+          type: integer
+        quantityPending:
+          type: integer
+        quantityReceived:
+          type: integer
     ErrorMessageResponse:
       type: object
       required: [errorMessage]

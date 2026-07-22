@@ -89,6 +89,27 @@ def test_read_unknown_is_404(client):
     assert resp.status_code == 404
 
 
+def test_returns_show(client, movement, batch21_endpoints):
+    resp = check(
+        client, spec, "GET", "/api/stockMovements/{id}/returnsShow",
+        path=f"/api/stockMovements/{movement}/returnsShow",
+    )
+    assert resp.status_code == 200
+    data = resp.json()["data"]
+    assert data["id"] == movement
+    assert data["origin"]["name"] == "Main Warehouse"
+    assert data["destination"]["name"] == "Boston Office"
+    assert data["isSameOrigin"] is True
+
+
+def test_returns_show_unknown_is_404(client, batch21_endpoints):
+    resp = check(
+        client, spec, "GET", "/api/stockMovements/{id}/returnsShow",
+        path="/api/stockMovements/zz-contract-missing/returnsShow",
+    )
+    assert resp.status_code == 404
+
+
 def test_status(client, movement):
     resp = check(
         client, spec, "GET", "/api/stockMovements/{id}/status",

@@ -1,5 +1,6 @@
 import React, { useEffect, useState } from 'react';
 
+import PropTypes from 'prop-types';
 import { useParams } from 'react-router-dom';
 import Alert from 'react-s-alert';
 
@@ -20,7 +21,7 @@ const detailRow = (labelId, defaultLabel, value, testId) => (
   </div>
 );
 
-const StockMovementShow = () => {
+const StockMovementShow = ({ initialDetails }) => {
   const { stockMovementId } = useParams();
   const [details, setDetails] = useState(null);
   const [activeTab, setActiveTab] = useState(null);
@@ -33,18 +34,24 @@ const StockMovementShow = () => {
   useEffect(() => {
     setTabData({});
     setActiveTab(null);
+    const applyDetails = (fetchedDetails) => {
+      setDetails(fetchedDetails);
+      // Mirrors the legacy show.gsp tab selection: Request Details is the
+      // initial tab only for pending-shipment, same-origin movements and is
+      // hidden entirely for supplier-origin movements.
+      const showRequestDetails = !fetchedDetails?.origin?.isSupplier;
+      const defaultToRequestDetails = showRequestDetails
+        && fetchedDetails?.shipment?.currentStatus === 'PENDING'
+        && fetchedDetails?.flags?.isSameOrigin;
+      setActiveTab(defaultToRequestDetails ? 'requestDetails' : 'packingList');
+    };
+    if (initialDetails && initialDetails.id === stockMovementId) {
+      applyDetails(initialDetails);
+      return;
+    }
     stockMovementApi.getDetails(stockMovementId)
       .then(({ data }) => {
-        const fetchedDetails = data?.data;
-        setDetails(fetchedDetails);
-        // Mirrors the legacy show.gsp tab selection: Request Details is the
-        // initial tab only for pending-shipment, same-origin movements and is
-        // hidden entirely for supplier-origin movements.
-        const showRequestDetails = !fetchedDetails?.origin?.isSupplier;
-        const defaultToRequestDetails = showRequestDetails
-          && fetchedDetails?.shipment?.currentStatus === 'PENDING'
-          && fetchedDetails?.flags?.isSameOrigin;
-        setActiveTab(defaultToRequestDetails ? 'requestDetails' : 'packingList');
+        applyDetails(data?.data);
       })
       .catch((err) => {
         const message = err?.response?.data?.errorMessage;
@@ -52,7 +59,7 @@ const StockMovementShow = () => {
           Alert.error(message);
         }
       });
-  }, [stockMovementId]);
+  }, [stockMovementId, initialDetails]);
 
   useEffect(() => {
     if (!activeTab || tabData[activeTab] !== undefined) {
@@ -526,6 +533,15 @@ const StockMovementShow = () => {
       </div>
     </div>
   );
+};
+
+StockMovementShow.propTypes = {
+  // eslint-disable-next-line react/forbid-prop-types
+  initialDetails: PropTypes.object,
+};
+
+StockMovementShow.defaultProps = {
+  initialDetails: null,
 };
 
 export default StockMovementShow;

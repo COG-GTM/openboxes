@@ -534,7 +534,7 @@ const AsyncInvoiceAddDocument = Loadable({
 });
 
 const AsyncStockMovementShow = Loadable({
-  loader: () => import('components/stock-movement/StockMovementShow'),
+  loader: () => import('components/stock-movement/StockMovementShowDispatcher'),
   loading: Loading,
 });
 
@@ -1093,6 +1093,31 @@ const AsyncDeliveryNotePrint = Loadable({
   loading: Loading,
 });
 
+const AsyncShipmentAddComment = Loadable({
+  loader: () => import('components/shipment/ShipmentAddComment'),
+  loading: Loading,
+});
+
+const AsyncShipmentAddDocument = Loadable({
+  loader: () => import('components/shipment/ShipmentAddDocument'),
+  loading: Loading,
+});
+
+const AsyncShipmentDelete = Loadable({
+  loader: () => import('components/shipment/ShipmentDelete'),
+  loading: Loading,
+});
+
+const AsyncShipmentEditEvent = Loadable({
+  loader: () => import('components/shipment/ShipmentEditEvent'),
+  loading: Loading,
+});
+
+const AsyncAddToShipment = Loadable({
+  loader: () => import('components/shipment/AddToShipment'),
+  loading: Loading,
+});
+
 const AsyncRequisitionList = Loadable({
   loader: () => import('components/requisition/RequisitionList'),
   loading: Loading,
@@ -1280,6 +1305,12 @@ const Router = () => {
             <MainLayoutRoute path="**/shipmentItem/split/:shipmentItemId" component={AsyncShipmentItemSplit} />
             <MainLayoutRoute path="**/shipmentWorkflow/create" component={AsyncShipmentWorkflowCreate} />
             <MainLayoutRoute path="**/deliveryNote/print/:requisitionId" component={AsyncDeliveryNotePrint} />
+            <MainLayoutRoute path="**/shipment/addComment/:shipmentId" component={AsyncShipmentAddComment} />
+            <MainLayoutRoute path="**/shipment/addDocument/:shipmentId" component={AsyncShipmentAddDocument} />
+            <MainLayoutRoute path="**/shipment/deleteShipment/:shipmentId" component={AsyncShipmentDelete} />
+            <MainLayoutRoute path="**/shipment/addEvent/:shipmentId" component={AsyncShipmentEditEvent} />
+            <MainLayoutRoute path="**/shipment/editEvent/:eventId" component={AsyncShipmentEditEvent} />
+            <MainLayoutRoute path="**/shipment/addToShipment" component={AsyncAddToShipment} />
             <MainLayoutRoute path="**/shipment/list" component={AsyncShipmentList} />
             <MainLayoutRoute path="**/shipment/showDetails/:shipmentId" component={AsyncShipmentShowDetails} />
             <MainLayoutRoute path="**/shipment/showPackingList/:shipmentId" component={AsyncShipmentPackingList} />

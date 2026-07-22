@@ -156,6 +156,380 @@ paths:
           $ref: '#/components/responses/Forbidden'
         '404':
           $ref: '#/components/responses/ControllerNotFound'
+    delete:
+      operationId: deleteShipment
+      summary: Delete a shipment and everything associated with it
+      description: >
+        Mirrors the POST branch of the legacy ShipmentController.deleteShipment
+        action, backing the migrated delete confirmation screen (Phase 2,
+        Batch 21). Cannot be undone.
+      parameters:
+        - $ref: '#/components/parameters/shipmentId'
+      responses:
+        '204':
+          description: Shipment deleted.
+        '403':
+          $ref: '#/components/responses/Forbidden'
+        '404':
+          $ref: '#/components/responses/ControllerNotFound'
+
+  /api/shipments/documentTypes:
+    get:
+      operationId: getShipmentDocumentTypeOptions
+      summary: Non-template document types for the add document screen
+      responses:
+        '200':
+          description: Document type options (sorted by name).
+          content:
+            application/json:
+              schema:
+                type: object
+                required: [data]
+                properties:
+                  data:
+                    type: array
+                    items:
+                      type: object
+                      required: [id, value, label]
+                      properties:
+                        id:
+                          $ref: '../components/common.yaml#/components/schemas/Id'
+                        value:
+                          $ref: '../components/common.yaml#/components/schemas/Id'
+                        label:
+                          type: string
+        '403':
+          $ref: '#/components/responses/Forbidden'
+
+  /api/shipments/eventOptions:
+    get:
+      operationId: getShipmentEventOptions
+      summary: Event types and locations for the add/edit event screen
+      responses:
+        '200':
+          description: Event select options.
+          content:
+            application/json:
+              schema:
+                type: object
+                required: [data]
+                properties:
+                  data:
+                    type: object
+                    required: [eventTypes, locations]
+                    properties:
+                      eventTypes:
+                        type: array
+                        items:
+                          $ref: '#/components/schemas/NamedReference'
+                      locations:
+                        type: array
+                        items:
+                          $ref: '#/components/schemas/NamedReference'
+        '403':
+          $ref: '#/components/responses/Forbidden'
+
+  /api/shipments/addToShipmentCandidates:
+    get:
+      operationId: getAddToShipmentCandidates
+      summary: Candidate inventory items and pending shipments
+      description: >
+        Inventory items (grouped by product) for the selected products plus
+        the pending shipments and their containers at the session warehouse -
+        mirrors shipmentService.getAddToShipmentCommand and the
+        selectContainer taglib used by the legacy addToShipment GSP.
+      parameters:
+        - name: product.id
+          in: query
+          required: false
+          schema:
+            type: array
+            items:
+              type: string
+          style: form
+          explode: true
+          description: Product ids selected in the inventory browser.
+      responses:
+        '200':
+          description: Candidate items and pending shipments.
+          content:
+            application/json:
+              schema:
+                type: object
+                required: [data]
+                properties:
+                  data:
+                    type: object
+                    required: [items, pendingShipments]
+                    properties:
+                      items:
+                        type: array
+                        items:
+                          $ref: '#/components/schemas/AddToShipmentCandidate'
+                      pendingShipments:
+                        type: array
+                        items:
+                          $ref: '#/components/schemas/PendingShipment'
+        '403':
+          $ref: '#/components/responses/Forbidden'
+
+  /api/shipments/addToShipment:
+    post:
+      operationId: addToShipment
+      summary: Add inventory item quantities to a pending shipment
+      description: >
+        Mirrors the legacy ShipmentController.addToShipmentPost action -
+        quantities of zero are skipped; atLeastOneUpdate reports whether any
+        item was actually added.
+      requestBody:
+        required: true
+        content:
+          application/json:
+            schema:
+              type: object
+              required: [shipmentId]
+              properties:
+                shipmentId:
+                  $ref: '../components/common.yaml#/components/schemas/Id'
+                containerId:
+                  type: string
+                  nullable: true
+                  description: Null adds the items as loose (unpacked) items.
+                items:
+                  type: array
+                  items:
+                    type: object
+                    required: [inventoryItemId, quantity]
+                    properties:
+                      inventoryItemId:
+                        $ref: '../components/common.yaml#/components/schemas/Id'
+                      quantity:
+                        type: integer
+      responses:
+        '200':
+          description: Result of the add-to-shipment operation.
+          content:
+            application/json:
+              schema:
+                type: object
+                required: [data]
+                properties:
+                  data:
+                    type: object
+                    required: [atLeastOneUpdate, shipmentId]
+                    properties:
+                      atLeastOneUpdate:
+                        type: boolean
+                      shipmentId:
+                        $ref: '../components/common.yaml#/components/schemas/Id'
+                      containerId:
+                        type: string
+                        nullable: true
+        '400':
+          $ref: '#/components/responses/ValidationError'
+        '403':
+          $ref: '#/components/responses/Forbidden'
+
+  /api/shipments/{id}/comments:
+    post:
+      operationId: createShipmentComment
+      summary: Add a comment to a shipment
+      description: >
+        Mirrors the legacy ShipmentController.saveComment action - the sender
+        is always the session user.
+      parameters:
+        - $ref: '#/components/parameters/shipmentId'
+      requestBody:
+        required: true
+        content:
+          application/json:
+            schema:
+              type: object
+              required: [comment]
+              properties:
+                comment:
+                  type: string
+                recipient:
+                  type: object
+                  nullable: true
+                  properties:
+                    id:
+                      $ref: '../components/common.yaml#/components/schemas/Id'
+                recipientId:
+                  type: string
+                  nullable: true
+      responses:
+        '201':
+          description: The created comment.
+          content:
+            application/json:
+              schema:
+                type: object
+                required: [data]
+                properties:
+                  data:
+                    type: object
+                    required: [id, comment]
+                    properties:
+                      id:
+                        $ref: '../components/common.yaml#/components/schemas/Id'
+                      comment:
+                        type: string
+                      sender:
+                        $ref: '#/components/schemas/NullableNamedReference'
+                      recipient:
+                        $ref: '#/components/schemas/NullableNamedReference'
+        '400':
+          $ref: '#/components/responses/ValidationError'
+        '403':
+          $ref: '#/components/responses/Forbidden'
+        '404':
+          $ref: '#/components/responses/ControllerNotFound'
+
+  /api/shipments/{id}/documents:
+    post:
+      operationId: uploadShipmentDocument
+      summary: Upload a document to a shipment
+      description: >
+        Mirrors the shipment branch of the legacy
+        DocumentController.uploadDocument action. Accepts either an uploaded
+        file (fileContents) or a URL (fileUri). Template document types are
+        rejected, files are limited to 10MB and to the allowed extensions.
+      parameters:
+        - $ref: '#/components/parameters/shipmentId'
+      requestBody:
+        required: true
+        content:
+          multipart/form-data:
+            schema:
+              type: object
+              properties:
+                fileContents:
+                  type: string
+                  format: binary
+                fileUri:
+                  type: string
+                name:
+                  type: string
+                documentNumber:
+                  type: string
+                typeId:
+                  type: string
+      responses:
+        '201':
+          description: The created document.
+          content:
+            application/json:
+              schema:
+                type: object
+                required: [data]
+                properties:
+                  data:
+                    type: object
+                    required: [id, name]
+                    properties:
+                      id:
+                        $ref: '../components/common.yaml#/components/schemas/Id'
+                      name:
+                        type: string
+                      filename:
+                        type: string
+                        nullable: true
+                      documentNumber:
+                        type: string
+                        nullable: true
+                      documentType:
+                        $ref: '#/components/schemas/NullableNamedReference'
+                      fileUri:
+                        type: string
+                        nullable: true
+        '400':
+          $ref: '#/components/responses/ValidationError'
+        '403':
+          $ref: '#/components/responses/Forbidden'
+        '404':
+          $ref: '#/components/responses/ControllerNotFound'
+
+  /api/shipments/{id}/events:
+    post:
+      operationId: createShipmentEvent
+      summary: Add an event to a shipment
+      description: >
+        Mirrors the create branch of the legacy ShipmentController.saveEvent
+        action (event created through the shipment event manager).
+      parameters:
+        - $ref: '#/components/parameters/shipmentId'
+      requestBody:
+        required: true
+        content:
+          application/json:
+            schema:
+              $ref: '#/components/schemas/EventRequest'
+      responses:
+        '201':
+          $ref: '#/components/responses/EventDetails'
+        '400':
+          $ref: '#/components/responses/ValidationError'
+        '403':
+          $ref: '#/components/responses/Forbidden'
+        '404':
+          $ref: '#/components/responses/ControllerNotFound'
+
+  /api/shipments/{id}/events/{eventId}:
+    get:
+      operationId: readShipmentEvent
+      summary: Read an event of a shipment
+      parameters:
+        - $ref: '#/components/parameters/shipmentId'
+        - $ref: '#/components/parameters/eventId'
+      responses:
+        '200':
+          $ref: '#/components/responses/EventDetails'
+        '403':
+          $ref: '#/components/responses/Forbidden'
+        '404':
+          $ref: '#/components/responses/ControllerNotFound'
+    post:
+      operationId: updateShipmentEvent
+      summary: Update an event of a shipment
+      description: >
+        Mirrors the update branch of the legacy ShipmentController.saveEvent
+        action. Like the legacy screen, the event type can only be set while
+        the event has no event type yet (eventTypeId is ignored on update).
+      parameters:
+        - $ref: '#/components/parameters/shipmentId'
+        - $ref: '#/components/parameters/eventId'
+      requestBody:
+        required: true
+        content:
+          application/json:
+            schema:
+              $ref: '#/components/schemas/EventRequest'
+      responses:
+        '200':
+          $ref: '#/components/responses/EventDetails'
+        '400':
+          $ref: '#/components/responses/ValidationError'
+        '403':
+          $ref: '#/components/responses/Forbidden'
+        '404':
+          $ref: '#/components/responses/ControllerNotFound'
+    delete:
+      operationId: deleteShipmentEvent
+      summary: Delete (roll back) an event of a shipment
+      description: >
+        Mirrors the legacy ShipmentController.deleteEvent action - the event
+        is rolled back through the shipment event manager.
+      parameters:
+        - $ref: '#/components/parameters/shipmentId'
+        - $ref: '#/components/parameters/eventId'
+      responses:
+        '204':
+          description: Event deleted.
+        '403':
+          $ref: '#/components/responses/Forbidden'
+        '404':
+          $ref: '#/components/responses/ControllerNotFound'
 
   /api/shipments/{id}/details:
     post:
@@ -792,66 +1166,6 @@ paths:
         '404':
           $ref: '#/components/responses/ControllerNotFound'
 
-  /api/shipments/{id}/comments:
-    post:
-      operationId: addShipmentComment
-      summary: Add a comment to a shipment
-      parameters:
-        - $ref: '#/components/parameters/shipmentId'
-      requestBody:
-        required: true
-        content:
-          application/json:
-            schema:
-              type: object
-              required: [comment]
-              properties:
-                comment:
-                  type: string
-                recipientId:
-                  type: string
-                  nullable: true
-      responses:
-        '200':
-          $ref: '#/components/responses/SuccessData'
-        '403':
-          $ref: '#/components/responses/Forbidden'
-        '404':
-          $ref: '#/components/responses/ControllerNotFound'
-
-  /api/shipments/{id}/events:
-    post:
-      operationId: addShipmentEvent
-      summary: Add an event to a shipment
-      parameters:
-        - $ref: '#/components/parameters/shipmentId'
-      requestBody:
-        required: true
-        content:
-          application/json:
-            schema:
-              type: object
-              required: [eventTypeId]
-              properties:
-                eventTypeId:
-                  type: string
-                eventLocationId:
-                  type: string
-                  nullable: true
-                eventDate:
-                  type: string
-                  nullable: true
-                  description: Format yyyy-MM-dd HH:mm; defaults to now.
-      responses:
-        '200':
-          $ref: '#/components/responses/SuccessData'
-        '400':
-          $ref: '#/components/responses/ValidationError'
-        '403':
-          $ref: '#/components/responses/Forbidden'
-        '404':
-          $ref: '#/components/responses/ControllerNotFound'
-
   /api/shipments/{id}/receipt:
     get:
       operationId: getShipmentReceipt
@@ -1205,6 +1519,14 @@ components:
         $ref: '../components/common.yaml#/components/schemas/Id'
       description: Shipment item id.
 
+    eventId:
+      name: eventId
+      in: path
+      required: true
+      schema:
+        $ref: '../components/common.yaml#/components/schemas/Id'
+      description: Event id.
+
     receiptItemId:
       name: receiptItemId
       in: path
@@ -1288,6 +1610,17 @@ components:
                   id:
                     $ref: '../components/common.yaml#/components/schemas/Id'
 
+    EventDetails:
+      description: Details of a shipment event.
+      content:
+        application/json:
+          schema:
+            type: object
+            required: [data]
+            properties:
+              data:
+                $ref: '#/components/schemas/EventDetails'
+
     SuccessData:
       description: Simple success flag after a mutation.
       content:
@@ -1315,6 +1648,107 @@ components:
                 $ref: '#/components/schemas/ItemDetails'
 
   schemas:
+    EventRequest:
+      type: object
+      properties:
+        eventTypeId:
+          type: string
+          nullable: true
+          description: Only bound while the event has no event type yet.
+        eventDate:
+          type: string
+          nullable: true
+          description: Format yyyy-MM-dd HH:mm.
+        eventLocationId:
+          type: string
+          nullable: true
+
+    EventDetails:
+      type: object
+      required: [id]
+      properties:
+        id:
+          $ref: '../components/common.yaml#/components/schemas/Id'
+        eventType:
+          $ref: '#/components/schemas/NullableNamedReference'
+        eventDate:
+          type: string
+          nullable: true
+          description: Format yyyy-MM-dd HH:mm.
+        eventLocation:
+          $ref: '#/components/schemas/NullableNamedReference'
+
+    AddToShipmentCandidate:
+      type: object
+      required: [quantityOnHand, quantityShipping, quantityReceiving]
+      properties:
+        inventoryItem:
+          type: object
+          nullable: true
+          properties:
+            id:
+              $ref: '../components/common.yaml#/components/schemas/Id'
+            lotNumber:
+              type: string
+              nullable: true
+            expirationDate:
+              type: string
+              nullable: true
+        product:
+          type: object
+          nullable: true
+          properties:
+            id:
+              $ref: '../components/common.yaml#/components/schemas/Id'
+            productCode:
+              type: string
+              nullable: true
+            name:
+              type: string
+              nullable: true
+        lotNumber:
+          type: string
+          nullable: true
+        quantityOnHand:
+          type: integer
+        quantityShipping:
+          type: integer
+        quantityReceiving:
+          type: integer
+
+    PendingShipment:
+      type: object
+      required: [id, looseItemCount, containers]
+      properties:
+        id:
+          $ref: '../components/common.yaml#/components/schemas/Id'
+        name:
+          type: string
+          nullable: true
+        shipmentNumber:
+          type: string
+          nullable: true
+        destination:
+          $ref: '#/components/schemas/NullableNamedReference'
+        expectedShippingDate:
+          type: string
+          nullable: true
+        looseItemCount:
+          type: integer
+        containers:
+          type: array
+          items:
+            type: object
+            required: [id, itemCount]
+            properties:
+              id:
+                $ref: '../components/common.yaml#/components/schemas/Id'
+              name:
+                type: string
+                nullable: true
+              itemCount:
+                type: integer
+
     NamedReference:
       type: object
       required: [id, name]

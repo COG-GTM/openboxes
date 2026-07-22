@@ -164,8 +164,8 @@ class StockMovementController {
         }
 
         if (stockMovement?.order) {
-            stockMovement.documents = stockMovementService.getDocuments(stockMovement)
-            render(view: "/returns/show", model: [stockMovement: stockMovement, currentLocation: currentLocation])
+            // Returns show screen migrated to React (Phase 2, Batch 21)
+            render(view: "/common/react")
         } else {
             render(view: "/common/react", params: params)
         }
