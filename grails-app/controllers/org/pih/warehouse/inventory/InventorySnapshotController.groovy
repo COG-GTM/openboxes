@@ -40,7 +40,9 @@ class InventorySnapshotController {
         redirect(uri: "/inventorySnapshot/list")
     }
 
-    def edit() {}
+    def edit() {
+        render(view: "/common/react")
+    }
 
     def update() {
         try {

@@ -373,13 +373,7 @@ class InventoryItemController {
      * Displays the stock card for a product
      */
     def showTransactionLog(StockCardCommand cmd) {
-        // add the current warehouse to the command object
-        cmd.warehouse = Location.get(session?.warehouse?.id)
-
-        // now populate the rest of the commmand object
-        def commandInstance = inventoryService.getStockCardCommand(cmd, params)
-
-        [commandInstance: commandInstance]
+        render(view: "/common/react")
     }
 
 

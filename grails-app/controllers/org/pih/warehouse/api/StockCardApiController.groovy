@@ -371,6 +371,49 @@ class StockCardApiController {
         render([data: [rows: rows, currencyCode: currencyCode]] as JSON)
     }
 
+    /**
+     * Transaction log for a product at the current location, backing the
+     * React "Transaction Log" screen (legacy inventoryItem/showTransactionLog).
+     * Optional startDate/endDate (MM/dd/yyyy) and transactionType.id filters.
+     */
+    def getTransactionLog(StockCardCommand cmd) {
+        cmd.warehouse = currentLocation
+        inventoryService.getStockCardCommand(cmd, params)
+        Product product = cmd.product
+
+        Map allTransactionsMap = cmd.allTransactionLogMap ?: [:]
+
+        DateFormat dateFormat = new SimpleDateFormat("MM/dd/yyyy")
+        Date startDate = params.startDate ? dateFormat.parse(params.startDate) : null
+        Date endDate = params.endDate ? use(TimeCategory) { dateFormat.parse(params.endDate) + 1.day } : null
+        String transactionTypeId = params["transactionType.id"]
+
+        def transactions = allTransactionsMap.keySet().findAll { transaction ->
+            (!startDate || transaction.transactionDate >= startDate) &&
+                    (!endDate || transaction.transactionDate < endDate) &&
+                    (!transactionTypeId || transactionTypeId == "0" || String.valueOf(transaction.transactionType?.id) == transactionTypeId)
+        }.sort { it.transactionDate }.reverse()
+
+        List rows = transactions.collect { transaction ->
+            def shipment = transaction.incomingShipment ?: transaction.outgoingShipment
+            [
+                    id             : transaction.id,
+                    transactionDate: transaction.transactionDate?.format("yyyy-MM-dd'T'HH:mm:ssXXX"),
+                    transactionType: [
+                            id             : transaction.transactionType?.id,
+                            name           : transaction.transactionType?.name,
+                            transactionCode: transaction.transactionType?.transactionCode?.name(),
+                    ],
+                    shipment       : shipment ? [id: shipment.id, name: shipment.name] : null,
+                    source         : transaction.source?.name,
+                    destination    : transaction.destination?.name,
+                    quantityChange : transaction.transactionEntries?.findAll { it?.inventoryItem?.product == product }?.quantity?.sum() ?: 0,
+            ]
+        }
+
+        render([data: rows, totalCount: allTransactionsMap.keySet().size()] as JSON)
+    }
+
     def getDocuments() {
         Product product = product
         List documents = product.documents?.collect { Document document ->

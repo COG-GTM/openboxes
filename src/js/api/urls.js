@@ -345,6 +345,7 @@ export const STOCK_CARD_SNAPSHOTS = (id) => `${STOCK_CARD_API(id)}/snapshots`;
 export const STOCK_CARD_SUPPLIERS = (id) => `${STOCK_CARD_API(id)}/suppliers`;
 export const STOCK_CARD_DOCUMENTS = (id) => `${STOCK_CARD_API(id)}/documents`;
 export const STOCK_CARD_ASSOCIATIONS = (id) => `${STOCK_CARD_API(id)}/associations`;
+export const STOCK_CARD_TRANSACTION_LOG = (id) => `${STOCK_CARD_API(id)}/transactionLog`;
 
 // INVENTORY ITEMS (LOT NUMBERS)
 export const INVENTORY_ITEMS_API = `${API}/inventoryItems`;
@@ -355,6 +356,8 @@ export const PRODUCT_INVENTORY_ITEMS = (productId) => `${API}/products/${product
 
 // INVENTORY LEVEL
 export const PRODUCT_INVENTORY_LEVEL = (facilityId, productId) => `${API}/facilities/${facilityId}/products/${productId}/inventoryLevel`;
+export const INVENTORY_LEVELS_API = `${API}/inventoryLevels`;
+export const INVENTORY_LEVEL_BY_ID = (id) => `${INVENTORY_LEVELS_API}/${id}`;
 
 // RECORD STOCK
 export const RECORD_STOCK = (facilityId) => `${API}/facilities/${facilityId}/inventory/record-stock`;

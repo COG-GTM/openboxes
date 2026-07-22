@@ -10,7 +10,6 @@
 package org.pih.warehouse.inventory
 
 import grails.converters.JSON
-import grails.gorm.PagedResultList
 import grails.gorm.transactions.Transactional
 import org.pih.warehouse.core.DocumentService
 import org.pih.warehouse.core.Location
@@ -35,43 +34,39 @@ class InventoryLevelController {
     }
 
     def list() {
-        params.max = Math.min(params.max ? params.int('max') : 10, 100)
-
-        def terms = params.q ? params?.q?.split(" ") : null
-        def products = terms ? productService.searchProducts(terms, null) : []
-        def location = Location.get(params?.location?.id)
-
-        // Remove paging parameters if user is downloading CSV export
+        // CSV export keeps its legacy URL; the screen itself is React now
         if (params.format) {
+            def terms = params.q ? params?.q?.split(" ") : null
+            def products = terms ? productService.searchProducts(terms, null) : []
+            def location = Location.get(params?.location?.id)
+
             params.remove("max")
             params.remove("offset")
-        }
 
-        PagedResultList inventoryLevels = InventoryLevel.createCriteria().list(params) {
-            if (location?.inventory) {
-                eq("inventory", location.inventory)
+            def inventoryLevels = InventoryLevel.createCriteria().list(params) {
+                if (location?.inventory) {
+                    eq("inventory", location.inventory)
+                }
+                if (products) {
+                    'in'("product", products)
+                }
             }
-            if (products) {
-                'in'("product", products)
+
+            if (inventoryLevels) {
+                def filename = "inventoryLevels.csv"
+                String text = inventoryLevelImportDataService.exportInventoryLevels(inventoryLevels)
+                response.contentType = "text/csv"
+                response.setHeader("Content-disposition", "attachment; filename=\"${filename}\"")
+                render(contentType: "text/csv", text: text)
+                return
             }
         }
 
-        if (params.format && inventoryLevels) {
-            def filename = "inventoryLevels.csv"
-            String text = inventoryLevelImportDataService.exportInventoryLevels(inventoryLevels)
-            response.contentType = "text/csv"
-            response.setHeader("Content-disposition", "attachment; filename=\"${filename}\"")
-            render(contentType: "text/csv", text: text)
-            return
-        }
-
-        [inventoryLevelInstanceList: inventoryLevels, inventoryLevelInstanceTotal: inventoryLevels?.totalCount]
+        render(view: "/common/react")
     }
 
     def create() {
-        def inventoryLevelInstance = new InventoryLevel()
-        inventoryLevelInstance.properties = params
-        return [inventoryLevelInstance: inventoryLevelInstance]
+        render(view: "/common/react")
     }
 
     def save() {
@@ -105,28 +100,27 @@ class InventoryLevelController {
     }
 
     def show() {
-        def inventoryLevelInstance = InventoryLevel.get(params.id)
-        if (!inventoryLevelInstance) {
-            flash.message = "${warehouse.message(code: 'default.not.found.message', args: [warehouse.message(code: 'inventoryLevel.label', default: 'InventoryLevel'), params.id])}"
-            redirect(action: "list")
-        } else {
-            [inventoryLevelInstance: inventoryLevelInstance]
-        }
+        render(view: "/common/react")
     }
 
     def edit() {
+        // Legacy links sometimes address the edit screen by product id;
+        // resolve to the inventory level id and let React load it
         def inventoryLevelInstance = InventoryLevel.get(params.id)
-
         if (!inventoryLevelInstance) {
             def productInstance = Product.get(params.id)
-            inventoryLevelInstance = InventoryLevel.findByProduct(productInstance)
+            inventoryLevelInstance = productInstance ? InventoryLevel.findByProduct(productInstance) : null
+            if (inventoryLevelInstance) {
+                redirect(action: "edit", id: inventoryLevelInstance.id, params: params.redirectUrl ? [redirectUrl: params.redirectUrl] : [:])
+                return
+            }
         }
         if (!inventoryLevelInstance) {
             flash.message = "${warehouse.message(code: 'default.not.found.message', args: [warehouse.message(code: 'inventoryLevel.label', default: 'InventoryLevel'), params.id])}"
             redirect(action: "create")
-        } else {
-            return [inventoryLevelInstance: inventoryLevelInstance]
+            return
         }
+        render(view: "/common/react")
     }
 
     def update() {

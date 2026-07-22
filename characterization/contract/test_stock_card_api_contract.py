@@ -56,3 +56,34 @@ def test_unknown_product_is_server_error(client, batch4_endpoints):
         path="/api/stockCard/ZZ-unknown-product/summary",
     )
     assert resp.status_code == 500
+
+
+TRANSACTION_LOG_PATH = "/api/stockCard/{id}/transactionLog"
+
+
+def test_transaction_log(client, batch5_endpoints):
+    product = client.product("BF640")
+    resp = check(client, spec, "GET", TRANSACTION_LOG_PATH,
+                 path=f"/api/stockCard/{product['id']}/transactionLog")
+    body = resp.json()
+    assert body["totalCount"] == len(body["data"])
+    for row in body["data"]:
+        assert row["transactionType"]["name"]
+
+
+def test_transaction_log_type_filter(client, batch5_endpoints):
+    product = client.product("BF640")
+    all_rows = client.get_json(
+        f"/api/stockCard/{product['id']}/transactionLog")["data"]
+    if not all_rows:
+        pytest.skip("no seeded transactions for BF640")
+    type_id = all_rows[0]["transactionType"]["id"]
+    resp = check(client, spec, "GET", TRANSACTION_LOG_PATH,
+                 path=f"/api/stockCard/{product['id']}/transactionLog",
+                 params={"transactionType.id": type_id})
+    body = resp.json()
+    assert body["data"], "filtering by an existing type should return rows"
+    for row in body["data"]:
+        assert row["transactionType"]["id"] == type_id
+    # totalCount stays the unfiltered count (legacy footer parity)
+    assert body["totalCount"] == len(all_rows)

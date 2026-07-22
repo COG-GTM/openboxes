@@ -159,6 +159,174 @@ paths:
                 type: string
         '500':
           $ref: '../components/common.yaml#/components/responses/ServerError'
+  /api/inventoryLevels:
+    get:
+      operationId: searchInventoryLevels
+      summary: Paged inventory level search (React inventoryLevel/list screen)
+      description: >
+        Mirrors the legacy InventoryLevelController.list criteria - optional
+        product search terms (q) and facility filter (locationId). Parity
+        quirk - when q matches no products the product filter is dropped and
+        all levels are returned. format=csv exports all matching rows as a
+        text/csv attachment.
+      parameters:
+        - name: q
+          in: query
+          required: false
+          schema:
+            type: string
+          description: Product search terms (space separated).
+        - name: locationId
+          in: query
+          required: false
+          schema:
+            $ref: '../components/common.yaml#/components/schemas/Id'
+          description: Facility (warehouse) id whose inventory to filter by.
+        - name: max
+          in: query
+          required: false
+          schema:
+            type: integer
+            maximum: 100
+            default: 10
+        - name: offset
+          in: query
+          required: false
+          schema:
+            type: integer
+            default: 0
+        - name: sort
+          in: query
+          required: false
+          schema:
+            type: string
+        - name: order
+          in: query
+          required: false
+          schema:
+            type: string
+            enum: [asc, desc]
+        - name: format
+          in: query
+          required: false
+          schema:
+            type: string
+            enum: [csv]
+      responses:
+        '200':
+          description: Page of inventory levels.
+          content:
+            application/json:
+              schema:
+                type: object
+                required: [data, totalCount]
+                properties:
+                  data:
+                    type: array
+                    items:
+                      $ref: '#/components/schemas/InventoryLevelListItem'
+                  totalCount:
+                    type: integer
+            text/csv:
+              schema:
+                type: string
+        '500':
+          $ref: '../components/common.yaml#/components/responses/ServerError'
+    post:
+      operationId: createInventoryLevel
+      summary: Create an inventory level (React inventoryLevel/create screen)
+      description: >
+        Mirrors the legacy InventoryLevelController.save duplicate check on
+        (product, inventory, internalLocation) - duplicates are rejected with
+        400. Parity quirk - returns 200 (not 201) on create.
+      requestBody:
+        required: true
+        content:
+          application/json:
+            schema:
+              $ref: '#/components/schemas/InventoryLevelWrite'
+      responses:
+        '200':
+          description: The created inventory level.
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/InventoryLevelDetailResponse'
+        '400':
+          $ref: '#/components/responses/InventoryLevelError'
+        '500':
+          $ref: '../components/common.yaml#/components/responses/ServerError'
+  /api/inventoryLevels/{id}:
+    get:
+      operationId: getInventoryLevelById
+      summary: Inventory level detail (React inventoryLevel/show and edit screens)
+      parameters:
+        - $ref: '#/components/parameters/inventoryLevelId'
+      responses:
+        '200':
+          description: The inventory level.
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/InventoryLevelDetailResponse'
+        '404':
+          $ref: '#/components/responses/InventoryLevelError'
+        '500':
+          $ref: '../components/common.yaml#/components/responses/ServerError'
+    put:
+      operationId: updateInventoryLevelById
+      summary: Update an inventory level (React inventoryLevel/edit screen)
+      description: >
+        Mirrors the legacy InventoryLevelController.update optimistic locking
+        check - a stale version in the body is rejected with 400.
+      parameters:
+        - $ref: '#/components/parameters/inventoryLevelId'
+      requestBody:
+        required: true
+        content:
+          application/json:
+            schema:
+              $ref: '#/components/schemas/InventoryLevelWrite'
+      responses:
+        '200':
+          description: The updated inventory level.
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/InventoryLevelDetailResponse'
+        '400':
+          $ref: '#/components/responses/InventoryLevelError'
+        '404':
+          $ref: '#/components/responses/InventoryLevelError'
+        '500':
+          $ref: '../components/common.yaml#/components/responses/ServerError'
+    delete:
+      operationId: deleteInventoryLevelById
+      summary: Delete an inventory level (React inventoryLevel/show screen)
+      parameters:
+        - $ref: '#/components/parameters/inventoryLevelId'
+      responses:
+        '200':
+          description: Deletion confirmation.
+          content:
+            application/json:
+              schema:
+                type: object
+                required: [data]
+                properties:
+                  data:
+                    type: object
+                    properties:
+                      id:
+                        type: string
+                      deleted:
+                        type: boolean
+        '400':
+          $ref: '#/components/responses/InventoryLevelError'
+        '404':
+          $ref: '#/components/responses/InventoryLevelError'
+        '500':
+          $ref: '../components/common.yaml#/components/responses/ServerError'
 components:
   parameters:
     facilityId:
@@ -175,6 +343,27 @@ components:
       schema:
         $ref: '../components/common.yaml#/components/schemas/Id'
       description: Product id.
+    inventoryLevelId:
+      name: id
+      in: path
+      required: true
+      schema:
+        $ref: '../components/common.yaml#/components/schemas/Id'
+      description: Inventory level id.
+  responses:
+    InventoryLevelError:
+      description: Error message.
+      content:
+        application/json:
+          schema:
+            type: object
+            properties:
+              errorMessage:
+                type: string
+              errorMessages:
+                type: array
+                items:
+                  type: string
   securitySchemes:
     cookieAuth:
       $ref: '../components/common.yaml#/components/securitySchemes/cookieAuth'
@@ -260,3 +449,148 @@ components:
           type: string
           nullable: true
       additionalProperties: true
+    NamedReference:
+      type: object
+      nullable: true
+      properties:
+        id:
+          $ref: '../components/common.yaml#/components/schemas/Id'
+        name:
+          type: string
+          nullable: true
+    InventoryLevelListItem:
+      type: object
+      required: [id, product, inventory]
+      properties:
+        id:
+          $ref: '../components/common.yaml#/components/schemas/Id'
+        status:
+          type: string
+          nullable: true
+        product:
+          type: object
+          properties:
+            id:
+              $ref: '../components/common.yaml#/components/schemas/Id'
+            productCode:
+              type: string
+              nullable: true
+            name:
+              type: string
+              nullable: true
+        inventory:
+          type: object
+          properties:
+            id:
+              $ref: '../components/common.yaml#/components/schemas/Id'
+            warehouse:
+              type: string
+              nullable: true
+        minQuantity:
+          type: number
+          nullable: true
+        reorderQuantity:
+          type: number
+          nullable: true
+        maxQuantity:
+          type: number
+          nullable: true
+        dateCreated:
+          type: string
+          nullable: true
+    InventoryLevelDetail:
+      allOf:
+        - $ref: '#/components/schemas/InventoryLevelListItem'
+        - type: object
+          properties:
+            version:
+              type: integer
+              nullable: true
+            facility:
+              $ref: '#/components/schemas/NamedReference'
+            supported:
+              type: boolean
+              nullable: true
+            internalLocation:
+              $ref: '#/components/schemas/NamedReference'
+            preferredBinLocation:
+              $ref: '#/components/schemas/NamedReference'
+            replenishmentLocation:
+              $ref: '#/components/schemas/NamedReference'
+            abcClass:
+              type: string
+              nullable: true
+            comments:
+              type: string
+              nullable: true
+            forecastQuantity:
+              type: number
+              nullable: true
+            forecastPeriodDays:
+              type: number
+              nullable: true
+            expectedLeadTimeDays:
+              type: number
+              nullable: true
+            replenishmentPeriodDays:
+              type: number
+              nullable: true
+            lastUpdated:
+              type: string
+              nullable: true
+    InventoryLevelDetailResponse:
+      type: object
+      required: [data]
+      properties:
+        data:
+          $ref: '#/components/schemas/InventoryLevelDetail'
+    InventoryLevelWrite:
+      type: object
+      description: >
+        Only keys present in the body are bound (partial update semantics).
+        product and location are only honored on create; version enables the
+        optimistic locking check on update.
+      properties:
+        product:
+          $ref: '#/components/schemas/NamedReference'
+        location:
+          $ref: '#/components/schemas/NamedReference'
+        internalLocation:
+          $ref: '#/components/schemas/NamedReference'
+        preferredBinLocation:
+          $ref: '#/components/schemas/NamedReference'
+        replenishmentLocation:
+          $ref: '#/components/schemas/NamedReference'
+        status:
+          type: string
+          nullable: true
+        abcClass:
+          type: string
+          nullable: true
+        comments:
+          type: string
+          nullable: true
+        minQuantity:
+          type: number
+          nullable: true
+        reorderQuantity:
+          type: number
+          nullable: true
+        maxQuantity:
+          type: number
+          nullable: true
+        forecastQuantity:
+          type: number
+          nullable: true
+        forecastPeriodDays:
+          type: number
+          nullable: true
+        expectedLeadTimeDays:
+          type: number
+          nullable: true
+        replenishmentPeriodDays:
+          type: number
+          nullable: true
+        version:
+          type: integer
+          nullable: true

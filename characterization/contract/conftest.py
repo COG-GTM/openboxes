@@ -62,6 +62,17 @@ def batch4_endpoints(client):
 
 
 @pytest.fixture(scope="session")
+def batch5_endpoints(client):
+    # The api-snapshot job runs against the pinned released image, which
+    # predates the Batch 5 inventory-level CRUD and transaction-log
+    # endpoints. There, /api/inventoryLevels falls through to the generic
+    # domain API (no totalCount envelope), so probe the response shape.
+    resp = client.request("GET", "/api/inventoryLevels")
+    if resp.status_code != 200 or "totalCount" not in resp.json():
+        pytest.skip("Batch 5 inventory-level endpoints not present in target build")
+
+
+@pytest.fixture(scope="session")
 def batch8_endpoints(client):
     # The api-snapshot job runs against the pinned released image, which
     # predates the Batch 8 product screen endpoints (mergeLogs, batchEdit,

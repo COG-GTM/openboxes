@@ -154,6 +154,15 @@ const INVENTORY_BROWSER_URL = {
   list: () => `${INVENTORY_BROWSER_URL.base}/list`,
 };
 
+const INVENTORY_LEVEL_URL = {
+  base: `${CONTEXT_PATH}/inventoryLevel`,
+  list: () => `${INVENTORY_LEVEL_URL.base}/list`,
+  create: () => `${INVENTORY_LEVEL_URL.base}/create`,
+  show: (id) => `${INVENTORY_LEVEL_URL.base}/show/${id}`,
+  edit: (id) => `${INVENTORY_LEVEL_URL.base}/edit/${id}`,
+  exportCsv: () => `${INVENTORY_LEVEL_URL.base}/list?format=csv`,
+};
+
 const INVENTORY_URL = {
   base: `${CONTEXT_PATH}/inventory`,
   showTransaction: (id) => `${INVENTORY_URL.base}/showTransaction/${id}`,
@@ -372,6 +381,7 @@ export {
   GL_ACCOUNT_URL,
   INVENTORY_BROWSER_URL,
   INVENTORY_ITEM_URL,
+  INVENTORY_LEVEL_URL,
   INVENTORY_SNAPSHOT_URL,
   INVENTORY_URL,
   INVOICE_URL,

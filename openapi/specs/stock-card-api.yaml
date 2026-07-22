@@ -352,6 +352,89 @@ paths:
                         type: number
         '500':
           $ref: '../components/common.yaml#/components/responses/ServerError'
+  /api/stockCard/{id}/transactionLog:
+    get:
+      operationId: getStockCardTransactionLog
+      summary: Transaction log for the product at the current location
+      description: >
+        Backs the React "Transaction Log" screen (legacy
+        inventoryItem/showTransactionLog). Rows are the product's transactions
+        at the session's current location, newest first. Optional
+        startDate/endDate (MM/dd/yyyy) and transactionType.id filters narrow
+        the rows; totalCount is always the unfiltered transaction count
+        (mirrors the legacy "Showing X of Y transactions" footer).
+      parameters:
+        - $ref: '#/components/parameters/productId'
+        - name: startDate
+          in: query
+          required: false
+          schema:
+            type: string
+          description: Inclusive start date, MM/dd/yyyy.
+        - name: endDate
+          in: query
+          required: false
+          schema:
+            type: string
+          description: Inclusive end date, MM/dd/yyyy.
+        - name: transactionType.id
+          in: query
+          required: false
+          schema:
+            type: string
+          description: Transaction type id; "0" means all types.
+      responses:
+        '200':
+          description: Transaction log rows.
+          content:
+            application/json:
+              schema:
+                type: object
+                required: [data, totalCount]
+                properties:
+                  data:
+                    type: array
+                    items:
+                      type: object
+                      required: [id, transactionType]
+                      properties:
+                        id:
+                          $ref: '../components/common.yaml#/components/schemas/Id'
+                        transactionDate:
+                          type: string
+                          nullable: true
+                        transactionType:
+                          type: object
+                          properties:
+                            id:
+                              $ref: '../components/common.yaml#/components/schemas/Id'
+                            name:
+                              type: string
+                              nullable: true
+                            transactionCode:
+                              type: string
+                              nullable: true
+                        shipment:
+                          type: object
+                          nullable: true
+                          properties:
+                            id:
+                              $ref: '../components/common.yaml#/components/schemas/Id'
+                            name:
+                              type: string
+                              nullable: true
+                        source:
+                          type: string
+                          nullable: true
+                        destination:
+                          type: string
+                          nullable: true
+                        quantityChange:
+                          type: number
+                  totalCount:
+                    type: integer
+        '500':
+          $ref: '../components/common.yaml#/components/responses/ServerError'
 components:
   parameters:
     productId:
