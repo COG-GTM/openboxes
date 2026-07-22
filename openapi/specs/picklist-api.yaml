@@ -1,0 +1,40 @@
+openapi: 3.0.3
+info:
+  title: OpenBoxes - PicklistApiController
+  description: >
+    Picklist-clearing endpoint handled by
+    org.pih.warehouse.api.PicklistApiController, routed via the
+    "/api/picklists/$id/items" URL mapping (DELETE -> clearPicklist). The
+    controller extends BaseDomainApiController but only clearPicklist() is
+    reachable through this mapping.
+  version: 0.1.0
+servers:
+  - url: http://localhost:8080/openboxes
+    description: Local Docker baseline (docs/migration/RUNNING_LOCALLY.md)
+security:
+  - cookieAuth: []
+paths:
+  /api/picklists/{id}/items:
+    delete:
+      operationId: clearPicklist
+      summary: Delete all items from a picklist
+      description: >
+        Removes every picklist item from the picklist and refreshes product
+        availability. The picklist itself is kept. Unknown ids raise
+        org.hibernate.ObjectNotFoundException, rendered as a 404 JSON error.
+      parameters:
+        - name: id
+          in: path
+          required: true
+          schema:
+            $ref: '../components/common.yaml#/components/schemas/Id'
+          description: Picklist id (not the stock movement or requisition id).
+      responses:
+        '204':
+          description: Picklist cleared; empty body.
+        '404':
+          $ref: '../components/common.yaml#/components/responses/NotFound'
+components:
+  securitySchemes:
+    cookieAuth:
+      $ref: '../components/common.yaml#/components/securitySchemes/cookieAuth'

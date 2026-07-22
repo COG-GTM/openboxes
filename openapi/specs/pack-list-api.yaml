@@ -1,0 +1,119 @@
+openapi: 3.0.3
+info:
+  title: OpenBoxes - PackListApiController
+  description: >
+    Pack-list template export/import endpoints handled by
+    org.pih.warehouse.api.PackListApiController, routed via the
+    "/api/stockMovements/packlistTemplate/$id" (GET -> exportPackTemplate)
+    and "/api/stockMovements/importPackListItems/$id"
+    (POST -> importPackListItems) URL mappings.
+  version: 0.1.0
+servers:
+  - url: http://localhost:8080/openboxes
+    description: Local Docker baseline (docs/migration/RUNNING_LOCALLY.md)
+security:
+  - cookieAuth: []
+paths:
+  /api/stockMovements/packlistTemplate/{id}:
+    get:
+      operationId: exportPackTemplate
+      summary: Export the pack-list template for a stock movement
+      description: >
+        Renders the stock movement's pack page items as a downloadable
+        CSV (default) or XLS template. When the movement has no pack items an
+        empty row is emitted so the template still has data rows. Unknown ids
+        raise org.hibernate.ObjectNotFoundException, rendered as a 404 JSON
+        error; unsupported format values respond HTTP 500 (the attempt to
+        throw IllegalFormatException itself fails with
+        GroovyRuntimeException - it is abstract with no such constructor).
+      parameters:
+        - name: id
+          in: path
+          required: true
+          schema:
+            $ref: '../components/common.yaml#/components/schemas/Id'
+          description: Stock movement id (requisition or shipment id).
+        - name: format
+          in: query
+          required: false
+          schema:
+            type: string
+            enum: [csv, xls]
+            default: csv
+          description: Output format; values other than csv/xls yield HTTP 500.
+      responses:
+        '200':
+          description: >
+            The pack-list template, as text/csv (format=csv, the default;
+            served with a Content-disposition attachment header and a UTF-8
+            BOM) or application/vnd.ms-excel (format=xls).
+          content:
+            text/csv:
+              schema:
+                type: string
+            application/vnd.ms-excel:
+              schema:
+                type: string
+                format: binary
+        '404':
+          $ref: '../components/common.yaml#/components/responses/NotFound'
+        '500':
+          $ref: '../components/common.yaml#/components/responses/ServerError'
+  /api/stockMovements/importPackListItems/{id}:
+    post:
+      operationId: importPackListItems
+      summary: Import pack-list items for a stock movement from a CSV template
+      description: >
+        Multipart upload of a filled-in pack-list template (see
+        exportPackTemplate; the first line is skipped as the header). Only
+        pack levels and recipient are applied to the matching shipment items.
+        Parity quirk: row-level validation problems are reported with status
+        200 - the controller renders {"message": "Data imported with errors",
+        "errors": [...]} (the trailing success render is suppressed because
+        the response is already committed). Unknown ids raise
+        ObjectNotFoundException (404 JSON error); unparseable files raise
+        RuntimeException (HTTP 500).
+      parameters:
+        - name: id
+          in: path
+          required: true
+          schema:
+            $ref: '../components/common.yaml#/components/schemas/Id'
+          description: Stock movement id (requisition or shipment id).
+      requestBody:
+        required: true
+        content:
+          multipart/form-data:
+            schema:
+              type: object
+              required: [importFile]
+              properties:
+                importFile:
+                  type: string
+                  format: binary
+                  description: The filled-in CSV template.
+      responses:
+        '200':
+          description: >
+            Import outcome; "Data imported successfully" (no errors key) or
+            "Data imported with errors" with the row-level error messages.
+          content:
+            application/json:
+              schema:
+                type: object
+                required: [message]
+                properties:
+                  message:
+                    type: string
+                  errors:
+                    type: array
+                    items:
+                      type: string
+        '404':
+          $ref: '../components/common.yaml#/components/responses/NotFound'
+        '500':
+          $ref: '../components/common.yaml#/components/responses/ServerError'
+components:
+  securitySchemes:
+    cookieAuth:
+      $ref: '../components/common.yaml#/components/securitySchemes/cookieAuth'

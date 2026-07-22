@@ -1,0 +1,60 @@
+openapi: 3.0.3
+info:
+  title: OpenBoxes - PrepaymentInvoiceApiController
+  description: >
+    Bulk invoice-item edit endpoint handled by
+    org.pih.warehouse.api.PrepaymentInvoiceApiController, routed via the
+    "/api/prepaymentInvoices/$id/invoiceItems" URL mapping
+    (POST -> updateItems).
+  version: 0.1.0
+servers:
+  - url: http://localhost:8080/openboxes
+    description: Local Docker baseline (docs/migration/RUNNING_LOCALLY.md)
+security:
+  - cookieAuth: []
+paths:
+  /api/prepaymentInvoices/{id}/invoiceItems:
+    post:
+      operationId: updatePrepaymentInvoiceItems
+      summary: Bulk-update quantities/unit prices of prepaid invoice items
+      description: >
+        For each item in the request array, updates the invoice item's
+        quantity (when set) or unit price, and adjusts the related inverse
+        prepayment item. Parity quirks: the target invoice must be a final
+        (non-prepayment) invoice that HAS a prepayment invoice - unknown ids
+        and prepayment/non-prepaid invoices raise IllegalArgumentException,
+        surfaced as HTTP 500 (not 404/400). Success responds 200 with an
+        empty body.
+      parameters:
+        - name: id
+          in: path
+          required: true
+          schema:
+            $ref: '../components/common.yaml#/components/schemas/Id'
+          description: Invoice id of the final (non-prepayment) invoice.
+      requestBody:
+        required: true
+        content:
+          application/json:
+            schema:
+              type: array
+              items:
+                type: object
+                properties:
+                  id:
+                    $ref: '../components/common.yaml#/components/schemas/Id'
+                  quantity:
+                    type: integer
+                    description: Takes precedence over unitPrice when both are set.
+                  unitPrice:
+                    type: number
+                additionalProperties: true
+      responses:
+        '200':
+          description: Items updated; empty body (render status 200).
+        '500':
+          $ref: '../components/common.yaml#/components/responses/ServerError'
+components:
+  securitySchemes:
+    cookieAuth:
+      $ref: '../components/common.yaml#/components/securitySchemes/cookieAuth'

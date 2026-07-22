@@ -1,0 +1,95 @@
+openapi: 3.0.3
+info:
+  title: OpenBoxes - PersonApiController
+  description: >
+    Person search endpoint handled by org.pih.warehouse.api.PersonApiController,
+    routed via the standard "/api/${resource}s" REST mapping (only list() is
+    overridden; the other BaseDomainApiController actions forward to
+    GenericApiController and are not pinned here).
+  version: 0.1.0
+servers:
+  - url: http://localhost:8080/openboxes
+    description: Local Docker baseline (docs/migration/RUNNING_LOCALLY.md)
+security:
+  - cookieAuth: []
+paths:
+  /api/persons:
+    get:
+      operationId: listPersons
+      summary: Search persons by name/email terms
+      parameters:
+        - name: name
+          in: query
+          required: false
+          schema:
+            type: string
+          description: >
+            Search terms, split on commas and spaces. Each term is matched
+            (ilike "%term%") against firstName, lastName and email; all terms
+            must match. When omitted, all persons are returned.
+        - name: status
+          in: query
+          required: false
+          schema:
+            type: string
+          description: >
+            Filters on the active flag; parsed with Boolean.valueOf, so any
+            value other than "true" (case-insensitive) means inactive-only.
+        - name: sort
+          in: query
+          required: false
+          schema:
+            type: string
+          description: Property to order by (default lastName).
+        - name: order
+          in: query
+          required: false
+          schema:
+            type: string
+            enum: [asc, desc]
+          description: Sort direction (default desc).
+        - $ref: '../components/common.yaml#/components/parameters/max'
+        - $ref: '../components/common.yaml#/components/parameters/offset'
+      responses:
+        '200':
+          description: Matching persons (default Grails JSON rendering of Person).
+          content:
+            application/json:
+              schema:
+                type: object
+                required: [data]
+                properties:
+                  data:
+                    type: array
+                    items:
+                      $ref: '#/components/schemas/PersonListItem'
+components:
+  schemas:
+    PersonListItem:
+      type: object
+      description: >
+        Default Grails JSON rendering of org.pih.warehouse.core.Person.
+        username is always null for plain persons (only User subclasses have
+        one).
+      properties:
+        id:
+          $ref: '../components/common.yaml#/components/schemas/Id'
+        name:
+          type: string
+          nullable: true
+        firstName:
+          type: string
+          nullable: true
+        lastName:
+          type: string
+          nullable: true
+        email:
+          type: string
+          nullable: true
+        username:
+          type: string
+          nullable: true
+      additionalProperties: true
+  securitySchemes:
+    cookieAuth:
+      $ref: '../components/common.yaml#/components/securitySchemes/cookieAuth'

@@ -1,0 +1,298 @@
+openapi: 3.0.3
+info:
+  title: OpenBoxes - PartialReceivingApiController
+  description: >
+    Partial-receiving workflow endpoints handled by
+    org.pih.warehouse.api.PartialReceivingApiController, routed via the
+    "/api/partialReceiving" (GET -> list), "/api/partialReceiving/$id"
+    (GET -> read, POST -> update), "/api/partialReceiving/exportCsv/$id"
+    (POST -> exportCsv) and "/api/partialReceiving/importCsv/$id"
+    (POST -> importCsv) URL mappings. The "/api/partialReceiving" mapping
+    also declares POST -> create, but no create action exists on the
+    controller. The PartialReceipt payload is built on the fly from the
+    shipment and its pending receipt (there is no PartialReceipt domain
+    class), so an unknown shipment id raises IllegalArgumentException
+    (HTTP 500, not 404).
+  version: 0.1.0
+servers:
+  - url: http://localhost:8080/openboxes
+    description: Local Docker baseline (docs/migration/RUNNING_LOCALLY.md)
+security:
+  - cookieAuth: []
+paths:
+  /api/partialReceiving:
+    get:
+      operationId: listPartialReceiving
+      summary: List partial receipts (always empty)
+      description: 'Parity quirk: the action is hardcoded to render {"data": []}.'
+      responses:
+        '200':
+          description: Always an empty data array.
+          content:
+            application/json:
+              schema:
+                type: object
+                required: [data]
+                properties:
+                  data:
+                    type: array
+                    maxItems: 0
+                    items: {}
+  /api/partialReceiving/{id}:
+    get:
+      operationId: readPartialReceiving
+      summary: Read the partial receipt for a shipment
+      parameters:
+        - $ref: '#/components/parameters/shipmentId'
+        - $ref: '#/components/parameters/stepNumber'
+        - name: sort
+          in: query
+          required: false
+          schema:
+            type: string
+          description: Item sort mode passed through to the container rendering.
+      responses:
+        '200':
+          description: The partial receipt built from the shipment.
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/PartialReceiptResponse'
+        '500':
+          $ref: '../components/common.yaml#/components/responses/ServerError'
+    post:
+      operationId: updatePartialReceiving
+      summary: Save/complete/rollback the partial receipt for a shipment
+      description: >
+        Binds the JSON body onto the shipment's partial receipt. Behavior
+        depends on receiptStatus in the body: COMPLETED saves and completes
+        (responding {"data": {}}), PENDING/CHECKING saves a pending receipt,
+        ROLLBACK rolls back received receipts; the refreshed partial receipt
+        is re-read and returned. Saving creates the shipment's receiving bin
+        location ("R-<shipmentNumber>") on first use.
+      parameters:
+        - $ref: '#/components/parameters/shipmentId'
+        - $ref: '#/components/parameters/stepNumber'
+      requestBody:
+        required: true
+        content:
+          application/json:
+            schema:
+              $ref: '#/components/schemas/PartialReceiptInput'
+      responses:
+        '200':
+          description: >
+            The refreshed partial receipt; {"data": {}} when the receipt was
+            completed (receiptStatus COMPLETED).
+          content:
+            application/json:
+              schema:
+                anyOf:
+                  - $ref: '#/components/schemas/PartialReceiptResponse'
+                  - type: object
+                    required: [data]
+                    properties:
+                      data:
+                        type: object
+                        maxProperties: 0
+                        description: Empty object returned when the receipt was completed.
+        '500':
+          $ref: '../components/common.yaml#/components/responses/ServerError'
+  /api/partialReceiving/exportCsv/{id}:
+    post:
+      operationId: exportPartialReceivingCsv
+      summary: Export the partial receipt line items as CSV
+      description: >
+        Binds the JSON body onto the partial receipt (same binding as
+        update, without saving) and renders the line items as a CSV
+        attachment; an empty row is emitted when there are no items.
+      parameters:
+        - $ref: '#/components/parameters/shipmentId'
+        - $ref: '#/components/parameters/stepNumber'
+      requestBody:
+        required: true
+        content:
+          application/json:
+            schema:
+              $ref: '#/components/schemas/PartialReceiptInput'
+      responses:
+        '200':
+          description: CSV attachment (Content-disposition header, UTF-8 BOM).
+          content:
+            text/csv:
+              schema:
+                type: string
+        '500':
+          $ref: '../components/common.yaml#/components/responses/ServerError'
+  /api/partialReceiving/importCsv/{id}:
+    post:
+      operationId: importPartialReceivingCsv
+      summary: Import receiving quantities from a filled-in CSV template
+      description: >
+        Multipart upload of the exportCsv template (first line skipped as
+        header). Only "Receiving now" and "Comment" may differ from the
+        current partial receipt; any other change aborts the import. The
+        pending receipt is saved afterwards. Parity quirk: ALL errors -
+        including unknown shipment ids and template mismatches - are caught
+        and rendered as HTTP 500 with {"errorCode": 500, "errorMessage": ...}
+        (no "cause" key, unlike the shared ServerError shape).
+      parameters:
+        - $ref: '#/components/parameters/shipmentId'
+      requestBody:
+        required: true
+        content:
+          multipart/form-data:
+            schema:
+              type: object
+              required: [importFile]
+              properties:
+                importFile:
+                  type: string
+                  format: binary
+                  description: The filled-in CSV template.
+      responses:
+        '200':
+          description: Import succeeded.
+          content:
+            application/json:
+              schema:
+                type: object
+                required: [data]
+                properties:
+                  data:
+                    type: string
+                    enum: [Data was imported successfully]
+        '500':
+          description: >
+            Any import error (unknown shipment id, unparseable file, template
+            mismatch), rendered by the controller's catch-all handler.
+          content:
+            application/json:
+              schema:
+                $ref: '../components/common.yaml#/components/schemas/ErrorResponse'
+components:
+  parameters:
+    shipmentId:
+      name: id
+      in: path
+      required: true
+      schema:
+        $ref: '../components/common.yaml#/components/schemas/Id'
+      description: >
+        Shipment id (NOT a requisition-based stock movement id). Unknown ids
+        raise IllegalArgumentException (HTTP 500).
+    stepNumber:
+      name: stepNumber
+      in: query
+      required: false
+      schema:
+        type: string
+      description: >
+        Receiving workflow step; "1" includes already-shipped items when a
+        pending receipt exists.
+  schemas:
+    PartialReceiptInput:
+      type: object
+      description: >
+        Partial receipt data bound onto the receipt built from the shipment
+        (PartialReceivingApiController.bindPartialReceiptData).
+      properties:
+        receiptStatus:
+          type: string
+          enum: [PENDING, CHECKING, COMPLETED, ROLLBACK]
+        dateDelivered:
+          type: string
+          nullable: true
+          description: Delivery date, parsed with the MM/dd/yyyy HH:mm XXX formatter.
+        containers:
+          type: array
+          items:
+            type: object
+            properties:
+              container:
+                type: object
+                nullable: true
+                additionalProperties: true
+              shipmentItems:
+                type: array
+                items:
+                  type: object
+                  additionalProperties: true
+            additionalProperties: true
+      additionalProperties: true
+    PartialReceiptResponse:
+      type: object
+      required: [data]
+      properties:
+        data:
+          $ref: '#/components/schemas/PartialReceipt'
+    PartialReceipt:
+      type: object
+      description: >
+        org.pih.warehouse.api.PartialReceipt.toJson() - note the literal
+        dotted keys ("shipment.name", "origin.id", ...).
+      properties:
+        receiptId:
+          type: string
+          nullable: true
+          description: Receipt id (see common.yaml Id); null until a receipt is saved.
+        receiptStatus:
+          type: string
+          nullable: true
+          description: PartialReceiptStatus enum name (PENDING, CHECKING, COMPLETED, ROLLBACK).
+        shipmentId:
+          $ref: '../components/common.yaml#/components/schemas/Id'
+        shipment.name:
+          type: string
+          nullable: true
+        shipment.shipmentNumber:
+          type: string
+          nullable: true
+        shipmentStatus:
+          type: string
+          nullable: true
+        origin.id:
+          type: string
+          nullable: true
+        origin.name:
+          type: string
+          nullable: true
+        destination.id:
+          type: string
+          nullable: true
+        destination.name:
+          type: string
+          nullable: true
+        dateShipped:
+          type: string
+          nullable: true
+          description: MM/dd/yyyy HH:mm XXX.
+        dateDelivered:
+          type: string
+          nullable: true
+          description: MM/dd/yyyy HH:mm XXX.
+        containers:
+          type: array
+          items:
+            type: object
+            additionalProperties: true
+        requisition:
+          type: string
+          nullable: true
+          description: Requisition id, when the shipment is requisition-based.
+        orderId:
+          type: string
+          nullable: true
+          description: Return-order id, when the shipment comes from a return.
+        description:
+          type: string
+          nullable: true
+        recipient:
+          type: object
+          nullable: true
+          allOf:
+            - $ref: '../components/common.yaml#/components/schemas/Person'
+      additionalProperties: true
+  securitySchemes:
+    cookieAuth:
+      $ref: '../components/common.yaml#/components/securitySchemes/cookieAuth'

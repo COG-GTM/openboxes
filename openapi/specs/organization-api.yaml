@@ -1,0 +1,211 @@
+openapi: 3.0.3
+info:
+  title: OpenBoxes - OrganizationApiController
+  description: >
+    Organization list/read/create endpoints handled by
+    org.pih.warehouse.api.OrganizationApiController, routed via the standard
+    "/api/${resource}s" and "/api/${resource}s/$id" REST mappings. The
+    controller extends BaseDomainApiController but overrides list(), read()
+    and create(); the inherited update/delete actions forward to
+    GenericApiController and are not pinned here. Parity quirks: create
+    responds 200 (not 201) with only {"data": {"id": ...}}, and an unknown id
+    on read raises IllegalArgumentException (HTTP 500, not 404).
+  version: 0.1.0
+servers:
+  - url: http://localhost:8080/openboxes
+    description: Local Docker baseline (docs/migration/RUNNING_LOCALLY.md)
+security:
+  - cookieAuth: []
+paths:
+  /api/organizations:
+    get:
+      operationId: listOrganizations
+      summary: List organizations, optionally filtered
+      parameters:
+        - name: q
+          in: query
+          required: false
+          schema:
+            type: string
+          description: >
+            Prefix search (ilike "q%") across id, code, name and description.
+        - name: roleType
+          in: query
+          required: false
+          schema:
+            type: string
+          description: >
+            RoleType enum name (e.g. ROLE_SUPPLIER, ROLE_MANUFACTURER); may
+            be repeated. Unknown values raise a conversion error (HTTP 500).
+        - name: active
+          in: query
+          required: false
+          schema:
+            type: string
+          description: >
+            Any non-empty value restricts results to active organizations
+            (the value itself is not parsed).
+        - name: sort
+          in: query
+          required: false
+          schema:
+            type: string
+          description: Only "name" is honored; other values are ignored.
+        - name: order
+          in: query
+          required: false
+          schema:
+            type: string
+            enum: [asc, desc]
+          description: Sort direction, only applied when sort=name.
+        - $ref: '../components/common.yaml#/components/parameters/max'
+        - $ref: '../components/common.yaml#/components/parameters/offset'
+      responses:
+        '200':
+          description: Organizations (default Grails JSON rendering).
+          content:
+            application/json:
+              schema:
+                type: object
+                required: [data]
+                properties:
+                  data:
+                    type: array
+                    items:
+                      $ref: '#/components/schemas/Organization'
+    post:
+      operationId: createOrganization
+      summary: Create an organization
+      description: >
+        Binds the request body onto a new Organization. Code and party type
+        are defaulted when omitted (the code gets a generated suffix, e.g.
+        "ZZ-123ABC"). Parity quirk: responds 200 (not 201) and returns only
+        the generated id.
+      requestBody:
+        required: true
+        content:
+          application/json:
+            schema:
+              type: object
+              properties:
+                name:
+                  type: string
+                code:
+                  type: string
+                description:
+                  type: string
+              additionalProperties: true
+      responses:
+        '200':
+          description: Created; only the generated id is returned.
+          content:
+            application/json:
+              schema:
+                type: object
+                required: [data]
+                properties:
+                  data:
+                    type: object
+                    required: [id]
+                    properties:
+                      id:
+                        $ref: '../components/common.yaml#/components/schemas/Id'
+        '400':
+          $ref: '../components/common.yaml#/components/responses/ValidationError'
+  /api/organizations/{id}:
+    get:
+      operationId: readOrganization
+      summary: Read a single organization
+      parameters:
+        - name: id
+          in: path
+          required: true
+          schema:
+            $ref: '../components/common.yaml#/components/schemas/Id'
+          description: >
+            Organization id. Unknown ids raise IllegalArgumentException,
+            surfaced as HTTP 500 (not 404).
+      responses:
+        '200':
+          description: The organization (default Grails JSON rendering).
+          content:
+            application/json:
+              schema:
+                type: object
+                required: [data]
+                properties:
+                  data:
+                    $ref: '#/components/schemas/Organization'
+        '500':
+          $ref: '../components/common.yaml#/components/responses/ServerError'
+components:
+  schemas:
+    Organization:
+      type: object
+      description: Default Grails JSON rendering of org.pih.warehouse.core.Organization.
+      properties:
+        id:
+          $ref: '../components/common.yaml#/components/schemas/Id'
+        name:
+          type: string
+          nullable: true
+        displayName:
+          type: string
+          nullable: true
+          description: '"CODE - Name".'
+        description:
+          type: string
+          nullable: true
+        code:
+          type: string
+          nullable: true
+        dateCreated:
+          type: string
+          nullable: true
+        lastUpdated:
+          type: string
+          nullable: true
+        defaultLocation:
+          type: object
+          nullable: true
+          additionalProperties: true
+        partyType:
+          type: object
+          nullable: true
+          properties:
+            id:
+              $ref: '../components/common.yaml#/components/schemas/Id'
+            name:
+              type: string
+              nullable: true
+            code:
+              type: string
+              nullable: true
+            partyTypeCode:
+              type: string
+              nullable: true
+          additionalProperties: true
+        roles:
+          type: array
+          items:
+            type: object
+            properties:
+              id:
+                $ref: '../components/common.yaml#/components/schemas/Id'
+              roleType:
+                type: string
+                nullable: true
+              startDate:
+                type: string
+                nullable: true
+              endDate:
+                type: string
+                nullable: true
+            additionalProperties: true
+        sequences:
+          type: object
+          additionalProperties: true
+      additionalProperties: true
+  securitySchemes:
+    cookieAuth:
+      $ref: '../components/common.yaml#/components/securitySchemes/cookieAuth'
