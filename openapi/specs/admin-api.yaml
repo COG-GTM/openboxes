@@ -1,0 +1,452 @@
+openapi: 3.0.3
+info:
+  title: OpenBoxes - AdminApiController
+  description: >
+    Admin console endpoints handled by org.pih.warehouse.api.AdminApiController,
+    added in Phase 2 (Batch 40) for the React admin screens (admin/index,
+    admin/controllerActions, admin/cache, admin/plugins, admin/sendMail,
+    admin/showSettings). Routed by the explicit /api/admin/* mappings in
+    grails-app/controllers/org/pih/warehouse/UrlMappings.groovy. All endpoints
+    require the admin role (RoleInterceptor adminControllers).
+  version: 0.1.0
+servers:
+  - url: http://localhost:8080/openboxes
+    description: Local Docker baseline (docs/migration/RUNNING_LOCALLY.md)
+security:
+  - cookieAuth: []
+paths:
+  /api/admin/controllers:
+    get:
+      operationId: getControllers
+      summary: List all Grails controllers for the React admin index screen
+      responses:
+        '200':
+          description: All controller classes, sorted by fullName.
+          content:
+            application/json:
+              schema:
+                type: object
+                required: [data]
+                properties:
+                  data:
+                    type: array
+                    items:
+                      type: object
+                      required: [fullName, logicalPropertyName, uri]
+                      properties:
+                        fullName:
+                          type: string
+                        logicalPropertyName:
+                          type: string
+                        uri:
+                          type: string
+                          description: Context-relative URI ("/" + logicalPropertyName).
+        '401':
+          $ref: '../components/common.yaml#/components/responses/Unauthorized'
+  /api/admin/controllerActions:
+    get:
+      operationId: getControllerActions
+      summary: List closure-declared controller actions
+      description: >
+        Mirrors the legacy admin/controllerActions screen, which scanned
+        controllers for Closure-typed action properties. On Grails 7 most
+        actions are methods, so this list is typically empty; the shape is
+        pinned for parity with the legacy screen.
+      responses:
+        '200':
+          description: Action label lines.
+          content:
+            application/json:
+              schema:
+                type: object
+                required: [data]
+                properties:
+                  data:
+                    type: array
+                    items:
+                      type: string
+        '401':
+          $ref: '../components/common.yaml#/components/responses/Unauthorized'
+  /api/admin/cache:
+    get:
+      operationId: getCacheStatistics
+      summary: Hibernate cache statistics for the React admin cache screen
+      responses:
+        '200':
+          description: Hibernate session-factory statistics.
+          content:
+            application/json:
+              schema:
+                type: object
+                required: [data]
+                properties:
+                  data:
+                    type: object
+                    required: [secondLevelCache, queries, entities]
+                    properties:
+                      hibernateConfig:
+                        type: string
+                        nullable: true
+                        description: String rendering of the hibernate config block.
+                      statistics:
+                        type: string
+                        nullable: true
+                        description: Statistics.toString() summary.
+                      secondLevelCache:
+                        type: array
+                        items:
+                          type: object
+                          required: [regionName]
+                          properties:
+                            regionName:
+                              type: string
+                            hitCount:
+                              type: integer
+                              nullable: true
+                            missCount:
+                              type: integer
+                              nullable: true
+                            putCount:
+                              type: integer
+                              nullable: true
+                            elementCountInMemory:
+                              type: integer
+                              nullable: true
+                            elementCountOnDisk:
+                              type: integer
+                              nullable: true
+                            sizeInMemory:
+                              type: integer
+                              nullable: true
+                      queries:
+                        type: array
+                        items:
+                          type: object
+                          required: [queryName]
+                          properties:
+                            queryName:
+                              type: string
+                            cacheHitCount:
+                              type: integer
+                              nullable: true
+                            cacheMissCount:
+                              type: integer
+                              nullable: true
+                            cachePutCount:
+                              type: integer
+                              nullable: true
+                            executionCount:
+                              type: integer
+                              nullable: true
+                            executionMinTime:
+                              type: integer
+                              nullable: true
+                            executionMaxTime:
+                              type: integer
+                              nullable: true
+                            executionAvgTime:
+                              type: integer
+                              nullable: true
+                            executionRowCount:
+                              type: integer
+                              nullable: true
+                      entities:
+                        type: array
+                        items:
+                          type: object
+                          required: [entityName]
+                          properties:
+                            entityName:
+                              type: string
+                            loadCount:
+                              type: integer
+                              nullable: true
+                            deleteCount:
+                              type: integer
+                              nullable: true
+                            fetchCount:
+                              type: integer
+                              nullable: true
+                            insertCount:
+                              type: integer
+                              nullable: true
+                            updateCount:
+                              type: integer
+                              nullable: true
+                            optimisticFailureCount:
+                              type: integer
+                              nullable: true
+        '401':
+          $ref: '../components/common.yaml#/components/responses/Unauthorized'
+  /api/admin/cache/evictDomain:
+    post:
+      operationId: evictDomainCache
+      summary: Evict a domain class cache region
+      parameters:
+        - name: name
+          in: query
+          required: true
+          schema:
+            type: string
+          description: Domain class name. Unknown names still respond 200 with a "does not exist" message (legacy parity).
+      responses:
+        '200':
+          $ref: '#/components/responses/Message'
+        '401':
+          $ref: '../components/common.yaml#/components/responses/Unauthorized'
+  /api/admin/cache/evictQueries:
+    post:
+      operationId: evictQueryCache
+      summary: Evict one or all query cache regions
+      parameters:
+        - name: name
+          in: query
+          required: false
+          schema:
+            type: string
+          description: Query cache region name; when omitted, all query caches are evicted.
+      responses:
+        '200':
+          $ref: '#/components/responses/Message'
+        '401':
+          $ref: '../components/common.yaml#/components/responses/Unauthorized'
+  /api/admin/plugins:
+    get:
+      operationId: getPlugins
+      summary: List installed Grails plugins
+      responses:
+        '200':
+          description: Installed plugins (name and version).
+          content:
+            application/json:
+              schema:
+                type: object
+                required: [data]
+                properties:
+                  data:
+                    type: array
+                    items:
+                      type: object
+                      required: [name]
+                      properties:
+                        name:
+                          type: string
+                        version:
+                          type: string
+                          nullable: true
+        '401':
+          $ref: '../components/common.yaml#/components/responses/Unauthorized'
+  /api/admin/mail:
+    get:
+      operationId: getMailInfo
+      summary: Mail configuration defaults for the React send-mail screen
+      responses:
+        '200':
+          description: Mail defaults (enabled flag, from address, session user email).
+          content:
+            application/json:
+              schema:
+                type: object
+                required: [data]
+                properties:
+                  data:
+                    type: object
+                    properties:
+                      enabled:
+                        type: boolean
+                        nullable: true
+                      from:
+                        type: string
+                        nullable: true
+                      defaultTo:
+                        type: string
+                        nullable: true
+        '401':
+          $ref: '../components/common.yaml#/components/responses/Unauthorized'
+    post:
+      operationId: sendMail
+      summary: Send a test email
+      description: >
+        Multipart form fields mirror the legacy admin/sendMail form (to,
+        subject, message, includesHtml, optional file attachment). Always
+        responds 200 with a status message; send failures (e.g. mail
+        disabled) are reported in the message text (legacy flash parity).
+      requestBody:
+        required: false
+        content:
+          multipart/form-data:
+            schema:
+              type: object
+              properties:
+                to:
+                  type: string
+                subject:
+                  type: string
+                message:
+                  type: string
+                includesHtml:
+                  type: string
+                file:
+                  type: string
+                  format: binary
+      responses:
+        '200':
+          $ref: '#/components/responses/Message'
+        '401':
+          $ref: '../components/common.yaml#/components/responses/Unauthorized'
+  /api/admin/settings:
+    get:
+      operationId: getSettings
+      summary: Application settings for the React admin settings screen
+      description: >
+        Pins the data rendered by the legacy admin/showSettings tabs -
+        general info, mail settings, external config properties, system
+        properties, printers and quartz scheduler metadata. Password-like
+        config values are masked (legacy parity).
+      responses:
+        '200':
+          description: Application settings snapshot.
+          content:
+            application/json:
+              schema:
+                type: object
+                required: [data]
+                properties:
+                  data:
+                    type: object
+                    required: [environment, locales, printers, quartz]
+                    properties:
+                      environment:
+                        type: string
+                      appVersion:
+                        type: string
+                        nullable: true
+                      buildNumber:
+                        type: string
+                        nullable: true
+                      buildDate:
+                        type: string
+                        nullable: true
+                      branchName:
+                        type: string
+                        nullable: true
+                      grailsVersion:
+                        type: string
+                        nullable: true
+                      currentDate:
+                        type: string
+                      defaultCharset:
+                        type: string
+                      locales:
+                        type: array
+                        items:
+                          type: object
+                          required: [code]
+                          properties:
+                            code:
+                              type: string
+                            displayName:
+                              type: string
+                              nullable: true
+                            current:
+                              type: boolean
+                      mailEnabled:
+                        type: boolean
+                      mailFrom:
+                        type: string
+                        nullable: true
+                      mailHost:
+                        type: string
+                        nullable: true
+                      mailPort:
+                        type: string
+                        nullable: true
+                      mailSettings:
+                        type: object
+                        additionalProperties: true
+                      externalConfigFile:
+                        type: string
+                        nullable: true
+                      configProperties:
+                        type: object
+                        additionalProperties: true
+                      systemProperties:
+                        type: object
+                        additionalProperties: true
+                      printers:
+                        type: array
+                        items:
+                          type: object
+                          required: [name]
+                          properties:
+                            name:
+                              type: string
+                            attributes:
+                              type: array
+                              items:
+                                type: object
+                                properties:
+                                  name:
+                                    type: string
+                                  value:
+                                    type: string
+                                    nullable: true
+                            docFlavors:
+                              type: array
+                              items:
+                                type: string
+                            attributeCategories:
+                              type: array
+                              items:
+                                type: object
+                                properties:
+                                  name:
+                                    type: string
+                                  defaultValue:
+                                    type: string
+                                    nullable: true
+                      quartz:
+                        type: object
+                        properties:
+                          schedulerName:
+                            type: string
+                            nullable: true
+                          schedulerInstanceId:
+                            type: string
+                            nullable: true
+                          metaData:
+                            type: string
+                            nullable: true
+                          jobsProperties:
+                            type: object
+                            additionalProperties: true
+        '401':
+          $ref: '../components/common.yaml#/components/responses/Unauthorized'
+  /api/admin/stockAlerts/trigger:
+    post:
+      operationId: triggerStockAlerts
+      summary: Trigger the send stock alerts quartz job
+      responses:
+        '200':
+          $ref: '#/components/responses/Message'
+        '401':
+          $ref: '../components/common.yaml#/components/responses/Unauthorized'
+components:
+  securitySchemes:
+    cookieAuth:
+      $ref: '../components/common.yaml#/components/securitySchemes/cookieAuth'
+  responses:
+    Message:
+      description: Status message.
+      content:
+        application/json:
+          schema:
+            type: object
+            required: [data]
+            properties:
+              data:
+                type: object
+                required: [message]
+                properties:
+                  message:
+                    type: string

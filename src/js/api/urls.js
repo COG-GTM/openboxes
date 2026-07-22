@@ -253,6 +253,18 @@ export const PARTY_TYPE_OPTIONS = `${API}/partyTypeOptions`;
 export const PARTY_TYPE_CODE_OPTIONS = `${API}/partyTypeCodeOptions`;
 export const ORGANIZATION_ROLE_TYPE_OPTIONS = `${API}/organizationRoleTypeOptions`;
 
+// ADMIN CONSOLE (Phase 2 Batch 40)
+export const ADMIN_API = `${API}/admin`;
+export const ADMIN_CONTROLLERS = `${ADMIN_API}/controllers`;
+export const ADMIN_CONTROLLER_ACTIONS = `${ADMIN_API}/controllerActions`;
+export const ADMIN_CACHE = `${ADMIN_API}/cache`;
+export const ADMIN_CACHE_EVICT_DOMAIN = `${ADMIN_API}/cache/evictDomain`;
+export const ADMIN_CACHE_EVICT_QUERIES = `${ADMIN_API}/cache/evictQueries`;
+export const ADMIN_PLUGINS = `${ADMIN_API}/plugins`;
+export const ADMIN_MAIL = `${ADMIN_API}/mail`;
+export const ADMIN_SETTINGS = `${ADMIN_API}/settings`;
+export const ADMIN_STOCK_ALERTS_TRIGGER = `${ADMIN_API}/stockAlerts/trigger`;
+
 // PERSONS
 export const PERSON_API = `${API}/persons`;
 export const PERSON_BY_ID = (id) => `${PERSON_API}/${id}`;

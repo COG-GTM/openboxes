@@ -423,6 +423,36 @@ const AsyncOrganizationShow = Loadable({
   loading: Loading,
 });
 
+const AsyncAdminIndex = Loadable({
+  loader: () => import('components/admin/AdminIndex'),
+  loading: Loading,
+});
+
+const AsyncAdminControllerActions = Loadable({
+  loader: () => import('components/admin/AdminControllerActions'),
+  loading: Loading,
+});
+
+const AsyncAdminCache = Loadable({
+  loader: () => import('components/admin/AdminCache'),
+  loading: Loading,
+});
+
+const AsyncAdminPlugins = Loadable({
+  loader: () => import('components/admin/AdminPlugins'),
+  loading: Loading,
+});
+
+const AsyncAdminSendMail = Loadable({
+  loader: () => import('components/admin/AdminSendMail'),
+  loading: Loading,
+});
+
+const AsyncAdminSettings = Loadable({
+  loader: () => import('components/admin/AdminSettings'),
+  loading: Loading,
+});
+
 const AsyncPersonList = Loadable({
   loader: () => import('components/person/PersonList'),
   loading: Loading,
@@ -1360,6 +1390,12 @@ const Router = () => {
             <MainLayoutRoute path="**/organization/create" component={AsyncOrganizationForm} />
             <MainLayoutRoute path="**/organization/edit/:organizationId" component={AsyncOrganizationForm} />
             <MainLayoutRoute path="**/organization/show/:organizationId" component={AsyncOrganizationShow} />
+            <MainLayoutRoute path="**/admin/index" component={AsyncAdminIndex} />
+            <MainLayoutRoute path="**/admin/controllerActions" component={AsyncAdminControllerActions} />
+            <MainLayoutRoute path="**/admin/cache" component={AsyncAdminCache} />
+            <MainLayoutRoute path="**/admin/plugins" component={AsyncAdminPlugins} />
+            <MainLayoutRoute path="**/admin/sendMail" component={AsyncAdminSendMail} />
+            <MainLayoutRoute path="**/admin/showSettings" component={AsyncAdminSettings} />
             <MainLayoutRoute path="**/person/list" component={AsyncPersonList} />
             <MainLayoutRoute path="**/person/create" component={AsyncPersonForm} />
             <MainLayoutRoute path="**/person/edit/:personId" component={AsyncPersonForm} />

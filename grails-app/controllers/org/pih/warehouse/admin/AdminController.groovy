@@ -12,44 +12,32 @@ package org.pih.warehouse.admin
 import grails.core.GrailsApplication
 import grails.util.Holders
 import grails.validation.Validateable
-import org.pih.warehouse.core.MailService
 import org.pih.warehouse.jobs.SendStockAlertsJob
 import org.springframework.boot.info.GitProperties
-import org.springframework.web.multipart.MultipartFile
 
-import javax.print.*
-import java.awt.print.PrinterJob
 import java.util.concurrent.FutureTask
 
 class AdminController {
 
     def sessionFactory // inject Hibernate sessionFactory
-    MailService mailService
     GrailsApplication grailsApplication
     def config = Holders.getConfig()
     def quartzScheduler
     def dataService
     GitProperties gitProperties
 
-    def index() {}
+    def index() {
+        // /admin (without an action) also maps here; normalize the URL so the
+        // React router matches the /admin/index route.
+        if (!request.forwardURI?.endsWith("/index")) {
+            redirect(action: "index")
+            return
+        }
+        render(view: "/common/react", params: params)
+    }
 
     def controllerActions() {
-
-        List actionNames = []
-        grailsApplication.controllerClasses.sort { it.logicalPropertyName }.each { controller ->
-
-            controller.reference.propertyDescriptors.each { pd ->
-                def closure = controller.getPropertyOrStaticPropertyOrFieldValue(pd.name, Closure)
-                if (closure) {
-                    if (pd.name != 'beforeInterceptor' && pd.name != 'afterInterceptor') {
-                        actionNames << controller.logicalPropertyName + "." + pd.name + ".label = " + pd.name
-                    }
-                }
-            }
-            println "$controller.clazz.simpleName: $actionNames"
-        }
-
-        [actionNames: actionNames]
+        render(view: "/common/react", params: params)
     }
 
     def triggerStockAlerts = {
@@ -59,10 +47,12 @@ class AdminController {
     }
 
     def cache() {
-        [cacheStatistics: sessionFactory.getStatistics()]
+        render(view: "/common/react", params: params)
     }
 
-    def plugins() {}
+    def plugins() {
+        render(view: "/common/react", params: params)
+    }
     def status() {}
 
     def static LOCAL_TEMP_WEBARCHIVE_PATH = "warehouse.war"
@@ -99,44 +89,7 @@ class AdminController {
 
 
     def sendMail() {
-        if (request.method == "POST") {
-            try {
-                withForm {
-                    MultipartFile multipartFile = request.getFile('file')
-                    if (!multipartFile.empty) {
-                        def success = mailService.sendHtmlMailWithAttachment(
-                                session?.user,
-                                params.list("to"),
-                                null,
-                                params["subject"],
-                                params["message"],
-                                multipartFile?.bytes,
-                                multipartFile?.originalFilename,
-                                multipartFile?.contentType
-                        )
-
-                        if (success) {
-                            flash.message = "Multipart email with subject ${params.subject} and attachment ${multipartFile.originalFilename} has been sent to ${params.to}"
-                        } else {
-                            flash.message = "Could not send email with subject ${params.subject} and attachment ${multipartFile.originalFilename} to ${params.to}"
-                        }
-                    } else {
-                        if (params.includesHtml) {
-                            mailService.sendHtmlMail(params.subject, params.message, params.to)
-                            flash.message = "HTML email with subject ${params.subject} has been sent to ${params.to}"
-                        } else {
-                            mailService.sendMail(params.subject, params.message, params.to)
-                            flash.message = "Text email with subject ${params.subject} has been sent to ${params.to}"
-                        }
-                    }
-                }.invalidToken {
-                    flash.message = "Invalid token"
-                }
-            } catch (Exception e) {
-                flash.message = "Unable to send email due to error: " + e.message
-            }
-        }
-        render(view: "sendMail")
+        render(view: "/common/react", params: params)
     }
 
 
@@ -186,30 +139,7 @@ class AdminController {
     }
 
     def showSettings() {
-
-        PrintService[] printServices = PrinterJob.lookupPrintServices()
-
-//        def caches = new ArrayList()
-//        def cacheNames = springcacheService.springcacheCacheManager.cacheNames
-//
-//        for (cacheName in cacheNames) {
-//            Cache cache = springcacheService.springcacheCacheManager.getCache(cacheName)
-//            if (cache instanceof Cache) {
-//                caches.add(cache)
-//            }
-//        }
-
-
-        [
-                gitProperties           : gitProperties,
-                quartzScheduler         : quartzScheduler,
-                printServices           : printServices,
-                caches                  : null, //caches,
-                enabled                 : Boolean.valueOf(grailsApplication.config.grails.mail.enabled),
-                from                    : "${config.getProperty("grails.mail.from")}",
-                host                    : "${config.getProperty("grails.mail.host")}",
-                port                    : "${config.getProperty("grails.mail.port")}"
-        ]
+        render(view: "/common/react", params: params)
     }
 
 

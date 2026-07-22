@@ -189,6 +189,52 @@ class UrlMappings {
             action = [GET: "details"]
         }
 
+        // Admin console endpoints for the React admin screens (Phase 2 Batch 40)
+        "/api/admin/controllers"(parseRequest: true) {
+            controller = { "adminApi" }
+            action = [GET: "controllers"]
+        }
+
+        "/api/admin/controllerActions"(parseRequest: true) {
+            controller = { "adminApi" }
+            action = [GET: "controllerActions"]
+        }
+
+        "/api/admin/cache"(parseRequest: true) {
+            controller = { "adminApi" }
+            action = [GET: "cache"]
+        }
+
+        "/api/admin/cache/evictDomain"(parseRequest: true) {
+            controller = { "adminApi" }
+            action = [POST: "evictDomainCache"]
+        }
+
+        "/api/admin/cache/evictQueries"(parseRequest: true) {
+            controller = { "adminApi" }
+            action = [POST: "evictQueryCache"]
+        }
+
+        "/api/admin/plugins"(parseRequest: true) {
+            controller = { "adminApi" }
+            action = [GET: "plugins"]
+        }
+
+        "/api/admin/mail"(parseRequest: true) {
+            controller = { "adminApi" }
+            action = [GET: "mailInfo", POST: "sendMail"]
+        }
+
+        "/api/admin/settings"(parseRequest: true) {
+            controller = { "adminApi" }
+            action = [GET: "settings"]
+        }
+
+        "/api/admin/stockAlerts/trigger"(parseRequest: true) {
+            controller = { "adminApi" }
+            action = [POST: "triggerStockAlerts"]
+        }
+
         // Person endpoints for the React person screens; explicit mappings
         // take precedence over the generic "/api/${resource}s" pattern.
         "/api/persons/search"(parseRequest: true) {

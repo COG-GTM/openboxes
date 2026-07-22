@@ -5,6 +5,19 @@ import { stringifyUrl } from 'query-string';
 
 export const CONTEXT_PATH = window.CONTEXT_PATH ?? '/openboxes';
 
+const ADMIN_URL = {
+  base: `${CONTEXT_PATH}/admin`,
+  index: () => `${ADMIN_URL.base}/index`,
+  cache: () => `${ADMIN_URL.base}/cache`,
+  controllerActions: () => `${ADMIN_URL.base}/controllerActions`,
+  plugins: () => `${ADMIN_URL.base}/plugins`,
+  sendMail: () => `${ADMIN_URL.base}/sendMail`,
+  showSettings: () => `${ADMIN_URL.base}/showSettings`,
+  showDatabaseStatus: () => `${ADMIN_URL.base}/showDatabaseStatus`,
+  showDatabaseProcessList: () => `${ADMIN_URL.base}/showDatabaseProcessList`,
+  showUpgrade: () => `${ADMIN_URL.base}/showUpgrade`,
+};
+
 const DASHBOARD_URL = {
   base: `${CONTEXT_PATH}/dashboard`,
 };
@@ -587,6 +600,7 @@ const CYCLE_COUNT = {
 };
 
 export {
+  ADMIN_URL,
   ATTRIBUTE_URL,
   BARCODE_URL,
   BUDGET_CODE_URL,
