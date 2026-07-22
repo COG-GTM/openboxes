@@ -17,7 +17,7 @@ import org.pih.warehouse.core.Document
 @Transactional
 class ShipmentWorkflowController {
 
-    static allowedMethods = [save: "POST", update: "POST", delete: "POST"]
+    static allowedMethods = [update: "POST", delete: "POST"]
 
     def index() {
         redirect(action: "list", params: params)
@@ -29,19 +29,7 @@ class ShipmentWorkflowController {
     }
 
     def create() {
-        def shipmentWorkflowInstance = new ShipmentWorkflow()
-        shipmentWorkflowInstance.properties = params
-        return [shipmentWorkflowInstance: shipmentWorkflowInstance, documentTemplates: documentTemplates]
-    }
-
-    def save() {
-        def shipmentWorkflowInstance = new ShipmentWorkflow(params)
-        if (shipmentWorkflowInstance.save(flush: true)) {
-            flash.message = "${warehouse.message(code: 'default.created.message', args: [warehouse.message(code: 'shipmentWorkflow.label', default: 'ShipmentWorkflow'), shipmentWorkflowInstance.id])}"
-            redirect(action: "list", id: shipmentWorkflowInstance.id)
-        } else {
-            render(view: "create", model: [shipmentWorkflowInstance: shipmentWorkflowInstance])
-        }
+        render(view: "/common/react", params: params)
     }
 
     def show() {

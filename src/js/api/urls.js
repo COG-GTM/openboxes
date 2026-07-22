@@ -346,6 +346,16 @@ export const SHIPMENT_CLEAR_PICKLIST = (id) => `${SHIPMENT_BY_ID(id)}/clearPickl
 export const SHIPMENT_SEND = (id) => `${SHIPMENT_BY_ID(id)}/send`;
 export const SHIPMENT_OUTBOUND_RETURN_PRINT = (id) => `${SHIPMENT_BY_ID(id)}/outboundReturnPrint`;
 export const SHIPMENT_GOODS_RECEIPT_NOTE_PRINT = (id) => `${SHIPMENT_BY_ID(id)}/goodsReceiptNotePrint`;
+
+// SHIPMENT ITEM (shipmentItem scaffold screens)
+export const SHIPMENT_ITEM_API = `${API}/shipmentItems`;
+export const SHIPMENT_ITEM_API_BY_ID = (id) => `${SHIPMENT_ITEM_API}/${id}`;
+export const SHIPMENT_ITEM_OPTIONS = `${SHIPMENT_ITEM_API}/options`;
+export const SHIPMENT_ITEM_PICK_CONTEXT = (id) => `${SHIPMENT_ITEM_API_BY_ID(id)}/pick`;
+export const SHIPMENT_ITEM_SPLIT_BY_ID = (id) => `${SHIPMENT_ITEM_API_BY_ID(id)}/split`;
+
+// SHIPMENT WORKFLOW
+export const SHIPMENT_WORKFLOW_API = `${API}/shipmentWorkflows`;
 export const REQUISITION_DELIVERY_NOTE = (id) => `${REQUISITION_BY_ID(id)}/deliveryNote`;
 
 // REQUISITION TEMPLATE (stock list template screens)

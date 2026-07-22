@@ -1,0 +1,426 @@
+openapi: 3.0.3
+info:
+  title: OpenBoxes - ShipmentItemApiController
+  description: >
+    REST endpoints for the migrated shipmentItem scaffold screens (list, show,
+    edit, pick, split) handled by
+    org.pih.warehouse.api.ShipmentItemApiController, routed via
+    "/api/shipmentItems". Added in Phase 2 (Batch 23). The standalone pick
+    screen reuses the existing shipment-scoped
+    POST /api/shipments/{id}/items/{itemId}/pick endpoint (shipment-api.yaml)
+    to save picks; this controller provides the read-side pick context and a
+    single-call split operation matching the legacy splitShipmentItem flow
+    event.
+  version: 0.1.0
+servers:
+  - url: http://localhost:8080/openboxes
+    description: Local Docker baseline (docs/migration/RUNNING_LOCALLY.md)
+security:
+  - cookieAuth: []
+paths:
+  /api/shipmentItems:
+    get:
+      operationId: listShipmentItems
+      summary: Paginated list of shipment items
+      parameters:
+        - $ref: '../components/common.yaml#/components/parameters/max'
+        - $ref: '../components/common.yaml#/components/parameters/offset'
+        - name: sort
+          in: query
+          description: >
+            One of id, lotNumber, expirationDate, quantity, dateCreated,
+            lastUpdated. Anything else falls back to id.
+          schema:
+            type: string
+        - name: order
+          in: query
+          schema:
+            type: string
+            enum: [asc, desc]
+      responses:
+        '200':
+          description: Paginated shipment items.
+          content:
+            application/json:
+              schema:
+                type: object
+                required: [data, totalCount]
+                properties:
+                  data:
+                    type: array
+                    items:
+                      $ref: '#/components/schemas/ShipmentItemSummary'
+                  totalCount:
+                    type: integer
+  /api/shipmentItems/options:
+    get:
+      operationId: getShipmentItemOptions
+      summary: Option lists for the shipment item edit screen selects
+      responses:
+        '200':
+          description: >
+            Containers, products, recipients, inventory items, donors and
+            shipments as id/label pairs (mirrors the legacy edit GSP select
+            boxes, which rendered the full domain lists).
+          content:
+            application/json:
+              schema:
+                type: object
+                required: [data]
+                properties:
+                  data:
+                    type: object
+                    required:
+                      [containers, products, recipients, inventoryItems,
+                       donors, shipments]
+                    properties:
+                      containers:
+                        type: array
+                        items:
+                          $ref: '#/components/schemas/Option'
+                      products:
+                        type: array
+                        items:
+                          $ref: '#/components/schemas/Option'
+                      recipients:
+                        type: array
+                        items:
+                          $ref: '#/components/schemas/Option'
+                      inventoryItems:
+                        type: array
+                        items:
+                          $ref: '#/components/schemas/Option'
+                      donors:
+                        type: array
+                        items:
+                          $ref: '#/components/schemas/Option'
+                      shipments:
+                        type: array
+                        items:
+                          $ref: '#/components/schemas/Option'
+  /api/shipmentItems/{id}:
+    parameters:
+      - name: id
+        in: path
+        required: true
+        schema:
+          $ref: '../components/common.yaml#/components/schemas/Id'
+    get:
+      operationId: readShipmentItem
+      summary: Read a single shipment item
+      responses:
+        '200':
+          description: Shipment item details.
+          content:
+            application/json:
+              schema:
+                type: object
+                required: [data]
+                properties:
+                  data:
+                    $ref: '#/components/schemas/ShipmentItemDetail'
+        '404':
+          description: Unknown shipment item id.
+          content:
+            application/json:
+              schema:
+                $ref: '../components/common.yaml#/components/schemas/ErrorResponse'
+    put:
+      operationId: updateShipmentItem
+      summary: Update a shipment item
+      requestBody:
+        required: true
+        content:
+          application/json:
+            schema:
+              $ref: '#/components/schemas/ShipmentItemRequest'
+      responses:
+        '200':
+          description: Updated shipment item.
+          content:
+            application/json:
+              schema:
+                type: object
+                required: [data]
+                properties:
+                  data:
+                    $ref: '#/components/schemas/ShipmentItemDetail'
+        '400':
+          description: Validation errors.
+          content:
+            application/json:
+              schema:
+                $ref: '../components/common.yaml#/components/schemas/ErrorResponse'
+        '404':
+          description: Unknown shipment item id.
+          content:
+            application/json:
+              schema:
+                $ref: '../components/common.yaml#/components/schemas/ErrorResponse'
+    delete:
+      operationId: deleteShipmentItem
+      summary: Delete a shipment item
+      responses:
+        '204':
+          description: Shipment item deleted.
+        '400':
+          description: Shipment item could not be deleted (data integrity violation).
+          content:
+            application/json:
+              schema:
+                $ref: '../components/common.yaml#/components/schemas/ErrorResponse'
+        '404':
+          description: Unknown shipment item id.
+          content:
+            application/json:
+              schema:
+                $ref: '../components/common.yaml#/components/schemas/ErrorResponse'
+  /api/shipmentItems/{id}/pick:
+    parameters:
+      - name: id
+        in: path
+        required: true
+        schema:
+          $ref: '../components/common.yaml#/components/schemas/Id'
+    get:
+      operationId: getShipmentItemPickContext
+      summary: Pick/split context for a shipment item
+      description: >
+        Shipment item details plus quantity on hand by bin location for the
+        item's product at the session warehouse (like the legacy pick/split
+        GSP models), the owning shipment id and the previous/next items in
+        picklist order (wrapping at the ends).
+      responses:
+        '200':
+          description: Pick context.
+          content:
+            application/json:
+              schema:
+                type: object
+                required: [data]
+                properties:
+                  data:
+                    type: object
+                    required: [shipmentItem, binLocations]
+                    properties:
+                      shipmentItem:
+                        $ref: '#/components/schemas/ShipmentItemDetail'
+                      shipmentId:
+                        $ref: '../components/common.yaml#/components/schemas/Id'
+                      previousItemId:
+                        type: string
+                        nullable: true
+                      nextItemId:
+                        type: string
+                        nullable: true
+                      binLocations:
+                        type: array
+                        items:
+                          $ref: '#/components/schemas/BinLocationEntry'
+        '404':
+          description: Unknown shipment item id.
+          content:
+            application/json:
+              schema:
+                $ref: '../components/common.yaml#/components/schemas/ErrorResponse'
+  /api/shipmentItems/{id}/split:
+    parameters:
+      - name: id
+        in: path
+        required: true
+        schema:
+          $ref: '../components/common.yaml#/components/schemas/Id'
+    post:
+      operationId: splitShipmentItem
+      summary: Split a shipment item into two items
+      description: >
+        Mirrors the legacy splitShipmentItem flow event: reduces the original
+        item quantity by splitQuantity and clones it into a new item assigned
+        to the selected bin location and inventory item. splitQuantity must be
+        greater than zero and less than the original quantity.
+      requestBody:
+        required: true
+        content:
+          application/json:
+            schema:
+              type: object
+              required: [inventoryItemId, splitQuantity]
+              properties:
+                binLocationId:
+                  type: string
+                  nullable: true
+                inventoryItemId:
+                  $ref: '../components/common.yaml#/components/schemas/Id'
+                splitQuantity:
+                  oneOf:
+                    - type: integer
+                    - type: string
+      responses:
+        '200':
+          description: Both resulting shipment items.
+          content:
+            application/json:
+              schema:
+                type: object
+                required: [data]
+                properties:
+                  data:
+                    type: object
+                    required: [originalItem, splitItem]
+                    properties:
+                      originalItem:
+                        $ref: '#/components/schemas/ShipmentItemDetail'
+                      splitItem:
+                        $ref: '#/components/schemas/ShipmentItemDetail'
+        '400':
+          description: Invalid split quantity or missing inventory item.
+          content:
+            application/json:
+              schema:
+                $ref: '../components/common.yaml#/components/schemas/ErrorResponse'
+        '404':
+          description: Unknown shipment item id.
+          content:
+            application/json:
+              schema:
+                $ref: '../components/common.yaml#/components/schemas/ErrorResponse'
+components:
+  schemas:
+    Option:
+      type: object
+      required: [id]
+      properties:
+        id:
+          $ref: '../components/common.yaml#/components/schemas/Id'
+        label:
+          type: string
+          nullable: true
+    NamedReference:
+      type: object
+      nullable: true
+      properties:
+        id:
+          $ref: '../components/common.yaml#/components/schemas/Id'
+        name:
+          type: string
+          nullable: true
+    ProductReference:
+      type: object
+      nullable: true
+      properties:
+        id:
+          $ref: '../components/common.yaml#/components/schemas/Id'
+        productCode:
+          type: string
+          nullable: true
+        name:
+          type: string
+          nullable: true
+    InventoryItemReference:
+      type: object
+      nullable: true
+      properties:
+        id:
+          $ref: '../components/common.yaml#/components/schemas/Id'
+        lotNumber:
+          type: string
+          nullable: true
+        expirationDate:
+          type: string
+          nullable: true
+    BinLocationEntry:
+      type: object
+      properties:
+        binLocation:
+          $ref: '#/components/schemas/NamedReference'
+        inventoryItem:
+          $ref: '#/components/schemas/InventoryItemReference'
+        quantity:
+          type: number
+          nullable: true
+    ShipmentItemSummary:
+      type: object
+      required: [id]
+      properties:
+        id:
+          $ref: '../components/common.yaml#/components/schemas/Id'
+        container:
+          $ref: '#/components/schemas/NamedReference'
+        product:
+          $ref: '#/components/schemas/ProductReference'
+        lotNumber:
+          type: string
+          nullable: true
+        expirationDate:
+          type: string
+          nullable: true
+        quantity:
+          type: integer
+          nullable: true
+        dateCreated:
+          type: string
+          nullable: true
+        lastUpdated:
+          type: string
+          nullable: true
+      additionalProperties: true
+    ShipmentItemDetail:
+      allOf:
+        - $ref: '#/components/schemas/ShipmentItemSummary'
+        - type: object
+          properties:
+            version:
+              type: integer
+              nullable: true
+            recipient:
+              $ref: '#/components/schemas/NamedReference'
+            inventoryItem:
+              $ref: '#/components/schemas/InventoryItemReference'
+            donor:
+              $ref: '#/components/schemas/NamedReference'
+            binLocation:
+              $ref: '#/components/schemas/NamedReference'
+            shipment:
+              $ref: '#/components/schemas/NamedReference'
+            orderItems:
+              type: array
+              items:
+                $ref: '#/components/schemas/NamedReference'
+            unitOfMeasure:
+              type: string
+              nullable: true
+    ShipmentItemRequest:
+      type: object
+      description: >
+        Association fields accept either {"id": "..."} objects or bare id
+        strings; omitted keys are left unchanged, explicit nulls clear the
+        field.
+      properties:
+        container:
+          description: Either an object with an "id" key or a bare id string.
+        product:
+          description: Either an object with an "id" key or a bare id string.
+        lotNumber:
+          type: string
+          nullable: true
+        expirationDate:
+          type: string
+          nullable: true
+          description: yyyy-MM-dd
+        quantity:
+          oneOf:
+            - type: integer
+              nullable: true
+            - type: string
+              nullable: true
+        recipient:
+          description: Either an object with an "id" key or a bare id string.
+        inventoryItem:
+          description: Either an object with an "id" key or a bare id string.
+        donor:
+          description: Either an object with an "id" key or a bare id string.
+        shipment:
+          description: Either an object with an "id" key or a bare id string.
+  securitySchemes:
+    cookieAuth:
+      $ref: '../components/common.yaml#/components/securitySchemes/cookieAuth'

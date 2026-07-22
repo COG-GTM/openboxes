@@ -1,0 +1,115 @@
+openapi: 3.0.3
+info:
+  title: OpenBoxes - ShipmentWorkflowApiController
+  description: >
+    REST endpoints for the migrated shipmentWorkflow/create screen handled by
+    org.pih.warehouse.api.ShipmentWorkflowApiController, routed via
+    "/api/shipmentWorkflows". Added in Phase 2 (Batch 23).
+  version: 0.1.0
+servers:
+  - url: http://localhost:8080/openboxes
+    description: Local Docker baseline (docs/migration/RUNNING_LOCALLY.md)
+security:
+  - cookieAuth: []
+paths:
+  /api/shipmentWorkflows:
+    get:
+      operationId: listShipmentWorkflows
+      summary: Paginated list of shipment workflows
+      parameters:
+        - $ref: '../components/common.yaml#/components/parameters/max'
+        - $ref: '../components/common.yaml#/components/parameters/offset'
+      responses:
+        '200':
+          description: Paginated shipment workflows ordered by dateCreated.
+          content:
+            application/json:
+              schema:
+                type: object
+                required: [data, totalCount]
+                properties:
+                  data:
+                    type: array
+                    items:
+                      $ref: '#/components/schemas/ShipmentWorkflow'
+                  totalCount:
+                    type: integer
+    post:
+      operationId: createShipmentWorkflow
+      summary: Create a shipment workflow
+      requestBody:
+        required: true
+        content:
+          application/json:
+            schema:
+              $ref: '#/components/schemas/ShipmentWorkflowRequest'
+      responses:
+        '201':
+          description: Created shipment workflow.
+          content:
+            application/json:
+              schema:
+                type: object
+                required: [data]
+                properties:
+                  data:
+                    $ref: '#/components/schemas/ShipmentWorkflow'
+        '400':
+          description: Validation errors (missing name or shipment type).
+          content:
+            application/json:
+              schema:
+                $ref: '../components/common.yaml#/components/schemas/ErrorResponse'
+components:
+  schemas:
+    ShipmentType:
+      type: object
+      nullable: true
+      properties:
+        id:
+          $ref: '../components/common.yaml#/components/schemas/Id'
+        name:
+          type: string
+          nullable: true
+    ShipmentWorkflow:
+      type: object
+      required: [id]
+      properties:
+        id:
+          $ref: '../components/common.yaml#/components/schemas/Id'
+        name:
+          type: string
+          nullable: true
+        shipmentType:
+          $ref: '#/components/schemas/ShipmentType'
+        excludedFields:
+          type: string
+          nullable: true
+        documentTemplate:
+          type: string
+          nullable: true
+        dateCreated:
+          type: string
+          nullable: true
+        lastUpdated:
+          type: string
+          nullable: true
+      additionalProperties: true
+    ShipmentWorkflowRequest:
+      type: object
+      properties:
+        name:
+          type: string
+          nullable: true
+        shipmentType:
+          description: >
+            Either an object with an "id" key or a bare id string.
+        excludedFields:
+          type: string
+          nullable: true
+        documentTemplate:
+          type: string
+          nullable: true
+  securitySchemes:
+    cookieAuth:
+      $ref: '../components/common.yaml#/components/securitySchemes/cookieAuth'
