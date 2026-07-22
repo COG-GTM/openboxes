@@ -1,0 +1,26 @@
+openapi: 3.0.3
+info:
+  title: OpenBoxes - BaseDomainApiController
+  description: >
+    org.pih.warehouse.api.BaseDomainApiController provides list/read/create/
+    update/delete actions that simply forward to GenericApiController. It is
+    not abstract, but no URL in
+    grails-app/controllers/org/pih/warehouse/UrlMappings.groovy routes to it
+    directly - it only serves as the base class for concrete controllers
+    (LocationApiController, PersonApiController, OrganizationApiController,
+    ...) that are reached through the "/api/${resource}s" standard REST
+    mappings. The forwarded behavior itself (response envelopes, status codes,
+    error shapes) is pinned in generic-api.yaml; the per-resource endpoints
+    belong to the subclasses' own specs. There are therefore no paths to
+    declare here.
+  version: 0.1.0
+servers:
+  - url: http://localhost:8080/openboxes
+    description: Local Docker baseline (docs/migration/RUNNING_LOCALLY.md)
+security:
+  - cookieAuth: []
+paths: {}
+components:
+  securitySchemes:
+    cookieAuth:
+      $ref: '../components/common.yaml#/components/securitySchemes/cookieAuth'

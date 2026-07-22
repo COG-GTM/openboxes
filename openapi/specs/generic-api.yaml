@@ -1,0 +1,269 @@
+openapi: 3.0.3
+info:
+  title: OpenBoxes - GenericApiController
+  description: >
+    Generic CRUD over any Grails domain class, handled by
+    org.pih.warehouse.api.GenericApiController via the
+    "/api/generic/${resource}/" mappings (and, through forwards from
+    BaseDomainApiController subclasses, the "/api/${resource}s" standard REST
+    mappings). The {resource} path segment is capitalized and resolved to a
+    domain class (e.g. "tag" -> org.pih.warehouse.core.Tag). Parity quirks
+    pinned here: create() is the only action that returns 201 (single object
+    or array depending on whether the request body is an object or an array);
+    an unknown resource name raises IllegalAccessException and is rendered as
+    a 500 by ErrorsController; POST and PUT on /{id} both invoke update();
+    search() runs a Hibernate criteria query built from "searchAttributes".
+  version: 0.1.0
+servers:
+  - url: http://localhost:8080/openboxes
+    description: Local Docker baseline (docs/migration/RUNNING_LOCALLY.md)
+security:
+  - cookieAuth: []
+paths:
+  /api/generic/{resource}:
+    get:
+      operationId: listObjects
+      summary: List all objects of the domain class
+      description: >
+        Default Grails listing (pagination params like max/offset are passed
+        straight to GORM's list()).
+      parameters:
+        - $ref: '#/components/parameters/resource'
+        - $ref: '../components/common.yaml#/components/parameters/max'
+        - $ref: '../components/common.yaml#/components/parameters/offset'
+      responses:
+        '200':
+          $ref: '#/components/responses/ObjectListOk'
+        '500':
+          $ref: '#/components/responses/UnknownResource'
+    post:
+      operationId: createObjects
+      summary: Create one object (JSON object body) or many (JSON array body)
+      description: >
+        Responds 201 with {"data": <object>} for an object body and
+        {"data": [<object>, ...]} for an array body. If the body carries an
+        "id" of an existing record, that record is updated instead (still
+        201). Domain validation failures render the common 400 shape.
+      parameters:
+        - $ref: '#/components/parameters/resource'
+      requestBody:
+        required: true
+        content:
+          application/json:
+            schema:
+              oneOf:
+                - $ref: '#/components/schemas/DomainObjectProperties'
+                - type: array
+                  items:
+                    $ref: '#/components/schemas/DomainObjectProperties'
+      responses:
+        '201':
+          description: >
+            Created object(s) wrapped in a "data" envelope; object or array
+            mirrors the request body form.
+          content:
+            application/json:
+              schema:
+                type: object
+                required: [data]
+                properties:
+                  data:
+                    oneOf:
+                      - $ref: '#/components/schemas/DomainObject'
+                      - type: array
+                        items:
+                          $ref: '#/components/schemas/DomainObject'
+        '400':
+          $ref: '../components/common.yaml#/components/responses/ValidationError'
+        '500':
+          $ref: '#/components/responses/UnknownResource'
+  /api/generic/{resource}/search:
+    get:
+      operationId: searchObjectsGet
+      summary: Search objects (GET variant)
+      description: >
+        Same handler as the POST variant; the criteria come from the JSON
+        request body ("searchAttributes"), which GET clients rarely send, so
+        this typically behaves like an unfiltered criteria query.
+      parameters:
+        - $ref: '#/components/parameters/resource'
+      responses:
+        '200':
+          $ref: '#/components/responses/ObjectListOk'
+        '500':
+          $ref: '#/components/responses/UnknownResource'
+    post:
+      operationId: searchObjectsPost
+      summary: Search objects by attribute criteria
+      description: >
+        Builds a Hibernate criteria query from searchAttributes (supported
+        operators: eq, like, ilike; unknown operators raise
+        UnsupportedOperationException -> 500).
+      parameters:
+        - $ref: '#/components/parameters/resource'
+      requestBody:
+        required: true
+        content:
+          application/json:
+            schema:
+              type: object
+              properties:
+                searchAttributes:
+                  type: array
+                  items:
+                    type: object
+                    properties:
+                      property:
+                        type: string
+                      operator:
+                        type: string
+                        description: eq (default), like or ilike.
+                        nullable: true
+                      value:
+                        type: string
+              additionalProperties: true
+      responses:
+        '200':
+          $ref: '#/components/responses/ObjectListOk'
+        '500':
+          $ref: '#/components/responses/UnknownResource'
+  /api/generic/{resource}/{id}:
+    get:
+      operationId: readObject
+      summary: Read one object by id
+      parameters:
+        - $ref: '#/components/parameters/resource'
+        - $ref: '#/components/parameters/objectId'
+      responses:
+        '200':
+          $ref: '#/components/responses/ObjectOk'
+        '404':
+          $ref: '../components/common.yaml#/components/responses/NotFound'
+        '500':
+          $ref: '#/components/responses/UnknownResource'
+    post:
+      operationId: updateObjectPost
+      summary: Update an object (POST variant of update())
+      parameters:
+        - $ref: '#/components/parameters/resource'
+        - $ref: '#/components/parameters/objectId'
+      requestBody:
+        $ref: '#/components/requestBodies/DomainObjectBody'
+      responses:
+        '200':
+          $ref: '#/components/responses/ObjectOk'
+        '400':
+          $ref: '../components/common.yaml#/components/responses/ValidationError'
+        '404':
+          $ref: '../components/common.yaml#/components/responses/NotFound'
+        '500':
+          $ref: '#/components/responses/UnknownResource'
+    put:
+      operationId: updateObjectPut
+      summary: Update an object (PUT variant of update())
+      parameters:
+        - $ref: '#/components/parameters/resource'
+        - $ref: '#/components/parameters/objectId'
+      requestBody:
+        $ref: '#/components/requestBodies/DomainObjectBody'
+      responses:
+        '200':
+          $ref: '#/components/responses/ObjectOk'
+        '400':
+          $ref: '../components/common.yaml#/components/responses/ValidationError'
+        '404':
+          $ref: '../components/common.yaml#/components/responses/NotFound'
+        '500':
+          $ref: '#/components/responses/UnknownResource'
+    delete:
+      operationId: deleteObject
+      summary: Delete an object
+      parameters:
+        - $ref: '#/components/parameters/resource'
+        - $ref: '#/components/parameters/objectId'
+      responses:
+        '204':
+          description: Object deleted (empty body).
+        '404':
+          $ref: '../components/common.yaml#/components/responses/NotFound'
+        '500':
+          description: >
+            Deletion blocked (e.g. foreign key constraint) or unknown
+            resource, rendered by ErrorsController.
+          content:
+            application/json:
+              schema:
+                $ref: '../components/common.yaml#/components/schemas/ErrorResponse'
+components:
+  parameters:
+    resource:
+      name: resource
+      in: path
+      required: true
+      description: >
+        Domain class name in lowerCamelCase (capitalized server-side), e.g.
+        "tag", "product", "shipmentType".
+      schema:
+        type: string
+    objectId:
+      name: id
+      in: path
+      required: true
+      schema:
+        $ref: '../components/common.yaml#/components/schemas/Id'
+  requestBodies:
+    DomainObjectBody:
+      required: true
+      content:
+        application/json:
+          schema:
+            $ref: '#/components/schemas/DomainObjectProperties'
+  responses:
+    ObjectOk:
+      description: The object in a "data" envelope (default Grails rendering).
+      content:
+        application/json:
+          schema:
+            type: object
+            required: [data]
+            properties:
+              data:
+                $ref: '#/components/schemas/DomainObject'
+    ObjectListOk:
+      description: List of objects in a "data" envelope.
+      content:
+        application/json:
+          schema:
+            type: object
+            required: [data]
+            properties:
+              data:
+                type: array
+                items:
+                  $ref: '#/components/schemas/DomainObject'
+    UnknownResource:
+      description: >
+        Unknown domain class name (IllegalAccessException, "Unable to locate
+        domain ...") or other unhandled exception, rendered by
+        ErrorsController.handleException.
+      content:
+        application/json:
+          schema:
+            $ref: '../components/common.yaml#/components/schemas/ErrorResponse'
+  schemas:
+    DomainObject:
+      type: object
+      description: >
+        Default Grails JSON rendering of the domain instance; the property
+        set depends entirely on the domain class, so only the envelope is
+        pinned.
+      additionalProperties: true
+    DomainObjectProperties:
+      type: object
+      description: >
+        Properties to bind onto the domain instance (Grails data binding);
+        domain-specific.
+      additionalProperties: true
+  securitySchemes:
+    cookieAuth:
+      $ref: '../components/common.yaml#/components/securitySchemes/cookieAuth'

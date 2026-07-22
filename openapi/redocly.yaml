@@ -16,8 +16,10 @@ rules:
   operation-2xx-response: off
   # The legacy UrlMappings freely mix literal and $id segments under the
   # same prefix (e.g. /api/stocklists/sendMail/$id vs /api/stocklists/$id/export,
-  # /api/stockTransfers/candidates vs /api/stockTransfers/$id); Grails resolves
-  # them by declaration order, so the "ambiguity" is real, pinned behavior.
+  # /api/stockTransfers/candidates vs /api/stockTransfers/$id,
+  # cycle-counts/{cycleCountId}/items vs cycle-counts/items/{id}); Grails
+  # resolves them by declaration order, so the "ambiguity" is real, pinned
+  # behavior.
   no-ambiguous-paths: off
   # The single documented server IS localhost - the Docker parity baseline
   # from docs/migration/RUNNING_LOCALLY.md.

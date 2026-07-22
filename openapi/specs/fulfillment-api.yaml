@@ -1,0 +1,269 @@
+openapi: 3.0.3
+info:
+  title: OpenBoxes - FulfillmentApiController
+  description: >
+    Outbound "import packing list" fulfillment endpoints handled by
+    org.pih.warehouse.api.FulfillmentApiController, routed via
+    "/api/fulfillments" (POST -> save) and "/api/fulfillments/validate"
+    (POST -> validate). Both actions bind the body onto
+    ImportPackingListCommand. validate() always renders the
+    {errors, data} table shape - 200 when the command is valid, 400 when not.
+    save() renders the same {errors, data} shape with 400 for command-level
+    validation failures, but deeper failures while creating the requisition/
+    shipment/transaction surface as the common ErrorsController 400/500
+    shapes instead; on success it renders {"data": <StockMovement>} and, as a
+    side effect, issues the shipment and posts an outbound transaction.
+  version: 0.1.0
+servers:
+  - url: http://localhost:8080/openboxes
+    description: Local Docker baseline (docs/migration/RUNNING_LOCALLY.md)
+security:
+  - cookieAuth: []
+paths:
+  /api/fulfillments/validate:
+    post:
+      operationId: validateFulfillment
+      summary: Validate an import packing list without saving
+      requestBody:
+        $ref: '#/components/requestBodies/ImportPackingListBody'
+      responses:
+        '200':
+          description: Command is valid; errors maps are empty.
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/PackingListValidationResult'
+        '400':
+          description: Command has validation errors.
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/PackingListValidationResult'
+  /api/fulfillments:
+    post:
+      operationId: saveFulfillment
+      summary: Save an import packing list (creates and issues a stock movement)
+      description: >
+        Creates a requisition, shipment, picklist and outbound transaction
+        from the packing list, then renders the resulting stock movement.
+      requestBody:
+        $ref: '#/components/requestBodies/ImportPackingListBody'
+      responses:
+        '200':
+          description: Stock movement created and issued.
+          content:
+            application/json:
+              schema:
+                type: object
+                required: [data]
+                properties:
+                  data:
+                    $ref: '#/components/schemas/StockMovement'
+        '400':
+          description: >
+            Command validation failure ({errors, data} shape) or a deeper
+            domain validation failure (common error shape, e.g. a
+            transactionDate in the future).
+          content:
+            application/json:
+              schema:
+                oneOf:
+                  - $ref: '#/components/schemas/PackingListValidationResult'
+                  - $ref: '../components/common.yaml#/components/schemas/ErrorResponse'
+components:
+  requestBodies:
+    ImportPackingListBody:
+      required: true
+      content:
+        application/json:
+          schema:
+            $ref: '#/components/schemas/ImportPackingListCommand'
+  schemas:
+    ImportPackingListCommand:
+      type: object
+      properties:
+        fulfillmentDetails:
+          type: object
+          description: Header details bound onto FulfillmentRequest.
+          properties:
+            origin:
+              $ref: '../components/common.yaml#/components/schemas/Id'
+            destination:
+              $ref: '../components/common.yaml#/components/schemas/Id'
+            requestedBy:
+              $ref: '../components/common.yaml#/components/schemas/Id'
+            dateRequested:
+              type: string
+              description: MM/dd/yyyy
+            description:
+              type: string
+              nullable: true
+          additionalProperties: true
+        sendingOptions:
+          type: object
+          description: Shipping details bound onto ShippingRequest.
+          properties:
+            expectedShippingDate:
+              type: string
+              description: >
+                "MM/dd/yyyy HH:mm XXX" (Constants.DELIVERY_DATE_FORMAT); must
+                not be in the future at transaction time or save() fails with
+                the common 400 shape.
+            expectedDeliveryDate:
+              type: string
+              description: MM/dd/yyyy HH:mm XXX
+            shipmentType:
+              $ref: '../components/common.yaml#/components/schemas/Id'
+            trackingNumber:
+              type: string
+              nullable: true
+          additionalProperties: true
+        packingList:
+          type: array
+          items:
+            type: object
+            description: Row bound onto ImportPackingListItem.
+            properties:
+              rowId:
+                type: string
+              origin:
+                $ref: '../components/common.yaml#/components/schemas/Id'
+              product:
+                type: string
+                description: Product code.
+              lotNumber:
+                type: string
+                nullable: true
+              binLocation:
+                type: string
+                description: Bin location name.
+                nullable: true
+              quantityPicked:
+                type: integer
+              palletName:
+                type: string
+                nullable: true
+              boxName:
+                type: string
+                nullable: true
+              recipient:
+                type: string
+                nullable: true
+            additionalProperties: true
+      additionalProperties: true
+    PackingListValidationResult:
+      type: object
+      required: [errors, data]
+      properties:
+        errors:
+          type: object
+          required: [fulfillmentDetails, sendingOptions, packingList]
+          properties:
+            fulfillmentDetails:
+              $ref: '#/components/schemas/FieldErrorsMap'
+            sendingOptions:
+              $ref: '#/components/schemas/FieldErrorsMap'
+            packingList:
+              type: object
+              description: >
+                Keyed by packing list rowId; each value is a field->messages
+                map for that row.
+              additionalProperties:
+                $ref: '#/components/schemas/FieldErrorsMap'
+          additionalProperties: false
+        data:
+          type: array
+          description: Table rendering of the bound packing list rows.
+          items:
+            $ref: '#/components/schemas/PackingListTableRow'
+      additionalProperties: false
+    FieldErrorsMap:
+      type: object
+      description: Map of field name to localized error messages.
+      additionalProperties:
+        type: array
+        items:
+          type: string
+    PackingListTableRow:
+      type: object
+      description: ImportPackingListItem.toTableJson() rendering.
+      required: [rowId, product, origin]
+      properties:
+        rowId:
+          type: string
+        product:
+          type: object
+          properties:
+            id:
+              type: string
+              nullable: true
+            name:
+              type: string
+              nullable: true
+            productCode:
+              type: string
+              nullable: true
+            displayNames:
+              type: object
+              nullable: true
+              additionalProperties: true
+            color:
+              type: string
+              nullable: true
+            handlingIcons:
+              type: array
+              nullable: true
+              items:
+                type: object
+                additionalProperties: true
+          additionalProperties: false
+        binLocation:
+          type: string
+          nullable: true
+        palletName:
+          type: string
+          nullable: true
+        boxName:
+          type: string
+          nullable: true
+        lotNumber:
+          type: string
+          nullable: true
+        quantityPicked:
+          type: integer
+          nullable: true
+        recipient:
+          type: string
+          nullable: true
+        expirationDate:
+          type: string
+          nullable: true
+        origin:
+          type: object
+          properties:
+            id:
+              type: string
+              nullable: true
+          additionalProperties: false
+      additionalProperties: false
+    StockMovement:
+      type: object
+      description: >
+        StockMovement JSON rendering (large; includes id, name, identifier,
+        statusCode, displayStatus, origin, destination, lineItems, shipment
+        details, ...); pinned loosely.
+      required: [id, statusCode, identifier]
+      properties:
+        id:
+          type: string
+        name:
+          type: string
+          nullable: true
+        identifier:
+          type: string
+        statusCode:
+          type: string
+      additionalProperties: true
+  securitySchemes:
+    cookieAuth:
+      $ref: '../components/common.yaml#/components/securitySchemes/cookieAuth'

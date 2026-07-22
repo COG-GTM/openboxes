@@ -1,0 +1,479 @@
+openapi: 3.0.3
+info:
+  title: OpenBoxes - DashboardApiController
+  description: >
+    Dashboard indicator endpoints handled by
+    org.pih.warehouse.api.DashboardApiController, routed via the explicit
+    "/api/dashboard/..." mappings. Every action renders 200 with a bare JSON
+    body (no "data"/"status" envelope except where the payload itself has a
+    "data" key). Number widgets render the NumberData shape, graph widgets the
+    GraphData shape (whose inner "data" varies per chart type). Most
+    endpoints take a locationId query param; when it is missing/unknown the
+    location resolves to null and the indicator services usually still
+    respond 200 with empty/zero data (occasionally 500 for the few that
+    dereference the location - not pinned here).
+  version: 0.1.0
+servers:
+  - url: http://localhost:8080/openboxes
+    description: Local Docker baseline (docs/migration/RUNNING_LOCALLY.md)
+security:
+  - cookieAuth: []
+paths:
+  /api/dashboard/{id}/config:
+    get:
+      operationId: getConfig
+      summary: Get the current user's dashboard configuration
+      description: >
+        Merges the static dashboard config (grails-app/conf/dashboard.groovy)
+        with the user's saved widget arrangement. {id} is the dashboard page
+        id (e.g. "mainDashboard").
+      parameters:
+        - $ref: '#/components/parameters/dashboardId'
+      responses:
+        '200':
+          $ref: '#/components/responses/DashboardConfigOk'
+  /api/dashboard/config:
+    post:
+      operationId: updateConfig
+      summary: Save the current user's dashboard configuration
+      description: >
+        Persists the posted config for the session user and echoes the
+        updated config back.
+      requestBody:
+        required: true
+        content:
+          application/json:
+            schema:
+              $ref: '#/components/schemas/DashboardConfig'
+      responses:
+        '200':
+          $ref: '#/components/responses/DashboardConfigOk'
+  /api/dashboard/{id}/subdashboardKeys:
+    get:
+      operationId: getSubdashboardKeys
+      summary: List the subdashboard keys of a dashboard
+      description: >
+        Renders the key set of the configured dashboard as a bare JSON array
+        of strings. The controller falls back to the configured
+        mainDashboardId only when {id} is empty; an unknown id raises an NPE
+        (500, not pinned).
+      parameters:
+        - $ref: '#/components/parameters/dashboardId'
+      responses:
+        '200':
+          description: Subdashboard keys.
+          content:
+            application/json:
+              schema:
+                type: array
+                items:
+                  type: string
+  /api/dashboard/inventoryByLotAndBin:
+    get:
+      operationId: getInventoryByLotAndBin
+      summary: Number of inventory items in stock by lot and bin
+      parameters:
+        - $ref: '#/components/parameters/locationId'
+      responses:
+        '200':
+          $ref: '#/components/responses/NumberDataOk'
+  /api/dashboard/inProgressShipments:
+    get:
+      operationId: getInProgressShipments
+      summary: Number of in-progress outbound shipments for the current user
+      parameters:
+        - $ref: '#/components/parameters/locationId'
+        - $ref: '#/components/parameters/userId'
+      responses:
+        '200':
+          $ref: '#/components/responses/NumberDataOk'
+  /api/dashboard/inProgressPutaways:
+    get:
+      operationId: getInProgressPutaways
+      summary: Number of in-progress putaways for the current user
+      parameters:
+        - $ref: '#/components/parameters/locationId'
+        - $ref: '#/components/parameters/userId'
+      responses:
+        '200':
+          $ref: '#/components/responses/NumberDataOk'
+  /api/dashboard/receivingBin:
+    get:
+      operationId: getReceivingBin
+      summary: Number of items in receiving bins
+      parameters:
+        - $ref: '#/components/parameters/locationId'
+      responses:
+        '200':
+          $ref: '#/components/responses/NumberDataOk'
+  /api/dashboard/itemsInventoried:
+    get:
+      operationId: getItemsInventoried
+      summary: Number of products inventoried
+      parameters:
+        - $ref: '#/components/parameters/locationId'
+      responses:
+        '200':
+          $ref: '#/components/responses/NumberDataOk'
+  /api/dashboard/defaultBin:
+    get:
+      operationId: getDefaultBin
+      summary: Number of products in the default bin
+      parameters:
+        - $ref: '#/components/parameters/locationId'
+      responses:
+        '200':
+          $ref: '#/components/responses/NumberDataOk'
+  /api/dashboard/expiredProductsInStock:
+    get:
+      operationId: getExpiredProductsInStock
+      summary: Number of expired products in stock
+      parameters:
+        - $ref: '#/components/parameters/locationId'
+      responses:
+        '200':
+          $ref: '#/components/responses/NumberDataOk'
+  /api/dashboard/expirationSummary:
+    get:
+      operationId: getExpirationSummary
+      summary: Expiration summary graph (items expiring per period)
+      parameters:
+        - $ref: '#/components/parameters/locationId'
+        - $ref: '#/components/parameters/querySize'
+      responses:
+        '200':
+          $ref: '#/components/responses/GraphDataOk'
+  /api/dashboard/fillRate:
+    get:
+      operationId: getFillRate
+      summary: Fill-rate graph (requested vs cancelled lines per month)
+      parameters:
+        - $ref: '#/components/parameters/locationId'
+        - name: destinationLocation
+          in: query
+          required: false
+          schema:
+            $ref: '../components/common.yaml#/components/schemas/Id'
+        - $ref: '#/components/parameters/querySize'
+      responses:
+        '200':
+          $ref: '#/components/responses/GraphDataOk'
+  /api/dashboard/fillRateSnapshot:
+    get:
+      operationId: getFillRateSnapshot
+      summary: Fill-rate snapshot graph (12-month average line)
+      parameters:
+        - $ref: '#/components/parameters/locationId'
+      responses:
+        '200':
+          $ref: '#/components/responses/GraphDataOk'
+  /api/dashboard/fillRateDestinations:
+    get:
+      operationId: getFillRateDestinations
+      summary: Destinations available for the fill-rate filter
+      description: >
+        Returns {"data": [...]} where the first entry is the synthetic "all
+        locations" option (id "" and a {code, message} name object) followed
+        by the destination locations.
+      parameters:
+        - $ref: '#/components/parameters/locationId'
+      responses:
+        '200':
+          description: Destination options.
+          content:
+            application/json:
+              schema:
+                type: object
+                required: [data]
+                properties:
+                  data:
+                    type: array
+                    items:
+                      type: object
+                      description: >
+                        Either the synthetic all-locations option or a
+                        destination location reference.
+                      additionalProperties: true
+  /api/dashboard/inventorySummary:
+    get:
+      operationId: getInventorySummary
+      summary: Inventory summary graph (stock status buckets)
+      parameters:
+        - $ref: '#/components/parameters/locationId'
+      responses:
+        '200':
+          $ref: '#/components/responses/GraphDataOk'
+  /api/dashboard/requisitionsByYear:
+    get:
+      operationId: getRequisitionsByYear
+      summary: Requisition count by fiscal year graph
+      parameters:
+        - $ref: '#/components/parameters/locationId'
+        - $ref: '#/components/parameters/querySize'
+      responses:
+        '200':
+          $ref: '#/components/responses/GraphDataOk'
+  /api/dashboard/sentStockMovements:
+    get:
+      operationId: getSentStockMovements
+      summary: Sent stock movements per month graph
+      parameters:
+        - $ref: '#/components/parameters/locationId'
+        - $ref: '#/components/parameters/querySize'
+      responses:
+        '200':
+          $ref: '#/components/responses/GraphDataOk'
+  /api/dashboard/receivedStockMovements:
+    get:
+      operationId: getReceivedStockMovements
+      summary: Received stock movements per month graph
+      parameters:
+        - $ref: '#/components/parameters/locationId'
+        - $ref: '#/components/parameters/querySize'
+      responses:
+        '200':
+          $ref: '#/components/responses/GraphDataOk'
+  /api/dashboard/outgoingStock:
+    get:
+      operationId: getOutgoingStock
+      summary: Outgoing stock numbers-indicator (first/second/third buckets)
+      parameters:
+        - $ref: '#/components/parameters/locationId'
+      responses:
+        '200':
+          $ref: '#/components/responses/GraphDataOk'
+  /api/dashboard/incomingStock:
+    get:
+      operationId: getIncomingStock
+      summary: Incoming stock numbers-indicator (first/second/third buckets)
+      parameters:
+        - $ref: '#/components/parameters/locationId'
+      responses:
+        '200':
+          $ref: '#/components/responses/GraphDataOk'
+  /api/dashboard/discrepancy:
+    get:
+      operationId: getDiscrepancy
+      summary: Shipment discrepancy table
+      parameters:
+        - $ref: '#/components/parameters/locationId'
+        - $ref: '#/components/parameters/querySize'
+      responses:
+        '200':
+          $ref: '#/components/responses/GraphDataOk'
+  /api/dashboard/delayedShipments:
+    get:
+      operationId: getDelayedShipments
+      summary: Delayed shipments indicator (numbers + table)
+      parameters:
+        - $ref: '#/components/parameters/locationId'
+      responses:
+        '200':
+          $ref: '#/components/responses/GraphDataOk'
+  /api/dashboard/productWithNegativeInventory:
+    get:
+      operationId: getProductWithNegativeInventory
+      summary: Number of products with negative inventory
+      parameters:
+        - $ref: '#/components/parameters/locationId'
+      responses:
+        '200':
+          $ref: '#/components/responses/NumberDataOk'
+  /api/dashboard/lossCausedByExpiry:
+    get:
+      operationId: getLossCausedByExpiry
+      summary: Inventory loss caused by expiry graph
+      parameters:
+        - $ref: '#/components/parameters/locationId'
+        - $ref: '#/components/parameters/querySize'
+      responses:
+        '200':
+          $ref: '#/components/responses/GraphDataOk'
+  /api/dashboard/productsInventoried:
+    get:
+      operationId: getProductsInventoried
+      summary: Percentage of products inventoried per period
+      parameters:
+        - $ref: '#/components/parameters/locationId'
+      responses:
+        '200':
+          $ref: '#/components/responses/GraphDataOk'
+  /api/dashboard/percentageAdHoc:
+    get:
+      operationId: getPercentageAdHoc
+      summary: Ad-hoc vs stocklist requests doughnut
+      description: Uses the session warehouse, not the locationId param.
+      responses:
+        '200':
+          $ref: '#/components/responses/GraphDataOk'
+  /api/dashboard/stockOutLastMonth:
+    get:
+      operationId: getStockOutLastMonth
+      summary: Stock-outs last month doughnut
+      description: Uses the session warehouse, not the locationId param.
+      responses:
+        '200':
+          $ref: '#/components/responses/GraphDataOk'
+  /api/dashboard/openStockRequests:
+    get:
+      operationId: getOpenStockRequests
+      summary: Number of open stock requests
+      parameters:
+        - $ref: '#/components/parameters/locationId'
+      responses:
+        '200':
+          $ref: '#/components/responses/NumberDataOk'
+  /api/dashboard/requestsPendingApproval:
+    get:
+      operationId: getRequestsPendingApproval
+      summary: Number of requests pending approval for the current user
+      parameters:
+        - $ref: '#/components/parameters/locationId'
+      responses:
+        '200':
+          $ref: '#/components/responses/NumberDataOk'
+  /api/dashboard/inventoryValue:
+    get:
+      operationId: getInventoryValue
+      summary: Total inventory value
+      parameters:
+        - $ref: '#/components/parameters/locationId'
+      responses:
+        '200':
+          $ref: '#/components/responses/NumberDataOk'
+  /api/dashboard/openPurchaseOrdersCount:
+    get:
+      operationId: getOpenPurchaseOrdersCount
+      summary: Number of open purchase orders
+      parameters:
+        - $ref: '#/components/parameters/locationId'
+      responses:
+        '200':
+          $ref: '#/components/responses/NumberDataOk'
+  /api/dashboard/backdatedOutboundShipments:
+    get:
+      operationId: getBackdatedOutboundShipments
+      summary: Backdated outbound shipments graph
+      parameters:
+        - $ref: '#/components/parameters/locationId'
+        - $ref: '#/components/parameters/querySizeMonths'
+      responses:
+        '200':
+          $ref: '#/components/responses/GraphDataOk'
+  /api/dashboard/backdatedInboundShipments:
+    get:
+      operationId: getBackdatedInboundShipments
+      summary: Backdated inbound shipments graph
+      parameters:
+        - $ref: '#/components/parameters/locationId'
+        - $ref: '#/components/parameters/querySizeMonths'
+      responses:
+        '200':
+          $ref: '#/components/responses/GraphDataOk'
+  /api/dashboard/itemsWithBackdatedShipments:
+    get:
+      operationId: getItemsWithBackdatedShipments
+      summary: Items with backdated shipments indicator (numbers + table)
+      parameters:
+        - $ref: '#/components/parameters/locationId'
+      responses:
+        '200':
+          $ref: '#/components/responses/GraphDataOk'
+components:
+  parameters:
+    dashboardId:
+      name: id
+      in: path
+      required: true
+      description: Dashboard page id, e.g. "mainDashboard".
+      schema:
+        type: string
+    locationId:
+      name: locationId
+      in: query
+      required: false
+      schema:
+        $ref: '../components/common.yaml#/components/schemas/Id'
+    userId:
+      name: userId
+      in: query
+      required: false
+      schema:
+        $ref: '../components/common.yaml#/components/schemas/Id'
+    querySize:
+      name: querySize
+      in: query
+      required: false
+      description: Number of periods (months/years) to include.
+      schema:
+        type: integer
+    querySizeMonths:
+      name: querySize
+      in: query
+      required: false
+      description: >
+        Months limit; capped at the configured
+        openboxes.dashboard.backdatedShipments.monthsLimit.
+      schema:
+        type: integer
+  responses:
+    NumberDataOk:
+      description: >
+        Bare org.pih.warehouse.dashboard.NumberData rendering (no envelope).
+      content:
+        application/json:
+          schema:
+            $ref: '#/components/schemas/NumberData'
+    GraphDataOk:
+      description: >
+        Bare org.pih.warehouse.dashboard.GraphData rendering; "data" carries
+        the chart payload (labels/datasets, numbers-indicator buckets or a
+        table), which varies per widget.
+      content:
+        application/json:
+          schema:
+            $ref: '#/components/schemas/GraphData'
+    DashboardConfigOk:
+      description: Dashboard configuration for the current user.
+      content:
+        application/json:
+          schema:
+            $ref: '#/components/schemas/DashboardConfig'
+  schemas:
+    NumberData:
+      type: object
+      required: [number]
+      properties:
+        number:
+          type: number
+        link:
+          type: string
+          nullable: true
+        tooltipData:
+          type: string
+          nullable: true
+      additionalProperties: false
+    GraphData:
+      type: object
+      required: [data]
+      properties:
+        data:
+          description: >
+            Chart payload (any JSON value); commonly {labels, datasets,
+            colorNumber} for chart.js widgets, {first, second, third, fourth}
+            for numbers-indicators, {body, name, number, value} for tables or
+            {numbersIndicator, tableData} combinations.
+        link:
+          type: string
+          nullable: true
+      additionalProperties: false
+    DashboardConfig:
+      type: object
+      description: >
+        Merged dashboard configuration (dashboard/dashboardWidgets/pageConfig
+        sections and per-subdashboard widget arrangements); shape driven by
+        grails-app/conf/dashboard.groovy, so only pinned loosely.
+      additionalProperties: true
+  securitySchemes:
+    cookieAuth:
+      $ref: '../components/common.yaml#/components/securitySchemes/cookieAuth'

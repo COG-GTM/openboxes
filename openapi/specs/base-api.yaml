@@ -1,0 +1,23 @@
+openapi: 3.0.3
+info:
+  title: OpenBoxes - BaseApiController
+  description: >
+    org.pih.warehouse.api.BaseApiController is the abstract base class for the
+    API controller components (e.g. CycleCountApiController extends it). It
+    declares no actions of its own and no URL in
+    grails-app/controllers/org/pih/warehouse/UrlMappings.groovy routes to it,
+    so there are no endpoints to pin. The renderResponse()/
+    renderNoContentResponse() helpers it inherits from BaseController (the
+    '{"data": ...}' envelope and empty 204 responses) are documented on the
+    subclasses' specs where they are actually observable.
+  version: 0.1.0
+servers:
+  - url: http://localhost:8080/openboxes
+    description: Local Docker baseline (docs/migration/RUNNING_LOCALLY.md)
+security:
+  - cookieAuth: []
+paths: {}
+components:
+  securitySchemes:
+    cookieAuth:
+      $ref: '../components/common.yaml#/components/securitySchemes/cookieAuth'

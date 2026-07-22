@@ -1,0 +1,1171 @@
+openapi: 3.0.3
+info:
+  title: OpenBoxes - CycleCountApiController
+  description: >
+    Cycle count workflow endpoints handled by
+    org.pih.warehouse.api.CycleCountApiController, routed via the
+    "/api/facilities/${facilityId}/cycle-counts/..." and
+    "/api/reports/cycle-count-{details,summary}" mappings. JSON responses go
+    through BaseController.renderResponse(), i.e. a {"data": ...} envelope
+    (PagedResultList results also carry "totalCount", and the report actions
+    add "count", "max" and "offset"). Command validation failures are thrown
+    as ValidationException and rendered by ErrorsController as the common
+    400 shape. Note: the controller also declares
+    getInventoryTransactionsSummary(), but the
+    "/api/reports/inventory-transactions-summary" mapping routes to
+    InventoryTransactionSummaryApiController, so that action is unreachable
+    and not specified here.
+  version: 0.1.0
+servers:
+  - url: http://localhost:8080/openboxes
+    description: Local Docker baseline (docs/migration/RUNNING_LOCALLY.md)
+security:
+  - cookieAuth: []
+paths:
+  /api/facilities/{facilityId}/cycle-counts/candidates:
+    get:
+      operationId: getCandidates
+      summary: List cycle count candidates (products to count) for a facility
+      description: >
+        Filterable/paginated candidate listing. With format=csv the payload is
+        rendered as a CSV attachment instead of the JSON envelope.
+      parameters:
+        - $ref: '#/components/parameters/facilityId'
+        - $ref: '../components/common.yaml#/components/parameters/max'
+        - $ref: '../components/common.yaml#/components/parameters/offset'
+        - name: format
+          in: query
+          required: false
+          description: Set to "csv" for the CSV export.
+          schema:
+            type: string
+        - name: searchTerm
+          in: query
+          required: false
+          schema:
+            type: string
+        - name: sortBy
+          in: query
+          required: false
+          description: >
+            One of the other CycleCountCandidateFilterCommand filters
+            (categories, tags, catalogs, abcClasses, dateLastCount, ...) may
+            also be passed; only the common ones are declared here.
+          schema:
+            type: string
+      responses:
+        '200':
+          description: >
+            Candidates page ({"data": [...], "totalCount": n}) or CSV
+            attachment when format=csv.
+          content:
+            application/json:
+              schema:
+                type: object
+                required: [data, totalCount]
+                properties:
+                  data:
+                    type: array
+                    items:
+                      $ref: '#/components/schemas/CycleCountCandidate'
+                  totalCount:
+                    type: integer
+            text/csv:
+              schema:
+                type: string
+        '400':
+          $ref: '../components/common.yaml#/components/responses/ValidationError'
+  /api/facilities/{facilityId}/cycle-counts/requests/pending:
+    get:
+      operationId: getPendingCycleCountRequests
+      summary: List pending cycle count requests for a facility
+      parameters:
+        - $ref: '#/components/parameters/facilityId'
+        - $ref: '../components/common.yaml#/components/parameters/max'
+        - $ref: '../components/common.yaml#/components/parameters/offset'
+      responses:
+        '200':
+          description: Pending requests page.
+          content:
+            application/json:
+              schema:
+                type: object
+                required: [data, totalCount]
+                properties:
+                  data:
+                    type: array
+                    items:
+                      $ref: '#/components/schemas/PendingCycleCountRequest'
+                  totalCount:
+                    type: integer
+        '400':
+          $ref: '../components/common.yaml#/components/responses/ValidationError'
+  /api/facilities/{facilityId}/cycle-counts/requests/batch:
+    post:
+      operationId: createRequests
+      summary: Create cycle count requests in batch
+      parameters:
+        - $ref: '#/components/parameters/facilityId'
+      requestBody:
+        required: true
+        content:
+          application/json:
+            schema:
+              type: object
+              required: [requests]
+              properties:
+                requests:
+                  type: array
+                  items:
+                    type: object
+                    properties:
+                      product:
+                        $ref: '../components/common.yaml#/components/schemas/Id'
+                      blindCount:
+                        type: boolean
+                    additionalProperties: true
+              additionalProperties: true
+      responses:
+        '200':
+          $ref: '#/components/responses/CycleCountRequestListOk'
+        '400':
+          $ref: '../components/common.yaml#/components/responses/ValidationError'
+    patch:
+      operationId: updateRequests
+      summary: Update cycle count requests in batch (assignments/deadlines)
+      parameters:
+        - $ref: '#/components/parameters/facilityId'
+      requestBody:
+        required: true
+        content:
+          application/json:
+            schema:
+              type: object
+              required: [commands]
+              properties:
+                commands:
+                  type: array
+                  items:
+                    type: object
+                    properties:
+                      cycleCountRequest:
+                        $ref: '../components/common.yaml#/components/schemas/Id'
+                      assignments:
+                        type: object
+                        additionalProperties: true
+                    additionalProperties: true
+              additionalProperties: true
+      responses:
+        '200':
+          $ref: '#/components/responses/CycleCountRequestListOk'
+        '400':
+          $ref: '../components/common.yaml#/components/responses/ValidationError'
+    delete:
+      operationId: deleteRequests
+      summary: Delete cycle count requests by id
+      parameters:
+        - $ref: '#/components/parameters/facilityId'
+        - name: id
+          in: query
+          required: true
+          description: Repeatable request id parameter.
+          schema:
+            type: array
+            items:
+              $ref: '../components/common.yaml#/components/schemas/Id'
+          style: form
+          explode: true
+      responses:
+        '204':
+          description: Requests deleted (empty body).
+  /api/facilities/{facilityId}/cycle-counts/start/batch:
+    post:
+      operationId: startCycleCount
+      summary: Start cycle counts from requests in batch
+      description: >
+        JSON by default; format=xls streams a count form spreadsheet and
+        format=pdf a printable count form (Accept header/format param via
+        withFormat).
+      parameters:
+        - $ref: '#/components/parameters/facilityId'
+        - $ref: '#/components/parameters/format'
+      requestBody:
+        required: true
+        content:
+          application/json:
+            schema:
+              type: object
+              required: [requests]
+              properties:
+                requests:
+                  type: array
+                  items:
+                    type: object
+                    properties:
+                      cycleCountRequest:
+                        $ref: '../components/common.yaml#/components/schemas/Id'
+                    additionalProperties: true
+              additionalProperties: true
+      responses:
+        '200':
+          $ref: '#/components/responses/CycleCountListOk'
+        '400':
+          $ref: '../components/common.yaml#/components/responses/ValidationError'
+  /api/facilities/{facilityId}/cycle-counts/recount/start/batch:
+    post:
+      operationId: startRecount
+      summary: Start recounts for cycle counts with discrepancies
+      description: >
+        Only valid for cycle counts in a recountable status (COUNTED, ...);
+        otherwise the batch command validation fails with 400. Supports
+        format=xls/pdf like start/batch.
+      parameters:
+        - $ref: '#/components/parameters/facilityId'
+        - $ref: '#/components/parameters/format'
+      requestBody:
+        required: true
+        content:
+          application/json:
+            schema:
+              type: object
+              required: [requests]
+              properties:
+                requests:
+                  type: array
+                  items:
+                    type: object
+                    properties:
+                      cycleCountRequest:
+                        $ref: '../components/common.yaml#/components/schemas/Id'
+                      countIndex:
+                        type: integer
+                    additionalProperties: true
+              additionalProperties: true
+      responses:
+        '200':
+          $ref: '#/components/responses/CycleCountListOk'
+        '400':
+          $ref: '../components/common.yaml#/components/responses/ValidationError'
+  /api/facilities/{facilityId}/cycle-counts:
+    get:
+      operationId: listCycleCounts
+      summary: List cycle counts (optionally by id)
+      description: >
+        Returns {"data": [...]} (no totalCount). The repeatable id param
+        filters to specific cycle counts. format=xls/pdf renders count or
+        recount forms depending on the counts' statuses.
+      parameters:
+        - $ref: '#/components/parameters/facilityId'
+        - name: id
+          in: query
+          required: false
+          description: Repeatable cycle count id parameter.
+          schema:
+            type: array
+            items:
+              $ref: '../components/common.yaml#/components/schemas/Id'
+          style: form
+          explode: true
+        - name: sortBy
+          in: query
+          required: false
+          schema:
+            type: string
+        - $ref: '#/components/parameters/format'
+      responses:
+        '200':
+          $ref: '#/components/responses/CycleCountListOk'
+  /api/facilities/{facilityId}/cycle-counts/{cycleCountId}/count:
+    post:
+      operationId: submitCount
+      summary: Submit the initial count of a cycle count
+      description: >
+        On success the count is approved (or moved to a recount when
+        requireRecountOnDiscrepancy is true and variances exist) and
+        inventory transactions are recorded.
+      parameters:
+        - $ref: '#/components/parameters/facilityId'
+        - $ref: '#/components/parameters/cycleCountId'
+      requestBody:
+        required: true
+        content:
+          application/json:
+            schema:
+              type: object
+              properties:
+                refreshQuantityOnHand:
+                  type: boolean
+                failOnOutdatedQuantity:
+                  type: boolean
+                requireRecountOnDiscrepancy:
+                  type: boolean
+              additionalProperties: true
+      responses:
+        '200':
+          $ref: '#/components/responses/CycleCountOk'
+        '400':
+          $ref: '../components/common.yaml#/components/responses/ValidationError'
+  /api/facilities/{facilityId}/cycle-counts/{cycleCountId}/recount:
+    post:
+      operationId: submitRecount
+      summary: Submit the recount of a cycle count
+      description: >
+        400 (common shape) if the cycle count is not in a recount status.
+      parameters:
+        - $ref: '#/components/parameters/facilityId'
+        - $ref: '#/components/parameters/cycleCountId'
+      requestBody:
+        required: true
+        content:
+          application/json:
+            schema:
+              type: object
+              properties:
+                refreshQuantityOnHand:
+                  type: boolean
+                failOnOutdatedQuantity:
+                  type: boolean
+              additionalProperties: true
+      responses:
+        '200':
+          $ref: '#/components/responses/CycleCountOk'
+        '400':
+          $ref: '../components/common.yaml#/components/responses/ValidationError'
+  /api/facilities/{facilityId}/cycle-counts/items/{cycleCountItemId}:
+    patch:
+      operationId: updateCycleCountItem
+      summary: Update a cycle count item (record a counted quantity)
+      description: >
+        Parity quirk: the command binds "id" from the request body only - the
+        cycleCountItemId path segment is used to look the item up, but a body
+        without "id" fails validation with 400.
+      parameters:
+        - $ref: '#/components/parameters/facilityId'
+        - $ref: '#/components/parameters/cycleCountItemId'
+      requestBody:
+        required: true
+        content:
+          application/json:
+            schema:
+              type: object
+              required: [id]
+              properties:
+                id:
+                  $ref: '../components/common.yaml#/components/schemas/Id'
+                quantityCounted:
+                  type: integer
+                  nullable: true
+                countIndex:
+                  type: integer
+                recount:
+                  type: boolean
+                discrepancyReasonCode:
+                  type: string
+                  nullable: true
+                comment:
+                  type: string
+                  nullable: true
+                assignee:
+                  type: string
+                  nullable: true
+              additionalProperties: true
+      responses:
+        '200':
+          $ref: '#/components/responses/CycleCountItemOk'
+        '400':
+          $ref: '../components/common.yaml#/components/responses/ValidationError'
+    delete:
+      operationId: deleteCycleCountItem
+      summary: Delete a cycle count item
+      parameters:
+        - $ref: '#/components/parameters/facilityId'
+        - $ref: '#/components/parameters/cycleCountItemId'
+      responses:
+        '204':
+          description: Item deleted (empty body).
+  /api/facilities/{facilityId}/cycle-counts/{cycleCountId}/items:
+    post:
+      operationId: createCycleCountItem
+      summary: Add an item (e.g. a new lot) to a cycle count
+      parameters:
+        - $ref: '#/components/parameters/facilityId'
+        - $ref: '#/components/parameters/cycleCountId'
+      requestBody:
+        required: true
+        content:
+          application/json:
+            schema:
+              $ref: '#/components/schemas/CycleCountItemCreate'
+      responses:
+        '200':
+          $ref: '#/components/responses/CycleCountItemOk'
+        '400':
+          $ref: '../components/common.yaml#/components/responses/ValidationError'
+  /api/facilities/{facilityId}/cycle-counts/{cycleCountId}/items/batch:
+    post:
+      operationId: createCycleCountItemBatch
+      summary: Create cycle count items in batch (cycleCountId variant)
+      parameters:
+        - $ref: '#/components/parameters/facilityId'
+        - $ref: '#/components/parameters/cycleCountId'
+      requestBody:
+        $ref: '#/components/requestBodies/ItemsToCreateBody'
+      responses:
+        '200':
+          $ref: '#/components/responses/CycleCountItemListOk'
+        '400':
+          $ref: '../components/common.yaml#/components/responses/ValidationError'
+    patch:
+      operationId: updateCycleCountItemBatch
+      summary: Update cycle count items in batch (cycleCountId variant)
+      parameters:
+        - $ref: '#/components/parameters/facilityId'
+        - $ref: '#/components/parameters/cycleCountId'
+      requestBody:
+        $ref: '#/components/requestBodies/ItemsToUpdateBody'
+      responses:
+        '200':
+          $ref: '#/components/responses/CycleCountItemListOk'
+        '400':
+          $ref: '../components/common.yaml#/components/responses/ValidationError'
+  /api/facilities/{facilityId}/cycle-counts/items/batch:
+    post:
+      operationId: createCycleCountItemBatchNoId
+      summary: Create cycle count items in batch
+      parameters:
+        - $ref: '#/components/parameters/facilityId'
+      requestBody:
+        $ref: '#/components/requestBodies/ItemsToCreateBody'
+      responses:
+        '200':
+          $ref: '#/components/responses/CycleCountItemListOk'
+        '400':
+          $ref: '../components/common.yaml#/components/responses/ValidationError'
+    patch:
+      operationId: updateCycleCountItemBatchNoId
+      summary: Update cycle count items in batch
+      parameters:
+        - $ref: '#/components/parameters/facilityId'
+      requestBody:
+        $ref: '#/components/requestBodies/ItemsToUpdateBody'
+      responses:
+        '200':
+          $ref: '#/components/responses/CycleCountItemListOk'
+        '400':
+          $ref: '../components/common.yaml#/components/responses/ValidationError'
+  /api/facilities/{facilityId}/cycle-counts/items/upload/count:
+    post:
+      operationId: uploadCycleCountItems
+      summary: Upload a filled-in count form spreadsheet
+      description: >
+        Multipart upload of the count form XLS; the parsed rows are validated
+        and echoed back with any errors ({"data": [...], "errors": [...]}).
+        Not exercised by the contract suite (requires an XLS fixture matching
+        an in-progress count).
+      parameters:
+        - $ref: '#/components/parameters/facilityId'
+      requestBody:
+        required: true
+        content:
+          multipart/form-data:
+            schema:
+              type: object
+              required: [importFile]
+              properties:
+                importFile:
+                  type: string
+                  format: binary
+      responses:
+        '200':
+          $ref: '#/components/responses/UploadResultOk'
+        '400':
+          $ref: '../components/common.yaml#/components/responses/ValidationError'
+  /api/facilities/{facilityId}/cycle-counts/items/upload/recount:
+    post:
+      operationId: uploadCycleCountRecountItems
+      summary: Upload a filled-in recount form spreadsheet
+      description: >
+        Multipart upload of the recount form XLS; same behavior as the count
+        upload. Not exercised by the contract suite (requires an XLS fixture
+        matching an in-progress recount).
+      parameters:
+        - $ref: '#/components/parameters/facilityId'
+      requestBody:
+        required: true
+        content:
+          multipart/form-data:
+            schema:
+              type: object
+              required: [importFile]
+              properties:
+                importFile:
+                  type: string
+                  format: binary
+      responses:
+        '200':
+          $ref: '#/components/responses/UploadResultOk'
+        '400':
+          $ref: '../components/common.yaml#/components/responses/ValidationError'
+  /api/facilities/{facilityId}/cycle-counts/{cycleCountId}/refresh:
+    post:
+      operationId: refreshCycleCount
+      summary: Refresh a cycle count's items against current stock
+      parameters:
+        - $ref: '#/components/parameters/facilityId'
+        - $ref: '#/components/parameters/cycleCountId'
+        - name: countIndex
+          in: query
+          required: false
+          schema:
+            type: integer
+        - name: removeOutOfStockItemsImplicitly
+          in: query
+          required: false
+          schema:
+            type: boolean
+      responses:
+        '200':
+          $ref: '#/components/responses/CycleCountOk'
+  /api/reports/cycle-count-details:
+    get:
+      operationId: getCycleCountDetails
+      summary: Cycle count details report (per inventory item)
+      parameters:
+        - $ref: '#/components/parameters/reportFacility'
+        - $ref: '../components/common.yaml#/components/parameters/max'
+        - $ref: '../components/common.yaml#/components/parameters/offset'
+      responses:
+        '200':
+          $ref: '#/components/responses/CycleCountDetailsReportOk'
+        '400':
+          $ref: '../components/common.yaml#/components/responses/ValidationError'
+    post:
+      operationId: getCycleCountDetailsPost
+      summary: Cycle count details report (POST variant)
+      parameters:
+        - $ref: '#/components/parameters/reportFacility'
+        - $ref: '../components/common.yaml#/components/parameters/max'
+        - $ref: '../components/common.yaml#/components/parameters/offset'
+      responses:
+        '200':
+          $ref: '#/components/responses/CycleCountDetailsReportOk'
+        '400':
+          $ref: '../components/common.yaml#/components/responses/ValidationError'
+  /api/reports/cycle-count-summary:
+    get:
+      operationId: getCycleCountSummary
+      summary: Cycle count summary report (per product)
+      parameters:
+        - $ref: '#/components/parameters/reportFacility'
+        - $ref: '../components/common.yaml#/components/parameters/max'
+        - $ref: '../components/common.yaml#/components/parameters/offset'
+      responses:
+        '200':
+          $ref: '#/components/responses/CycleCountSummaryReportOk'
+        '400':
+          $ref: '../components/common.yaml#/components/responses/ValidationError'
+    post:
+      operationId: getCycleCountSummaryPost
+      summary: Cycle count summary report (POST variant)
+      parameters:
+        - $ref: '#/components/parameters/reportFacility'
+        - $ref: '../components/common.yaml#/components/parameters/max'
+        - $ref: '../components/common.yaml#/components/parameters/offset'
+      responses:
+        '200':
+          $ref: '#/components/responses/CycleCountSummaryReportOk'
+        '400':
+          $ref: '../components/common.yaml#/components/responses/ValidationError'
+components:
+  parameters:
+    facilityId:
+      name: facilityId
+      in: path
+      required: true
+      description: >
+        Facility (depot location) id. The UrlMappings variable is named
+        $facilityId for candidates/pending and $facility for the other
+        routes; both are the same path segment.
+      schema:
+        $ref: '../components/common.yaml#/components/schemas/Id'
+    cycleCountId:
+      name: cycleCountId
+      in: path
+      required: true
+      schema:
+        $ref: '../components/common.yaml#/components/schemas/Id'
+    cycleCountItemId:
+      name: cycleCountItemId
+      in: path
+      required: true
+      schema:
+        $ref: '../components/common.yaml#/components/schemas/Id'
+    format:
+      name: format
+      in: query
+      required: false
+      description: >
+        json (default), xls (application/vnd.ms-excel attachment) or pdf
+        (application/pdf) via Grails withFormat.
+      schema:
+        type: string
+        enum: [json, xls, pdf]
+    reportFacility:
+      name: facility
+      in: query
+      required: true
+      description: Facility (depot location) id to report on.
+      schema:
+        $ref: '../components/common.yaml#/components/schemas/Id'
+  requestBodies:
+    ItemsToCreateBody:
+      required: true
+      content:
+        application/json:
+          schema:
+            type: object
+            required: [itemsToCreate]
+            properties:
+              itemsToCreate:
+                type: array
+                items:
+                  $ref: '#/components/schemas/CycleCountItemCreate'
+            additionalProperties: true
+    ItemsToUpdateBody:
+      required: true
+      content:
+        application/json:
+          schema:
+            type: object
+            required: [itemsToUpdate]
+            properties:
+              itemsToUpdate:
+                type: array
+                items:
+                  type: object
+                  required: [id]
+                  properties:
+                    id:
+                      $ref: '../components/common.yaml#/components/schemas/Id'
+                    quantityCounted:
+                      type: integer
+                      nullable: true
+                    countIndex:
+                      type: integer
+                    recount:
+                      type: boolean
+                  additionalProperties: true
+            additionalProperties: true
+  responses:
+    CycleCountRequestListOk:
+      description: Cycle count requests in a "data" envelope.
+      content:
+        application/json:
+          schema:
+            type: object
+            required: [data]
+            properties:
+              data:
+                type: array
+                items:
+                  $ref: '#/components/schemas/CycleCountRequest'
+    CycleCountListOk:
+      description: >
+        Cycle counts in a "data" envelope (JSON), or an XLS/PDF form when
+        format=xls/pdf.
+      content:
+        application/json:
+          schema:
+            type: object
+            required: [data]
+            properties:
+              data:
+                type: array
+                items:
+                  $ref: '#/components/schemas/CycleCount'
+        application/vnd.ms-excel:
+          schema:
+            type: string
+            format: binary
+        application/pdf:
+          schema:
+            type: string
+            format: binary
+    CycleCountOk:
+      description: A cycle count in a "data" envelope.
+      content:
+        application/json:
+          schema:
+            type: object
+            required: [data]
+            properties:
+              data:
+                $ref: '#/components/schemas/CycleCount'
+    CycleCountItemOk:
+      description: A cycle count item in a "data" envelope.
+      content:
+        application/json:
+          schema:
+            type: object
+            required: [data]
+            properties:
+              data:
+                $ref: '#/components/schemas/CycleCountItem'
+    CycleCountItemListOk:
+      description: Cycle count items in a "data" envelope.
+      content:
+        application/json:
+          schema:
+            type: object
+            required: [data]
+            properties:
+              data:
+                type: array
+                items:
+                  $ref: '#/components/schemas/CycleCountItem'
+    UploadResultOk:
+      description: Parsed spreadsheet rows plus row-level error messages.
+      content:
+        application/json:
+          schema:
+            type: object
+            required: [data, errors]
+            properties:
+              data:
+                type: array
+                items:
+                  type: object
+                  additionalProperties: true
+              errors:
+                type: array
+                items:
+                  type: string
+    CycleCountDetailsReportOk:
+      description: Paginated details report.
+      content:
+        application/json:
+          schema:
+            type: object
+            required: [data, count, max, offset, totalCount]
+            properties:
+              data:
+                type: array
+                items:
+                  $ref: '#/components/schemas/CycleCountDetailsRow'
+              count:
+                type: integer
+              max:
+                type: integer
+              offset:
+                type: integer
+              totalCount:
+                type: integer
+    CycleCountSummaryReportOk:
+      description: Paginated summary report.
+      content:
+        application/json:
+          schema:
+            type: object
+            required: [data, count, max, offset, totalCount]
+            properties:
+              data:
+                type: array
+                items:
+                  $ref: '#/components/schemas/CycleCountSummaryRow'
+              count:
+                type: integer
+              max:
+                type: integer
+              offset:
+                type: integer
+              totalCount:
+                type: integer
+  schemas:
+    FacilityRef:
+      type: object
+      description: Location rendering used for facilities/bin locations.
+      required: [id, name]
+      properties:
+        id:
+          type: string
+        name:
+          type: string
+      additionalProperties: true
+    ProductRef:
+      type: object
+      description: >
+        Product rendering; the full form carries category, unitOfMeasure,
+        handlingIcons etc., the short form only id/name/productCode.
+      required: [id, name, productCode]
+      properties:
+        id:
+          type: string
+        name:
+          type: string
+        productCode:
+          type: string
+      additionalProperties: true
+    CountDetails:
+      type: object
+      description: Assignee/deadline pair for initial or verification count.
+      required: [assignee, deadline]
+      properties:
+        assignee:
+          type: object
+          description: Assigned person rendering.
+          nullable: true
+          additionalProperties: true
+        deadline:
+          type: string
+          nullable: true
+      additionalProperties: false
+    CycleCountCandidate:
+      type: object
+      required: [product, status]
+      properties:
+        product:
+          $ref: '#/components/schemas/ProductRef'
+        category:
+          type: object
+          nullable: true
+          additionalProperties: true
+        abcClass:
+          type: string
+          nullable: true
+        status:
+          type: string
+        cycleCountRequest:
+          type: object
+          nullable: true
+          additionalProperties: true
+        internalLocations:
+          type: string
+          nullable: true
+        tags:
+          type: array
+          nullable: true
+          items:
+            type: object
+            additionalProperties: true
+        productCatalogs:
+          type: array
+          nullable: true
+          items:
+            type: object
+            additionalProperties: true
+        quantityOnHand:
+          type: number
+          nullable: true
+        quantityAllocated:
+          type: number
+          nullable: true
+        inventoryItemCount:
+          type: integer
+          nullable: true
+        negativeItemCount:
+          type: integer
+          nullable: true
+        dateLastCount:
+          type: string
+          nullable: true
+        dateNextCount:
+          type: string
+          nullable: true
+        daysUntilNextCount:
+          type: integer
+          nullable: true
+        hasStockOnHandOrNegativeStock:
+          type: boolean
+          nullable: true
+        sortOrder:
+          type: integer
+          nullable: true
+      additionalProperties: true
+    CycleCountRequest:
+      type: object
+      required: [id, facility, product, status, requestType]
+      properties:
+        id:
+          type: string
+        facility:
+          $ref: '#/components/schemas/FacilityRef'
+        product:
+          $ref: '#/components/schemas/ProductRef'
+        status:
+          type: string
+        requestType:
+          type: string
+        initialCount:
+          $ref: '#/components/schemas/CountDetails'
+        verificationCount:
+          $ref: '#/components/schemas/CountDetails'
+        inventoryItemsCount:
+          type: integer
+          nullable: true
+        blindCount:
+          type: boolean
+        dateCreated:
+          type: string
+        lastUpdated:
+          type: string
+      additionalProperties: true
+    PendingCycleCountRequest:
+      type: object
+      description: >
+        Pending request rendering (product, category, quantities, tags,
+        catalogs, the originating cycleCountRequest, ...).
+      required: [id, facility, product, status]
+      properties:
+        id:
+          type: string
+        facility:
+          $ref: '#/components/schemas/FacilityRef'
+        product:
+          $ref: '#/components/schemas/ProductRef'
+        status:
+          type: string
+        cycleCountRequest:
+          $ref: '#/components/schemas/CycleCountRequest'
+      additionalProperties: true
+    CycleCount:
+      type: object
+      description: CycleCountDto rendering.
+      required: [id, status, cycleCountItems]
+      properties:
+        id:
+          type: string
+        requestId:
+          type: string
+          nullable: true
+        status:
+          type: string
+        maxCountIndex:
+          type: integer
+          nullable: true
+        cycleCountItems:
+          type: array
+          items:
+            $ref: '#/components/schemas/CycleCountItem'
+        initialCount:
+          $ref: '#/components/schemas/CountDetails'
+        verificationCount:
+          type: object
+          description: CountDetails; null until a recount exists.
+          nullable: true
+          additionalProperties: true
+      additionalProperties: true
+    CycleCountItem:
+      type: object
+      description: CycleCountItemDto rendering.
+      required: [id, countIndex, status, facility, product, inventoryItem]
+      properties:
+        id:
+          type: string
+          description: >
+            Parity quirk: null in the items rendered directly by
+            startRecount (the fresh recount items are not yet flushed when
+            serialized); subsequent reads return the real id.
+          nullable: true
+        countIndex:
+          type: integer
+        custom:
+          type: boolean
+        status:
+          $ref: '#/components/schemas/CycleCountItemStatus'
+        facility:
+          $ref: '#/components/schemas/FacilityRef'
+        binLocation:
+          type: object
+          description: Bin location rendering (FacilityRef shape).
+          nullable: true
+          additionalProperties: true
+        product:
+          $ref: '#/components/schemas/ProductRef'
+        inventoryItem:
+          type: object
+          required: [id]
+          properties:
+            id:
+              type: string
+            product:
+              $ref: '#/components/schemas/ProductRef'
+            lotNumber:
+              type: string
+              nullable: true
+            expirationDate:
+              type: string
+              nullable: true
+          additionalProperties: true
+        assignee:
+          type: object
+          description: Assigned person rendering.
+          nullable: true
+          additionalProperties: true
+        quantityOnHand:
+          type: number
+          nullable: true
+        quantityCounted:
+          type: number
+          nullable: true
+        quantityVariance:
+          type: number
+          nullable: true
+        discrepancyReasonCode:
+          type: string
+          nullable: true
+        comment:
+          type: string
+          nullable: true
+        dateCounted:
+          type: string
+          nullable: true
+        dateCreated:
+          type: string
+          nullable: true
+      additionalProperties: true
+    CycleCountItemStatus:
+      description: >
+        Parity quirk: the item status is serialized as a Groovy enum object
+        {"enumType": "org.pih.warehouse.inventory.CycleCountItemStatus",
+        "name": "..."} rather than a plain string.
+      type: object
+      required: [enumType, name]
+      properties:
+        enumType:
+          type: string
+        name:
+          type: string
+      additionalProperties: false
+    CycleCountItemCreate:
+      type: object
+      required: [inventoryItem]
+      properties:
+        inventoryItem:
+          type: object
+          properties:
+            product:
+              $ref: '../components/common.yaml#/components/schemas/Id'
+            lotNumber:
+              type: string
+              nullable: true
+            expirationDate:
+              type: string
+              nullable: true
+          additionalProperties: true
+        quantityCounted:
+          type: integer
+          nullable: true
+        countIndex:
+          type: integer
+        recount:
+          type: boolean
+        binLocation:
+          type: string
+          nullable: true
+        assignee:
+          type: string
+          nullable: true
+      additionalProperties: true
+    ReportCycleCountRef:
+      type: object
+      description: Transaction-level cycle count reference in reports.
+      required: [id, transactionNumber, transactionType]
+      properties:
+        id:
+          type: string
+        transactionNumber:
+          type: string
+        transactionType:
+          type: string
+        dateRequested:
+          type: string
+          nullable: true
+        dateInitiated:
+          type: string
+          nullable: true
+        dateRecorded:
+          type: string
+          nullable: true
+        requestedBy:
+          type: object
+          nullable: true
+          additionalProperties: true
+        initiatedBy:
+          type: object
+          nullable: true
+          additionalProperties: true
+        recordedBy:
+          type: object
+          nullable: true
+          additionalProperties: true
+      additionalProperties: true
+    ReportCountSection:
+      type: object
+      description: Blind or verification count section of a report row.
+      properties:
+        assignee:
+          type: object
+          nullable: true
+          additionalProperties: true
+        dateCounted:
+          type: string
+          nullable: true
+        quantityOnHand:
+          type: number
+          nullable: true
+        quantityCounted:
+          type: number
+          nullable: true
+        quantityVariance:
+          type: number
+          nullable: true
+        varianceTypeCode:
+          type: string
+          nullable: true
+        varianceReasonCode:
+          type: string
+          nullable: true
+        varianceComment:
+          type: string
+          nullable: true
+      additionalProperties: true
+    CycleCountDetailsRow:
+      type: object
+      required: [id, cycleCount, inventoryItem]
+      properties:
+        id:
+          type: integer
+        cycleCount:
+          $ref: '#/components/schemas/ReportCycleCountRef'
+        inventoryItem:
+          type: object
+          additionalProperties: true
+        blindCount:
+          $ref: '#/components/schemas/ReportCountSection'
+        verificationCount:
+          type: object
+          description: ReportCountSection; null when there was no recount.
+          nullable: true
+          additionalProperties: true
+      additionalProperties: true
+    CycleCountSummaryRow:
+      type: object
+      required: [id, cycleCount, product]
+      properties:
+        id:
+          type: integer
+        cycleCount:
+          $ref: '#/components/schemas/ReportCycleCountRef'
+        product:
+          $ref: '#/components/schemas/ProductRef'
+        blindCount:
+          $ref: '#/components/schemas/ReportCountSection'
+        verificationCount:
+          type: object
+          description: ReportCountSection; null when there was no recount.
+          nullable: true
+          additionalProperties: true
+      additionalProperties: true
+  securitySchemes:
+    cookieAuth:
+      $ref: '../components/common.yaml#/components/securitySchemes/cookieAuth'
