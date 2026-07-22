@@ -15,24 +15,14 @@ import org.pih.warehouse.product.Product
 
 class SupplierController {
 
-    def locationService
-    def documentService
     def orderService
 
     def list() {
-        params.max = Math.min(params.max ? params.int('max') : 10, 100)
-        params.offset = params.offset ? params.int("offset") : 0
-
-        def suppliers = locationService.getSuppliers(params.q, params.max, params.offset as int)
-
-        [suppliers: suppliers, suppliersTotal: suppliers.totalCount]
+        render(view: "/common/react", params: params)
     }
 
     def show() {
-        Organization supplier = Organization.get(params.id)
-        List<Document> documents = documentService.getAllDocumentsBySupplierOrganization(supplier)
-
-        [supplier: supplier, documents: documents]
+        render(view: "/common/react", params: params)
     }
 
     def getPriceHistory() {

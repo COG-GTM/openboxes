@@ -250,6 +250,18 @@ export const PARTY_TYPE_OPTIONS = `${API}/partyTypeOptions`;
 export const PARTY_TYPE_CODE_OPTIONS = `${API}/partyTypeCodeOptions`;
 export const ORGANIZATION_ROLE_TYPE_OPTIONS = `${API}/organizationRoleTypeOptions`;
 
+// PERSONS
+export const PERSON_API = `${API}/persons`;
+export const PERSON_BY_ID = (id) => `${PERSON_API}/${id}`;
+export const PERSON_SEARCH_API = `${PERSON_API}/search`;
+export const PERSON_DETAILS = (id) => `${PERSON_API}/${id}/details`;
+
+// SUPPLIERS
+export const SUPPLIER_API = `${API}/suppliers`;
+export const SUPPLIER_SEARCH_API = `${SUPPLIER_API}/search`;
+export const SUPPLIER_DETAILS = (id) => `${SUPPLIER_API}/${id}/details`;
+export const SUPPLIER_PRICE_HISTORY = (id) => `${SUPPLIER_API}/${id}/priceHistory`;
+
 // PARTIES
 export const PARTY_API = `${API}/parties`;
 export const PARTY_BY_ID = (id) => `${PARTY_API}/${id}`;

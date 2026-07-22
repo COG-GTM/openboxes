@@ -15,101 +15,30 @@ import grails.gorm.transactions.Transactional
 class PersonController {
     def userService
 
-    static allowedMethods = [save: "POST", update: "POST", delete: "POST"]
-
+    static allowedMethods = [delete: "POST"]
 
     def redirect() {
         redirect(action: "show", id: params.id)
     }
 
     def index() {
-        redirect(action: "list", params:params)
+        redirect(action: "list", params: params)
     }
 
-
     def list() {
-        def personInstanceList = []
-        def personInstanceTotal = 0
-
-        params.max = Math.min(params.max ? params.int('max') : 10, 100)
-
-        if (params.q) {
-            String[] terms = ["%" + params.q + "%"]
-            personInstanceList = userService.findPersons(terms, params)
-            personInstanceTotal = personInstanceList.totalCount
-
-        } else {
-            personInstanceList = Person.list(params)
-            personInstanceTotal = Person.count()
-        }
-
-        [personInstanceList: personInstanceList, personInstanceTotal: personInstanceTotal]
+        render(view: "/common/react", params: params)
     }
 
     def create() {
-        def personInstance = new Person()
-        personInstance.properties = params
-        return [personInstance: personInstance]
-    }
-
-    def save() {
-        def personInstance = new Person(params)
-        if (personInstance.save(flush: true)) {
-            flash.message = "${warehouse.message(code: 'default.created.message', args: [warehouse.message(code: 'person.label', default: 'Person'), personInstance.id])}"
-            redirect(action: "list", id: personInstance.id)
-        }
-        else {
-            render(view: "create", model: [personInstance: personInstance])
-        }
+        render(view: "/common/react", params: params)
     }
 
     def show() {
-        def personInstance = Person.get(params.id)
-        if (!personInstance) {
-            flash.message = "${warehouse.message(code: 'default.not.found.message', args: [warehouse.message(code: 'person.label', default: 'Person'), params.id])}"
-            redirect(action: "list")
-        }
-        else {
-            [personInstance: personInstance]
-        }
+        render(view: "/common/react", params: params)
     }
 
     def edit() {
-        def personInstance = Person.get(params.id)
-        if (!personInstance) {
-            flash.message = "${warehouse.message(code: 'default.not.found.message', args: [warehouse.message(code: 'person.label', default: 'Person'), params.id])}"
-            redirect(action: "list")
-        }
-        else {
-            return [personInstance: personInstance]
-        }
-    }
-
-    def update() {
-        def personInstance = Person.get(params.id)
-        if (personInstance) {
-            if (params.version) {
-                def version = params.version.toLong()
-                if (personInstance.version > version) {
-
-                    personInstance.errors.rejectValue("version", "default.optimistic.locking.failure", [warehouse.message(code: 'person.label', default: 'Person')] as Object[], "Another user has updated this Person while you were editing")
-                    render(view: "edit", model: [personInstance: personInstance])
-                    return
-                }
-            }
-            personInstance.properties = params
-            if (!personInstance.hasErrors() && personInstance.save(flush: true)) {
-                flash.message = "${warehouse.message(code: 'default.updated.message', args: [warehouse.message(code: 'person.label', default: 'Person'), personInstance.id])}"
-                redirect(action: "list", id: personInstance.id)
-            }
-            else {
-                render(view: "edit", model: [personInstance: personInstance])
-            }
-        }
-        else {
-            flash.message = "${warehouse.message(code: 'default.not.found.message', args: [warehouse.message(code: 'person.label', default: 'Person'), params.id])}"
-            redirect(action: "list")
-        }
+        render(view: "/common/react", params: params)
     }
 
     def delete() {

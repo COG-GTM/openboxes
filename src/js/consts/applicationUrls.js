@@ -344,6 +344,26 @@ const ORGANIZATION_URL = {
   }),
 };
 
+const PERSON_URL = {
+  base: `${CONTEXT_PATH}/person`,
+  list: () => `${PERSON_URL.base}/list`,
+  create: () => `${PERSON_URL.base}/create`,
+  edit: (id) => `${PERSON_URL.base}/edit/${id}`,
+  show: (id) => `${PERSON_URL.base}/show/${id}`,
+  convertPersonToUser: (id) => `${PERSON_URL.base}/convertPersonToUser/${id}`,
+  convertUserToPerson: (id) => `${PERSON_URL.base}/convertUserToPerson/${id}`,
+};
+
+const SUPPLIER_URL = {
+  base: `${CONTEXT_PATH}/supplier`,
+  list: () => `${SUPPLIER_URL.base}/list`,
+  show: (id) => `${SUPPLIER_URL.base}/show/${id}`,
+  downloadPriceHistory: (params) => stringifyUrl({
+    url: `${SUPPLIER_URL.base}/getPriceHistory`,
+    query: { ...(params ?? {}), format: 'text/csv' },
+  }),
+};
+
 const PARTY_URL = {
   base: `${CONTEXT_PATH}/party`,
   list: () => `${PARTY_URL.base}/list`,
@@ -566,6 +586,7 @@ export {
   PARTY_TYPE_URL,
   PARTY_URL,
   PAYMENT_TERM_URL,
+  PERSON_URL,
   PICKLIST_URL,
   PREFERENCE_TYPE_URL,
   PRODUCT_ASSOCIATION_URL,
@@ -589,6 +610,7 @@ export {
   STOCK_MOVEMENT_URL,
   STOCK_TRANSFER_URL,
   STOCKLIST_URL,
+  SUPPLIER_URL,
   TAG_URL,
   TRANSACTION_ENTRY_URL,
   UNIT_OF_MEASURE_CONVERSION_URL,

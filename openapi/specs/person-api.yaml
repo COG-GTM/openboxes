@@ -2,11 +2,15 @@ openapi: 3.0.3
 info:
   title: OpenBoxes - PersonApiController
   description: >
-    Person search endpoint handled by org.pih.warehouse.api.PersonApiController,
-    routed via the standard "/api/${resource}s" REST mapping (only list() is
-    overridden; the other BaseDomainApiController actions forward to
-    GenericApiController and are not pinned here).
-  version: 0.1.0
+    Person endpoints handled by org.pih.warehouse.api.PersonApiController.
+    list() is routed via the standard "/api/${resource}s" REST mapping.
+    Phase 2 (Batch 36) added search/details plus create/update/delete
+    overrides for the React person screens (the previous generic
+    GenericApiController forwarding for POST/PUT/DELETE is replaced by
+    the JSON-body implementations pinned here). Create/update respond 200
+    with only {"data": {"id": ...}}; details/update/delete respond 404 for
+    unknown ids.
+  version: 0.2.0
 servers:
   - url: http://localhost:8080/openboxes
     description: Local Docker baseline (docs/migration/RUNNING_LOCALLY.md)
@@ -63,6 +67,197 @@ paths:
                     type: array
                     items:
                       $ref: '#/components/schemas/PersonListItem'
+    post:
+      operationId: createPerson
+      summary: Create a person
+      description: >
+        Creates a person from the JSON body. First and last name are
+        required (validation error when missing). Added in Phase 2
+        (Batch 36).
+      requestBody:
+        required: true
+        content:
+          application/json:
+            schema:
+              $ref: '#/components/schemas/PersonInput'
+      responses:
+        '200':
+          description: Created; only the id is returned.
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/IdEnvelope'
+        '400':
+          $ref: '../components/common.yaml#/components/responses/ValidationError'
+  /api/persons/search:
+    get:
+      operationId: searchPersons
+      summary: Paginated person search for the React list screen
+      description: >
+        Returns a page of persons with a totalCount, for the React person
+        list. Added in Phase 2 (Batch 36).
+      parameters:
+        - name: q
+          in: query
+          required: false
+          schema:
+            type: string
+          description: >
+            Search terms, split on commas and spaces. Each term is matched
+            (ilike "%term%") against firstName, lastName and email; all
+            terms must match.
+        - name: sort
+          in: query
+          required: false
+          schema:
+            type: string
+          description: >
+            One of firstName, lastName, email, phoneNumber, active,
+            dateCreated; anything else falls back to lastName.
+        - name: order
+          in: query
+          required: false
+          schema:
+            type: string
+            enum: [asc, desc]
+        - $ref: '../components/common.yaml#/components/parameters/max'
+        - $ref: '../components/common.yaml#/components/parameters/offset'
+      responses:
+        '200':
+          description: A page of person rows.
+          content:
+            application/json:
+              schema:
+                type: object
+                required: [data, totalCount]
+                properties:
+                  data:
+                    type: array
+                    items:
+                      type: object
+                      required: [id]
+                      properties:
+                        id:
+                          $ref: '../components/common.yaml#/components/schemas/Id'
+                        name:
+                          type: string
+                          nullable: true
+                        firstName:
+                          type: string
+                          nullable: true
+                        lastName:
+                          type: string
+                          nullable: true
+                        email:
+                          type: string
+                          nullable: true
+                        phoneNumber:
+                          type: string
+                          nullable: true
+                        active:
+                          type: boolean
+                          nullable: true
+                        type:
+                          type: string
+                          description: Person subclass simple name (Person or User).
+                  totalCount:
+                    type: integer
+  /api/persons/{id}/details:
+    get:
+      operationId: personDetails
+      summary: Person details for the React edit/show screens
+      description: Full person details. Added in Phase 2 (Batch 36).
+      parameters:
+        - name: id
+          in: path
+          required: true
+          schema:
+            $ref: '../components/common.yaml#/components/schemas/Id'
+      responses:
+        '200':
+          description: Person details.
+          content:
+            application/json:
+              schema:
+                type: object
+                required: [data]
+                properties:
+                  data:
+                    $ref: '#/components/schemas/PersonDetails'
+        '404':
+          $ref: '../components/common.yaml#/components/responses/NotFound'
+  /api/persons/{id}:
+    put:
+      operationId: updatePerson
+      summary: Update a person
+      description: >
+        Partially updates a person from the JSON body (only keys present in
+        the body are bound). When the body includes a version that is
+        older than the persisted one, responds 409 without saving
+        (optimistic locking, mirroring the legacy person edit screen).
+        Added in Phase 2 (Batch 36).
+      parameters:
+        - name: id
+          in: path
+          required: true
+          schema:
+            $ref: '../components/common.yaml#/components/schemas/Id'
+      requestBody:
+        required: true
+        content:
+          application/json:
+            schema:
+              $ref: '#/components/schemas/PersonInput'
+      responses:
+        '200':
+          description: Updated; only the id is returned.
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/IdEnvelope'
+        '400':
+          $ref: '../components/common.yaml#/components/responses/ValidationError'
+        '404':
+          $ref: '../components/common.yaml#/components/responses/NotFound'
+        '409':
+          description: Stale version; the person was updated by someone else.
+          content:
+            application/json:
+              schema:
+                type: object
+                properties:
+                  errorCode:
+                    type: integer
+                  errorMessage:
+                    type: string
+    delete:
+      operationId: deletePerson
+      summary: Delete a person
+      description: >
+        Deletes the person; responds 400 when it is still referenced (data
+        integrity violation). Added in Phase 2 (Batch 36).
+      parameters:
+        - name: id
+          in: path
+          required: true
+          schema:
+            $ref: '../components/common.yaml#/components/schemas/Id'
+      responses:
+        '204':
+          description: Deleted.
+        '400':
+          description: Person is still referenced and cannot be deleted.
+          content:
+            application/json:
+              schema:
+                type: object
+                properties:
+                  errorCode:
+                    type: integer
+                  errorMessage:
+                    type: string
+        '404':
+          $ref: '../components/common.yaml#/components/responses/NotFound'
 components:
   schemas:
     PersonListItem:
@@ -90,6 +285,79 @@ components:
           type: string
           nullable: true
       additionalProperties: true
+    PersonInput:
+      type: object
+      description: >
+        JSON body for create/update. Only keys present in the body are
+        bound.
+      properties:
+        firstName:
+          type: string
+          nullable: true
+        lastName:
+          type: string
+          nullable: true
+        email:
+          type: string
+          nullable: true
+        phoneNumber:
+          type: string
+          nullable: true
+        active:
+          type: boolean
+          nullable: true
+        version:
+          type: integer
+          nullable: true
+          description: >
+            Optimistic-locking version from GET details; ignored on create.
+            On update, a stale value causes a 409.
+      additionalProperties: true
+    PersonDetails:
+      type: object
+      required: [id]
+      properties:
+        id:
+          $ref: '../components/common.yaml#/components/schemas/Id'
+        name:
+          type: string
+          nullable: true
+        firstName:
+          type: string
+          nullable: true
+        lastName:
+          type: string
+          nullable: true
+        email:
+          type: string
+          nullable: true
+        phoneNumber:
+          type: string
+          nullable: true
+        active:
+          type: boolean
+          nullable: true
+        type:
+          type: string
+          description: Person subclass simple name (Person or User).
+        version:
+          type: integer
+        dateCreated:
+          type: string
+          nullable: true
+        lastUpdated:
+          type: string
+          nullable: true
+    IdEnvelope:
+      type: object
+      required: [data]
+      properties:
+        data:
+          type: object
+          required: [id]
+          properties:
+            id:
+              $ref: '../components/common.yaml#/components/schemas/Id'
   securitySchemes:
     cookieAuth:
       $ref: '../components/common.yaml#/components/securitySchemes/cookieAuth'

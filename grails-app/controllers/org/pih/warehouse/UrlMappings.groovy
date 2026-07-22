@@ -189,6 +189,34 @@ class UrlMappings {
             action = [GET: "details"]
         }
 
+        // Person endpoints for the React person screens; explicit mappings
+        // take precedence over the generic "/api/${resource}s" pattern.
+        "/api/persons/search"(parseRequest: true) {
+            controller = { "personApi" }
+            action = [GET: "search"]
+        }
+
+        "/api/persons/$id/details"(parseRequest: true) {
+            controller = { "personApi" }
+            action = [GET: "details"]
+        }
+
+        // Supplier endpoints for the React supplier screens
+        "/api/suppliers/search"(parseRequest: true) {
+            controller = { "supplierApi" }
+            action = [GET: "search"]
+        }
+
+        "/api/suppliers/$id/details"(parseRequest: true) {
+            controller = { "supplierApi" }
+            action = [GET: "details"]
+        }
+
+        "/api/suppliers/$id/priceHistory"(parseRequest: true) {
+            controller = { "supplierApi" }
+            action = [GET: "priceHistory"]
+        }
+
         "/api/organizations/search"(parseRequest: true) {
             controller = { "organizationApi" }
             action = [GET: "search"]

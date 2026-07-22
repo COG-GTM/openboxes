@@ -1,0 +1,255 @@
+openapi: 3.0.3
+info:
+  title: OpenBoxes - SupplierApiController
+  description: >
+    Supplier endpoints handled by org.pih.warehouse.api.SupplierApiController,
+    added in Phase 2 (Batch 36) for the React supplier list/show screens.
+    The supplier list is backed by the read-only Supplier view (supplier
+    locations joined with pending order/shipment counts); details and price
+    history are keyed by the supplier Organization id. details/priceHistory
+    respond 404 for unknown organization ids.
+  version: 0.1.0
+servers:
+  - url: http://localhost:8080/openboxes
+    description: Local Docker baseline (docs/migration/RUNNING_LOCALLY.md)
+security:
+  - cookieAuth: []
+paths:
+  /api/suppliers/search:
+    get:
+      operationId: searchSuppliers
+      summary: Paginated supplier search for the React list screen
+      description: >
+        Returns a page of supplier locations (ordered by location name) with
+        a totalCount. Added in Phase 2 (Batch 36).
+      parameters:
+        - name: q
+          in: query
+          required: false
+          schema:
+            type: string
+          description: >
+            Substring match (ilike "%q%") on the supplier location name or
+            the supplier organization name.
+        - $ref: '../components/common.yaml#/components/parameters/max'
+        - $ref: '../components/common.yaml#/components/parameters/offset'
+      responses:
+        '200':
+          description: A page of supplier rows.
+          content:
+            application/json:
+              schema:
+                type: object
+                required: [data, totalCount]
+                properties:
+                  data:
+                    type: array
+                    items:
+                      type: object
+                      required: [id]
+                      properties:
+                        id:
+                          $ref: '../components/common.yaml#/components/schemas/Id'
+                        name:
+                          type: string
+                          nullable: true
+                          description: Supplier location name.
+                        organization:
+                          type: object
+                          nullable: true
+                          properties:
+                            id:
+                              $ref: '../components/common.yaml#/components/schemas/Id'
+                            name:
+                              type: string
+                              nullable: true
+                        pendingOrdersCount:
+                          type: integer
+                          nullable: true
+                        pendingShipmentsCount:
+                          type: integer
+                          nullable: true
+                  totalCount:
+                    type: integer
+  /api/suppliers/{id}/details:
+    get:
+      operationId: supplierDetails
+      summary: Supplier organization details for the React show screen
+      description: >
+        Supplier organization details with its locations and purchase order
+        documents. Added in Phase 2 (Batch 36).
+      parameters:
+        - name: id
+          in: path
+          required: true
+          schema:
+            $ref: '../components/common.yaml#/components/schemas/Id'
+          description: Supplier Organization id.
+      responses:
+        '200':
+          description: Supplier details.
+          content:
+            application/json:
+              schema:
+                type: object
+                required: [data]
+                properties:
+                  data:
+                    type: object
+                    required: [id]
+                    properties:
+                      id:
+                        $ref: '../components/common.yaml#/components/schemas/Id'
+                      code:
+                        type: string
+                        nullable: true
+                      name:
+                        type: string
+                        nullable: true
+                      displayName:
+                        type: string
+                        nullable: true
+                        description: '"code - name".'
+                      locations:
+                        type: array
+                        items:
+                          type: object
+                          properties:
+                            id:
+                              $ref: '../components/common.yaml#/components/schemas/Id'
+                            name:
+                              type: string
+                              nullable: true
+                      documents:
+                        type: array
+                        description: >
+                          One row per purchase-order document
+                          (DocumentService.getAllDocumentsBySupplierOrganization
+                          projection).
+                        items:
+                          $ref: '#/components/schemas/SupplierDocument'
+        '404':
+          $ref: '../components/common.yaml#/components/responses/NotFound'
+  /api/suppliers/{id}/priceHistory:
+    get:
+      operationId: supplierPriceHistory
+      summary: Purchase order price history for the React show screen
+      description: >
+        Purchase order item price history rows for the supplier organization
+        (OrderService.getOrderItemsForPriceHistory projection). Added in
+        Phase 2 (Batch 36).
+      parameters:
+        - name: id
+          in: path
+          required: true
+          schema:
+            $ref: '../components/common.yaml#/components/schemas/Id'
+          description: Supplier Organization id.
+        - name: productId
+          in: query
+          required: false
+          schema:
+            type: string
+          description: Restrict to order items for the given product id.
+        - name: q
+          in: query
+          required: false
+          schema:
+            type: string
+          description: >
+            Substring match (ilike "%q%") on product code/name, source code,
+            supplier code, manufacturer code or manufacturer name.
+      responses:
+        '200':
+          description: Price history rows.
+          content:
+            application/json:
+              schema:
+                type: object
+                required: [data]
+                properties:
+                  data:
+                    type: array
+                    items:
+                      $ref: '#/components/schemas/PriceHistoryRow'
+        '404':
+          $ref: '../components/common.yaml#/components/responses/NotFound'
+components:
+  securitySchemes:
+    cookieAuth:
+      $ref: '../components/common.yaml#/components/securitySchemes/cookieAuth'
+  schemas:
+    SupplierDocument:
+      type: object
+      properties:
+        orderId:
+          $ref: '../components/common.yaml#/components/schemas/Id'
+        orderNumber:
+          type: string
+          nullable: true
+        orderDescription:
+          type: string
+          nullable: true
+        origin:
+          type: string
+          nullable: true
+        destination:
+          type: string
+          nullable: true
+        documentId:
+          $ref: '../components/common.yaml#/components/schemas/Id'
+        documentNumber:
+          type: string
+          nullable: true
+        documentType:
+          type: string
+          nullable: true
+        documentName:
+          type: string
+          nullable: true
+        fileType:
+          type: string
+          nullable: true
+        fileUri:
+          type: string
+          nullable: true
+      additionalProperties: true
+    PriceHistoryRow:
+      type: object
+      properties:
+        orderId:
+          $ref: '../components/common.yaml#/components/schemas/Id'
+        orderNumber:
+          type: string
+          nullable: true
+        dateCreated:
+          type: string
+          nullable: true
+        description:
+          type: string
+          nullable: true
+        productCode:
+          type: string
+          nullable: true
+        productName:
+          type: string
+          nullable: true
+        sourceCode:
+          type: string
+          nullable: true
+        supplierCode:
+          type: string
+          nullable: true
+        manufacturerCode:
+          type: string
+          nullable: true
+        manufacturerName:
+          type: string
+          nullable: true
+        unitPrice:
+          type: number
+          nullable: true
+        quantityPerUom:
+          type: number
+          nullable: true
+      additionalProperties: true

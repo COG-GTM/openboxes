@@ -423,6 +423,31 @@ const AsyncOrganizationShow = Loadable({
   loading: Loading,
 });
 
+const AsyncPersonList = Loadable({
+  loader: () => import('components/person/PersonList'),
+  loading: Loading,
+});
+
+const AsyncPersonForm = Loadable({
+  loader: () => import('components/person/PersonForm'),
+  loading: Loading,
+});
+
+const AsyncPersonShow = Loadable({
+  loader: () => import('components/person/PersonShow'),
+  loading: Loading,
+});
+
+const AsyncSupplierList = Loadable({
+  loader: () => import('components/supplier/SupplierList'),
+  loading: Loading,
+});
+
+const AsyncSupplierShow = Loadable({
+  loader: () => import('components/supplier/SupplierShow'),
+  loading: Loading,
+});
+
 const AsyncPartyList = Loadable({
   loader: () => import('components/party/PartyList'),
   loading: Loading,
@@ -1220,6 +1245,12 @@ const Router = () => {
             <MainLayoutRoute path="**/organization/create" component={AsyncOrganizationForm} />
             <MainLayoutRoute path="**/organization/edit/:organizationId" component={AsyncOrganizationForm} />
             <MainLayoutRoute path="**/organization/show/:organizationId" component={AsyncOrganizationShow} />
+            <MainLayoutRoute path="**/person/list" component={AsyncPersonList} />
+            <MainLayoutRoute path="**/person/create" component={AsyncPersonForm} />
+            <MainLayoutRoute path="**/person/edit/:personId" component={AsyncPersonForm} />
+            <MainLayoutRoute path="**/person/show/:personId" component={AsyncPersonShow} />
+            <MainLayoutRoute path="**/supplier/list" component={AsyncSupplierList} />
+            <MainLayoutRoute path="**/supplier/show/:supplierId" component={AsyncSupplierShow} />
             <MainLayoutRoute path="**/party/list" component={AsyncPartyList} />
             <MainLayoutRoute path="**/party/create" component={AsyncPartyForm} />
             <MainLayoutRoute path="**/party/edit/:partyId" component={AsyncPartyForm} />
