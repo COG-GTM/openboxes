@@ -238,6 +238,26 @@ const AsyncExpirationHistoryReport = Loadable({
   loading: Loading,
 });
 
+const AsyncBudgetCodeList = Loadable({
+  loader: () => import('components/budgetCode/BudgetCodeList'),
+  loading: Loading,
+});
+
+const AsyncBudgetCodeForm = Loadable({
+  loader: () => import('components/budgetCode/BudgetCodeForm'),
+  loading: Loading,
+});
+
+const AsyncGlAccountList = Loadable({
+  loader: () => import('components/glAccount/GlAccountList'),
+  loading: Loading,
+});
+
+const AsyncGlAccountForm = Loadable({
+  loader: () => import('components/glAccount/GlAccountForm'),
+  loading: Loading,
+});
+
 const AsyncAttributeList = Loadable({
   loader: () => import('components/attribute/AttributeList'),
   loading: Loading,
@@ -408,6 +428,12 @@ const Router = () => {
             <MainLayoutRoute path="**/requisitionTemplate/list" component={AsyncStockList} />
             <MainLayoutRoute path="**/product/list" component={AsyncProductsList} />
             <MainLayoutRoute path="**/stockTransfer/list" component={AsyncStockTransferList} />
+            <MainLayoutRoute path="**/budgetCode/list" component={AsyncBudgetCodeList} />
+            <MainLayoutRoute path="**/budgetCode/create" component={AsyncBudgetCodeForm} />
+            <MainLayoutRoute path="**/budgetCode/edit/:budgetCodeId" component={AsyncBudgetCodeForm} />
+            <MainLayoutRoute path="**/glAccount/list" component={AsyncGlAccountList} />
+            <MainLayoutRoute path="**/glAccount/create" component={AsyncGlAccountForm} />
+            <MainLayoutRoute path="**/glAccount/edit/:glAccountId" component={AsyncGlAccountForm} />
             <MainLayoutRoute path="**/attribute/list" component={AsyncAttributeList} />
             <MainLayoutRoute path="**/attribute/create" component={AsyncAttributeForm} />
             <MainLayoutRoute path="**/attribute/edit/:id" component={AsyncAttributeForm} />

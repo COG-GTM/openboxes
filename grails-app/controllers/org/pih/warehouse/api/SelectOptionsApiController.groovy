@@ -11,6 +11,7 @@ package org.pih.warehouse.api
 
 import grails.converters.JSON
 import org.pih.warehouse.core.GlAccount
+import org.pih.warehouse.core.GlAccountType
 import org.pih.warehouse.core.PaymentTerm
 import org.pih.warehouse.core.PreferenceType
 import org.pih.warehouse.core.RatingTypeCode
@@ -39,6 +40,15 @@ class SelectOptionsApiController {
                     [id: it.id, label: "${it.code} - ${it.name}"]
                 }
         render([data: glAccounts] as JSON)
+    }
+
+    def glAccountTypeOptions() {
+        List<GlAccountType> glAccountTypes = genericApiService.getList(GlAccountType.class.simpleName, [sort: "code"])
+                .findAll { it?.code }
+                .collect {
+                    [id: it.id, label: "${it.code}"]
+                }
+        render([data: glAccountTypes] as JSON)
     }
 
     def productGroupOptions() {

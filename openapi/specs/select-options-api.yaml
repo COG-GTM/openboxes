@@ -8,7 +8,8 @@ info:
     "/api/productGroupOptions", "/api/tagOptions", "/api/glAccountOptions",
     "/api/paymentTermOptions", "/api/users", "/api/preferenceTypeOptions",
     "/api/ratingTypeCodeOptions", "/api/handlingRequirementsOptions" and
-    "/api/stockMovements/shipmentStatusCodes"). All endpoints are GET-only and
+    "/api/stockMovements/shipmentStatusCodes", "/api/glAccountTypeOptions").
+    All endpoints are GET-only and
     render an option list under a "data" envelope; the option shape varies
     slightly per endpoint (some include "value" and/or "variant").
   version: 0.1.0
@@ -18,6 +19,17 @@ servers:
 security:
   - cookieAuth: []
 paths:
+  /api/glAccountTypeOptions:
+    get:
+      operationId: listGlAccountTypeOptions
+      summary: GL account type options
+      description: >
+        Returns all GlAccountType records that have a code, sorted by code,
+        as {id, label} pairs (label is the code). Added in Phase 2 (Batch 26)
+        for the React glAccount form.
+      responses:
+        '200':
+          $ref: '#/components/responses/IdLabelOptionsOk'
   /api/glAccountOptions:
     get:
       operationId: glAccountOptions

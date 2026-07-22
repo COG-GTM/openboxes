@@ -1,0 +1,224 @@
+openapi: 3.0.3
+info:
+  title: OpenBoxes - GlAccountApiController
+  description: >
+    GL account list/read/create/update/delete endpoints handled by
+    org.pih.warehouse.api.GlAccountApiController, routed via the standard
+    "/api/${resource}s" and "/api/${resource}s/$id" REST mappings. Added in
+    Phase 2 (Batch 26) to back the React glAccount list/create/edit screens.
+    Parity rule preserved from the legacy GSP flow: a GL account referenced
+    by any product cannot be deactivated (update rejects with a 400
+    validation error).
+  version: 0.1.0
+servers:
+  - url: http://localhost:8080/openboxes
+    description: Local Docker baseline (docs/migration/RUNNING_LOCALLY.md)
+security:
+  - cookieAuth: []
+paths:
+  /api/glAccounts:
+    get:
+      operationId: listGlAccounts
+      summary: List GL accounts, optionally filtered
+      parameters:
+        - name: active
+          in: query
+          required: false
+          schema:
+            type: boolean
+          description: Filter by active flag.
+        - name: sort
+          in: query
+          required: false
+          schema:
+            type: string
+          description: GlAccount property to sort by (e.g. code, name, dateCreated).
+        - name: order
+          in: query
+          required: false
+          schema:
+            type: string
+            enum: [asc, desc]
+          description: Sort direction, only applied when sort is provided.
+        - $ref: '../components/common.yaml#/components/parameters/max'
+        - $ref: '../components/common.yaml#/components/parameters/offset'
+      responses:
+        '200':
+          description: >
+            GL accounts. totalCount reflects the full result set when max is
+            provided (paged criteria query), otherwise the returned list size.
+          content:
+            application/json:
+              schema:
+                type: object
+                required: [data, totalCount]
+                properties:
+                  data:
+                    type: array
+                    items:
+                      $ref: '#/components/schemas/GlAccount'
+                  totalCount:
+                    type: integer
+    post:
+      operationId: createGlAccount
+      summary: Create a GL account
+      requestBody:
+        required: true
+        content:
+          application/json:
+            schema:
+              $ref: '#/components/schemas/GlAccountInput'
+      responses:
+        '201':
+          description: Created GL account.
+          content:
+            application/json:
+              schema:
+                type: object
+                required: [data]
+                properties:
+                  data:
+                    $ref: '#/components/schemas/GlAccount'
+        '400':
+          $ref: '../components/common.yaml#/components/responses/ValidationError'
+  /api/glAccounts/{id}:
+    parameters:
+      - name: id
+        in: path
+        required: true
+        schema:
+          $ref: '../components/common.yaml#/components/schemas/Id'
+        description: >
+          GL account id. Unknown ids raise ObjectNotFoundException,
+          rendered as HTTP 404 by ErrorsController.handleNotFound.
+    get:
+      operationId: readGlAccount
+      summary: Read a single GL account
+      responses:
+        '200':
+          description: The GL account.
+          content:
+            application/json:
+              schema:
+                type: object
+                required: [data]
+                properties:
+                  data:
+                    $ref: '#/components/schemas/GlAccount'
+        '404':
+          $ref: '../components/common.yaml#/components/responses/NotFound'
+    put:
+      operationId: updateGlAccount
+      summary: Update a GL account
+      description: >
+        Partial update; only keys present in the body are bound. Deactivating
+        a GL account that is referenced by any product is rejected with a 400
+        validation error. Also mapped for POST via the standard
+        "/api/${resource}s/$id" REST mapping.
+      requestBody:
+        required: true
+        content:
+          application/json:
+            schema:
+              $ref: '#/components/schemas/GlAccountInput'
+      responses:
+        '200':
+          description: The updated GL account.
+          content:
+            application/json:
+              schema:
+                type: object
+                required: [data]
+                properties:
+                  data:
+                    $ref: '#/components/schemas/GlAccount'
+        '400':
+          $ref: '../components/common.yaml#/components/responses/ValidationError'
+        '404':
+          $ref: '../components/common.yaml#/components/responses/NotFound'
+    delete:
+      operationId: deleteGlAccount
+      summary: Delete a GL account
+      responses:
+        '204':
+          description: Deleted; no content.
+        '400':
+          description: >
+            GL account is referenced by other records (foreign key
+            constraint) and cannot be deleted.
+          content:
+            application/json:
+              schema:
+                $ref: '../components/common.yaml#/components/schemas/ValidationErrorResponse'
+        '404':
+          $ref: '../components/common.yaml#/components/responses/NotFound'
+        '500':
+          $ref: '../components/common.yaml#/components/responses/ServerError'
+components:
+  schemas:
+    GlAccount:
+      type: object
+      description: GL account rendering emitted by GlAccountApiController.toJson().
+      required: [id, code]
+      properties:
+        id:
+          $ref: '../components/common.yaml#/components/schemas/Id'
+        code:
+          type: string
+        name:
+          type: string
+          nullable: true
+        description:
+          type: string
+          nullable: true
+        active:
+          type: boolean
+        glAccountType:
+          type: object
+          nullable: true
+          properties:
+            id:
+              $ref: '../components/common.yaml#/components/schemas/Id'
+            code:
+              type: string
+              nullable: true
+            name:
+              type: string
+              nullable: true
+            glAccountTypeCode:
+              type: string
+              nullable: true
+              description: GlAccountTypeCode enum name (e.g. ASSET, EXPENSE).
+          additionalProperties: true
+        dateCreated:
+          type: string
+          nullable: true
+        lastUpdated:
+          type: string
+          nullable: true
+      additionalProperties: true
+    GlAccountInput:
+      type: object
+      description: >
+        Partial-update input; only keys present are bound. glAccountType may
+        be an object with an id or a plain id string; null clears it (which
+        fails validation since glAccountType is required).
+      properties:
+        code:
+          type: string
+        name:
+          type: string
+          nullable: true
+        description:
+          type: string
+          nullable: true
+        active:
+          type: boolean
+        glAccountType:
+          description: >
+            GL account type reference; either an object with an id or a plain
+            id string.
+      additionalProperties: true
+  securitySchemes:
+    cookieAuth:
+      $ref: '../components/common.yaml#/components/securitySchemes/cookieAuth'

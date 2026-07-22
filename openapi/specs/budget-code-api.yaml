@@ -1,0 +1,220 @@
+openapi: 3.0.3
+info:
+  title: OpenBoxes - BudgetCodeApiController
+  description: >
+    Budget code list/read/create/update/delete endpoints handled by
+    org.pih.warehouse.api.BudgetCodeApiController, routed via the standard
+    "/api/${resource}s" and "/api/${resource}s/$id" REST mappings. Added in
+    Phase 2 (Batch 26) to back the React budgetCode list/create/edit screens.
+  version: 0.1.0
+servers:
+  - url: http://localhost:8080/openboxes
+    description: Local Docker baseline (docs/migration/RUNNING_LOCALLY.md)
+security:
+  - cookieAuth: []
+paths:
+  /api/budgetCodes:
+    get:
+      operationId: listBudgetCodes
+      summary: List budget codes, optionally filtered
+      parameters:
+        - name: q
+          in: query
+          required: false
+          schema:
+            type: string
+          description: Substring search (ilike "%q%") on code.
+        - name: active
+          in: query
+          required: false
+          schema:
+            type: boolean
+          description: Filter by active flag.
+        - name: sort
+          in: query
+          required: false
+          schema:
+            type: string
+          description: BudgetCode property to sort by (e.g. code, name, dateCreated).
+        - name: order
+          in: query
+          required: false
+          schema:
+            type: string
+            enum: [asc, desc]
+          description: Sort direction, only applied when sort is provided.
+        - $ref: '../components/common.yaml#/components/parameters/max'
+        - $ref: '../components/common.yaml#/components/parameters/offset'
+      responses:
+        '200':
+          description: Paged budget codes.
+          content:
+            application/json:
+              schema:
+                type: object
+                required: [data, totalCount]
+                properties:
+                  data:
+                    type: array
+                    items:
+                      $ref: '#/components/schemas/BudgetCode'
+                  totalCount:
+                    type: integer
+    post:
+      operationId: createBudgetCode
+      summary: Create a budget code
+      requestBody:
+        required: true
+        content:
+          application/json:
+            schema:
+              $ref: '#/components/schemas/BudgetCodeInput'
+      responses:
+        '201':
+          description: Created budget code.
+          content:
+            application/json:
+              schema:
+                type: object
+                required: [data]
+                properties:
+                  data:
+                    $ref: '#/components/schemas/BudgetCode'
+        '400':
+          $ref: '../components/common.yaml#/components/responses/ValidationError'
+  /api/budgetCodes/{id}:
+    parameters:
+      - name: id
+        in: path
+        required: true
+        schema:
+          $ref: '../components/common.yaml#/components/schemas/Id'
+        description: >
+          Budget code id. Unknown ids raise ObjectNotFoundException,
+          rendered as HTTP 404 by ErrorsController.handleNotFound.
+    get:
+      operationId: readBudgetCode
+      summary: Read a single budget code
+      responses:
+        '200':
+          description: The budget code.
+          content:
+            application/json:
+              schema:
+                type: object
+                required: [data]
+                properties:
+                  data:
+                    $ref: '#/components/schemas/BudgetCode'
+        '404':
+          $ref: '../components/common.yaml#/components/responses/NotFound'
+    put:
+      operationId: updateBudgetCode
+      summary: Update a budget code
+      description: >
+        Partial update; only keys present in the body are bound. Also mapped
+        for POST via the standard "/api/${resource}s/$id" REST mapping.
+      requestBody:
+        required: true
+        content:
+          application/json:
+            schema:
+              $ref: '#/components/schemas/BudgetCodeInput'
+      responses:
+        '200':
+          description: The updated budget code.
+          content:
+            application/json:
+              schema:
+                type: object
+                required: [data]
+                properties:
+                  data:
+                    $ref: '#/components/schemas/BudgetCode'
+        '400':
+          $ref: '../components/common.yaml#/components/responses/ValidationError'
+        '404':
+          $ref: '../components/common.yaml#/components/responses/NotFound'
+    delete:
+      operationId: deleteBudgetCode
+      summary: Delete a budget code
+      responses:
+        '204':
+          description: Deleted; no content.
+        '400':
+          description: >
+            Budget code is referenced by other records (foreign key
+            constraint) and cannot be deleted.
+          content:
+            application/json:
+              schema:
+                $ref: '../components/common.yaml#/components/schemas/ValidationErrorResponse'
+        '404':
+          $ref: '../components/common.yaml#/components/responses/NotFound'
+        '500':
+          $ref: '../components/common.yaml#/components/responses/ServerError'
+components:
+  schemas:
+    BudgetCode:
+      type: object
+      description: Budget code rendering emitted by BudgetCodeApiController.toJson().
+      required: [id, code]
+      properties:
+        id:
+          $ref: '../components/common.yaml#/components/schemas/Id'
+        code:
+          type: string
+        name:
+          type: string
+          nullable: true
+        description:
+          type: string
+          nullable: true
+        active:
+          type: boolean
+          nullable: true
+        organization:
+          type: object
+          nullable: true
+          properties:
+            id:
+              $ref: '../components/common.yaml#/components/schemas/Id'
+            code:
+              type: string
+              nullable: true
+            name:
+              type: string
+              nullable: true
+          additionalProperties: true
+        dateCreated:
+          type: string
+          nullable: true
+        lastUpdated:
+          type: string
+          nullable: true
+      additionalProperties: true
+    BudgetCodeInput:
+      type: object
+      description: >
+        Partial-update input; only keys present are bound. organization may
+        be an object with an id or a plain id string; null clears it.
+      properties:
+        code:
+          type: string
+        name:
+          type: string
+          nullable: true
+        description:
+          type: string
+          nullable: true
+        active:
+          type: boolean
+          nullable: true
+        organization:
+          description: >
+            Organization reference; either an object with an id, a plain id
+            string, or null to clear.
+      additionalProperties: true
+  securitySchemes:
+    cookieAuth:
+      $ref: '../components/common.yaml#/components/securitySchemes/cookieAuth'

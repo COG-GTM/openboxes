@@ -9,31 +9,24 @@
 **/
 package org.pih.warehouse.core
 
-import grails.gorm.PagedResultList
 import grails.gorm.transactions.Transactional
 
 class BudgetCodeController {
-    def budgetCodeService
 
     def index() {
         redirect(action: "list", params: params)
     }
 
-    def list(BudgetCodeFilterCommand command) {
-        PagedResultList<BudgetCode> budgetCodeList = budgetCodeService.getBudgetCodes(command)
-        return [budgetCodes: budgetCodeList, budgetCodesTotal: budgetCodeList.totalCount]
+    def list() {
+        render(view: "/common/react", params: params)
     }
 
     def create() {
-        def budgetCode = new BudgetCode()
-        budgetCode.properties = params
-        return [budgetCode: budgetCode]
+        render(view: "/common/react", params: params)
     }
 
     def edit() {
-        def budgetCode = BudgetCode.get(params.id)
-        def organization = budgetCode?.organization ? Organization.get(budgetCode.organization.id) : null
-        return [budgetCode: budgetCode, organizationId: organization?.id]
+        render(view: "/common/react", params: params)
     }
 
     @Transactional

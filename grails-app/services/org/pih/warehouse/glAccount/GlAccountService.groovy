@@ -22,6 +22,9 @@ class GlAccountService {
             if (params.active != null) {
                 eq("active", params.active?.toBoolean())
             }
+            if (params.sort) {
+                order(params.sort, params.order ?: 'asc')
+            }
         }
     }
 }

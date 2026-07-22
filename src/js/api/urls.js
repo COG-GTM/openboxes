@@ -94,6 +94,13 @@ export const STOCKLIST_UNPUBLISH = (id) => `${STOCKLIST_API}/${id}/unpublish`;
 
 // GL ACCOUNTS
 export const GL_ACCOUNTS_OPTION = `${API}/glAccountOptions`;
+export const GL_ACCOUNT_API = `${API}/glAccounts`;
+export const GL_ACCOUNT_BY_ID = (id) => `${GL_ACCOUNT_API}/${id}`;
+export const GL_ACCOUNT_TYPE_OPTIONS = `${API}/glAccountTypeOptions`;
+
+// BUDGET CODES
+export const BUDGET_CODE_API = `${API}/budgetCodes`;
+export const BUDGET_CODE_BY_ID = (id) => `${BUDGET_CODE_API}/${id}`;
 
 // PRODUCT GROUP
 export const PRODUCT_GROUP_OPTION = `${API}/productGroupOptions`;

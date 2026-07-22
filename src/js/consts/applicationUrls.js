@@ -154,6 +154,20 @@ const REPLENISHMENT_URL = {
   print: (id) => `${REPLENISHMENT_URL.base}/print/${id}`,
 };
 
+const BUDGET_CODE_URL = {
+  base: `${CONTEXT_PATH}/budgetCode`,
+  list: () => `${BUDGET_CODE_URL.base}/list`,
+  create: () => `${BUDGET_CODE_URL.base}/create`,
+  edit: (id) => `${BUDGET_CODE_URL.base}/edit/${id}`,
+};
+
+const GL_ACCOUNT_URL = {
+  base: `${CONTEXT_PATH}/glAccount`,
+  list: () => `${GL_ACCOUNT_URL.base}/list`,
+  create: () => `${GL_ACCOUNT_URL.base}/create`,
+  edit: (id) => `${GL_ACCOUNT_URL.base}/edit/${id}`,
+};
+
 const CATEGORY_URL = {
   base: `${CONTEXT_PATH}/category`,
   tree: (id) => (id ? `${CATEGORY_URL.base}/tree?id=${id}` : `${CATEGORY_URL.base}/tree`),
@@ -224,9 +238,11 @@ const CYCLE_COUNT = {
 export {
   ATTRIBUTE_URL,
   BARCODE_URL,
+  BUDGET_CODE_URL,
   CATEGORY_URL,
   CYCLE_COUNT,
   DASHBOARD_URL,
+  GL_ACCOUNT_URL,
   INVENTORY_ITEM_URL,
   INVENTORY_URL,
   INVOICE_URL,

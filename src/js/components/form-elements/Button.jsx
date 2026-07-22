@@ -56,6 +56,7 @@ Button.propTypes = {
     'primary-outline',
     'grayed',
     'danger',
+    'danger-outline',
   ]),
   onClick: PropTypes.func,
   EndIcon: PropTypes.element,
