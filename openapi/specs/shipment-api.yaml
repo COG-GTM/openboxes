@@ -525,12 +525,75 @@ paths:
         '404':
           $ref: '#/components/responses/ControllerNotFound'
 
+  /api/shipments/{id}/outboundReturnPrint:
+    get:
+      operationId: getOutboundReturnPrintData
+      summary: Print data for the outbound return delivery note
+      description: >-
+        Returns the shipment header, addresses, notes and shipment items (with
+        matching positive-quantity receipt items) that the legacy
+        deliveryNote/printOutboundReturn.gsp screen rendered. Shipment items
+        are sorted by product name. Returns 404 with an `errorMessage` body
+        when the shipment does not exist.
+      parameters:
+        - $ref: '#/components/parameters/id'
+      responses:
+        '200':
+          description: Outbound return print data
+          content:
+            application/json:
+              schema:
+                type: object
+                required: [data]
+                properties:
+                  data:
+                    $ref: '#/components/schemas/OutboundReturnPrintData'
+        '404':
+          $ref: '../components/common.yaml#/components/responses/NotFound'
+        '401':
+          $ref: '../components/common.yaml#/components/responses/Unauthorized'
+  /api/shipments/{id}/goodsReceiptNotePrint:
+    get:
+      operationId: getGoodsReceiptNotePrintData
+      summary: Print data for the goods receipt note
+      description: >-
+        Returns the shipment header, receipts and shipment items (each with
+        its receipt items) that the legacy goodsReceiptNote/print.gsp screen
+        rendered. Only shipment items that have receipt items are included;
+        items are in shipment sort order and receipt items are ordered with
+        split items first (the legacy _body.gsp sort). `status` is the localized shipment status display
+        name. Returns 404 with an `errorMessage` body when the shipment does
+        not exist.
+      parameters:
+        - $ref: '#/components/parameters/id'
+      responses:
+        '200':
+          description: Goods receipt note print data
+          content:
+            application/json:
+              schema:
+                type: object
+                required: [data]
+                properties:
+                  data:
+                    $ref: '#/components/schemas/GoodsReceiptNotePrintData'
+        '404':
+          $ref: '../components/common.yaml#/components/responses/NotFound'
+        '401':
+          $ref: '../components/common.yaml#/components/responses/Unauthorized'
 components:
   securitySchemes:
     cookieAuth:
       $ref: '../components/common.yaml#/components/securitySchemes/cookieAuth'
 
   parameters:
+    id:
+      name: id
+      in: path
+      required: true
+      description: Shipment id
+      schema:
+        $ref: '../components/common.yaml#/components/schemas/Id'
     shipmentId:
       name: id
       in: path
@@ -881,3 +944,210 @@ components:
           $ref: '#/components/schemas/NullableNamedReference'
         recipient:
           $ref: '#/components/schemas/PersonReference'
+    PrintLocation:
+      type: object
+      nullable: true
+      properties:
+        id:
+          $ref: '../components/common.yaml#/components/schemas/Id'
+        name:
+          type: string
+          nullable: true
+        address:
+          type: object
+          nullable: true
+          properties:
+            address:
+              type: string
+              nullable: true
+            address2:
+              type: string
+              nullable: true
+            city:
+              type: string
+              nullable: true
+            stateOrProvince:
+              type: string
+              nullable: true
+            postalCode:
+              type: string
+              nullable: true
+            country:
+              type: string
+              nullable: true
+    OutboundReturnPrintData:
+      type: object
+      required: [id, shipmentNumber, shipmentItems]
+      properties:
+        id:
+          $ref: '../components/common.yaml#/components/schemas/Id'
+        shipmentNumber:
+          type: string
+          nullable: true
+        name:
+          type: string
+          nullable: true
+        origin:
+          $ref: '#/components/schemas/PrintLocation'
+        destination:
+          $ref: '#/components/schemas/PrintLocation'
+        expectedShippingDate:
+          type: string
+          nullable: true
+        receivedDate:
+          type: string
+          nullable: true
+        referenceNumber:
+          type: string
+          nullable: true
+        driverName:
+          type: string
+          nullable: true
+        additionalInformation:
+          type: string
+          nullable: true
+        shipmentItems:
+          type: array
+          items:
+            type: object
+            required: [id, receiptItems]
+            properties:
+              id:
+                $ref: '../components/common.yaml#/components/schemas/Id'
+              productId:
+                type: string
+                nullable: true
+              productCode:
+                type: string
+                nullable: true
+              productName:
+                type: string
+                nullable: true
+              lotNumber:
+                type: string
+                nullable: true
+              expirationDate:
+                type: string
+                nullable: true
+              quantity:
+                type: integer
+                nullable: true
+              receiptItems:
+                type: array
+                items:
+                  type: object
+                  properties:
+                    id:
+                      $ref: '../components/common.yaml#/components/schemas/Id'
+                    productId:
+                      type: string
+                      nullable: true
+                    productCode:
+                      type: string
+                      nullable: true
+                    productName:
+                      type: string
+                      nullable: true
+                    lotNumber:
+                      type: string
+                      nullable: true
+                    expirationDate:
+                      type: string
+                      nullable: true
+                    quantityReceived:
+                      type: integer
+                      nullable: true
+                    comment:
+                      type: string
+                      nullable: true
+    GoodsReceiptNotePrintData:
+      type: object
+      required: [id, shipmentNumber, receipts, shipmentItems]
+      properties:
+        id:
+          $ref: '../components/common.yaml#/components/schemas/Id'
+        shipmentNumber:
+          type: string
+          nullable: true
+        name:
+          type: string
+          nullable: true
+        status:
+          type: string
+          nullable: true
+        origin:
+          $ref: '#/components/schemas/PrintLocation'
+        destination:
+          $ref: '#/components/schemas/PrintLocation'
+        actualShippingDate:
+          type: string
+          nullable: true
+        lastReceiptDate:
+          type: string
+          nullable: true
+        receipts:
+          type: array
+          items:
+            type: object
+            properties:
+              id:
+                $ref: '../components/common.yaml#/components/schemas/Id'
+              receiptNumber:
+                type: string
+                nullable: true
+        shipmentItems:
+          type: array
+          items:
+            type: object
+            required: [id, receiptItems]
+            properties:
+              id:
+                $ref: '../components/common.yaml#/components/schemas/Id'
+              productCode:
+                type: string
+                nullable: true
+              productName:
+                type: string
+                nullable: true
+              lotNumber:
+                type: string
+                nullable: true
+              expirationDate:
+                type: string
+                nullable: true
+              unitOfMeasure:
+                type: string
+                nullable: true
+              quantityShipped:
+                type: integer
+                nullable: true
+              hasSplit:
+                type: boolean
+              receiptItems:
+                type: array
+                items:
+                  type: object
+                  properties:
+                    id:
+                      $ref: '../components/common.yaml#/components/schemas/Id'
+                    receiptId:
+                      type: string
+                      nullable: true
+                    lotNumber:
+                      type: string
+                      nullable: true
+                    expirationDate:
+                      type: string
+                      nullable: true
+                    quantityShipped:
+                      type: integer
+                      nullable: true
+                    quantityReceived:
+                      type: integer
+                      nullable: true
+                    comment:
+                      type: string
+                      nullable: true
+                    isSplitItem:
+                      type: boolean
+                      nullable: true

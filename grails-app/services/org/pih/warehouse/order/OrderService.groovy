@@ -15,6 +15,7 @@ import grails.validation.ValidationException
 import grails.util.Holders
 import org.grails.plugins.web.taglib.ApplicationTagLib
 import org.hibernate.sql.JoinType
+import org.grails.orm.hibernate.cfg.GrailsHibernateUtil
 
 import grails.plugins.csv.CSVMapReader
 import org.hibernate.criterion.CriteriaSpecification
@@ -315,6 +316,7 @@ class OrderService {
         shipmentInstance.expectedShippingDate = orderCommand?.shippedOn
 
         orderCommand?.shipment = shipmentInstance
+        def shipmentItemsToLink = []
         orderCommand?.orderItems.each { orderItemCommand ->
 
             // Ignores any null order items and makes sure that the order item has a product and quantity
@@ -337,14 +339,35 @@ class OrderService {
                 shipmentItem.quantity = orderItemCommand.quantityReceived
                 shipmentItem.recipient = orderCommand?.recipient
                 shipmentItem.inventoryItem = inventoryItem
-                shipmentItem.addToOrderItems(orderItemCommand?.orderItem)
+                shipmentItemsToLink << [shipmentItem: shipmentItem, orderItemId: orderItemCommand?.orderItem?.id]
                 shipmentInstance.addToShipmentItems(shipmentItem)
             }
+        }
+
+        // The session.flush()/session.clear() calls above detach the order
+        // graph, leaving uninitialized proxies (order type, destination
+        // location type) that later lazy access fails on, so re-attach the
+        // order before continuing
+        if (orderCommand?.order?.id) {
+            orderCommand.order = Order.get(orderCommand.order.id)
+        }
+
+        // Link the shipment items to their order items only after the last
+        // session.clear() above, on freshly attached order items, so the
+        // order_shipment join rows actually get flushed
+        shipmentItemsToLink.each {
+            OrderItem orderItem = OrderItem.get(it.orderItemId)
+            it.shipmentItem.addToOrderItems(orderItem)
         }
 
         // Validate the shipment and save it if there are no errors
         if (shipmentInstance.validate() && !shipmentInstance.hasErrors()) {
             shipmentService.saveShipment(shipmentInstance)
+            // Flush the shipment insert before sendShipment creates the SHIPPED
+            // event, otherwise Hibernate executes the shipment insert (whose
+            // beforeInsert sets currentEvent) before the event insert at the next
+            // flush, violating the shipment.current_event_id foreign key
+            shipmentInstance.save(flush: true)
         } else {
             log.info("Errors with shipment " + shipmentInstance?.errors)
             throw new ShipmentException(message: "Validation errors on shipment ", shipment: shipmentInstance)
@@ -374,7 +397,10 @@ class OrderService {
     }
 
     Order saveOrder(Order order) {
-        if (order.destinationParty?.id != sessionManager.getCurrentLocation().organizationId) {
+        // destinationParty may be a Hibernate proxy of an Organization typed as
+        // Party; unwrap it so reflective property access doesn't throw
+        def destinationParty = GrailsHibernateUtil.unwrapIfProxy(order.destinationParty)
+        if (destinationParty?.id != sessionManager.getCurrentLocation().organizationId) {
             order.errors.rejectValue("destinationParty", "order.destinationParty.invalid.differentOrganization")
             throw new ValidationException("Unable to save order due to errors", order.errors)
         }

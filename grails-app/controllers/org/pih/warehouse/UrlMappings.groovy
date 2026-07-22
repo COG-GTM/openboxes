@@ -1201,6 +1201,23 @@ class UrlMappings {
             action = [GET: "printData"]
         }
 
+        // Receive order API (migrated receiveOrderWorkflow screens)
+        "/api/orders/$id/receiveOrder"(parseRequest: true) {
+            controller = "receiveOrderApi"
+            action = [GET: "read", POST: "save"]
+        }
+
+        // Shipment print API (migrated deliveryNote/goodsReceiptNote print screens)
+        "/api/shipments/$id/outboundReturnPrint"(parseRequest: true) {
+            controller = "shipmentApi"
+            action = [GET: "outboundReturnPrintData"]
+        }
+
+        "/api/shipments/$id/goodsReceiptNotePrint"(parseRequest: true) {
+            controller = "shipmentApi"
+            action = [GET: "goodsReceiptNotePrintData"]
+        }
+
         // Order adjustment type API (migrated orderAdjustmentType screens)
         "/api/orderAdjustmentTypes"(parseRequest: true) {
             controller = "orderAdjustmentTypeApi"

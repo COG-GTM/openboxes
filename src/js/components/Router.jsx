@@ -523,6 +523,21 @@ const AsyncOrderPrint = Loadable({
   loading: Loading,
 });
 
+const AsyncOutboundReturnPrint = Loadable({
+  loader: () => import('components/deliveryNote/OutboundReturnPrint'),
+  loading: Loading,
+});
+
+const AsyncGoodsReceiptNotePrint = Loadable({
+  loader: () => import('components/goodsReceiptNote/GoodsReceiptNotePrint'),
+  loading: Loading,
+});
+
+const AsyncReceiveOrderPage = Loadable({
+  loader: () => import('components/receiveOrder/ReceiveOrderPage'),
+  loading: Loading,
+});
+
 const AsyncOrderAdjustmentTypeList = Loadable({
   loader: () => import('components/orderAdjustmentType/OrderAdjustmentTypeList'),
   loading: Loading,
@@ -1039,6 +1054,9 @@ const Router = () => {
             <MainLayoutRoute path="**/order/orderItemDetails" component={OrderItemDetailsList} />
             <MainLayoutRoute path="**/order/show/:orderId" component={AsyncOrderShow} />
             <MainLayoutRoute path="**/order/print/:orderId" component={AsyncOrderPrint} />
+            <MainLayoutRoute path="**/deliveryNote/printOutboundReturn/:id?" component={AsyncOutboundReturnPrint} />
+            <MainLayoutRoute path="**/goodsReceiptNote/print/:id?" component={AsyncGoodsReceiptNotePrint} />
+            <MainLayoutRoute path="**/receiveOrderWorkflow/receiveOrder/:orderId?" component={AsyncReceiveOrderPage} />
             <MainLayoutRoute path="**/orderAdjustmentType/list" component={AsyncOrderAdjustmentTypeList} />
             <MainLayoutRoute path="**/orderAdjustmentType/create" component={AsyncOrderAdjustmentTypeForm} />
             <MainLayoutRoute path="**/orderAdjustmentType/edit/:orderAdjustmentTypeId" component={AsyncOrderAdjustmentTypeForm} />

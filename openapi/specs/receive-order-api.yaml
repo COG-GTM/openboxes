@@ -1,0 +1,264 @@
+openapi: 3.0.3
+info:
+  title: OpenBoxes - ReceiveOrderApiController
+  description: >-
+    Receive order workflow endpoints served by ReceiveOrderApiController. URL
+    mapping (see grails-app/controllers/org/pih/warehouse/UrlMappings.groovy):
+    `/api/orders/{id}/receiveOrder` (GET read, POST save). Added when the
+    legacy receiveOrderWorkflow webflow screens (enterShipmentDetails,
+    processOrderItems, confirmOrderReceipt, handleError) were migrated to
+    React.
+  version: 0.1.0
+servers:
+  - url: http://localhost:8080/openboxes
+security:
+  - cookieAuth: []
+paths:
+  /api/orders/{id}/receiveOrder:
+    get:
+      operationId: getReceiveOrderData
+      summary: Order and order item data for the receive order workflow
+      description: >-
+        Returns the order header and order items that the legacy
+        ReceiveOrderWorkflowController webflow assembled via
+        OrderService.getOrder. `quantityFulfilled` and
+        `isCompletelyFulfilled` reflect quantities already received on prior
+        shipments. Returns 404 with an `errorMessage` body when the order
+        does not exist.
+      parameters:
+        - $ref: '#/components/parameters/id'
+      responses:
+        '200':
+          description: Receive order data
+          content:
+            application/json:
+              schema:
+                type: object
+                required: [data]
+                properties:
+                  data:
+                    $ref: '#/components/schemas/ReceiveOrderData'
+        '404':
+          $ref: '../components/common.yaml#/components/responses/NotFound'
+        '401':
+          $ref: '../components/common.yaml#/components/responses/Unauthorized'
+    post:
+      operationId: receiveOrder
+      summary: Receive an order (create, send and receive a shipment)
+      description: >-
+        Mirrors the confirmOrderReceipt submit transition of the legacy
+        receive order webflow, which delegates to
+        OrderService.saveOrderShipment: creates a shipment for the submitted
+        order items, sends it and receives it against the current location.
+        Validation failures (missing shipment type/recipient/dates, future
+        dates, received quantity without a product) return 400 with
+        `errorMessages`; persistence failures return 500 with
+        `errorMessages`. Dates are `yyyy-MM-dd` strings.
+      parameters:
+        - $ref: '#/components/parameters/id'
+      requestBody:
+        required: true
+        content:
+          application/json:
+            schema:
+              $ref: '#/components/schemas/ReceiveOrderRequest'
+      responses:
+        '200':
+          description: Order received
+          content:
+            application/json:
+              schema:
+                type: object
+                required: [data]
+                properties:
+                  data:
+                    type: object
+                    properties:
+                      orderId:
+                        $ref: '../components/common.yaml#/components/schemas/Id'
+                      shipmentId:
+                        type: string
+                        nullable: true
+        '400':
+          description: Validation error
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/ReceiveOrderErrorResponse'
+        '404':
+          $ref: '../components/common.yaml#/components/responses/NotFound'
+        '401':
+          $ref: '../components/common.yaml#/components/responses/Unauthorized'
+        '500':
+          description: Error while saving the shipment, receipt or order
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/ReceiveOrderErrorResponse'
+components:
+  securitySchemes:
+    cookieAuth:
+      $ref: '../components/common.yaml#/components/securitySchemes/cookieAuth'
+  parameters:
+    id:
+      name: id
+      in: path
+      required: true
+      description: Order id
+      schema:
+        $ref: '../components/common.yaml#/components/schemas/Id'
+  schemas:
+    ReceiveOrderErrorResponse:
+      type: object
+      required: [errorCode, errorMessages]
+      properties:
+        errorCode:
+          type: integer
+        errorMessages:
+          type: array
+          items:
+            type: string
+    ReceiveOrderData:
+      type: object
+      required: [id, orderNumber, orderItems]
+      properties:
+        id:
+          $ref: '../components/common.yaml#/components/schemas/Id'
+        defaultRecipient:
+          description: >-
+            Suggested recipient (the current user), matching the recipient the
+            legacy webflow preselected.
+          type: object
+          nullable: true
+          properties:
+            id:
+              $ref: '../components/common.yaml#/components/schemas/Id'
+            name:
+              type: string
+              nullable: true
+        orderNumber:
+          type: string
+          nullable: true
+        name:
+          type: string
+          nullable: true
+        dateOrdered:
+          type: string
+          nullable: true
+        origin:
+          type: object
+          nullable: true
+          properties:
+            id:
+              $ref: '../components/common.yaml#/components/schemas/Id'
+            name:
+              type: string
+              nullable: true
+        destination:
+          type: object
+          nullable: true
+          properties:
+            id:
+              $ref: '../components/common.yaml#/components/schemas/Id'
+            name:
+              type: string
+              nullable: true
+        orderedBy:
+          type: object
+          nullable: true
+          properties:
+            id:
+              $ref: '../components/common.yaml#/components/schemas/Id'
+            name:
+              type: string
+              nullable: true
+        orderItems:
+          type: array
+          items:
+            type: object
+            required: [id]
+            properties:
+              id:
+                $ref: '../components/common.yaml#/components/schemas/Id'
+              type:
+                type: string
+                nullable: true
+              description:
+                type: string
+                nullable: true
+              product:
+                type: object
+                nullable: true
+                properties:
+                  id:
+                    $ref: '../components/common.yaml#/components/schemas/Id'
+                  productCode:
+                    type: string
+                    nullable: true
+                  name:
+                    type: string
+                    nullable: true
+                  unitOfMeasure:
+                    type: string
+                    nullable: true
+              quantityOrdered:
+                type: integer
+                nullable: true
+              quantityFulfilled:
+                type: integer
+                nullable: true
+              isCompletelyFulfilled:
+                type: boolean
+                nullable: true
+    ReceiveOrderRequest:
+      type: object
+      properties:
+        shipmentType:
+          type: object
+          nullable: true
+          properties:
+            id:
+              $ref: '../components/common.yaml#/components/schemas/Id'
+        recipient:
+          type: object
+          nullable: true
+          properties:
+            id:
+              $ref: '../components/common.yaml#/components/schemas/Id'
+        shippedOn:
+          type: string
+          nullable: true
+          description: yyyy-MM-dd
+        deliveredOn:
+          type: string
+          nullable: true
+          description: yyyy-MM-dd
+        orderItems:
+          type: array
+          items:
+            type: object
+            properties:
+              orderItem:
+                type: object
+                properties:
+                  id:
+                    $ref: '../components/common.yaml#/components/schemas/Id'
+              primary:
+                type: boolean
+                nullable: true
+              productReceived:
+                type: object
+                nullable: true
+                properties:
+                  id:
+                    $ref: '../components/common.yaml#/components/schemas/Id'
+              lotNumber:
+                type: string
+                nullable: true
+              expirationDate:
+                type: string
+                nullable: true
+                description: yyyy-MM-dd
+              quantityReceived:
+                type: integer
+                nullable: true

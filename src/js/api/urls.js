@@ -81,6 +81,7 @@ export const ORDER_ITEMS = (id) => `${ORDER_BY_ID(id)}/items`;
 export const ORDER_SHIPMENTS = (id) => `${ORDER_BY_ID(id)}/shipments`;
 export const ORDER_INVOICES = (id) => `${ORDER_BY_ID(id)}/invoices`;
 export const ORDER_PRINT = (id) => `${ORDER_BY_ID(id)}/print`;
+export const ORDER_RECEIVE = (id) => `${ORDER_BY_ID(id)}/receiveOrder`;
 export const ORDER_ADJUSTMENTS = (id) => `${ORDER_BY_ID(id)}/adjustments`;
 export const ORDER_ADJUSTMENT_BY_ID = (id, adjustmentId) => `${ORDER_ADJUSTMENTS(id)}/${adjustmentId}`;
 export const ORDER_SUMMARIES = `${API}/orderSummaries`;
@@ -343,6 +344,8 @@ export const SHIPMENT_PICKLIST = (id) => `${SHIPMENT_BY_ID(id)}/picklist`;
 export const SHIPMENT_VALIDATE_PICKLIST = (id) => `${SHIPMENT_BY_ID(id)}/validatePicklist`;
 export const SHIPMENT_CLEAR_PICKLIST = (id) => `${SHIPMENT_BY_ID(id)}/clearPicklist`;
 export const SHIPMENT_SEND = (id) => `${SHIPMENT_BY_ID(id)}/send`;
+export const SHIPMENT_OUTBOUND_RETURN_PRINT = (id) => `${SHIPMENT_BY_ID(id)}/outboundReturnPrint`;
+export const SHIPMENT_GOODS_RECEIPT_NOTE_PRINT = (id) => `${SHIPMENT_BY_ID(id)}/goodsReceiptNotePrint`;
 export const REQUISITION_DELIVERY_NOTE = (id) => `${REQUISITION_BY_ID(id)}/deliveryNote`;
 
 // REQUISITION TEMPLATE (stock list template screens)

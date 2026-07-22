@@ -5,10 +5,12 @@ import {
   SHIPMENT_CONTAINER_BY_ID,
   SHIPMENT_CONTAINERS,
   SHIPMENT_DETAILS,
+  SHIPMENT_GOODS_RECEIPT_NOTE_PRINT,
   SHIPMENT_ITEM_BY_ID,
   SHIPMENT_ITEM_PICK,
   SHIPMENT_ITEM_SPLIT,
   SHIPMENT_ITEMS,
+  SHIPMENT_OUTBOUND_RETURN_PRINT,
   SHIPMENT_PACKING,
   SHIPMENT_PICKLIST,
   SHIPMENT_SEND,
@@ -39,4 +41,8 @@ export default {
   validatePicklist: (id) => apiClient.post(SHIPMENT_VALIDATE_PICKLIST(id)),
   clearPicklist: (id) => apiClient.post(SHIPMENT_CLEAR_PICKLIST(id)),
   sendShipment: (id, payload) => apiClient.post(SHIPMENT_SEND(id), payload),
+  getOutboundReturnPrintData: (id, config) =>
+    apiClient.get(SHIPMENT_OUTBOUND_RETURN_PRINT(id), config),
+  getGoodsReceiptNotePrintData: (id, config) =>
+    apiClient.get(SHIPMENT_GOODS_RECEIPT_NOTE_PRINT(id), config),
 };

@@ -10,7 +10,6 @@
 package org.pih.warehouse.requisition
 
 import grails.gorm.transactions.Transactional
-import org.pih.warehouse.shipping.Shipment
 
 @Transactional
 class DeliveryNoteController {
@@ -20,7 +19,6 @@ class DeliveryNoteController {
     }
 
     def printOutboundReturn() {
-        Shipment shipment = Shipment.get(params.id)
-        return [shipment: shipment]
+        render(view: "/common/react", params: params)
     }
 }

@@ -144,6 +144,16 @@ const ORDER_URL = {
   orderItemDetails: () => `${ORDER_URL.base}/orderItemDetails`,
 };
 
+const GOODS_RECEIPT_NOTE_URL = {
+  base: `${CONTEXT_PATH}/goodsReceiptNote`,
+  print: (id) => `${GOODS_RECEIPT_NOTE_URL.base}/print/${id}`,
+};
+
+const RECEIVE_ORDER_URL = {
+  base: `${CONTEXT_PATH}/receiveOrderWorkflow`,
+  receiveOrder: (id) => `${RECEIVE_ORDER_URL.base}/receiveOrder/${id}`,
+};
+
 const ORDER_ADJUSTMENT_TYPE_URL = {
   base: `${CONTEXT_PATH}/orderAdjustmentType`,
   list: () => `${ORDER_ADJUSTMENT_TYPE_URL.base}/list`,
@@ -472,6 +482,7 @@ const SHIPMENT_SHOW_URL = {
 const DELIVERY_NOTE_URL = {
   base: `${CONTEXT_PATH}/deliveryNote`,
   print: (id) => `${DELIVERY_NOTE_URL.base}/print/${id}`,
+  printOutboundReturn: (id) => `${DELIVERY_NOTE_URL.base}/printOutboundReturn/${id}`,
 };
 
 const PICKLIST_URL = {
@@ -511,6 +522,7 @@ export {
   DOCUMENT_URL,
   GL_ACCOUNT_TYPE_URL,
   GL_ACCOUNT_URL,
+  GOODS_RECEIPT_NOTE_URL,
   INVENTORY_BROWSER_URL,
   INVENTORY_ITEM_URL,
   INVENTORY_LEVEL_URL,
@@ -539,6 +551,7 @@ export {
   PRODUCT_URL,
   PURCHASE_ORDER_URL,
   PUTAWAY_URL,
+  RECEIVE_ORDER_URL,
   REPLENISHMENT_URL,
   REQUISITION_ITEM_URL,
   REQUISITION_TEMPLATE_URL,
