@@ -1,0 +1,353 @@
+openapi: 3.0.3
+info:
+  title: OpenBoxes - StockMovementItemApiController
+  description: >
+    Stock movement line item workflow handled by
+    org.pih.warehouse.api.StockMovementItemApiController, routed via the
+    explicit "/api/stockMovementItems..." mappings plus
+    "/api/stockMovements/$id/stockMovementItems" and
+    "/api/stockMovements/$id/substitutionItems". A stock movement item's id
+    is its underlying RequisitionItem id. Parity quirks: unknown ids raise
+    ObjectNotFoundException rendered by ErrorsController as a 404 with the
+    common error body; missing required body fields raise
+    IllegalArgumentException rendered as 500.
+  version: 0.1.0
+servers:
+  - url: http://localhost:8080/openboxes
+    description: Local Docker baseline (docs/migration/RUNNING_LOCALLY.md)
+security:
+  - cookieAuth: []
+paths:
+  /api/stockMovementItems:
+    get:
+      operationId: listStockMovementItems
+      summary: List the line items of a stock movement
+      description: >
+        Requires the stockMovement.id query parameter; when it is missing or
+        unknown the lookup raises ObjectNotFoundException, rendered as a 404
+        with the common error body.
+      parameters:
+        - name: stockMovement.id
+          in: query
+          required: true
+          schema:
+            $ref: '../components/common.yaml#/components/schemas/Id'
+      responses:
+        '200':
+          $ref: '#/components/responses/StockMovementItemListOk'
+        '404':
+          $ref: '../components/common.yaml#/components/responses/NotFound'
+  /api/stockMovementItems/{id}:
+    get:
+      operationId: readStockMovementItem
+      summary: Read a stock movement item
+      description: >
+        Parity quirk: an unknown id is not a 404 - it renders 200 with
+        {"data": null}.
+      parameters:
+        - $ref: '#/components/parameters/itemId'
+      responses:
+        '200':
+          $ref: '#/components/responses/StockMovementItemOk'
+  /api/stockMovementItems/{id}/details:
+    get:
+      operationId: readStockMovementItemDetails
+      summary: Read a stock movement item with details
+      description: >
+        Same rendering as read but with showDetails enabled. Like read, an
+        unknown id renders 200 with {"data": null}.
+      parameters:
+        - $ref: '#/components/parameters/itemId'
+      responses:
+        '200':
+          $ref: '#/components/responses/StockMovementItemOk'
+  /api/stockMovements/{id}/stockMovementItems:
+    get:
+      operationId: getStockMovementItems
+      summary: List a movement's items for a workflow step
+      description: >
+        The {id} is the stock movement id. stepNumber selects the item
+        rendering (edit/pick/pack page items); supports max/offset paging.
+      parameters:
+        - name: id
+          in: path
+          required: true
+          schema:
+            $ref: '../components/common.yaml#/components/schemas/Id'
+          description: Stock movement id.
+        - name: stepNumber
+          in: query
+          required: false
+          schema:
+            type: integer
+        - $ref: '../components/common.yaml#/components/parameters/max'
+        - $ref: '../components/common.yaml#/components/parameters/offset'
+      responses:
+        '200':
+          $ref: '#/components/responses/StockMovementItemListOk'
+        '404':
+          $ref: '../components/common.yaml#/components/responses/NotFound'
+  /api/stockMovements/{id}/substitutionItems:
+    get:
+      operationId: getSubstitutionItems
+      summary: List available substitutions for a requisition item
+      description: >
+        Parity quirk: despite the /api/stockMovements prefix, the {id} is a
+        RequisitionItem (stock movement item) id.
+      parameters:
+        - $ref: '#/components/parameters/itemId'
+      responses:
+        '200':
+          description: Available substitution items.
+          content:
+            application/json:
+              schema:
+                type: object
+                required: [data]
+                properties:
+                  data:
+                    type: array
+                    items:
+                      type: object
+                      additionalProperties: true
+  /api/stockMovementItems/{id}/updatePicklist:
+    post:
+      operationId: updatePicklist
+      summary: Replace the item's picklist items
+      description: >
+        Requires "picklistItems" in the body (IllegalArgumentException ->
+        500 otherwise). reasonCode is required when changing quantities.
+      parameters:
+        - $ref: '#/components/parameters/itemId'
+      requestBody:
+        required: true
+        content:
+          application/json:
+            schema:
+              type: object
+              required: [picklistItems]
+              properties:
+                picklistItems:
+                  type: array
+                  items:
+                    type: object
+                    additionalProperties: true
+                reasonCode:
+                  type: string
+                  nullable: true
+              additionalProperties: true
+      responses:
+        '200':
+          description: Picklist updated (empty body).
+        '400':
+          $ref: '../components/common.yaml#/components/responses/ValidationError'
+        '500':
+          $ref: '../components/common.yaml#/components/responses/ServerError'
+  /api/stockMovementItems/{id}/createPicklist:
+    post:
+      operationId: createPicklist
+      summary: Auto-allocate a picklist for the item
+      parameters:
+        - $ref: '#/components/parameters/itemId'
+      responses:
+        '200':
+          description: Picklist created (empty body).
+        '400':
+          $ref: '../components/common.yaml#/components/responses/ValidationError'
+  /api/stockMovementItems/{id}/clearPicklist:
+    post:
+      operationId: clearPicklist
+      summary: Clear the item's picklist
+      parameters:
+        - $ref: '#/components/parameters/itemId'
+      responses:
+        '200':
+          description: Picklist cleared (empty body).
+  /api/stockMovementItems/{id}/picklistItems:
+    delete:
+      operationId: revertPick
+      summary: Revert the item's pick (delete its picklist items)
+      parameters:
+        - $ref: '#/components/parameters/itemId'
+      responses:
+        '204':
+          description: Pick reverted (empty body).
+  /api/stockMovementItems/{id}/substituteItem:
+    post:
+      operationId: substituteItem
+      summary: Substitute the item's product
+      parameters:
+        - $ref: '#/components/parameters/itemId'
+      requestBody:
+        required: true
+        content:
+          application/json:
+            schema:
+              type: object
+              properties:
+                substitutionItems:
+                  type: array
+                  items:
+                    type: object
+                    additionalProperties: true
+                reasonCode:
+                  type: string
+                  nullable: true
+                quantityRevised:
+                  description: Number or numeric string.
+                newQuantity:
+                  description: Number or numeric string.
+              additionalProperties: true
+      responses:
+        '200':
+          description: Item substituted (empty body).
+        '400':
+          $ref: '../components/common.yaml#/components/responses/ValidationError'
+  /api/stockMovementItems/{id}/revertItem:
+    post:
+      operationId: revertItem
+      summary: Undo the item's revision/cancellation and re-create its picklist
+      parameters:
+        - $ref: '#/components/parameters/itemId'
+      responses:
+        '200':
+          description: Item reverted (empty body).
+        '400':
+          $ref: '../components/common.yaml#/components/responses/ValidationError'
+  /api/stockMovementItems/{id}/cancelItem:
+    post:
+      operationId: cancelItem
+      summary: Cancel the item's remaining quantity
+      description: >
+        Cancels using the item's existing reasonCode/comments; when the item
+        has no reason code the underlying requisition item fails validation
+        (400).
+      parameters:
+        - $ref: '#/components/parameters/itemId'
+      responses:
+        '200':
+          $ref: '#/components/responses/StockMovementItemOk'
+        '400':
+          $ref: '../components/common.yaml#/components/responses/ValidationError'
+  /api/stockMovementItems/{id}/removeItem:
+    delete:
+      operationId: eraseItem
+      summary: Remove the line item from the stock movement
+      parameters:
+        - $ref: '#/components/parameters/itemId'
+      responses:
+        '204':
+          description: Item removed (empty body).
+        '404':
+          $ref: '../components/common.yaml#/components/responses/NotFound'
+components:
+  parameters:
+    itemId:
+      name: id
+      in: path
+      required: true
+      schema:
+        $ref: '../components/common.yaml#/components/schemas/Id'
+      description: Stock movement item (RequisitionItem) id.
+  responses:
+    StockMovementItemOk:
+      description: The stock movement item (StockMovementItem.toJson()).
+      content:
+        application/json:
+          schema:
+            type: object
+            required: [data]
+            properties:
+              data:
+                $ref: '#/components/schemas/StockMovementItem'
+    StockMovementItemListOk:
+      description: Stock movement items.
+      content:
+        application/json:
+          schema:
+            type: object
+            required: [data]
+            properties:
+              data:
+                type: array
+                items:
+                  $ref: '#/components/schemas/StockMovementItem'
+  schemas:
+    StockMovementItem:
+      type: object
+      nullable: true
+      description: >
+        org.pih.warehouse.api.StockMovementItem.toJson() rendering (the exact
+        key set varies by workflow step); only the stable keys are pinned.
+        Nullable because read/details render {"data": null} for unknown ids.
+      required: [id]
+      properties:
+        id:
+          $ref: '../components/common.yaml#/components/schemas/Id'
+        productCode:
+          type: string
+          nullable: true
+        product:
+          type: object
+          nullable: true
+          additionalProperties: true
+        inventoryItem:
+          type: object
+          nullable: true
+          additionalProperties: true
+        lotNumber:
+          type: string
+          nullable: true
+        expirationDate:
+          type: string
+          nullable: true
+        quantityRequested:
+          type: number
+          nullable: true
+        quantityPicked:
+          type: number
+          nullable: true
+        quantityRequired:
+          type: number
+          nullable: true
+        quantityRevised:
+          type: number
+          nullable: true
+        quantityCanceled:
+          type: number
+          nullable: true
+        statusCode:
+          type: string
+          nullable: true
+        reasonCode:
+          type: string
+          nullable: true
+        comments:
+          type: string
+          nullable: true
+        palletName:
+          type: string
+          nullable: true
+        boxName:
+          type: string
+          nullable: true
+        recipient:
+          type: object
+          nullable: true
+          additionalProperties: true
+        sortOrder:
+          type: integer
+          nullable: true
+        substitutionItems:
+          type: array
+          nullable: true
+          items:
+            type: object
+            additionalProperties: true
+        version:
+          type: integer
+          nullable: true
+      additionalProperties: true
+  securitySchemes:
+    cookieAuth:
+      $ref: '../components/common.yaml#/components/securitySchemes/cookieAuth'

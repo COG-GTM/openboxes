@@ -1,0 +1,169 @@
+openapi: 3.0.3
+info:
+  title: OpenBoxes - RecordStockApiController
+  description: >
+    Baseline stock recount ("record stock") handled by
+    org.pih.warehouse.api.RecordStockApiController, routed via the explicit
+    "/api/facilities/$facility/inventory/record-stock/save" mapping. A single
+    POST action creates a baseline transaction plus an adjustment transaction
+    for the given product and refreshes product availability.
+  version: 0.1.0
+servers:
+  - url: http://localhost:8080/openboxes
+    description: Local Docker baseline (docs/migration/RUNNING_LOCALLY.md)
+security:
+  - cookieAuth: []
+paths:
+  /api/facilities/{facility}/inventory/record-stock/save:
+    post:
+      operationId: saveRecordStock
+      summary: Record counted stock for a product at a facility
+      description: >
+        Parity quirks: responds 200 (not 201) and echoes the bound
+        RecordInventoryCommand in its default Grails JSON rendering
+        (including an "errors" object and the full inventory with
+        configuredProducts). The request must include "inventory.id" (the
+        warehouse's Inventory id) - omitting it fails with a 400 whose
+        message wraps "Cannot get property 'warehouse' on null object",
+        because the service catches the exception into command errors.
+        Rows with an expirationDate but no lotNumber are rejected with 400.
+        Because transaction timestamps have one-second precision, a repeat
+        request with the same transactionDate fails validation (400,
+        "A transaction already exists at time ...").
+      parameters:
+        - name: facility
+          in: path
+          required: true
+          schema:
+            $ref: '../components/common.yaml#/components/schemas/Id'
+          description: >
+            Facility (warehouse Location) id. Bound into params; the service
+            operates on the session's current location.
+      requestBody:
+        required: true
+        content:
+          application/json:
+            schema:
+              type: object
+              required: [product, recordInventoryRows]
+              properties:
+                product:
+                  type: object
+                  required: [id]
+                  properties:
+                    id:
+                      $ref: '../components/common.yaml#/components/schemas/Id'
+                inventory:
+                  type: object
+                  description: >
+                    The warehouse's Inventory id. Effectively required (see
+                    operation description).
+                  properties:
+                    id:
+                      $ref: '../components/common.yaml#/components/schemas/Id'
+                transactionDate:
+                  type: string
+                  description: >
+                    ISO-8601 instant (e.g. 2026-07-20T10:00:00Z). Must not be
+                    in the future.
+                comment:
+                  type: string
+                  nullable: true
+                recordInventoryRows:
+                  type: array
+                  items:
+                    type: object
+                    properties:
+                      id:
+                        type: string
+                        nullable: true
+                        description: Existing InventoryItem id (null for new lots).
+                      binLocation:
+                        type: object
+                        nullable: true
+                        properties:
+                          id:
+                            type: string
+                      lotNumber:
+                        type: string
+                        nullable: true
+                      expirationDate:
+                        type: string
+                        nullable: true
+                      oldQuantity:
+                        type: integer
+                        nullable: true
+                      newQuantity:
+                        type: integer
+                      comment:
+                        type: string
+                        nullable: true
+                    additionalProperties: true
+              additionalProperties: true
+      responses:
+        '200':
+          description: >
+            Stock recorded. Body is the RecordInventoryCommand rendered with
+            the default Grails JSON converter.
+          content:
+            application/json:
+              schema:
+                type: object
+                required: [data]
+                properties:
+                  data:
+                    $ref: '#/components/schemas/RecordInventoryCommand'
+        '400':
+          $ref: '../components/common.yaml#/components/responses/ValidationError'
+components:
+  schemas:
+    RecordInventoryCommand:
+      type: object
+      description: >
+        Default Grails JSON rendering of
+        org.pih.warehouse.inventory.RecordInventoryCommand. Deep object graph
+        (inventory.configuredProducts, product, rows); only the stable keys
+        are pinned.
+      required: [product, recordInventoryRows]
+      properties:
+        product:
+          type: object
+          nullable: true
+          additionalProperties: true
+        inventory:
+          type: object
+          nullable: true
+          additionalProperties: true
+        inventoryLevel:
+          type: object
+          nullable: true
+          additionalProperties: true
+        totalQuantity:
+          type: integer
+          nullable: true
+        totalQuantityAvailableToPromise:
+          type: integer
+          nullable: true
+        transactionDate:
+          type: string
+          nullable: true
+        comment:
+          type: string
+          nullable: true
+        recordInventoryRow:
+          type: object
+          nullable: true
+          additionalProperties: true
+        recordInventoryRows:
+          type: array
+          items:
+            type: object
+            additionalProperties: true
+        errors:
+          type: object
+          description: Spring Errors object rendered by the default converter.
+          additionalProperties: true
+      additionalProperties: true
+  securitySchemes:
+    cookieAuth:
+      $ref: '../components/common.yaml#/components/securitySchemes/cookieAuth'

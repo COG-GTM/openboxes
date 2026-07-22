@@ -1,0 +1,263 @@
+openapi: 3.0.3
+info:
+  title: OpenBoxes - SelectOptionsApiController
+  description: >
+    Read-only dropdown/filter option lists handled by
+    org.pih.warehouse.api.SelectOptionsApiController, routed via the explicit
+    per-option mappings ("/api/categoryOptions", "/api/catalogOptions",
+    "/api/productGroupOptions", "/api/tagOptions", "/api/glAccountOptions",
+    "/api/paymentTermOptions", "/api/users", "/api/preferenceTypeOptions",
+    "/api/ratingTypeCodeOptions", "/api/handlingRequirementsOptions" and
+    "/api/stockMovements/shipmentStatusCodes"). All endpoints are GET-only and
+    render an option list under a "data" envelope; the option shape varies
+    slightly per endpoint (some include "value" and/or "variant").
+  version: 0.1.0
+servers:
+  - url: http://localhost:8080/openboxes
+    description: Local Docker baseline (docs/migration/RUNNING_LOCALLY.md)
+security:
+  - cookieAuth: []
+paths:
+  /api/glAccountOptions:
+    get:
+      operationId: glAccountOptions
+      summary: GL account options (code + name labels)
+      description: >
+        Options for GL accounts that have a code; label is "<code> - <name>".
+        The seeded demo dataset has none, so "data" is usually empty.
+      responses:
+        '200':
+          $ref: '#/components/responses/IdLabelOptionsOk'
+  /api/productGroupOptions:
+    get:
+      operationId: productGroupOptions
+      summary: Product group options
+      responses:
+        '200':
+          $ref: '#/components/responses/IdLabelOptionsOk'
+  /api/catalogOptions:
+    get:
+      operationId: catalogOptions
+      summary: Product catalog options
+      description: >
+        Label is "<name> (<item count>)" unless hideNumbers=true, in which
+        case it is the bare catalog name.
+      parameters:
+        - $ref: '#/components/parameters/hideNumbers'
+      responses:
+        '200':
+          $ref: '#/components/responses/IdLabelOptionsOk'
+  /api/categoryOptions:
+    get:
+      operationId: categoryOptions
+      summary: Product category options
+      description: >
+        Label is the category hierarchy joined with " > " (ROOT is excluded
+        from the rendered hierarchy string).
+      responses:
+        '200':
+          $ref: '#/components/responses/IdLabelOptionsOk'
+  /api/tagOptions:
+    get:
+      operationId: tagOptions
+      summary: Product tag options
+      description: >
+        Label is "<tag> (<product count>)" unless hideNumbers=true, in which
+        case it is the bare tag.
+      parameters:
+        - $ref: '#/components/parameters/hideNumbers'
+      responses:
+        '200':
+          $ref: '#/components/responses/IdLabelOptionsOk'
+  /api/paymentTermOptions:
+    get:
+      operationId: paymentTermOptions
+      summary: Payment term options
+      description: Options include "value" (same as "id").
+      responses:
+        '200':
+          $ref: '#/components/responses/IdLabelValueOptionsOk'
+  /api/users:
+    get:
+      operationId: usersOptions
+      summary: List users (for user pickers)
+      description: >
+        Backed by UserService.findUsers. Accepts optional filters:
+        roleTypes (repeatable), location (defaults to the session warehouse
+        when roleTypes is given), status, searchTerm. Renders user summary
+        maps, not the id/label option shape used by the other endpoints.
+      parameters:
+        - name: roleTypes
+          in: query
+          required: false
+          schema:
+            type: string
+          description: Role type name filter (may be repeated).
+      responses:
+        '200':
+          description: User summaries.
+          content:
+            application/json:
+              schema:
+                type: object
+                required: [data]
+                properties:
+                  data:
+                    type: array
+                    items:
+                      $ref: '#/components/schemas/UserOption'
+  /api/preferenceTypeOptions:
+    get:
+      operationId: preferenceTypeOptions
+      summary: Product supplier preference type options
+      description: >
+        Renders the PreferenceType domain records as id/label/value options.
+        includeMultiple=true and includeNone=true prepend the synthetic
+        MULTIPLE and NONE options.
+      parameters:
+        - name: includeMultiple
+          in: query
+          required: false
+          schema:
+            type: boolean
+        - name: includeNone
+          in: query
+          required: false
+          schema:
+            type: boolean
+      responses:
+        '200':
+          $ref: '#/components/responses/IdLabelValueOptionsOk'
+  /api/ratingTypeCodeOptions:
+    get:
+      operationId: ratingTypeCodeOptions
+      summary: Rating type code options (RatingTypeCode enum)
+      responses:
+        '200':
+          $ref: '#/components/responses/IdLabelValueOptionsOk'
+  /api/handlingRequirementsOptions:
+    get:
+      operationId: handlingRequirementsOptions
+      summary: Handling requirement options (fixed ProductField subset)
+      description: >
+        Always the four options COLD_CHAIN, CONTROLLED_SUBSTANCE,
+        HAZARDOUS_MATERIAL and RECONDITIONED.
+      responses:
+        '200':
+          $ref: '#/components/responses/IdLabelValueOptionsOk'
+  /api/stockMovements/shipmentStatusCodes:
+    get:
+      operationId: shipmentStatusCodesOptions
+      summary: Shipment status code options
+      description: >
+        Options additionally carry a display "variant". excludedStatuses
+        removes the given status codes from the list.
+      parameters:
+        - name: excludedStatuses
+          in: query
+          required: false
+          schema:
+            type: string
+          description: Status code to exclude (may be repeated).
+      responses:
+        '200':
+          description: Shipment status options.
+          content:
+            application/json:
+              schema:
+                type: object
+                required: [data]
+                properties:
+                  data:
+                    type: array
+                    items:
+                      allOf:
+                        - $ref: '#/components/schemas/IdLabelValueOption'
+                        - type: object
+                          properties:
+                            variant:
+                              type: string
+components:
+  parameters:
+    hideNumbers:
+      name: hideNumbers
+      in: query
+      required: false
+      schema:
+        type: boolean
+      description: When true, omit the item count from the label.
+  responses:
+    IdLabelOptionsOk:
+      description: Option list.
+      content:
+        application/json:
+          schema:
+            type: object
+            required: [data]
+            properties:
+              data:
+                type: array
+                items:
+                  $ref: '#/components/schemas/IdLabelOption'
+    IdLabelValueOptionsOk:
+      description: Option list (with value).
+      content:
+        application/json:
+          schema:
+            type: object
+            required: [data]
+            properties:
+              data:
+                type: array
+                items:
+                  $ref: '#/components/schemas/IdLabelValueOption'
+  schemas:
+    IdLabelOption:
+      type: object
+      required: [id, label]
+      properties:
+        id:
+          $ref: '../components/common.yaml#/components/schemas/Id'
+        label:
+          type: string
+      additionalProperties: true
+    IdLabelValueOption:
+      type: object
+      required: [id, label, value]
+      properties:
+        id:
+          type: string
+          description: Domain id or enum name, depending on the endpoint.
+        label:
+          type: string
+        value:
+          type: string
+      additionalProperties: true
+    UserOption:
+      type: object
+      required: [id, name, username]
+      properties:
+        id:
+          $ref: '../components/common.yaml#/components/schemas/Id'
+        name:
+          type: string
+          nullable: true
+        firstName:
+          type: string
+          nullable: true
+        lastName:
+          type: string
+          nullable: true
+        email:
+          type: string
+          nullable: true
+        username:
+          type: string
+        roles:
+          type: array
+          items:
+            type: string
+      additionalProperties: true
+  securitySchemes:
+    cookieAuth:
+      $ref: '../components/common.yaml#/components/securitySchemes/cookieAuth'

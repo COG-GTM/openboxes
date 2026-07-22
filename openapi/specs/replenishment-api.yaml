@@ -1,0 +1,371 @@
+openapi: 3.0.3
+info:
+  title: OpenBoxes - ReplenishmentApiController
+  description: >
+    Bin replenishment (transfer order) workflow handled by
+    org.pih.warehouse.api.ReplenishmentApiController. Routed via the explicit
+    "/api/requirements", "/api/replenishments/statusOptions",
+    "/api/replenishments/$id/", "/api/replenishments/$id/removeItem",
+    "/api/replenishments/$id/picklists" and
+    "/api/replenishments/$id/picklistItem" mappings, plus the generic
+    "/api/${resource}s" mapping (GET /api/replenishments -> list, POST ->
+    create; GET/POST/PUT /api/replenishments/{id} also reach
+    read/update/update through the generic "/api/${resource}s/$id" mapping).
+    Parity quirks: unknown ids raise IllegalArgumentException rendered as a
+    500 (not 404), and several path {id}s are OrderItem ids rather than
+    replenishment (Order) ids - see each operation.
+  version: 0.1.0
+servers:
+  - url: http://localhost:8080/openboxes
+    description: Local Docker baseline (docs/migration/RUNNING_LOCALLY.md)
+security:
+  - cookieAuth: []
+paths:
+  /api/replenishments:
+    get:
+      operationId: listReplenishments
+      summary: List all transfer orders
+      description: >
+        Returns every Order of type TRANSFER_ORDER rendered with
+        Order.toJson() (no pagination, no filtering by status or location).
+      responses:
+        '200':
+          description: Transfer orders.
+          content:
+            application/json:
+              schema:
+                type: object
+                required: [data]
+                properties:
+                  data:
+                    type: array
+                    items:
+                      type: object
+                      description: Order.toJson() rendering.
+                      additionalProperties: true
+    post:
+      operationId: createReplenishment
+      summary: Create a replenishment (transfer order) and its picklist
+      description: >
+        Creates or updates an Order from the posted replenishment, then
+        creates a picklist for it. Requires a session location/user
+        (IllegalArgumentException -> 500 otherwise). Missing
+        "replenishmentItems" also fails with 500 (the controller iterates it
+        unconditionally).
+      requestBody:
+        $ref: '#/components/requestBodies/ReplenishmentBody'
+      responses:
+        '201':
+          description: The created replenishment.
+          content:
+            application/json:
+              schema:
+                type: object
+                required: [data]
+                properties:
+                  data:
+                    $ref: '#/components/schemas/Replenishment'
+        '500':
+          $ref: '../components/common.yaml#/components/responses/ServerError'
+  /api/replenishments/statusOptions:
+    get:
+      operationId: replenishmentStatusOptions
+      summary: Inventory-level status options for replenishment filters
+      responses:
+        '200':
+          description: BELOW_MINIMUM / BELOW_REORDER / BELOW_MAXIMUM options.
+          content:
+            application/json:
+              schema:
+                type: object
+                required: [data]
+                properties:
+                  data:
+                    type: array
+                    items:
+                      $ref: '#/components/schemas/Option'
+  /api/replenishments/{id}:
+    get:
+      operationId: readReplenishment
+      summary: Read a replenishment
+      description: >
+        Renders Replenishment.createFromOrder(order).toJson() with calculated
+        picklist data filled in. Unknown id -> IllegalArgumentException
+        rendered as 500 (not 404).
+      parameters:
+        - $ref: '#/components/parameters/replenishmentId'
+      responses:
+        '200':
+          description: The replenishment.
+          content:
+            application/json:
+              schema:
+                type: object
+                required: [data]
+                properties:
+                  data:
+                    $ref: '#/components/schemas/Replenishment'
+        '500':
+          $ref: '../components/common.yaml#/components/responses/ServerError'
+    post:
+      operationId: updateReplenishmentPost
+      summary: Update a replenishment (POST variant of update())
+      description: >
+        Rebinds the posted replenishment onto the order; when status is
+        COMPLETED the replenishment is completed instead. Responds 200 with
+        an empty body. Unknown id -> 500.
+      parameters:
+        - $ref: '#/components/parameters/replenishmentId'
+      requestBody:
+        $ref: '#/components/requestBodies/ReplenishmentBody'
+      responses:
+        '200':
+          description: Updated (empty body).
+        '500':
+          $ref: '../components/common.yaml#/components/responses/ServerError'
+    put:
+      operationId: updateReplenishmentPut
+      summary: Update a replenishment (PUT variant of update())
+      parameters:
+        - $ref: '#/components/parameters/replenishmentId'
+      requestBody:
+        $ref: '#/components/requestBodies/ReplenishmentBody'
+      responses:
+        '200':
+          description: Updated (empty body).
+        '500':
+          $ref: '../components/common.yaml#/components/responses/ServerError'
+  /api/requirements:
+    get:
+      operationId: listRequirements
+      summary: List replenishment requirements for a location
+      description: >
+        Requires location.id (500 NullPointerException when omitted).
+        inventoryLevelStatus defaults to BELOW_MINIMUM.
+      parameters:
+        - name: location.id
+          in: query
+          required: true
+          schema:
+            $ref: '../components/common.yaml#/components/schemas/Id'
+        - name: inventoryLevelStatus
+          in: query
+          required: false
+          schema:
+            type: string
+            enum: [BELOW_MINIMUM, BELOW_REORDER, BELOW_MAXIMUM]
+      responses:
+        '200':
+          description: Requirements (Requirement.toJson() renderings).
+          content:
+            application/json:
+              schema:
+                type: object
+                required: [data]
+                properties:
+                  data:
+                    type: array
+                    items:
+                      type: object
+                      additionalProperties: true
+        '500':
+          $ref: '../components/common.yaml#/components/responses/ServerError'
+  /api/replenishments/{id}/removeItem:
+    delete:
+      operationId: removeReplenishmentItem
+      summary: Delete a replenishment (order) item
+      description: The {id} is the OrderItem id, not the order id.
+      parameters:
+        - $ref: '#/components/parameters/orderItemId'
+      responses:
+        '204':
+          description: Item removed (empty body).
+        '500':
+          $ref: '../components/common.yaml#/components/responses/ServerError'
+  /api/replenishments/{id}/picklists:
+    get:
+      operationId: getReplenishmentPicklist
+      summary: Get the picklist for an order item
+      description: >
+        The {id} is the OrderItem id. Renders picked, available and suggested
+        items for the item. Unknown id -> 500.
+      parameters:
+        - $ref: '#/components/parameters/orderItemId'
+      responses:
+        '200':
+          description: Pick page item (ReplenishmentPickPageItem.toJson()).
+          content:
+            application/json:
+              schema:
+                type: object
+                required: [data]
+                properties:
+                  data:
+                    type: object
+                    additionalProperties: true
+        '500':
+          $ref: '../components/common.yaml#/components/responses/ServerError'
+    post:
+      operationId: createReplenishmentPicklist
+      summary: Recreate the picklist for a replenishment order
+      description: >
+        The {id} is the Order id (unlike the other /picklists methods).
+        Clears and recreates the picklist. Responds 201 with an empty body.
+      parameters:
+        - $ref: '#/components/parameters/replenishmentId'
+      responses:
+        '201':
+          description: Picklist created (empty body).
+        '500':
+          $ref: '../components/common.yaml#/components/responses/ServerError'
+    put:
+      operationId: updateReplenishmentPicklist
+      summary: Replace the picklist items for an order item
+      description: >
+        The {id} is the OrderItem id. Requires "picklistItems" in the body
+        (IllegalArgumentException -> 500 otherwise).
+      parameters:
+        - $ref: '#/components/parameters/orderItemId'
+      requestBody:
+        required: true
+        content:
+          application/json:
+            schema:
+              type: object
+              required: [picklistItems]
+              properties:
+                picklistItems:
+                  type: array
+                  items:
+                    type: object
+                    additionalProperties: true
+              additionalProperties: true
+      responses:
+        '200':
+          description: Picklist updated (empty body).
+        '500':
+          $ref: '../components/common.yaml#/components/responses/ServerError'
+    delete:
+      operationId: deleteReplenishmentPicklist
+      summary: Clear the picklist for an order item
+      description: The {id} is the OrderItem id.
+      parameters:
+        - $ref: '#/components/parameters/orderItemId'
+      responses:
+        '200':
+          description: Picklist cleared (empty body).
+        '500':
+          $ref: '../components/common.yaml#/components/responses/ServerError'
+  /api/replenishments/{id}/picklistItem:
+    post:
+      operationId: createReplenishmentPicklistItem
+      summary: Create picklist items for a single order item
+      description: The {id} is the OrderItem id. Responds 200 with an empty body.
+      parameters:
+        - $ref: '#/components/parameters/orderItemId'
+      responses:
+        '200':
+          description: Picklist item(s) created (empty body).
+        '500':
+          $ref: '../components/common.yaml#/components/responses/ServerError'
+components:
+  parameters:
+    replenishmentId:
+      name: id
+      in: path
+      required: true
+      schema:
+        $ref: '../components/common.yaml#/components/schemas/Id'
+      description: Replenishment (transfer Order) id.
+    orderItemId:
+      name: id
+      in: path
+      required: true
+      schema:
+        $ref: '../components/common.yaml#/components/schemas/Id'
+      description: OrderItem id.
+  requestBodies:
+    ReplenishmentBody:
+      required: true
+      content:
+        application/json:
+          schema:
+            type: object
+            required: [replenishmentItems]
+            properties:
+              origin:
+                type: object
+                nullable: true
+                properties:
+                  id:
+                    type: string
+              destination:
+                type: object
+                nullable: true
+                properties:
+                  id:
+                    type: string
+              status:
+                type: string
+                nullable: true
+                description: ReplenishmentStatus name (e.g. PENDING, COMPLETED).
+              replenishmentItems:
+                type: array
+                items:
+                  type: object
+                  additionalProperties: true
+            additionalProperties: true
+  schemas:
+    Option:
+      type: object
+      required: [id, label, value]
+      properties:
+        id:
+          type: string
+        label:
+          type: string
+        value:
+          type: string
+      additionalProperties: true
+    Replenishment:
+      type: object
+      description: org.pih.warehouse.api.Replenishment.toJson() rendering.
+      required: [id, replenishmentNumber, status, replenishmentItems]
+      properties:
+        id:
+          $ref: '../components/common.yaml#/components/schemas/Id'
+        replenishmentNumber:
+          type: string
+          nullable: true
+        status:
+          type: string
+          nullable: true
+        dateCreated:
+          type: string
+          nullable: true
+          description: '"MMMM dd, yyyy" display format.'
+        origin.id:
+          type: string
+          nullable: true
+        origin.name:
+          type: string
+          nullable: true
+        destination.id:
+          type: string
+          nullable: true
+        destination.name:
+          type: string
+          nullable: true
+        orderedBy:
+          type: string
+          nullable: true
+        replenishmentItems:
+          type: array
+          items:
+            type: object
+            description: ReplenishmentItem.toJson() rendering.
+            additionalProperties: true
+      additionalProperties: true
+  securitySchemes:
+    cookieAuth:
+      $ref: '../components/common.yaml#/components/securitySchemes/cookieAuth'

@@ -1,0 +1,85 @@
+openapi: 3.0.3
+info:
+  title: OpenBoxes - StockAdjustmentApiController
+  description: >
+    Stock adjustments handled by
+    org.pih.warehouse.api.StockAdjustmentApiController, routed via the
+    generic "/api/${resource}s" mapping (POST /api/stockAdjustments ->
+    create). The controller only defines create(); GET/PUT/DELETE on
+    /api/stockAdjustments/{id} resolve to actions that do not exist.
+  version: 0.1.0
+servers:
+  - url: http://localhost:8080/openboxes
+    description: Local Docker baseline (docs/migration/RUNNING_LOCALLY.md)
+security:
+  - cookieAuth: []
+paths:
+  /api/stockAdjustments:
+    post:
+      operationId: createStockAdjustments
+      summary: Adjust stock for one or more inventory items
+      description: >
+        PARITY QUIRK - currently always fails with 500: the controller
+        assigns AdjustStockCommand.quantity and .comment, but the command
+        class only declares newQuantity/currentQuantity and comment is bound
+        via a different property, so every request throws
+        groovy.lang.MissingPropertyException ("No such property: quantity for
+        class: org.pih.warehouse.inventory.AdjustStockCommand") before any
+        adjustment is made. The 200 response documented by the code path
+        (render([data: stockAdjustments])) is unreachable. This spec pins the
+        broken behavior; update it when the application is intentionally
+        fixed. An IllegalArgumentException (also rendered as 500) is thrown
+        first when neither location.id nor a session warehouse is available.
+      parameters:
+        - name: location.id
+          in: query
+          required: false
+          schema:
+            $ref: '../components/common.yaml#/components/schemas/Id'
+          description: >
+            Location to adjust stock in; defaults to the session warehouse.
+      requestBody:
+        required: true
+        content:
+          application/json:
+            schema:
+              type: array
+              items:
+                type: object
+                properties:
+                  inventoryItem:
+                    type: object
+                    properties:
+                      id:
+                        $ref: '../components/common.yaml#/components/schemas/Id'
+                  productId:
+                    type: string
+                    description: >
+                      Used (with lotNumber/expirationDate) to find or create
+                      the inventory item when inventoryItem.id is not given.
+                  lotNumber:
+                    type: string
+                    nullable: true
+                  expirationDate:
+                    type: string
+                    nullable: true
+                    description: MM/dd/yyyy
+                  binLocation:
+                    type: object
+                    nullable: true
+                    properties:
+                      id:
+                        type: string
+                  quantityAdjusted:
+                    type: integer
+                  comments:
+                    type: string
+                    nullable: true
+                additionalProperties: true
+      responses:
+        '500':
+          $ref: '../components/common.yaml#/components/responses/ServerError'
+components:
+  securitySchemes:
+    cookieAuth:
+      $ref: '../components/common.yaml#/components/securitySchemes/cookieAuth'

@@ -1,0 +1,808 @@
+openapi: 3.0.3
+info:
+  title: OpenBoxes - StockMovementApiController
+  description: >
+    Stock movement (requisition + shipment) workflow handled by
+    org.pih.warehouse.api.StockMovementApiController. Routed via the explicit
+    "/api/stockMovements..." mappings in UrlMappings.groovy plus the generic
+    "/api/${resource}s/$id" and "/api/${resource}s/$id/status" mappings
+    (read/delete and status/updateStatus/deleteStatus). Parity quirks pinned
+    here: several error responses use ad-hoc {"errorMessage": ...} or
+    {"errorMessages": [...]} bodies without an errorCode; updateRequisition
+    and DELETE .../status respond 302 redirects to the read action; unknown
+    ids surface as ObjectNotFoundException rendered by ErrorsController
+    (404 with the common error body).
+  version: 0.1.0
+servers:
+  - url: http://localhost:8080/openboxes
+    description: Local Docker baseline (docs/migration/RUNNING_LOCALLY.md)
+security:
+  - cookieAuth: []
+paths:
+  /api/stockMovements:
+    get:
+      operationId: listStockMovements
+      summary: List stock movements
+      description: >
+        Requires "direction" (INBOUND/OUTBOUND) and different origin and
+        destination; otherwise responds 400 with an "errorMessages" array.
+        Supports many filters (origin, destination, q, requestedBy,
+        receiptStatusCode, requisitionStatusCode, requestType, sourceType,
+        approver) plus pagination. format=csv streams a CSV attachment
+        instead. totalCount is the paged total; when the underlying result
+        list is empty Grails renders it as [] (empty array), so no type is
+        pinned.
+      parameters:
+        - name: direction
+          in: query
+          required: true
+          schema:
+            type: string
+            enum: [INBOUND, OUTBOUND]
+        - name: origin
+          in: query
+          required: false
+          schema:
+            $ref: '../components/common.yaml#/components/schemas/Id'
+        - name: destination
+          in: query
+          required: false
+          schema:
+            $ref: '../components/common.yaml#/components/schemas/Id'
+        - name: q
+          in: query
+          required: false
+          schema:
+            type: string
+        - name: format
+          in: query
+          required: false
+          schema:
+            type: string
+            enum: [csv]
+        - $ref: '../components/common.yaml#/components/parameters/max'
+        - $ref: '../components/common.yaml#/components/parameters/offset'
+      responses:
+        '200':
+          description: Stock movements page (or CSV attachment with format=csv).
+          content:
+            application/json:
+              schema:
+                type: object
+                required: [data]
+                properties:
+                  data:
+                    type: array
+                    items:
+                      $ref: '#/components/schemas/StockMovement'
+                  totalCount:
+                    description: Integer total, or [] when the page is empty.
+            text/csv:
+              schema:
+                type: string
+        '400':
+          $ref: '#/components/responses/ErrorMessagesBadRequest'
+    post:
+      operationId: createStockMovement
+      summary: Create a stock movement
+      requestBody:
+        $ref: '#/components/requestBodies/StockMovementBody'
+      responses:
+        '201':
+          $ref: '#/components/responses/StockMovementOk'
+        '400':
+          $ref: '../components/common.yaml#/components/responses/ValidationError'
+  /api/stockMovements/{id}:
+    get:
+      operationId: readStockMovement
+      summary: Read a stock movement
+      description: >
+        Renders {data, totalCount} where totalCount depends on the optional
+        stepNumber workflow parameter (line items / pick page items / pack
+        page items). stepNumber=4 with refreshPicklistItems=true reallocates
+        picklist items first.
+      parameters:
+        - $ref: '#/components/parameters/stockMovementId'
+        - name: stepNumber
+          in: query
+          required: false
+          schema:
+            type: integer
+        - name: refreshPicklistItems
+          in: query
+          required: false
+          schema:
+            type: boolean
+      responses:
+        '200':
+          $ref: '#/components/responses/StockMovementWithTotalOk'
+        '404':
+          $ref: '../components/common.yaml#/components/responses/NotFound'
+    delete:
+      operationId: deleteStockMovement
+      summary: Delete a stock movement
+      description: >
+        Deletes requisition-, shipment- or order-based movements. 400 with an
+        ad-hoc {"errorMessage"} body when deletion is not allowed (shipped,
+        invoiced, wrong location...). Unknown ids raise
+        ObjectNotFoundException inside the outbound lookup, rendered by
+        ErrorsController as a common 404 error body - the controller's own
+        {"errorMessage"} 404 branch is effectively unreachable.
+      parameters:
+        - $ref: '#/components/parameters/stockMovementId'
+      responses:
+        '204':
+          description: Deleted (empty body).
+        '400':
+          $ref: '#/components/responses/ErrorMessageBadRequest'
+        '404':
+          $ref: '../components/common.yaml#/components/responses/NotFound'
+  /api/stockMovements/{id}/status:
+    get:
+      operationId: getStockMovementStatus
+      summary: Read the stock movement status
+      parameters:
+        - $ref: '#/components/parameters/stockMovementId'
+      responses:
+        '200':
+          description: The status name.
+          content:
+            application/json:
+              schema:
+                type: object
+                required: [data]
+                properties:
+                  data:
+                    type: string
+                    nullable: true
+        '404':
+          $ref: '../components/common.yaml#/components/responses/NotFound'
+    post:
+      operationId: updateStockMovementStatus
+      summary: Transition the stock movement to a new status
+      parameters:
+        - $ref: '#/components/parameters/stockMovementId'
+      requestBody:
+        required: true
+        content:
+          application/json:
+            schema:
+              type: object
+              properties:
+                status:
+                  type: string
+              additionalProperties: true
+      responses:
+        '200':
+          description: Transitioned (empty body).
+        '400':
+          $ref: '../components/common.yaml#/components/responses/ValidationError'
+        '500':
+          $ref: '../components/common.yaml#/components/responses/ServerError'
+    delete:
+      operationId: rollbackStockMovementStatus
+      summary: Roll back the last status transition
+      description: >
+        Parity quirk: responds 302 Found redirecting to the read action
+        (Location: .../stockMovementApi/read/{id}, the controller/action URL
+        rather than the /api path) instead of rendering a body.
+      parameters:
+        - $ref: '#/components/parameters/stockMovementId'
+      responses:
+        '302':
+          description: Redirect to the read action (empty body).
+  /api/stockMovements/createCombinedShipments:
+    post:
+      operationId: createCombinedShipments
+      summary: Create a shipment-based (inbound) stock movement
+      requestBody:
+        $ref: '#/components/requestBodies/StockMovementBody'
+      responses:
+        '201':
+          $ref: '#/components/responses/StockMovementOk'
+        '400':
+          $ref: '../components/common.yaml#/components/responses/ValidationError'
+        '500':
+          $ref: '../components/common.yaml#/components/responses/ServerError'
+  /api/stockMovements/{id}/updateRequisition:
+    post:
+      operationId: updateRequisition
+      summary: Update the movement's requisition (RPC-style, deprecated)
+      description: >
+        Parity quirk: responds 302 Found redirecting to the read action
+        (Location: .../stockMovementApi/read/{id}) after updating.
+      parameters:
+        - $ref: '#/components/parameters/stockMovementId'
+      requestBody:
+        $ref: '#/components/requestBodies/StockMovementBody'
+      responses:
+        '302':
+          description: Redirect to the read action (empty body).
+  /api/stockMovements/{id}/updateShipment:
+    post:
+      operationId: updateShipment
+      summary: Update the movement's shipment (RPC-style, deprecated)
+      parameters:
+        - $ref: '#/components/parameters/stockMovementId'
+      requestBody:
+        $ref: '#/components/requestBodies/StockMovementBody'
+      responses:
+        '200':
+          description: Updated (empty body).
+        '400':
+          $ref: '../components/common.yaml#/components/responses/ValidationError'
+  /api/stockMovements/{id}/removeAllItems:
+    delete:
+      operationId: removeAllItems
+      summary: Remove all line items (RPC-style, deprecated)
+      parameters:
+        - $ref: '#/components/parameters/stockMovementId'
+      responses:
+        '204':
+          description: Items removed (empty body).
+  /api/stockMovements/{id}/reviseItems:
+    post:
+      operationId: reviseItems
+      summary: Revise line item quantities (RPC-style, deprecated)
+      parameters:
+        - $ref: '#/components/parameters/stockMovementId'
+      requestBody:
+        $ref: '#/components/requestBodies/LineItemsBody'
+      responses:
+        '200':
+          description: Items revised (empty body).
+        '400':
+          $ref: '../components/common.yaml#/components/responses/ValidationError'
+  /api/stockMovements/{id}/updateItems:
+    post:
+      operationId: updateItems
+      summary: Add/update line items (RPC-style, deprecated)
+      description: >
+        Body may set removeEmptyItems (boolean) to drop zero-quantity items.
+        Responds with the full updated stock movement.
+      parameters:
+        - $ref: '#/components/parameters/stockMovementId'
+      requestBody:
+        $ref: '#/components/requestBodies/LineItemsBody'
+      responses:
+        '200':
+          $ref: '#/components/responses/StockMovementOk'
+        '400':
+          $ref: '../components/common.yaml#/components/responses/ValidationError'
+  /api/stockMovements/{id}/updateInventoryItems:
+    post:
+      operationId: updateInventoryItems
+      summary: Update lot/expiry on the movement's inventory items
+      parameters:
+        - $ref: '#/components/parameters/stockMovementId'
+      requestBody:
+        $ref: '#/components/requestBodies/LineItemsBody'
+      responses:
+        '200':
+          description: Inventory items updated (empty body).
+        '400':
+          $ref: '../components/common.yaml#/components/responses/ValidationError'
+  /api/stockMovements/{id}/updateShipmentItems:
+    post:
+      operationId: updateShipmentItems
+      summary: Update pack page (shipment) items
+      parameters:
+        - $ref: '#/components/parameters/stockMovementId'
+      requestBody:
+        required: true
+        content:
+          application/json:
+            schema:
+              type: object
+              properties:
+                packPageItems:
+                  type: array
+                  items:
+                    type: object
+                    additionalProperties: true
+              additionalProperties: true
+      responses:
+        '200':
+          description: The refreshed pack page items.
+          content:
+            application/json:
+              schema:
+                type: object
+                required: [data]
+                properties:
+                  data:
+                    type: array
+                    items:
+                      type: object
+                      additionalProperties: true
+  /api/stockMovements/{id}/updateAdjustedItems:
+    post:
+      operationId: updateAdjustedItems
+      summary: Re-allocate picklist items for an adjusted product
+      parameters:
+        - $ref: '#/components/parameters/stockMovementId'
+        - name: adjustedProduct
+          in: query
+          required: false
+          schema:
+            type: string
+          description: Product id whose picklist items should be re-allocated.
+      responses:
+        '200':
+          $ref: '#/components/responses/StockMovementOk'
+  /api/stockMovements/createPickList/{id}:
+    get:
+      operationId: createPickList
+      summary: Create the movement's picklist
+      description: Parity quirk - a GET with side effects.
+      parameters:
+        - $ref: '#/components/parameters/stockMovementId'
+      responses:
+        '200':
+          description: Picklist created (empty body).
+  /api/stockMovements/{id}/validatePicklist:
+    get:
+      operationId: validatePicklist
+      summary: Validate the movement's picklist
+      parameters:
+        - $ref: '#/components/parameters/stockMovementId'
+      responses:
+        '200':
+          description: Picklist valid (empty body).
+        '400':
+          $ref: '../components/common.yaml#/components/responses/ValidationError'
+  /api/stockMovements/pendingRequisitionDetails:
+    get:
+      operationId: getPendingRequisitionDetails
+      summary: Pending requisitions for an origin and product
+      description: >
+        Requires origin.id and product.id (IllegalArgumentException -> 500
+        otherwise). stockMovementId excludes that movement from the result.
+      parameters:
+        - name: origin.id
+          in: query
+          required: true
+          schema:
+            $ref: '../components/common.yaml#/components/schemas/Id'
+        - name: product.id
+          in: query
+          required: true
+          schema:
+            $ref: '../components/common.yaml#/components/schemas/Id'
+        - name: stockMovementId
+          in: query
+          required: false
+          schema:
+            type: string
+      responses:
+        '200':
+          description: Pending requisition details.
+          content:
+            application/json:
+              schema:
+                type: object
+                required: [data]
+                properties:
+                  data:
+                    type: array
+                    items:
+                      type: object
+                      additionalProperties: true
+        '500':
+          $ref: '../components/common.yaml#/components/responses/ServerError'
+  /api/stockMovements/shippedItems:
+    get:
+      operationId: shippedItems
+      summary: Shipped-not-yet-received items as CSV
+      description: >
+        400 with an "errorMessages" array when destination is missing; 404
+        with an ad-hoc {"errorMessage"} body when the destination is unknown
+        or there is nothing to report.
+      parameters:
+        - name: destination
+          in: query
+          required: true
+          schema:
+            $ref: '../components/common.yaml#/components/schemas/Id'
+      responses:
+        '200':
+          description: CSV attachment.
+          content:
+            text/csv:
+              schema:
+                type: string
+        '400':
+          $ref: '#/components/responses/ErrorMessagesBadRequest'
+        '404':
+          $ref: '#/components/responses/ErrorMessageNotFound'
+  /api/stockMovements/pendingRequisitionItems:
+    get:
+      operationId: pendingRequisitionItems
+      summary: Pending (picked, unshipped) requisition items as CSV
+      description: Same error quirks as shippedItems, keyed on origin.
+      parameters:
+        - name: origin
+          in: query
+          required: true
+          schema:
+            $ref: '../components/common.yaml#/components/schemas/Id'
+      responses:
+        '200':
+          description: CSV attachment.
+          content:
+            text/csv:
+              schema:
+                type: string
+        '400':
+          $ref: '#/components/responses/ErrorMessagesBadRequest'
+        '404':
+          $ref: '#/components/responses/ErrorMessageNotFound'
+  /api/stockMovements/requisitionsStatusCodes:
+    get:
+      operationId: requisitionStatusCodes
+      summary: Requisition status filter options
+      description: >
+        Option set depends on sourceType (ELECTRONIC vs other), whether the
+        current location requires request approval, and the user's approver
+        role.
+      parameters:
+        - name: sourceType
+          in: query
+          required: false
+          schema:
+            type: string
+      responses:
+        '200':
+          description: Status options.
+          content:
+            application/json:
+              schema:
+                type: object
+                required: [data]
+                properties:
+                  data:
+                    type: array
+                    items:
+                      type: object
+                      required: [id, label, value]
+                      properties:
+                        id:
+                          type: string
+                        label:
+                          type: string
+                        value:
+                          type: string
+                      additionalProperties: true
+  /api/stockMovements/{id}/rollbackApproval:
+    put:
+      operationId: rollbackApproval
+      summary: Roll back request approval
+      description: >
+        On failure renders 500 with an ad-hoc {"errorMessage"} body (the
+        trailing render(status:200) is ignored once the response is
+        committed).
+      parameters:
+        - $ref: '#/components/parameters/stockMovementId'
+      responses:
+        '200':
+          description: Approval rolled back (empty body).
+        '500':
+          $ref: '#/components/responses/ErrorMessageServerError'
+  /api/stockMovements/packingList/template:
+    get:
+      operationId: downloadPackingListTemplate
+      summary: Download the completed-packing-list template (.xls)
+      description: >
+        Streams templates/completedPackingList.xls. In the Docker baseline
+        the template file is absent, so this renders status 404 which
+        ErrorsController turns into the common JSON error body.
+      responses:
+        '200':
+          description: The Excel template.
+          content:
+            application/vnd.ms-excel:
+              schema:
+                type: string
+                format: binary
+        '404':
+          $ref: '../components/common.yaml#/components/responses/NotFound'
+  /api/stockMovements/{id}/documents:
+    get:
+      operationId: getDocuments
+      summary: List printable documents for the movement
+      parameters:
+        - $ref: '#/components/parameters/stockMovementId'
+      responses:
+        '200':
+          description: Document descriptors.
+          content:
+            application/json:
+              schema:
+                type: object
+                required: [data]
+                properties:
+                  data:
+                    type: array
+                    items:
+                      type: object
+                      required: [name, documentType, uri]
+                      properties:
+                        name:
+                          type: string
+                        documentType:
+                          type: string
+                          nullable: true
+                        contentType:
+                          type: string
+                          nullable: true
+                        stepNumber:
+                          type: integer
+                          nullable: true
+                        uri:
+                          type: string
+                        hidden:
+                          type: boolean
+                      additionalProperties: true
+components:
+  parameters:
+    stockMovementId:
+      name: id
+      in: path
+      required: true
+      schema:
+        $ref: '../components/common.yaml#/components/schemas/Id'
+  requestBodies:
+    StockMovementBody:
+      required: true
+      content:
+        application/json:
+          schema:
+            $ref: '#/components/schemas/StockMovementRequest'
+    LineItemsBody:
+      required: true
+      content:
+        application/json:
+          schema:
+            type: object
+            properties:
+              id:
+                type: string
+              lineItems:
+                type: array
+                items:
+                  $ref: '#/components/schemas/StockMovementItemRequest'
+            additionalProperties: true
+  responses:
+    StockMovementOk:
+      description: The stock movement (StockMovement.toJson() rendering).
+      content:
+        application/json:
+          schema:
+            type: object
+            required: [data]
+            properties:
+              data:
+                $ref: '#/components/schemas/StockMovement'
+    StockMovementWithTotalOk:
+      description: The stock movement plus the step-dependent item count.
+      content:
+        application/json:
+          schema:
+            type: object
+            required: [data]
+            properties:
+              data:
+                $ref: '#/components/schemas/StockMovement'
+              totalCount:
+                type: integer
+                nullable: true
+    ErrorMessagesBadRequest:
+      description: Ad-hoc validation failure body (no errorCode).
+      content:
+        application/json:
+          schema:
+            $ref: '#/components/schemas/ErrorMessagesResponse'
+    ErrorMessageBadRequest:
+      description: Ad-hoc failure body (no errorCode).
+      content:
+        application/json:
+          schema:
+            $ref: '#/components/schemas/ErrorMessageResponse'
+    ErrorMessageNotFound:
+      description: Ad-hoc not-found body (no errorCode).
+      content:
+        application/json:
+          schema:
+            $ref: '#/components/schemas/ErrorMessageResponse'
+    ErrorMessageServerError:
+      description: Ad-hoc server-error body (no errorCode).
+      content:
+        application/json:
+          schema:
+            $ref: '#/components/schemas/ErrorMessageResponse'
+  schemas:
+    ErrorMessageResponse:
+      type: object
+      required: [errorMessage]
+      properties:
+        errorMessage:
+          type: string
+      additionalProperties: true
+    ErrorMessagesResponse:
+      type: object
+      required: [errorMessages]
+      properties:
+        errorMessages:
+          type: array
+          items:
+            type: string
+      additionalProperties: true
+    StockMovementRequest:
+      type: object
+      description: >
+        JSON accepted by the stock movement data binder. Dates use the
+        "MM/dd/yyyy" display format.
+      properties:
+        name:
+          type: string
+          nullable: true
+        description:
+          type: string
+          nullable: true
+        origin:
+          type: object
+          properties:
+            id:
+              $ref: '../components/common.yaml#/components/schemas/Id'
+        destination:
+          type: object
+          properties:
+            id:
+              $ref: '../components/common.yaml#/components/schemas/Id'
+        requestedBy:
+          type: object
+          properties:
+            id:
+              $ref: '../components/common.yaml#/components/schemas/Id'
+        dateRequested:
+          type: string
+        dateShipped:
+          type: string
+          nullable: true
+        stocklist:
+          type: object
+          nullable: true
+          properties:
+            id:
+              type: string
+              nullable: true
+        lineItems:
+          type: array
+          items:
+            $ref: '#/components/schemas/StockMovementItemRequest'
+      additionalProperties: true
+    StockMovementItemRequest:
+      type: object
+      properties:
+        id:
+          type: string
+          nullable: true
+        product:
+          type: object
+          properties:
+            id:
+              $ref: '../components/common.yaml#/components/schemas/Id'
+        quantityRequested:
+          description: Number or numeric string.
+        quantityRevised:
+          description: Number or numeric string.
+        reasonCode:
+          type: string
+          nullable: true
+        comments:
+          type: string
+          nullable: true
+        lotNumber:
+          type: string
+          nullable: true
+        expirationDate:
+          type: string
+          nullable: true
+        palletName:
+          type: string
+          nullable: true
+        boxName:
+          type: string
+          nullable: true
+        recipient:
+          type: object
+          nullable: true
+          properties:
+            id:
+              type: string
+        sortOrder:
+          type: integer
+          nullable: true
+        delete:
+          type: boolean
+        revert:
+          type: boolean
+        cancel:
+          type: boolean
+        substitute:
+          type: boolean
+      additionalProperties: true
+    StockMovement:
+      type: object
+      description: >
+        org.pih.warehouse.api.StockMovement.toJson() rendering. Deep object
+        graph (origin/destination summaries, associations, lineItems); only
+        the stable top-level keys are pinned.
+      required: [id, name, statusCode]
+      properties:
+        id:
+          $ref: '../components/common.yaml#/components/schemas/Id'
+        name:
+          type: string
+          nullable: true
+        description:
+          type: string
+          nullable: true
+        identifier:
+          type: string
+          nullable: true
+        statusCode:
+          type: string
+          nullable: true
+        displayStatus:
+          type: object
+          nullable: true
+          additionalProperties: true
+        origin:
+          type: object
+          nullable: true
+          additionalProperties: true
+        destination:
+          type: object
+          nullable: true
+          additionalProperties: true
+        dateRequested:
+          type: string
+          nullable: true
+        dateCreated:
+          type: string
+          nullable: true
+        lastUpdated:
+          type: string
+          nullable: true
+        requestedBy:
+          type: object
+          nullable: true
+          additionalProperties: true
+        lineItems:
+          type: array
+          nullable: true
+          items:
+            type: object
+            additionalProperties: true
+        lineItemCount:
+          type: integer
+          nullable: true
+        associations:
+          type: object
+          nullable: true
+          additionalProperties: true
+        currentStatus:
+          type: string
+          nullable: true
+        isPending:
+          type: boolean
+          nullable: true
+        picklist:
+          type: object
+          nullable: true
+          additionalProperties: true
+      additionalProperties: true
+  securitySchemes:
+    cookieAuth:
+      $ref: '../components/common.yaml#/components/securitySchemes/cookieAuth'
