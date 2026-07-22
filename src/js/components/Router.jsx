@@ -483,6 +483,21 @@ const AsyncPaymentTermForm = Loadable({
   loading: Loading,
 });
 
+const AsyncPaymentTermList = Loadable({
+  loader: () => import('components/paymentTerm/PaymentTermList'),
+  loading: Loading,
+});
+
+const AsyncPreferenceTypeList = Loadable({
+  loader: () => import('components/preferenceType/PreferenceTypeList'),
+  loading: Loading,
+});
+
+const AsyncPreferenceTypeForm = Loadable({
+  loader: () => import('components/preferenceType/PreferenceTypeForm'),
+  loading: Loading,
+});
+
 const AsyncAttributeList = Loadable({
   loader: () => import('components/attribute/AttributeList'),
   loading: Loading,
@@ -942,7 +957,12 @@ const Router = () => {
             <MainLayoutRoute path="**/orderAdjustmentType/list" component={AsyncOrderAdjustmentTypeList} />
             <MainLayoutRoute path="**/orderAdjustmentType/create" component={AsyncOrderAdjustmentTypeForm} />
             <MainLayoutRoute path="**/orderAdjustmentType/edit/:orderAdjustmentTypeId" component={AsyncOrderAdjustmentTypeForm} />
+            <MainLayoutRoute path="**/paymentTerm/list" component={AsyncPaymentTermList} />
             <MainLayoutRoute path="**/paymentTerm/create" component={AsyncPaymentTermForm} />
+            <MainLayoutRoute path="**/paymentTerm/edit/:paymentTermId" component={AsyncPaymentTermForm} />
+            <MainLayoutRoute path="**/preferenceType/list" component={AsyncPreferenceTypeList} />
+            <MainLayoutRoute path="**/preferenceType/create" component={AsyncPreferenceTypeForm} />
+            <MainLayoutRoute path="**/preferenceType/edit/:preferenceTypeId" component={AsyncPreferenceTypeForm} />
             <MainLayoutRoute path="**/stockTransfer/create/:stockTransferId?" component={AsyncStockTransfer} />
             <MainLayoutRoute path="**/stockTransfer/createOutboundReturn/:outboundReturnId?" component={AsyncOutboundReturns} />
             <MainLayoutRoute path="**/stockTransfer/createInboundReturn/:inboundReturnId?" component={AsyncInboundReturns} />

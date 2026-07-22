@@ -1,6 +1,7 @@
 import React from 'react';
 
 import { Controller, useForm } from 'react-hook-form';
+import { useHistory, useParams } from 'react-router-dom';
 import Alert from 'react-s-alert';
 
 import paymentTermApi from 'api/services/PaymentTermApi';
@@ -19,12 +20,24 @@ import PageWrapper from 'wrappers/PageWrapper';
 const PaymentTermForm = () => {
   useTranslation('paymentTerm', 'default');
 
+  const { paymentTermId } = useParams();
+  const history = useHistory();
   const translate = useTranslate();
 
-  // The payment term list is still a legacy GSP screen, so a full page
-  // navigation is required (there is no React route for it).
   const goToList = () => {
-    window.location.href = PAYMENT_TERM_URL.list();
+    history.push(PAYMENT_TERM_URL.list());
+  };
+
+  const getPaymentTerm = async () => {
+    const response = await paymentTermApi.getPaymentTerm(paymentTermId);
+    const paymentTerm = response?.data?.data;
+    return {
+      code: paymentTerm?.code ?? '',
+      name: paymentTerm?.name ?? '',
+      description: paymentTerm?.description ?? '',
+      prepaymentPercent: paymentTerm?.prepaymentPercent ?? '',
+      daysToPayment: paymentTerm?.daysToPayment ?? '',
+    };
   };
 
   const {
@@ -33,9 +46,11 @@ const PaymentTermForm = () => {
     formState: { errors, isSubmitting },
   } = useForm({
     mode: 'onBlur',
-    defaultValues: {
-      code: '', name: '', description: '', prepaymentPercent: '', daysToPayment: '',
-    },
+    defaultValues: paymentTermId
+      ? getPaymentTerm
+      : {
+        code: '', name: '', description: '', prepaymentPercent: '', daysToPayment: '',
+      },
   });
 
   const onSubmit = async (values) => {
@@ -47,10 +62,17 @@ const PaymentTermForm = () => {
       daysToPayment: values.daysToPayment === '' ? null : Number(values.daysToPayment),
     };
     try {
-      await paymentTermApi.createPaymentTerm(payload);
-      notification(NotificationType.SUCCESS)({
-        message: translate('react.paymentTerm.create.success.label', 'Payment term has been created successfully'),
-      });
+      if (paymentTermId) {
+        await paymentTermApi.updatePaymentTerm(paymentTermId, payload);
+        notification(NotificationType.SUCCESS)({
+          message: translate('react.paymentTerm.update.success.label', 'Payment term has been updated successfully'),
+        });
+      } else {
+        await paymentTermApi.createPaymentTerm(payload);
+        notification(NotificationType.SUCCESS)({
+          message: translate('react.paymentTerm.create.success.label', 'Payment term has been created successfully'),
+        });
+      }
       goToList();
     } catch (error) {
       const message = error?.response?.data?.errorMessage
@@ -65,7 +87,9 @@ const PaymentTermForm = () => {
     <PageWrapper>
       <HeaderWrapper className="align-items-center h-auto py-3">
         <span className="title">
-          <Translate id="react.paymentTerm.create.label" defaultMessage="Create Payment Term" />
+          {paymentTermId
+            ? <Translate id="react.paymentTerm.edit.label" defaultMessage="Edit Payment Term" />
+            : <Translate id="react.paymentTerm.create.label" defaultMessage="Create Payment Term" />}
         </span>
       </HeaderWrapper>
       <form onSubmit={handleSubmit(onSubmit)} className="p-3">

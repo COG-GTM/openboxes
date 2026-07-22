@@ -158,6 +158,13 @@ const PAYMENT_TERM_URL = {
   edit: (id) => `${PAYMENT_TERM_URL.base}/edit/${id}`,
 };
 
+const PREFERENCE_TYPE_URL = {
+  base: `${CONTEXT_PATH}/preferenceType`,
+  list: () => `${PREFERENCE_TYPE_URL.base}/list`,
+  create: () => `${PREFERENCE_TYPE_URL.base}/create`,
+  edit: (id) => `${PREFERENCE_TYPE_URL.base}/edit/${id}`,
+};
+
 const PURCHASE_ORDER_URL = {
   base: `${CONTEXT_PATH}/purchaseOrder`,
   create: () => `${PURCHASE_ORDER_URL.base}/create`,
@@ -475,6 +482,7 @@ export {
   PARTY_URL,
   PAYMENT_TERM_URL,
   PICKLIST_URL,
+  PREFERENCE_TYPE_URL,
   PRODUCT_ASSOCIATION_URL,
   PRODUCT_CATALOG_URL,
   PRODUCT_CONFIGURATION_URL,

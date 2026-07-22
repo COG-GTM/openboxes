@@ -14,8 +14,7 @@ import grails.gorm.transactions.Transactional
 class PaymentTermController {
 
     def list() {
-        params.max = Math.min(params.max ? params.int('max') : 10, 100)
-        [paymentTerms: PaymentTerm.list(params), paymentTermsTotal: PaymentTerm.count()]
+        render(view: "/common/react", params: params)
     }
 
     def create() {
@@ -23,8 +22,7 @@ class PaymentTermController {
     }
 
     def edit() {
-        def paymentTerm = PaymentTerm.get(params.id)
-        return [paymentTerm: paymentTerm]
+        render(view: "/common/react", params: params)
     }
 
     @Transactional

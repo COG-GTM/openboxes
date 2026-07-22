@@ -1,14 +1,13 @@
 openapi: 3.0.3
 info:
-  title: OpenBoxes - PaymentTermApiController
+  title: OpenBoxes - PreferenceTypeApiController
   description: >
-    CRUD endpoints for payment terms handled by
-    org.pih.warehouse.api.PaymentTermApiController, routed via
-    "/api/paymentTerms" and "/api/paymentTerms/{id}". Create was added in
-    Phase 2 (Batch 29) for the migrated paymentTerm create screen; list,
-    read and update were added in Phase 2 (Batch 30) for the migrated
-    paymentTerm list/edit screens. Option lists for existing payment terms
-    are served by "/api/paymentTermOptions" (select-options-api.yaml).
+    CRUD endpoints for preference types handled by
+    org.pih.warehouse.api.PreferenceTypeApiController, routed via
+    "/api/preferenceTypes" and "/api/preferenceTypes/{id}". Added in
+    Phase 2 (Batch 30) for the migrated preferenceType list/create/edit
+    screens. Option lists for existing preference types are served by
+    "/api/preferenceTypeOptions" (select-options-api.yaml).
   version: 0.1.0
 servers:
   - url: http://localhost:8080/openboxes
@@ -16,10 +15,10 @@ servers:
 security:
   - cookieAuth: []
 paths:
-  /api/paymentTerms:
+  /api/preferenceTypes:
     get:
-      operationId: listPaymentTerms
-      summary: Paginated list of payment terms
+      operationId: listPreferenceTypes
+      summary: Paginated list of preference types
       parameters:
         - name: max
           in: query
@@ -45,7 +44,7 @@ paths:
             type: string
       responses:
         '200':
-          description: Paginated payment terms.
+          description: Paginated preference types.
           content:
             application/json:
               schema:
@@ -55,21 +54,21 @@ paths:
                   data:
                     type: array
                     items:
-                      $ref: '#/components/schemas/PaymentTerm'
+                      $ref: '#/components/schemas/PreferenceType'
                   totalCount:
                     type: integer
     post:
-      operationId: createPaymentTerm
-      summary: Create a payment term
+      operationId: createPreferenceType
+      summary: Create a preference type
       requestBody:
         required: true
         content:
           application/json:
             schema:
-              $ref: '#/components/schemas/PaymentTermRequest'
+              $ref: '#/components/schemas/PreferenceTypeRequest'
       responses:
         '201':
-          description: Created payment term.
+          description: Created preference type.
           content:
             application/json:
               schema:
@@ -77,27 +76,27 @@ paths:
                 required: [data]
                 properties:
                   data:
-                    $ref: '#/components/schemas/PaymentTerm'
+                    $ref: '#/components/schemas/PreferenceType'
         '400':
-          description: Validation errors (e.g. blank code or name).
+          description: Validation errors (e.g. blank or duplicate name, invalid validation code).
           content:
             application/json:
               schema:
                 $ref: '../components/common.yaml#/components/schemas/ErrorResponse'
-  /api/paymentTerms/{id}:
+  /api/preferenceTypes/{id}:
     parameters:
       - name: id
         in: path
         required: true
         schema:
           $ref: '../components/common.yaml#/components/schemas/Id'
-        description: Payment term id.
+        description: Preference type id.
     get:
-      operationId: readPaymentTerm
-      summary: Read a payment term
+      operationId: readPreferenceType
+      summary: Read a preference type
       responses:
         '200':
-          description: The payment term.
+          description: The preference type.
           content:
             application/json:
               schema:
@@ -105,25 +104,25 @@ paths:
                 required: [data]
                 properties:
                   data:
-                    $ref: '#/components/schemas/PaymentTerm'
+                    $ref: '#/components/schemas/PreferenceType'
         '404':
-          description: Unknown payment term id.
+          description: Unknown preference type id.
           content:
             application/json:
               schema:
                 $ref: '../components/common.yaml#/components/schemas/ErrorResponse'
     put:
-      operationId: updatePaymentTerm
-      summary: Update a payment term
+      operationId: updatePreferenceType
+      summary: Update a preference type
       requestBody:
         required: true
         content:
           application/json:
             schema:
-              $ref: '#/components/schemas/PaymentTermRequest'
+              $ref: '#/components/schemas/PreferenceTypeRequest'
       responses:
         '200':
-          description: Updated payment term.
+          description: Updated preference type.
           content:
             application/json:
               schema:
@@ -131,56 +130,47 @@ paths:
                 required: [data]
                 properties:
                   data:
-                    $ref: '#/components/schemas/PaymentTerm'
+                    $ref: '#/components/schemas/PreferenceType'
         '400':
-          description: Validation errors (e.g. blank code or name).
+          description: Validation errors (e.g. blank or duplicate name, invalid validation code).
           content:
             application/json:
               schema:
                 $ref: '../components/common.yaml#/components/schemas/ErrorResponse'
         '404':
-          description: Unknown payment term id.
+          description: Unknown preference type id.
           content:
             application/json:
               schema:
                 $ref: '../components/common.yaml#/components/schemas/ErrorResponse'
 components:
   schemas:
-    PaymentTermRequest:
+    PreferenceTypeRequest:
       type: object
-      required: [code, name]
+      required: [name]
       properties:
-        code:
-          type: string
         name:
           type: string
-        description:
+        validationCode:
           type: string
           nullable: true
-        prepaymentPercent:
-          type: number
-          nullable: true
-        daysToPayment:
-          type: integer
-          nullable: true
-    PaymentTerm:
+          enum: [HIDE, WARN, BLOCK, DEFAULT, ALLOW_ONLY, PREFERRED, null]
+    PreferenceType:
       type: object
-      required: [id, code, name]
+      required: [id, name]
       properties:
         id:
           $ref: '../components/common.yaml#/components/schemas/Id'
-        code:
-          type: string
         name:
           type: string
-        description:
+        validationCode:
           type: string
           nullable: true
-        prepaymentPercent:
-          type: number
+        dateCreated:
+          type: string
           nullable: true
-        daysToPayment:
-          type: integer
+        lastUpdated:
+          type: string
           nullable: true
       additionalProperties: true
   securitySchemes:

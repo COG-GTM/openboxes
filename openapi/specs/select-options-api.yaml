@@ -15,7 +15,7 @@ info:
     "/api/partyTypeOptions",
     "/api/organizationRoleTypeOptions", "/api/roleTypeOptions",
     "/api/partyOptions", "/api/productActivityCodeOptions",
-    "/api/productFieldOptions").
+    "/api/productFieldOptions", "/api/validationCodeOptions").
     All endpoints are GET-only and
     render an option list under a "data" envelope; the option shape varies
     slightly per endpoint (some include "value" and/or "variant").
@@ -95,6 +95,18 @@ paths:
                           type: string
                         label:
                           type: string
+  /api/validationCodeOptions:
+    get:
+      operationId: validationCodeOptions
+      summary: Validation code (enum) options
+      description: >
+        Returns the ValidationCode enum values (HIDE, WARN, BLOCK, DEFAULT,
+        ALLOW_ONLY, PREFERRED) as {id, value, label} triples, all equal to
+        the enum name. Added in Phase 2 (Batch 30) for the React
+        preferenceType form.
+      responses:
+        '200':
+          $ref: '#/components/responses/IdLabelValueOptionsOk'
   /api/locationTypeCodeOptions:
     get:
       operationId: listLocationTypeCodeOptions

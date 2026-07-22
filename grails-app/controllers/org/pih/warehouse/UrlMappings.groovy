@@ -1096,10 +1096,31 @@ class UrlMappings {
             action = [GET: "orderAdjustmentTypeCodeOptions"]
         }
 
-        // Payment term API (migrated paymentTerm create screen)
+        // Payment term API (migrated paymentTerm screens)
         "/api/paymentTerms"(parseRequest: true) {
             controller = "paymentTermApi"
-            action = [POST: "create"]
+            action = [GET: "list", POST: "create"]
+        }
+
+        "/api/paymentTerms/$id"(parseRequest: true) {
+            controller = "paymentTermApi"
+            action = [GET: "read", PUT: "update"]
+        }
+
+        // Preference type API (migrated preferenceType screens)
+        "/api/preferenceTypes"(parseRequest: true) {
+            controller = "preferenceTypeApi"
+            action = [GET: "list", POST: "create"]
+        }
+
+        "/api/preferenceTypes/$id"(parseRequest: true) {
+            controller = "preferenceTypeApi"
+            action = [GET: "read", PUT: "update"]
+        }
+
+        "/api/validationCodeOptions"(parseRequest: true) {
+            controller = { "selectOptionsApi" }
+            action = [GET: "validationCodeOptions"]
         }
 
         "/api/orderSummaries"(parseRequest: true) {

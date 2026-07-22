@@ -170,12 +170,16 @@ export const SHIPMENT_TYPES = `${GENERIC_API}/shipmentType`;
 // PAYMENT TERMS
 export const PAYMENT_TERMS_OPTION = `${API}/paymentTermOptions`;
 export const PAYMENT_TERM_API = `${API}/paymentTerms`;
+export const PAYMENT_TERM_BY_ID = (id) => `${PAYMENT_TERM_API}/${id}`;
 
 // USERS
 export const USERS_OPTIONS = `${API}/users`;
 
 // PREFERENCE TYPES
 export const PREFERENCE_TYPE_OPTIONS = `${API}/preferenceTypeOptions`;
+export const PREFERENCE_TYPE_API = `${API}/preferenceTypes`;
+export const PREFERENCE_TYPE_BY_ID = (id) => `${PREFERENCE_TYPE_API}/${id}`;
+export const VALIDATION_CODE_OPTIONS = `${API}/validationCodeOptions`;
 
 // RATING TYPES
 export const RATING_TYPE_OPTIONS = `${API}/ratingTypeCodeOptions`;

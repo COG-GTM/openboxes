@@ -18,19 +18,15 @@ class PreferenceTypeController {
     }
 
     def list() {
-        params.max = Math.min(params.max ? params.int('max') : 10, 100)
-        [preferenceTypes: PreferenceType.list(params), preferenceTypesTotal: PreferenceType.count()]
+        render(view: "/common/react", params: params)
     }
 
     def create() {
-        def preferenceType = new PreferenceType()
-        preferenceType.properties = params
-        return [preferenceType: preferenceType]
+        render(view: "/common/react", params: params)
     }
 
     def edit() {
-        def preferenceType = PreferenceType.get(params.id)
-        return [preferenceType: preferenceType]
+        render(view: "/common/react", params: params)
     }
 
     @Transactional
