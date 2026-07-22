@@ -1,0 +1,67 @@
+openapi: 3.0.3
+info:
+  title: OpenBoxes - CombineShipmentApiController
+  description: >
+    Order read endpoint handled by
+    org.pih.warehouse.api.CombineShipmentApiController, routed via the
+    standard "/api/${resource}s/$id" REST mapping (only read() exists).
+    Parity quirk pinned here: an unknown id does NOT 404 - Order.get()
+    returns null and the endpoint responds 200 with {"data": null}.
+  version: 0.1.0
+servers:
+  - url: http://localhost:8080/openboxes
+    description: Local Docker baseline (docs/migration/RUNNING_LOCALLY.md)
+security:
+  - cookieAuth: []
+paths:
+  /api/combineShipments/{id}:
+    get:
+      operationId: readCombineShipment
+      summary: Read an order for the combine-shipments workflow
+      parameters:
+        - name: id
+          in: path
+          required: true
+          schema:
+            $ref: '../components/common.yaml#/components/schemas/Id'
+          description: 'Order id. Unknown ids yield {"data": null} with status 200.'
+      responses:
+        '200':
+          description: >
+            The order (default Grails JSON rendering of
+            org.pih.warehouse.order.Order), or null when no order matches.
+          content:
+            application/json:
+              schema:
+                type: object
+                required: [data]
+                properties:
+                  data:
+                    type: object
+                    nullable: true
+                    allOf:
+                      - $ref: '#/components/schemas/Order'
+components:
+  schemas:
+    Order:
+      type: object
+      nullable: true
+      description: >
+        Default Grails JSON rendering of the Order domain (loosely pinned;
+        the seeded demo dataset contains no orders).
+      properties:
+        id:
+          $ref: '../components/common.yaml#/components/schemas/Id'
+        orderNumber:
+          type: string
+          nullable: true
+        name:
+          type: string
+          nullable: true
+        status:
+          type: string
+          nullable: true
+      additionalProperties: true
+  securitySchemes:
+    cookieAuth:
+      $ref: '../components/common.yaml#/components/securitySchemes/cookieAuth'

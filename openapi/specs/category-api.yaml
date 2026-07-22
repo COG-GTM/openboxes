@@ -1,0 +1,181 @@
+openapi: 3.0.3
+info:
+  title: OpenBoxes - CategoryApiController
+  description: >
+    Product category CRUD handled by
+    org.pih.warehouse.api.CategoryApiController, routed via the explicit
+    "/api/categories" mappings. Note the non-REST quirks pinned here for
+    parity: save() responds 200 (not 201) with the bare category JSON (no
+    "data" envelope), and both POST and PUT on /api/categories/{id} invoke
+    save().
+  version: 0.1.0
+servers:
+  - url: http://localhost:8080/openboxes
+    description: Local Docker baseline (docs/migration/RUNNING_LOCALLY.md)
+security:
+  - cookieAuth: []
+paths:
+  /api/categories:
+    get:
+      operationId: listCategories
+      summary: List the full category tree
+      description: >
+        Returns every category. Children are nested under "categories" (the
+        tree is reachable from the ROOT category, but all categories also
+        appear as top-level items).
+      responses:
+        '200':
+          description: Category tree.
+          content:
+            application/json:
+              schema:
+                type: object
+                required: [data]
+                properties:
+                  data:
+                    type: array
+                    items:
+                      $ref: '#/components/schemas/Category'
+    post:
+      operationId: createCategory
+      summary: Create a category
+      requestBody:
+        $ref: '#/components/requestBodies/CategoryBody'
+      responses:
+        '200':
+          $ref: '#/components/responses/CategoryOk'
+        '400':
+          $ref: '../components/common.yaml#/components/responses/ValidationError'
+  /api/categories/{id}:
+    get:
+      operationId: readCategory
+      summary: Read a category
+      parameters:
+        - $ref: '#/components/parameters/categoryId'
+      responses:
+        '200':
+          $ref: '#/components/responses/CategoryOk'
+        '404':
+          $ref: '../components/common.yaml#/components/responses/NotFound'
+    post:
+      operationId: updateCategoryPost
+      summary: Update a category (POST variant of save())
+      parameters:
+        - $ref: '#/components/parameters/categoryId'
+      requestBody:
+        $ref: '#/components/requestBodies/CategoryBody'
+      responses:
+        '200':
+          $ref: '#/components/responses/CategoryOk'
+        '400':
+          $ref: '../components/common.yaml#/components/responses/ValidationError'
+    put:
+      operationId: updateCategoryPut
+      summary: Update a category (PUT variant of save())
+      parameters:
+        - $ref: '#/components/parameters/categoryId'
+      requestBody:
+        $ref: '#/components/requestBodies/CategoryBody'
+      responses:
+        '200':
+          $ref: '#/components/responses/CategoryOk'
+        '400':
+          $ref: '../components/common.yaml#/components/responses/ValidationError'
+    delete:
+      operationId: deleteCategory
+      summary: Delete a category
+      parameters:
+        - $ref: '#/components/parameters/categoryId'
+      responses:
+        '204':
+          description: Category deleted (empty body).
+        '404':
+          $ref: '../components/common.yaml#/components/responses/NotFound'
+        '500':
+          description: >
+            Deletion blocked by an existing association (foreign key
+            constraint), rendered by ErrorsController.handleConstraintViolation.
+          content:
+            application/json:
+              schema:
+                $ref: '../components/common.yaml#/components/schemas/ErrorResponse'
+components:
+  parameters:
+    categoryId:
+      name: id
+      in: path
+      required: true
+      schema:
+        $ref: '../components/common.yaml#/components/schemas/Id'
+  requestBodies:
+    CategoryBody:
+      required: true
+      content:
+        application/json:
+          schema:
+            type: object
+            properties:
+              name:
+                type: string
+              description:
+                type: string
+              parentCategory:
+                type: object
+                properties:
+                  id:
+                    $ref: '../components/common.yaml#/components/schemas/Id'
+            additionalProperties: true
+  responses:
+    CategoryOk:
+      description: >
+        The category as rendered by Category.toJson() - a bare object with no
+        "data" envelope.
+      content:
+        application/json:
+          schema:
+            $ref: '#/components/schemas/Category'
+  schemas:
+    Category:
+      type: object
+      description: >
+        Category.toJson() rendering. dateCreated/lastUpdated use the
+        "dd/MMM/yyyy hh:mm a" display format and are null on freshly created
+        records within the same request.
+      required:
+        - id
+        - name
+        - version
+        - deleted
+        - isRoot
+      properties:
+        id:
+          $ref: '../components/common.yaml#/components/schemas/Id'
+        name:
+          type: string
+        description:
+          type: string
+          nullable: true
+        version:
+          type: integer
+        dateCreated:
+          type: string
+          nullable: true
+        lastUpdated:
+          type: string
+          nullable: true
+        sortOrder:
+          type: integer
+          nullable: true
+        deleted:
+          type: boolean
+          nullable: true
+        isRoot:
+          type: boolean
+        categories:
+          type: array
+          nullable: true
+          items:
+            $ref: '#/components/schemas/Category'
+  securitySchemes:
+    cookieAuth:
+      $ref: '../components/common.yaml#/components/securitySchemes/cookieAuth'

@@ -1,0 +1,70 @@
+openapi: 3.0.3
+info:
+  title: OpenBoxes - BinLocationApiController
+  description: >
+    Bin-location listing/read handled by
+    org.pih.warehouse.api.BinLocationApiController, routed via the standard
+    "/api/${resource}s" REST mappings (only list() and read() exist).
+  version: 0.1.0
+servers:
+  - url: http://localhost:8080/openboxes
+    description: Local Docker baseline (docs/migration/RUNNING_LOCALLY.md)
+security:
+  - cookieAuth: []
+paths:
+  /api/binLocations:
+    get:
+      operationId: listBinLocations
+      summary: List bin locations of a warehouse
+      parameters:
+        - name: parentLocation.id
+          in: query
+          required: false
+          schema:
+            $ref: '../components/common.yaml#/components/schemas/Id'
+          description: >
+            Warehouse to list bins for; defaults to the session warehouse.
+            An unresolvable location raises UnresolvableObjectException
+            (500 error page/body).
+      responses:
+        '200':
+          description: Bin locations (default Grails Location rendering).
+          content:
+            application/json:
+              schema:
+                type: object
+                required: [data]
+                properties:
+                  data:
+                    type: array
+                    items:
+                      $ref: '../components/common.yaml#/components/schemas/Location'
+        '500':
+          $ref: '../components/common.yaml#/components/responses/ServerError'
+  /api/binLocations/{id}:
+    get:
+      operationId: readBinLocation
+      summary: Read a single bin location
+      parameters:
+        - name: id
+          in: path
+          required: true
+          schema:
+            $ref: '../components/common.yaml#/components/schemas/Id'
+      responses:
+        '200':
+          description: Bin location.
+          content:
+            application/json:
+              schema:
+                type: object
+                required: [data]
+                properties:
+                  data:
+                    $ref: '../components/common.yaml#/components/schemas/Location'
+        '404':
+          $ref: '../components/common.yaml#/components/responses/NotFound'
+components:
+  securitySchemes:
+    cookieAuth:
+      $ref: '../components/common.yaml#/components/securitySchemes/cookieAuth'

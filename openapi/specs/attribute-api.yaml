@@ -1,0 +1,63 @@
+openapi: 3.0.3
+info:
+  title: OpenBoxes - AttributeApiController
+  description: >
+    Product/entity attribute listing handled by
+    org.pih.warehouse.api.AttributeApiController, routed via the standard
+    "/api/${resource}s" REST mapping (only list() is implemented).
+  version: 0.1.0
+servers:
+  - url: http://localhost:8080/openboxes
+    description: Local Docker baseline (docs/migration/RUNNING_LOCALLY.md)
+security:
+  - cookieAuth: []
+paths:
+  /api/attributes:
+    get:
+      operationId: listAttributes
+      summary: List attributes, optionally filtered by entity type
+      parameters:
+        - name: entityType
+          in: query
+          required: false
+          schema:
+            type: string
+            enum: [PRODUCT, PRODUCT_SUPPLIER]
+          description: >
+            EntityTypeCode enum value. Unknown values raise a conversion
+            error; when omitted, all attributes are returned.
+      responses:
+        '200':
+          description: >
+            Attributes (default Grails JSON rendering of the Attribute
+            domain). The seeded demo dataset contains none, so the item shape
+            is only loosely pinned.
+          content:
+            application/json:
+              schema:
+                type: object
+                required: [data]
+                properties:
+                  data:
+                    type: array
+                    items:
+                      $ref: '#/components/schemas/Attribute'
+components:
+  schemas:
+    Attribute:
+      type: object
+      properties:
+        id:
+          $ref: '../components/common.yaml#/components/schemas/Id'
+        name:
+          type: string
+          nullable: true
+        code:
+          type: string
+          nullable: true
+        active:
+          type: boolean
+      additionalProperties: true
+  securitySchemes:
+    cookieAuth:
+      $ref: '../components/common.yaml#/components/securitySchemes/cookieAuth'

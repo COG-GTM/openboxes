@@ -1,0 +1,251 @@
+openapi: 3.0.3
+info:
+  title: OpenBoxes API - shared components
+  description: >
+    Shared OpenAPI components referenced by every per-controller spec under
+    openapi/specs/. Contains the session-cookie security scheme, the common
+    error shapes rendered by ErrorsController for AJAX/JSON requests, common
+    pagination parameters, and a handful of small schemas reused across
+    controllers. See openapi/README.md for conventions.
+  version: 0.1.0
+servers:
+  - url: http://localhost:8080/openboxes
+    description: Local Docker baseline (docs/migration/RUNNING_LOCALLY.md)
+paths: {}
+components:
+  securitySchemes:
+    cookieAuth:
+      type: apiKey
+      in: cookie
+      name: JSESSIONID
+      description: >
+        Grails HTTP session cookie. Obtain a session by POSTing credentials to
+        /api/login, then select a warehouse with POST
+        /api/chooseLocation/{locationId}. All authenticated endpoints read the
+        current user and warehouse from this session.
+
+  parameters:
+    max:
+      name: max
+      in: query
+      description: Maximum number of results to return (page size).
+      required: false
+      schema:
+        type: integer
+    offset:
+      name: offset
+      in: query
+      description: Zero-based index of the first result to return.
+      required: false
+      schema:
+        type: integer
+
+  responses:
+    NotFound:
+      description: >
+        Resource not found. Rendered by ErrorsController.handleNotFound for
+        JSON/AJAX requests (HTML error page otherwise).
+      content:
+        application/json:
+          schema:
+            $ref: '#/components/schemas/ErrorResponse'
+    Unauthorized:
+      description: >
+        No authenticated session. Rendered by
+        ErrorsController.handleUnauthorized for JSON/AJAX requests (redirect
+        to /auth/login otherwise).
+      content:
+        application/json:
+          schema:
+            $ref: '#/components/schemas/ErrorResponse'
+    ValidationError:
+      description: >
+        Domain validation failed (grails.validation.ValidationException).
+        Rendered by ErrorsController.handleValidationErrors for JSON/AJAX
+        requests.
+      content:
+        application/json:
+          schema:
+            $ref: '#/components/schemas/ValidationErrorResponse'
+    ServerError:
+      description: >
+        Unhandled exception. Rendered by ErrorsController.handleException for
+        JSON/AJAX requests (HTML error page otherwise).
+      content:
+        application/json:
+          schema:
+            $ref: '#/components/schemas/ErrorResponse'
+
+  schemas:
+    ErrorResponse:
+      type: object
+      description: Common error body rendered by ErrorsController for JSON requests.
+      required:
+        - errorCode
+      properties:
+        errorCode:
+          type: integer
+          description: HTTP-like error code echoed in the body (e.g. 401, 404, 500).
+        errorMessage:
+          type: string
+          nullable: true
+        cause:
+          type: string
+          nullable: true
+          description: Root-cause exception class (500 responses only).
+      additionalProperties: true
+
+    ValidationErrorResponse:
+      type: object
+      required:
+        - errorCode
+        - errorMessage
+      properties:
+        errorCode:
+          type: integer
+          enum: [400]
+        errorMessage:
+          type: string
+        errorMessages:
+          type: array
+          items:
+            type: string
+      additionalProperties: true
+
+    Id:
+      description: >
+        Domain object identifier. Usually a Hibernate-generated 32-char hex
+        string (UUID generator), but a few seeded records have short numeric
+        ids, so the format is not constrained.
+      type: string
+
+    Address:
+      type: object
+      nullable: true
+      description: Embedded address rendered inside Location payloads (null when unset).
+      properties:
+        address:
+          type: string
+          nullable: true
+        address2:
+          type: string
+          nullable: true
+        city:
+          type: string
+          nullable: true
+        stateOrProvince:
+          type: string
+          nullable: true
+        postalCode:
+          type: string
+          nullable: true
+        country:
+          type: string
+          nullable: true
+        description:
+          type: string
+          nullable: true
+      additionalProperties: true
+
+    LocationType:
+      type: object
+      nullable: true
+      properties:
+        id:
+          $ref: '#/components/schemas/Id'
+        name:
+          type: string
+          nullable: true
+        description:
+          type: string
+          nullable: true
+        locationTypeCode:
+          type: string
+          nullable: true
+          description: One of the LocationTypeCode enum values (e.g. DEPOT, BIN_LOCATION).
+      additionalProperties: true
+
+    Person:
+      type: object
+      nullable: true
+      description: Default Grails JSON rendering of a Person/User reference (null when unset).
+      properties:
+        id:
+          $ref: '#/components/schemas/Id'
+        firstName:
+          type: string
+          nullable: true
+        lastName:
+          type: string
+          nullable: true
+        email:
+          type: string
+          nullable: true
+      additionalProperties: true
+
+    Location:
+      type: object
+      description: >
+        Default Grails JSON rendering of org.pih.warehouse.core.Location (used
+        for both warehouses and bin locations). parentLocation is rendered
+        recursively; on nested occurrences Grails may render a shallow
+        reference, so only a loose shape is pinned.
+      properties:
+        id:
+          $ref: '#/components/schemas/Id'
+        name:
+          type: string
+          nullable: true
+        description:
+          type: string
+          nullable: true
+        locationNumber:
+          type: string
+          nullable: true
+        active:
+          type: boolean
+        backgroundColor:
+          type: string
+          nullable: true
+        address:
+          type: object
+          nullable: true
+          allOf:
+            - $ref: '#/components/schemas/Address'
+        locationType:
+          type: object
+          nullable: true
+          allOf:
+            - $ref: '#/components/schemas/LocationType'
+        locationGroup:
+          nullable: true
+          type: object
+          additionalProperties: true
+        parentLocation:
+          nullable: true
+          type: object
+          additionalProperties: true
+        organization:
+          nullable: true
+          type: object
+          additionalProperties: true
+        organizationCode:
+          type: string
+          nullable: true
+        organizationName:
+          type: string
+          nullable: true
+        manager:
+          type: object
+          nullable: true
+          allOf:
+            - $ref: '#/components/schemas/Person'
+        hasBinLocationSupport:
+          type: boolean
+        hasPackingSupport:
+          type: boolean
+        hasPartialReceivingSupport:
+          type: boolean
+        hasCentralPurchasingEnabled:
+          type: boolean
+      additionalProperties: true

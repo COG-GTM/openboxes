@@ -1,0 +1,325 @@
+openapi: 3.0.3
+info:
+  title: OpenBoxes - ApiController
+  description: >
+    Session, authentication and application-context endpoints handled by
+    org.pih.warehouse.api.ApiController. Routed via the catch-all
+    "/api/$action/$id?" URL mapping (any HTTP method reaches the action;
+    the methods documented here are the ones exercised by clients) plus the
+    explicit /api/supportLinks and /api/resettingInstance/command mappings.
+    This spec pins CURRENT behavior for the migration parity oracle - the
+    text/html bodies and non-REST status usage are intentional.
+  version: 0.1.0
+servers:
+  - url: http://localhost:8080/openboxes
+    description: Local Docker baseline (docs/migration/RUNNING_LOCALLY.md)
+security:
+  - cookieAuth: []
+paths:
+  /api/login:
+    post:
+      operationId: login
+      summary: Authenticate and establish an HTTP session
+      description: >
+        Authenticates against username/email + password. On success the
+        Grails session is bound to the user (and optionally a location) and
+        the JSESSIONID cookie authenticates subsequent requests.
+      security: []
+      requestBody:
+        required: true
+        content:
+          application/json:
+            schema:
+              type: object
+              required: [username, password]
+              properties:
+                username:
+                  type: string
+                  description: Username or email address.
+                password:
+                  type: string
+                location:
+                  type: string
+                  description: Optional location id to bind to the session.
+      responses:
+        '200':
+          description: Authentication succeeded ("Authentication was successful").
+          content:
+            text/html:
+              schema:
+                type: string
+        '401':
+          description: Authentication failed ("Authentication failed").
+          content:
+            text/html:
+              schema:
+                type: string
+  /api/logout:
+    get:
+      operationId: logout
+      summary: Invalidate the session (or end impersonation)
+      description: >
+        Invalidates the HTTP session. If the session was impersonating
+        another user, only the impersonation ends. Always responds 200.
+      responses:
+        '200':
+          description: Logout succeeded ("Logout was successful").
+          content:
+            text/html:
+              schema:
+                type: string
+  /api/chooseLocation/{locationId}:
+    post:
+      operationId: chooseLocationPost
+      summary: Select the active warehouse for the session
+      parameters:
+        - $ref: '#/components/parameters/locationId'
+      responses:
+        '200':
+          $ref: '#/components/responses/ChooseLocationOk'
+        '404':
+          $ref: '../components/common.yaml#/components/responses/NotFound'
+    get:
+      operationId: chooseLocationGet
+      summary: Select the active warehouse for the session (GET variant)
+      description: >
+        The catch-all URL mapping does not constrain the HTTP method, so GET
+        behaves identically to POST. Existing clients use both.
+      parameters:
+        - $ref: '#/components/parameters/locationId'
+      responses:
+        '200':
+          $ref: '#/components/responses/ChooseLocationOk'
+        '404':
+          $ref: '../components/common.yaml#/components/responses/NotFound'
+  /api/chooseLocale/{localeCode}:
+    get:
+      operationId: chooseLocale
+      summary: Set the session locale
+      parameters:
+        - name: localeCode
+          in: path
+          required: true
+          schema:
+            type: string
+          description: Locale code, e.g. "en" or "fr".
+      responses:
+        '200':
+          description: Locale applied.
+          content:
+            application/json:
+              schema:
+                type: object
+                required: [data]
+                properties:
+                  data:
+                    type: object
+                    required: [activeLanguage, activeLanguageTag]
+                    properties:
+                      activeLanguage:
+                        type: string
+                      activeLanguageTag:
+                        type: string
+        '404':
+          $ref: '../components/common.yaml#/components/responses/NotFound'
+  /api/getMenuConfig:
+    get:
+      operationId: getMenuConfig
+      summary: Menu configuration for the current user and location
+      responses:
+        '200':
+          description: Translated megamenu configuration.
+          content:
+            application/json:
+              schema:
+                type: object
+                required: [data]
+                properties:
+                  data:
+                    type: object
+                    required: [menuConfig]
+                    properties:
+                      menuConfig:
+                        type: array
+                        description: >
+                          Translated menu sections (config-driven structure;
+                          empty for request-only locations).
+                        items:
+                          type: object
+                          additionalProperties: true
+                      menuSectionsUrlParts:
+                        type: object
+                        description: >
+                          Map of menu section key to URL fragments (absent
+                          when menuConfig is empty).
+                        additionalProperties: true
+  /api/getAppContext:
+    get:
+      operationId: getAppContext
+      summary: Application context for the React frontend
+      description: >
+        Aggregated session/user/location/config payload consumed by the React
+        app on boot. The full field list mirrors ApiController.getAppContext;
+        only structural invariants are pinned here (the payload embeds
+        default-rendered User and Location objects plus many config values).
+      responses:
+        '200':
+          description: Application context.
+          content:
+            application/json:
+              schema:
+                type: object
+                required: [data]
+                properties:
+                  data:
+                    type: object
+                    required:
+                      - user
+                      - location
+                      - supportedActivities
+                      - activeLanguage
+                      - menuItems
+                      - supportedLocales
+                      - currencyCode
+                    properties:
+                      user:
+                        type: object
+                        additionalProperties: true
+                      location:
+                        type: object
+                        additionalProperties: true
+                      supportedActivities:
+                        type: array
+                        items:
+                          type: string
+                      activeLanguage:
+                        type: string
+                      activeLanguageTag:
+                        type: string
+                      menuItems:
+                        type: array
+                        items:
+                          type: object
+                          additionalProperties: true
+                      supportedLocales:
+                        type: array
+                        items:
+                          type: object
+                          properties:
+                            code:
+                              type: string
+                            name:
+                              type: string
+                      currencyCode:
+                        type: string
+                      isSuperuser:
+                        type: boolean
+                      isUserAdmin:
+                        type: boolean
+                      isPaginated:
+                        type: boolean
+                      pageSize:
+                        type: integer
+                    additionalProperties: true
+  /api/getRequestTypes:
+    get:
+      operationId: getRequestTypes
+      summary: Localized requisition request types
+      responses:
+        '200':
+          description: Request type options.
+          content:
+            application/json:
+              schema:
+                type: object
+                required: [data]
+                properties:
+                  data:
+                    type: array
+                    items:
+                      type: object
+                      required: [id, name]
+                      properties:
+                        id:
+                          type: string
+                          description: RequisitionType enum name (e.g. ADHOC, STOCK).
+                        name:
+                          type: string
+                          description: Localized display name.
+  /api/status:
+    get:
+      operationId: status
+      summary: Application/database health status
+      security: []
+      responses:
+        '200':
+          description: Health status (always 200; database failures are reported in the body).
+          content:
+            application/json:
+              schema:
+                type: object
+                required: [status, database]
+                properties:
+                  status:
+                    type: string
+                    enum: [OK]
+                  database:
+                    type: object
+                    required: [status, message]
+                    properties:
+                      status:
+                        type: boolean
+                      message:
+                        type: string
+  /api/supportLinks:
+    get:
+      operationId: getSupportLinks
+      summary: Configured support/documentation links
+      responses:
+        '200':
+          description: Map of link key to URL.
+          content:
+            application/json:
+              schema:
+                type: object
+                required: [data]
+                properties:
+                  data:
+                    type: object
+                    additionalProperties:
+                      type: string
+  /api/resettingInstance/command:
+    get:
+      operationId: getResettingInstanceCommand
+      summary: Configured instance-reset shell command
+      responses:
+        '200':
+          description: Reset command string (null when unconfigured).
+          content:
+            application/json:
+              schema:
+                type: object
+                required: [data]
+                properties:
+                  data:
+                    type: string
+                    nullable: true
+components:
+  parameters:
+    locationId:
+      name: locationId
+      in: path
+      required: true
+      schema:
+        $ref: '../components/common.yaml#/components/schemas/Id'
+  responses:
+    ChooseLocationOk:
+      description: >
+        Warehouse selected ("User {name} is now logged into {location}").
+      content:
+        text/html:
+          schema:
+            type: string
+  securitySchemes:
+    cookieAuth:
+      $ref: '../components/common.yaml#/components/securitySchemes/cookieAuth'

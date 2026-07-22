@@ -1,0 +1,280 @@
+openapi: 3.0.3
+info:
+  title: OpenBoxes - CombinedShipmentItemApiController
+  description: >
+    Combined-shipment (multi-order shipment) item endpoints handled by
+    org.pih.warehouse.api.CombinedShipmentItemApiController, routed via
+    explicit URL mappings ("/api/orderNumberOptions" and
+    "/api/combinedShipmentItems/*").
+  version: 0.1.0
+servers:
+  - url: http://localhost:8080/openboxes
+    description: Local Docker baseline (docs/migration/RUNNING_LOCALLY.md)
+security:
+  - cookieAuth: []
+paths:
+  /api/orderNumberOptions:
+    get:
+      operationId: getOrderOptions
+      summary: Orders eligible for a combined shipment
+      parameters:
+        - $ref: '#/components/parameters/vendor'
+        - $ref: '#/components/parameters/destination'
+      responses:
+        '200':
+          description: >
+            Orders between the vendor and destination that still have items
+            with quantity remaining to ship.
+          content:
+            application/json:
+              schema:
+                type: object
+                required: [data]
+                properties:
+                  data:
+                    type: array
+                    items:
+                      type: object
+                      required: [id, orderNumber]
+                      properties:
+                        id:
+                          $ref: '../components/common.yaml#/components/schemas/Id'
+                        orderNumber:
+                          type: string
+  /api/combinedShipmentItems/findOrderItems:
+    post:
+      operationId: findOrderItems
+      summary: Find shippable order items for a combined shipment
+      requestBody:
+        required: true
+        content:
+          application/json:
+            schema:
+              type: object
+              properties:
+                orderIds:
+                  type: array
+                  items:
+                    $ref: '../components/common.yaml#/components/schemas/Id'
+                  description: >
+                    Explicit order ids; when absent, orders are resolved from
+                    vendor + destination.
+                vendor:
+                  $ref: '../components/common.yaml#/components/schemas/Id'
+                destination:
+                  $ref: '../components/common.yaml#/components/schemas/Id'
+                productId:
+                  $ref: '../components/common.yaml#/components/schemas/Id'
+              additionalProperties: true
+      responses:
+        '200':
+          description: >
+            Shippable (non-canceled, quantity remaining > 0) order items.
+            Note the envelope key is "orderItems", not "data".
+          content:
+            application/json:
+              schema:
+                type: object
+                required: [orderItems]
+                properties:
+                  orderItems:
+                    type: array
+                    items:
+                      $ref: '#/components/schemas/ShippableOrderItem'
+  /api/combinedShipmentItems/addToShipment/{id}:
+    post:
+      operationId: addItemsToShipment
+      summary: Add order items to an existing shipment
+      parameters:
+        - name: id
+          in: path
+          required: true
+          schema:
+            $ref: '../components/common.yaml#/components/schemas/Id'
+          description: Shipment id.
+      requestBody:
+        required: true
+        content:
+          application/json:
+            schema:
+              type: object
+              properties:
+                itemsToAdd:
+                  type: array
+                  items:
+                    type: object
+                    additionalProperties: true
+              additionalProperties: true
+      responses:
+        '200':
+          description: The updated shipment (default Grails JSON rendering).
+          content:
+            application/json:
+              schema:
+                type: object
+                required: [data]
+                properties:
+                  data:
+                    type: object
+                    additionalProperties: true
+        '400':
+          description: Shipment not found (plain-text body "Shipment not found").
+          content:
+            text/html:
+              schema:
+                type: string
+  /api/combinedShipmentItems/importTemplate/{id}:
+    post:
+      operationId: importTemplate
+      summary: Import a filled order-items template into a shipment
+      parameters:
+        - name: id
+          in: path
+          required: true
+          schema:
+            $ref: '../components/common.yaml#/components/schemas/Id'
+          description: Shipment id.
+      requestBody:
+        required: true
+        content:
+          multipart/form-data:
+            schema:
+              type: object
+              properties:
+                importFile:
+                  type: string
+                  format: binary
+      responses:
+        '200':
+          description: Template imported ("Successfully imported template").
+          content:
+            text/html:
+              schema:
+                type: string
+        '500':
+          $ref: '../components/common.yaml#/components/responses/ServerError'
+  /api/combinedShipmentItems/getProductsInOrders:
+    get:
+      operationId: getProductsInOrders
+      summary: Products present in shippable order items
+      parameters:
+        - name: name
+          in: query
+          required: false
+          schema:
+            type: string
+          description: >
+            Space/comma-separated search terms. Terms shorter than the
+            configured typeahead minLength short-circuit to an empty list.
+        - $ref: '#/components/parameters/vendor'
+        - $ref: '#/components/parameters/destination'
+      responses:
+        '200':
+          description: >
+            Unique products (default Grails JSON rendering) from order items
+            with quantity remaining to ship.
+          content:
+            application/json:
+              schema:
+                type: object
+                required: [data]
+                properties:
+                  data:
+                    type: array
+                    items:
+                      type: object
+                      additionalProperties: true
+  /api/combinedShipmentItems/exportTemplate:
+    get:
+      operationId: exportTemplate
+      summary: Export the order-items CSV template
+      parameters:
+        - name: blank
+          in: query
+          required: false
+          schema:
+            type: string
+          description: >
+            When set (e.g. "true"), exports a single empty template row
+            instead of the shippable order items for vendor + destination.
+        - $ref: '#/components/parameters/vendor'
+        - $ref: '#/components/parameters/destination'
+      responses:
+        '200':
+          description: >
+            CSV template (Content-Disposition attachment
+            "Order-items-template.csv").
+          content:
+            text/csv:
+              schema:
+                type: string
+components:
+  parameters:
+    vendor:
+      name: vendor
+      in: query
+      required: false
+      schema:
+        $ref: '../components/common.yaml#/components/schemas/Id'
+      description: Vendor (origin) location id.
+    destination:
+      name: destination
+      in: query
+      required: false
+      schema:
+        $ref: '../components/common.yaml#/components/schemas/Id'
+      description: Destination location id.
+  schemas:
+    ShippableOrderItem:
+      type: object
+      required:
+        - orderId
+        - orderItemId
+        - quantityAvailable
+        - quantityToShip
+      properties:
+        orderId:
+          $ref: '../components/common.yaml#/components/schemas/Id'
+        orderItemId:
+          $ref: '../components/common.yaml#/components/schemas/Id'
+        orderNumber:
+          type: string
+          nullable: true
+        productCode:
+          type: string
+          nullable: true
+        productName:
+          type: string
+          nullable: true
+        displayName:
+          type: string
+          nullable: true
+        budgetCode:
+          type: string
+          nullable: true
+        recipient:
+          type: string
+          nullable: true
+        quantityAvailable:
+          type: number
+          description: >
+            Quantity remaining to ship; usually integral but
+            getQuantityRemainingToShip() is not constrained to integers.
+        quantityToShip:
+          type: string
+          description: Always rendered as an empty string placeholder.
+        uom:
+          type: string
+          nullable: true
+        supplierCode:
+          type: string
+          nullable: true
+        productSupplierName:
+          type: string
+          nullable: true
+        color:
+          type: string
+          nullable: true
+  securitySchemes:
+    cookieAuth:
+      $ref: '../components/common.yaml#/components/securitySchemes/cookieAuth'
