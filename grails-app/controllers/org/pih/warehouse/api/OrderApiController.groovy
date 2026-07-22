@@ -437,6 +437,381 @@ class OrderApiController {
         ]] as JSON)
     }
 
+    /**
+     * Order header details for the migrated order show screen (mirrors the
+     * legacy OrderController.show view model plus the derived status that the
+     * legacy page fetched via ajax).
+     */
+    def details() {
+        Order order = Order.get(params.id)
+        if (!order) {
+            response.status = HttpStatus.NOT_FOUND.value()
+            render([errorCode: HttpStatus.NOT_FOUND.value(), errorMessage: "Order ${params.id} not found"] as JSON)
+            return
+        }
+        String defaultCurrencyCode = grailsApplication.config.openboxes.locale.defaultCurrencyCode
+        def ordersDerivedStatus = orderService.getOrdersDerivedStatus([order.id])
+        render([data: [
+                id                 : order.id,
+                orderNumber        : order.orderNumber,
+                name               : order.name,
+                description        : order.description,
+                status             : order.status?.name(),
+                derivedStatus      : ordersDerivedStatus ? ordersDerivedStatus[order.id] : null,
+                orderType          : [
+                        id  : order.orderType?.id,
+                        code: order.orderType?.code,
+                        name: order.orderType?.name,
+                ],
+                isPurchaseOrder    : order.isPurchaseOrder,
+                isPutawayOrder     : order.isPutawayOrder,
+                origin             : order.origin ? [
+                        id              : order.origin.id,
+                        name            : order.origin.name,
+                        organizationCode: order.origin.organization?.code,
+                ] : null,
+                destination        : order.destination ? [
+                        id              : order.destination.id,
+                        name            : order.destination.name,
+                        organizationCode: order.destination.organization?.code,
+                ] : null,
+                paymentTerm        : order.paymentTerm ? [id: order.paymentTerm.id, name: order.paymentTerm.name] : null,
+                paymentMethodType  : order.paymentMethodType ? [id: order.paymentMethodType.id, name: order.paymentMethodType.name] : null,
+                subtotal           : order.subtotal ?: 0,
+                totalAdjustments   : order.totalAdjustments ?: 0,
+                total              : order.total ?: 0,
+                currencyCode       : order.currencyCode ?: defaultCurrencyCode,
+                orderedBy          : order.orderedBy ? [id: order.orderedBy.id, name: order.orderedBy.name] : null,
+                dateOrdered        : order.dateOrdered,
+                approvedBy         : order.approvedBy ? [id: order.approvedBy.id, name: order.approvedBy.name] : null,
+                dateApproved       : order.dateApproved,
+                completedBy        : order.completedBy ? [id: order.completedBy.id, name: order.completedBy.name] : null,
+                dateCompleted      : order.dateCompleted,
+                createdBy          : order.createdBy ? [id: order.createdBy.id, name: order.createdBy.name] : null,
+                dateCreated        : order.dateCreated,
+                updatedBy          : order.updatedBy ? [id: order.updatedBy.id, name: order.updatedBy.name] : null,
+                lastUpdated        : order.lastUpdated,
+                commentsCount      : order.comments?.size() ?: 0,
+        ]] as JSON)
+    }
+
+    /**
+     * Order items for the migrated order show screen tabs (summary, item
+     * status, item details). Includes canceled items; the client filters per
+     * tab like the legacy templates did.
+     */
+    def items() {
+        Order order = Order.get(params.id)
+        if (!order) {
+            response.status = HttpStatus.NOT_FOUND.value()
+            render([errorCode: HttpStatus.NOT_FOUND.value(), errorMessage: "Order ${params.id} not found"] as JSON)
+            return
+        }
+        String defaultCurrencyCode = grailsApplication.config.openboxes.locale.defaultCurrencyCode
+        def orderItems = order.orderItems?.sort { a, b ->
+            a.dateCreated <=> b.dateCreated ?: a.orderIndex <=> b.orderIndex
+        } ?: []
+        render([data: [
+                isPurchaseOrder    : order.isPurchaseOrder,
+                isPutawayOrder     : order.isPutawayOrder,
+                hasSupplierCode    : orderItems.any { it.productSupplier?.supplierCode } ?: false,
+                hasManufacturerName: orderItems.any { it.productSupplier?.manufacturerName } ?: false,
+                hasManufacturerCode: orderItems.any { it.productSupplier?.manufacturerCode } ?: false,
+                currencyCode       : order.currencyCode ?: defaultCurrencyCode,
+                subtotal           : order.subtotal ?: 0,
+                totalAdjustments   : order.totalAdjustments ?: 0,
+                total              : order.total ?: 0,
+                orderItems         : orderItems.collect { OrderItem orderItem ->
+                    [
+                            id                     : orderItem.id,
+                            canceled               : orderItem.orderItemStatusCode == OrderItemStatusCode.CANCELED,
+                            orderItemStatusCode    : orderItem.orderItemStatusCode?.name(),
+                            product                : orderItem.product ? [
+                                    id         : orderItem.product.id,
+                                    productCode: orderItem.product.productCode,
+                                    name       : orderItem.product.displayNameOrDefaultName,
+                                    color      : orderItem.product.color,
+                            ] : null,
+                            description            : orderItem.description,
+                            supplierCode           : orderItem.productSupplier?.supplierCode,
+                            manufacturerName       : orderItem.productSupplier?.manufacturerName,
+                            manufacturerCode       : orderItem.productSupplier?.manufacturerCode,
+                            quantity               : orderItem.quantity,
+                            unitOfMeasure          : orderItem.unitOfMeasure,
+                            unitPrice              : orderItem.unitPrice,
+                            totalPrice             : orderItem.totalPrice(),
+                            quantityShipped        : orderItem.quantityShipped,
+                            quantityReceived       : orderItem.quantityReceived,
+                            postedQuantityInvoiced : orderItem.postedQuantityInvoiced,
+                            recipient              : orderItem.recipient?.name,
+                            estimatedReadyDate     : orderItem.estimatedReadyDate,
+                            actualReadyDate        : orderItem.actualReadyDate,
+                            budgetCode             : orderItem.budgetCode?.code,
+                            lotNumber              : orderItem.inventoryItem?.lotNumber,
+                            expirationDate         : orderItem.inventoryItem?.expirationDate,
+                            originBinLocation      : orderItem.originBinLocation?.name,
+                            destinationBinLocation : orderItem.destinationBinLocation?.name,
+                    ]
+                },
+        ]] as JSON)
+    }
+
+    /**
+     * Order adjustments for the migrated order show screen adjustments tab
+     * (mirrors the legacy _orderAdjustments template).
+     */
+    def listAdjustments() {
+        Order order = Order.get(params.id)
+        if (!order) {
+            response.status = HttpStatus.NOT_FOUND.value()
+            render([errorCode: HttpStatus.NOT_FOUND.value(), errorMessage: "Order ${params.id} not found"] as JSON)
+            return
+        }
+        def orderAdjustments = order.orderAdjustments?.sort() ?: []
+        render([data: [
+                totalAdjustments: order.totalAdjustments ?: 0,
+                adjustments     : orderAdjustments.collect { OrderAdjustment orderAdjustment ->
+                    [
+                            id                  : orderAdjustment.id,
+                            canceled            : orderAdjustment.canceled ?: false,
+                            orderItem           : orderAdjustment.orderItem?.product ? [
+                                    id   : orderAdjustment.orderItem.id,
+                                    label: orderAdjustment.orderItem.product.displayNameOrDefaultName,
+                            ] : null,
+                            orderAdjustmentType : orderAdjustment.orderAdjustmentType ? [
+                                    id  : orderAdjustment.orderAdjustmentType.id,
+                                    name: orderAdjustment.orderAdjustmentType.name,
+                            ] : null,
+                            description         : orderAdjustment.description,
+                            percentage          : orderAdjustment.percentage,
+                            amount              : orderAdjustment.amount,
+                            totalAdjustments    : orderAdjustment.orderItem
+                                    ? orderAdjustment.orderItem.totalAdjustments
+                                    : orderAdjustment.totalAdjustments,
+                            budgetCode          : orderAdjustment.budgetCode?.code,
+                            derivedPaymentStatus: orderAdjustment.derivedPaymentStatus?.name(),
+                    ]
+                },
+        ]] as JSON)
+    }
+
+    /**
+     * Shipment items for the migrated order show screen shipments tab
+     * (mirrors the legacy _orderShipments template).
+     */
+    def shipments() {
+        Order order = Order.get(params.id)
+        if (!order) {
+            response.status = HttpStatus.NOT_FOUND.value()
+            render([errorCode: HttpStatus.NOT_FOUND.value(), errorMessage: "Order ${params.id} not found"] as JSON)
+            return
+        }
+        def rows = []
+        def orderItems = order.orderItems?.sort { a, b ->
+            a.dateCreated <=> b.dateCreated ?: a.orderIndex <=> b.orderIndex
+        } ?: []
+        orderItems.eachWithIndex { OrderItem orderItem, int i ->
+            def shipmentItems = orderItem.shipmentItems?.sort { it.dateCreated } ?: []
+            shipmentItems.eachWithIndex { shipmentItem, int j ->
+                rows << [
+                        orderItemIndex : j == 0 ? i + 1 : null,
+                        product        : j == 0 && shipmentItem.product ? [
+                                id         : shipmentItem.product.id,
+                                productCode: shipmentItem.product.productCode,
+                                name       : shipmentItem.product.displayNameOrDefaultName,
+                        ] : null,
+                        shipment       : shipmentItem.shipment ? [
+                                id            : shipmentItem.shipment.id,
+                                shipmentNumber: shipmentItem.shipment.shipmentNumber,
+                                name          : shipmentItem.shipment.name,
+                        ] : null,
+                        shipmentType   : shipmentItem.shipment?.shipmentType?.name,
+                        status         : shipmentItem.shipment?.currentStatus?.name(),
+                        packLevel      : [shipmentItem.container?.parentContainer?.name, shipmentItem.container?.name]
+                                .findAll { it }.join(" \u203a ") ?: null,
+                        lotNumber      : shipmentItem.inventoryItem?.lotNumber,
+                        expirationDate : shipmentItem.inventoryItem?.expirationDate,
+                        quantity       : shipmentItem.quantity,
+                        unitOfMeasure  : shipmentItem.product?.unitOfMeasure,
+                ]
+            }
+        }
+        render([data: rows] as JSON)
+    }
+
+    /**
+     * Invoice items for the migrated order show screen invoices tab (mirrors
+     * the legacy _orderInvoices template).
+     */
+    def invoices() {
+        Order order = Order.get(params.id)
+        if (!order) {
+            response.status = HttpStatus.NOT_FOUND.value()
+            render([errorCode: HttpStatus.NOT_FOUND.value(), errorMessage: "Order ${params.id} not found"] as JSON)
+            return
+        }
+        render([data: order.getSortedInvoiceItems().collect { invoiceItem ->
+            def relatedOrderItem = invoiceItem.orderItem ?: invoiceItem.shipmentItem?.orderItem
+            [
+                    id           : invoiceItem.id,
+                    inverse      : invoiceItem.inverse ?: false,
+                    orderItemId  : invoiceItem.orderItem?.id,
+                    productCode  : invoiceItem.product?.productCode,
+                    description  : invoiceItem.orderAdjustment
+                            ? invoiceItem.description
+                            : (invoiceItem.product?.displayNameOrDefaultName ?: relatedOrderItem?.description),
+                    invoice      : invoiceItem.invoice ? [
+                            id           : invoiceItem.invoice.id,
+                            invoiceNumber: invoiceItem.invoice.invoiceNumber,
+                    ] : null,
+                    invoiceType  : invoiceItem.invoice?.invoiceType?.name,
+                    invoiceStatus: invoiceItem.invoice?.status?.name(),
+                    quantity     : invoiceItem.quantity,
+                    unitOfMeasure: invoiceItem.unitOfMeasure,
+                    unitPrice    : invoiceItem.unitPrice,
+                    amount       : invoiceItem.amount,
+            ]
+        }] as JSON)
+    }
+
+    /**
+     * Documents, links and purchase order templates for the migrated order
+     * show screen documents tab (mirrors the legacy _orderDocuments template).
+     */
+    def listDocuments() {
+        Order order = Order.get(params.id)
+        if (!order) {
+            response.status = HttpStatus.NOT_FOUND.value()
+            render([errorCode: HttpStatus.NOT_FOUND.value(), errorMessage: "Order ${params.id} not found"] as JSON)
+            return
+        }
+        def documentToJson = { Document document ->
+            [
+                    id          : document.id,
+                    name        : document.name,
+                    filename    : document.filename,
+                    documentType: document.documentType?.name,
+                    size        : document.size,
+                    fileUri     : document.fileUri,
+                    lastUpdated : document.lastUpdated,
+            ]
+        }
+        def documents = order.documents?.findAll { !it.fileUri } ?: []
+        def links = order.documents?.findAll { it.fileUri } ?: []
+        def documentTemplates = Document.findAllByDocumentCode(DocumentCode.PURCHASE_ORDER_TEMPLATE)
+        render([data: [
+                documents        : documents.collect(documentToJson),
+                links            : links.collect(documentToJson),
+                documentTemplates: documentTemplates.collect(documentToJson),
+        ]] as JSON)
+    }
+
+    /**
+     * Comments for the migrated order show screen comments tab (mirrors the
+     * legacy _orderComments template).
+     */
+    def listComments() {
+        Order order = Order.get(params.id)
+        if (!order) {
+            response.status = HttpStatus.NOT_FOUND.value()
+            render([errorCode: HttpStatus.NOT_FOUND.value(), errorMessage: "Order ${params.id} not found"] as JSON)
+            return
+        }
+        render([data: (order.comments ?: []).collect { Comment comment ->
+            [
+                    id         : comment.id,
+                    comment    : comment.comment,
+                    sender     : comment.sender ? [id: comment.sender.id, name: comment.sender.name] : null,
+                    recipient  : comment.recipient ? [id: comment.recipient.id, name: comment.recipient.name] : null,
+                    lastUpdated: comment.lastUpdated,
+            ]
+        }] as JSON)
+    }
+
+    /**
+     * Data for the migrated order print screen (mirrors the legacy
+     * order/print.gsp view model).
+     */
+    def printData() {
+        Order order = Order.get(params.id)
+        if (!order) {
+            response.status = HttpStatus.NOT_FOUND.value()
+            render([errorCode: HttpStatus.NOT_FOUND.value(), errorMessage: "Order ${params.id} not found"] as JSON)
+            return
+        }
+        String defaultCurrencyCode = grailsApplication.config.openboxes.locale.defaultCurrencyCode
+        def addressToJson = { address ->
+            address ? [
+                    address        : address.address,
+                    address2       : address.address2,
+                    city           : address.city,
+                    stateOrProvince: address.stateOrProvince,
+                    postalCode     : address.postalCode,
+                    country        : address.country,
+                    description    : address.description,
+            ] : null
+        }
+        def orderItems = order.listOrderItems()
+        def orderAdjustments = order.orderAdjustments
+                ?.findAll { !(it.orderItem || it.canceled) }
+                ?.sort { it.totalAdjustments }
+                ?.reverse() ?: []
+        render([data: [
+                id                 : order.id,
+                orderNumber        : order.orderNumber,
+                name               : order.name,
+                orderType          : [id: order.orderType?.id, code: order.orderType?.code, name: order.orderType?.name],
+                destinationParty   : order.destinationParty ? [
+                        id         : order.destinationParty.id,
+                        displayName: order.destinationParty.hasProperty("displayName") ? order.destinationParty.displayName : order.destinationParty.name,
+                        address    : addressToJson(order.destinationParty.defaultLocation?.address),
+                ] : null,
+                origin             : order.origin ? [
+                        id     : order.origin.id,
+                        name   : order.origin.name,
+                        address: addressToJson(order.origin.address),
+                ] : null,
+                destination        : order.destination ? [
+                        id     : order.destination.id,
+                        name   : order.destination.name,
+                        address: addressToJson(order.destination.address),
+                ] : null,
+                orderedBy          : order.orderedBy ? [id: order.orderedBy.id, name: order.orderedBy.name] : null,
+                paymentTerm        : order.paymentTerm?.name,
+                paymentMethodType  : order.paymentMethodType?.name,
+                hasSupplierCode    : order.orderItems?.any { it.productSupplier?.supplierCode } ?: false,
+                hasManufacturerName: order.orderItems?.any { it.productSupplier?.manufacturerName } ?: false,
+                hasManufacturerCode: order.orderItems?.any { it.productSupplier?.manufacturerCode } ?: false,
+                orderItems         : orderItems.collect { OrderItem orderItem ->
+                    [
+                            id              : orderItem.id,
+                            productCode     : orderItem.product?.productCode,
+                            productName     : orderItem.product?.displayNameOrDefaultName,
+                            supplierCode    : orderItem.productSupplier?.supplierCode,
+                            manufacturerName: orderItem.productSupplier?.manufacturerName,
+                            manufacturerCode: orderItem.productSupplier?.manufacturerCode,
+                            quantity        : orderItem.quantity,
+                            unitOfMeasure   : orderItem.unitOfMeasure,
+                            unitPrice       : orderItem.unitPrice,
+                            subtotal        : orderItem.subtotal,
+                            total           : orderItem.total,
+                    ]
+                },
+                orderAdjustments   : orderAdjustments.collect { OrderAdjustment orderAdjustment ->
+                    [
+                            id                 : orderAdjustment.id,
+                            description        : orderAdjustment.description,
+                            orderAdjustmentType: orderAdjustment.orderAdjustmentType?.name,
+                            percentage         : orderAdjustment.percentage,
+                            totalAdjustments   : orderAdjustment.totalAdjustments,
+                    ]
+                },
+                subtotal           : order.subtotal ?: 0,
+                total              : order.total ?: 0,
+                currencyCode       : order.currencyCode ?: defaultCurrencyCode,
+        ]] as JSON)
+    }
+
     // OrderAdjustment.getHasRegularInvoice NPEs when the adjustment has no
     // invoice items yet (freshly created adjustments).
     private static boolean hasRegularInvoice(OrderAdjustment orderAdjustment) {

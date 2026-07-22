@@ -1,0 +1,83 @@
+openapi: 3.0.3
+info:
+  title: OpenBoxes - PaymentTermApiController
+  description: >
+    Create endpoint for payment terms handled by
+    org.pih.warehouse.api.PaymentTermApiController, routed via
+    "/api/paymentTerms". Added in Phase 2 (Batch 29) for the migrated
+    paymentTerm create screen. Option lists for existing payment terms are
+    served by "/api/paymentTermOptions" (select-options-api.yaml).
+  version: 0.1.0
+servers:
+  - url: http://localhost:8080/openboxes
+    description: Local Docker baseline (docs/migration/RUNNING_LOCALLY.md)
+security:
+  - cookieAuth: []
+paths:
+  /api/paymentTerms:
+    post:
+      operationId: createPaymentTerm
+      summary: Create a payment term
+      requestBody:
+        required: true
+        content:
+          application/json:
+            schema:
+              type: object
+              required: [code, name]
+              properties:
+                code:
+                  type: string
+                name:
+                  type: string
+                description:
+                  type: string
+                  nullable: true
+                prepaymentPercent:
+                  type: number
+                  nullable: true
+                daysToPayment:
+                  type: integer
+                  nullable: true
+      responses:
+        '201':
+          description: Created payment term.
+          content:
+            application/json:
+              schema:
+                type: object
+                required: [data]
+                properties:
+                  data:
+                    $ref: '#/components/schemas/PaymentTerm'
+        '400':
+          description: Validation errors (e.g. blank code or name).
+          content:
+            application/json:
+              schema:
+                $ref: '../components/common.yaml#/components/schemas/ErrorResponse'
+components:
+  schemas:
+    PaymentTerm:
+      type: object
+      required: [id, code, name]
+      properties:
+        id:
+          $ref: '../components/common.yaml#/components/schemas/Id'
+        code:
+          type: string
+        name:
+          type: string
+        description:
+          type: string
+          nullable: true
+        prepaymentPercent:
+          type: number
+          nullable: true
+        daysToPayment:
+          type: integer
+          nullable: true
+      additionalProperties: true
+  securitySchemes:
+    cookieAuth:
+      $ref: '../components/common.yaml#/components/securitySchemes/cookieAuth'

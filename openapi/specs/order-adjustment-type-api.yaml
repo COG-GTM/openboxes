@@ -1,0 +1,200 @@
+openapi: 3.0.3
+info:
+  title: OpenBoxes - OrderAdjustmentTypeApiController
+  description: >
+    CRUD endpoints for order adjustment types handled by
+    org.pih.warehouse.api.OrderAdjustmentTypeApiController, routed via
+    "/api/orderAdjustmentTypes" and "/api/orderAdjustmentTypes/{id}".
+    Added in Phase 2 (Batch 29) for the migrated orderAdjustmentType
+    list/create/edit screens. Create and update enforce the legacy
+    GL-account requirement when the current location requires accounting.
+  version: 0.1.0
+servers:
+  - url: http://localhost:8080/openboxes
+    description: Local Docker baseline (docs/migration/RUNNING_LOCALLY.md)
+security:
+  - cookieAuth: []
+paths:
+  /api/orderAdjustmentTypes:
+    get:
+      operationId: listOrderAdjustmentTypes
+      summary: Paginated list of order adjustment types
+      parameters:
+        - name: max
+          in: query
+          schema:
+            type: integer
+        - name: offset
+          in: query
+          schema:
+            type: integer
+        - name: sort
+          in: query
+          schema:
+            type: string
+        - name: order
+          in: query
+          schema:
+            type: string
+            enum: [asc, desc]
+        - name: q
+          in: query
+          description: Name prefix filter (legacy list search behavior).
+          schema:
+            type: string
+      responses:
+        '200':
+          description: Paginated order adjustment types.
+          content:
+            application/json:
+              schema:
+                type: object
+                required: [data, totalCount]
+                properties:
+                  data:
+                    type: array
+                    items:
+                      $ref: '#/components/schemas/OrderAdjustmentType'
+                  totalCount:
+                    type: integer
+    post:
+      operationId: createOrderAdjustmentType
+      summary: Create an order adjustment type
+      requestBody:
+        required: true
+        content:
+          application/json:
+            schema:
+              $ref: '#/components/schemas/OrderAdjustmentTypeRequest'
+      responses:
+        '201':
+          description: Created order adjustment type.
+          content:
+            application/json:
+              schema:
+                type: object
+                required: [data]
+                properties:
+                  data:
+                    $ref: '#/components/schemas/OrderAdjustmentType'
+        '400':
+          description: Validation errors (e.g. blank name, missing GL account when accounting is required).
+          content:
+            application/json:
+              schema:
+                $ref: '../components/common.yaml#/components/schemas/ErrorResponse'
+  /api/orderAdjustmentTypes/{id}:
+    parameters:
+      - name: id
+        in: path
+        required: true
+        schema:
+          $ref: '../components/common.yaml#/components/schemas/Id'
+        description: Order adjustment type id.
+    get:
+      operationId: readOrderAdjustmentType
+      summary: Read an order adjustment type
+      responses:
+        '200':
+          description: The order adjustment type.
+          content:
+            application/json:
+              schema:
+                type: object
+                required: [data]
+                properties:
+                  data:
+                    $ref: '#/components/schemas/OrderAdjustmentType'
+        '404':
+          description: Unknown order adjustment type id.
+          content:
+            application/json:
+              schema:
+                $ref: '../components/common.yaml#/components/schemas/ErrorResponse'
+    put:
+      operationId: updateOrderAdjustmentType
+      summary: Update an order adjustment type
+      requestBody:
+        required: true
+        content:
+          application/json:
+            schema:
+              $ref: '#/components/schemas/OrderAdjustmentTypeRequest'
+      responses:
+        '200':
+          description: Updated order adjustment type.
+          content:
+            application/json:
+              schema:
+                type: object
+                required: [data]
+                properties:
+                  data:
+                    $ref: '#/components/schemas/OrderAdjustmentType'
+        '400':
+          description: Validation errors.
+          content:
+            application/json:
+              schema:
+                $ref: '../components/common.yaml#/components/schemas/ErrorResponse'
+        '404':
+          description: Unknown order adjustment type id.
+          content:
+            application/json:
+              schema:
+                $ref: '../components/common.yaml#/components/schemas/ErrorResponse'
+components:
+  schemas:
+    OrderAdjustmentType:
+      type: object
+      required: [id, name]
+      properties:
+        id:
+          $ref: '../components/common.yaml#/components/schemas/Id'
+        name:
+          type: string
+        description:
+          type: string
+          nullable: true
+        code:
+          type: string
+          nullable: true
+        glAccount:
+          type: object
+          nullable: true
+          properties:
+            id:
+              $ref: '../components/common.yaml#/components/schemas/Id'
+            code:
+              type: string
+              nullable: true
+            name:
+              type: string
+              nullable: true
+        dateCreated:
+          type: string
+          nullable: true
+        lastUpdated:
+          type: string
+          nullable: true
+      additionalProperties: true
+    OrderAdjustmentTypeRequest:
+      type: object
+      required: [name, code]
+      properties:
+        name:
+          type: string
+        description:
+          type: string
+          nullable: true
+        code:
+          type: string
+        glAccount:
+          type: object
+          nullable: true
+          properties:
+            id:
+              $ref: '../components/common.yaml#/components/schemas/Id'
+  securitySchemes:
+    cookieAuth:
+      $ref: '../components/common.yaml#/components/securitySchemes/cookieAuth'

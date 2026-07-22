@@ -21,6 +21,17 @@ def test_gl_account_type_code_options(client):
     assert values == {"ASSET", "EXPENSE", "LIABILITY", "EQUITY", "REVENUE"}
 
 
+def test_order_adjustment_type_code_options(client):
+    # The pinned released image predates this endpoint; only source builds
+    # of this branch expose it.
+    if client.request("GET", "/api/orderAdjustmentTypeCodeOptions").status_code != 200:
+        pytest.skip("app build does not expose /api/orderAdjustmentTypeCodeOptions")
+    resp = check(client, spec, "GET", "/api/orderAdjustmentTypeCodeOptions")
+    values = {o["value"] for o in resp.json()["data"]}
+    assert values == {"DISCOUNT_ADJUSTMENT", "SURCHARGE_ADJUSTMENT", "SALES_TAX",
+                      "SHIPPING_CHARGE", "MISCELLANEOUS_CHARGE", "FEE"}
+
+
 def test_product_group_options(client):
     check(client, spec, "GET", "/api/productGroupOptions")
 

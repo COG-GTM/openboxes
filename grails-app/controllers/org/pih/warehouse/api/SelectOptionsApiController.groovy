@@ -28,6 +28,7 @@ import org.pih.warehouse.core.UserService
 import org.pih.warehouse.data.ProductSupplierService
 import org.pih.warehouse.glAccount.GlAccountService
 import org.pih.warehouse.order.OrderAdjustmentType
+import org.pih.warehouse.order.OrderAdjustmentTypeCode
 import org.pih.warehouse.order.OrderStatus
 import org.pih.warehouse.order.OrderSummaryStatus
 import org.pih.warehouse.product.Category
@@ -225,6 +226,13 @@ class SelectOptionsApiController {
                     [id: it.id, label: it.name]
                 }
         render([data: documentTypes] as JSON)
+    }
+
+    def orderAdjustmentTypeCodeOptions() {
+        List<Map> options = OrderAdjustmentTypeCode.values().collect {
+            [id: it.name(), value: it.name(), label: it.name()]
+        }
+        render([data: options] as JSON)
     }
 
     def orderAdjustmentTypeOptions() {

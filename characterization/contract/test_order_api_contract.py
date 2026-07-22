@@ -155,6 +155,71 @@ def test_adjustment_crud(client, batch28_endpoints, order_id):
     assert updated.json()["data"]["percentage"] == 10
 
 
+# ---------------------------------------------------------------------------
+# Batch 29 endpoints (order show / print read endpoints). Skipped on builds
+# that predate them.
+# ---------------------------------------------------------------------------
+
+@pytest.fixture(scope="module")
+def batch29_endpoints(client, order_id):
+    if client.request("GET", f"/api/orders/{order_id}/details").status_code != 200:
+        pytest.skip("app build does not expose the batch 29 order endpoints")
+
+
+def test_order_details(client, batch29_endpoints, order_id):
+    resp = check(client, spec, "GET", "/api/orders/{id}/details",
+                 path=f"/api/orders/{order_id}/details")
+    assert resp.json()["data"]["id"] == order_id
+
+
+def test_order_details_unknown(client, batch29_endpoints):
+    resp = check(client, spec, "GET", "/api/orders/{id}/details",
+                 path=f"/api/orders/{UNKNOWN}/details")
+    assert resp.status_code == 404
+
+
+def test_order_items(client, batch29_endpoints, order_id):
+    resp = check(client, spec, "GET", "/api/orders/{id}/items",
+                 path=f"/api/orders/{order_id}/items")
+    assert "orderItems" in resp.json()["data"]
+
+
+def test_order_shipments(client, batch29_endpoints, order_id):
+    resp = check(client, spec, "GET", "/api/orders/{id}/shipments",
+                 path=f"/api/orders/{order_id}/shipments")
+    assert isinstance(resp.json()["data"], list)
+
+
+def test_order_invoices(client, batch29_endpoints, order_id):
+    resp = check(client, spec, "GET", "/api/orders/{id}/invoices",
+                 path=f"/api/orders/{order_id}/invoices")
+    assert isinstance(resp.json()["data"], list)
+
+
+def test_order_adjustments_list(client, batch29_endpoints, order_id):
+    resp = check(client, spec, "GET", "/api/orders/{id}/adjustments",
+                 path=f"/api/orders/{order_id}/adjustments")
+    assert "adjustments" in resp.json()["data"]
+
+
+def test_order_documents_list(client, batch29_endpoints, order_id):
+    resp = check(client, spec, "GET", "/api/orders/{id}/documents",
+                 path=f"/api/orders/{order_id}/documents")
+    assert "documents" in resp.json()["data"]
+
+
+def test_order_comments_list(client, batch29_endpoints, order_id):
+    resp = check(client, spec, "GET", "/api/orders/{id}/comments",
+                 path=f"/api/orders/{order_id}/comments")
+    assert isinstance(resp.json()["data"], list)
+
+
+def test_order_print_data(client, batch29_endpoints, order_id):
+    resp = check(client, spec, "GET", "/api/orders/{id}/print",
+                 path=f"/api/orders/{order_id}/print")
+    assert resp.json()["data"]["orderNumber"]
+
+
 def test_order_summaries(client, batch28_endpoints):
     resp = check(client, spec, "GET", "/api/orderSummaries")
     body = resp.json()

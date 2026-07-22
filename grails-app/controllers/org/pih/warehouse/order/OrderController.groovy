@@ -74,13 +74,7 @@ class OrderController {
     }
 
     def show() {
-        def orderInstance = Order.get(params.id)
-        if (!orderInstance) {
-            flash.message = "${warehouse.message(code: 'default.not.found.message', args: [warehouse.message(code: 'order.label', default: 'Order'), params.id])}"
-            redirect(action: "list")
-        } else {
-            [orderInstance: orderInstance]
-        }
+        render(view: "/common/react", params: params)
     }
 
     def edit() {
@@ -749,7 +743,7 @@ class OrderController {
                 render documentTemplateService.renderGroovyServerPageDocumentTemplate(documentTemplate, [orderInstance:orderInstance])
                 return
             }
-            [orderInstance: orderInstance]
+            render(view: "/common/react", params: params)
         }
     }
 

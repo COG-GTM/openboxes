@@ -122,6 +122,31 @@ paths:
         schema:
           $ref: '../components/common.yaml#/components/schemas/Id'
         description: Order id.
+    get:
+      operationId: listOrderDocuments
+      summary: List documents and URL links attached to an order
+      description: >
+        Batch 29 endpoint backing the documents tab of the migrated order show
+        screen. Returns file documents, URL links and purchase order templates
+        under separate keys.
+      responses:
+        '200':
+          description: Order documents.
+          content:
+            application/json:
+              schema:
+                type: object
+                required: [data]
+                properties:
+                  data:
+                    type: object
+                    additionalProperties: true
+        '404':
+          description: Unknown order id.
+          content:
+            application/json:
+              schema:
+                $ref: '../components/common.yaml#/components/schemas/ErrorResponse'
     post:
       operationId: uploadOrderDocument
       summary: Attach a document (file upload or URL) to an order
@@ -202,6 +227,30 @@ paths:
         schema:
           $ref: '../components/common.yaml#/components/schemas/Id'
         description: Order id.
+    get:
+      operationId: listOrderAdjustments
+      summary: List adjustments on an order
+      description: >
+        Batch 29 endpoint backing the adjustments tab of the migrated order
+        show screen.
+      responses:
+        '200':
+          description: Order adjustments.
+          content:
+            application/json:
+              schema:
+                type: object
+                required: [data]
+                properties:
+                  data:
+                    type: object
+                    additionalProperties: true
+        '404':
+          description: Unknown order id.
+          content:
+            application/json:
+              schema:
+                $ref: '../components/common.yaml#/components/schemas/ErrorResponse'
     post:
       operationId: createOrderAdjustment
       summary: Create an order adjustment
@@ -455,6 +504,32 @@ paths:
         schema:
           $ref: '../components/common.yaml#/components/schemas/Id'
         description: Order id.
+    get:
+      operationId: listOrderComments
+      summary: List comments on an order
+      description: >
+        Batch 29 endpoint backing the comments tab of the migrated order show
+        screen.
+      responses:
+        '200':
+          description: Order comments.
+          content:
+            application/json:
+              schema:
+                type: object
+                required: [data]
+                properties:
+                  data:
+                    type: array
+                    items:
+                      type: object
+                      additionalProperties: true
+        '404':
+          description: Unknown order id.
+          content:
+            application/json:
+              schema:
+                $ref: '../components/common.yaml#/components/schemas/ErrorResponse'
     post:
       operationId: createOrderComment
       summary: Add a comment to an order
@@ -496,6 +571,183 @@ paths:
             application/json:
               schema:
                 $ref: '../components/common.yaml#/components/schemas/ErrorResponse'
+        '404':
+          description: Unknown order id.
+          content:
+            application/json:
+              schema:
+                $ref: '../components/common.yaml#/components/schemas/ErrorResponse'
+  /api/orders/{id}/details:
+    parameters:
+      - name: id
+        in: path
+        required: true
+        schema:
+          $ref: '../components/common.yaml#/components/schemas/Id'
+        description: Order id.
+    get:
+      operationId: readOrderDetails
+      summary: Full order header details
+      description: >
+        Batch 29 endpoint backing the header of the migrated order show
+        screen (order number, status, derived status, origin/destination,
+        payment info, totals and audit fields).
+      responses:
+        '200':
+          description: Order details.
+          content:
+            application/json:
+              schema:
+                type: object
+                required: [data]
+                properties:
+                  data:
+                    type: object
+                    required: [id, orderNumber]
+                    additionalProperties: true
+                    properties:
+                      id:
+                        $ref: '../components/common.yaml#/components/schemas/Id'
+                      orderNumber:
+                        type: string
+        '404':
+          description: Unknown order id.
+          content:
+            application/json:
+              schema:
+                $ref: '../components/common.yaml#/components/schemas/ErrorResponse'
+  /api/orders/{id}/items:
+    parameters:
+      - name: id
+        in: path
+        required: true
+        schema:
+          $ref: '../components/common.yaml#/components/schemas/Id'
+        description: Order id.
+    get:
+      operationId: listOrderItems
+      summary: Order items with quantities, prices and fulfillment status
+      description: >
+        Batch 29 endpoint backing the summary, item status and item details
+        tabs of the migrated order show screen.
+      responses:
+        '200':
+          description: Order items plus order-level summary flags and totals.
+          content:
+            application/json:
+              schema:
+                type: object
+                required: [data]
+                properties:
+                  data:
+                    type: object
+                    additionalProperties: true
+        '404':
+          description: Unknown order id.
+          content:
+            application/json:
+              schema:
+                $ref: '../components/common.yaml#/components/schemas/ErrorResponse'
+  /api/orders/{id}/shipments:
+    parameters:
+      - name: id
+        in: path
+        required: true
+        schema:
+          $ref: '../components/common.yaml#/components/schemas/Id'
+        description: Order id.
+    get:
+      operationId: listOrderShipments
+      summary: Shipment items associated with an order
+      description: >
+        Batch 29 endpoint backing the shipments tab of the migrated order show
+        screen.
+      responses:
+        '200':
+          description: Shipment line items.
+          content:
+            application/json:
+              schema:
+                type: object
+                required: [data]
+                properties:
+                  data:
+                    type: array
+                    items:
+                      type: object
+                      additionalProperties: true
+        '404':
+          description: Unknown order id.
+          content:
+            application/json:
+              schema:
+                $ref: '../components/common.yaml#/components/schemas/ErrorResponse'
+  /api/orders/{id}/invoices:
+    parameters:
+      - name: id
+        in: path
+        required: true
+        schema:
+          $ref: '../components/common.yaml#/components/schemas/Id'
+        description: Order id.
+    get:
+      operationId: listOrderInvoices
+      summary: Invoice items associated with an order
+      description: >
+        Batch 29 endpoint backing the invoices tab of the migrated order show
+        screen.
+      responses:
+        '200':
+          description: Invoice line items.
+          content:
+            application/json:
+              schema:
+                type: object
+                required: [data]
+                properties:
+                  data:
+                    type: array
+                    items:
+                      type: object
+                      additionalProperties: true
+        '404':
+          description: Unknown order id.
+          content:
+            application/json:
+              schema:
+                $ref: '../components/common.yaml#/components/schemas/ErrorResponse'
+  /api/orders/{id}/print:
+    parameters:
+      - name: id
+        in: path
+        required: true
+        schema:
+          $ref: '../components/common.yaml#/components/schemas/Id'
+        description: Order id.
+    get:
+      operationId: readOrderPrintData
+      summary: Print view model for an order
+      description: >
+        Batch 29 endpoint backing the migrated order print screen (header,
+        addresses, items, non-item adjustments and totals).
+      responses:
+        '200':
+          description: Print view model.
+          content:
+            application/json:
+              schema:
+                type: object
+                required: [data]
+                properties:
+                  data:
+                    type: object
+                    required: [id, orderNumber]
+                    additionalProperties: true
+                    properties:
+                      id:
+                        $ref: '../components/common.yaml#/components/schemas/Id'
+                      orderNumber:
+                        type: string
         '404':
           description: Unknown order id.
           content:

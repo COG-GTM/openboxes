@@ -926,7 +926,7 @@ class UrlMappings {
         // Order API (comments for the migrated add comment screen)
         "/api/orders/$id/comments"(parseRequest: true) {
             controller = "orderApi"
-            action = [POST: "createComment"]
+            action = [GET: "listComments", POST: "createComment"]
         }
 
         // Order API (migrated order list / documents / adjustments screens)
@@ -942,7 +942,7 @@ class UrlMappings {
 
         "/api/orders/$id/documents"(parseRequest: false) {
             controller = "orderApi"
-            action = [POST: "uploadDocument"]
+            action = [GET: "listDocuments", POST: "uploadDocument"]
         }
 
         "/api/orders/$id/orderItemOptions"(parseRequest: true) {
@@ -952,12 +952,60 @@ class UrlMappings {
 
         "/api/orders/$id/adjustments"(parseRequest: true) {
             controller = "orderApi"
-            action = [POST: "createAdjustment"]
+            action = [GET: "listAdjustments", POST: "createAdjustment"]
         }
 
         "/api/orders/$id/adjustments/$adjustmentId"(parseRequest: true) {
             controller = "orderApi"
             action = [GET: "readAdjustment", PUT: "updateAdjustment"]
+        }
+
+        // Order API (migrated order show / print screens)
+        "/api/orders/$id/details"(parseRequest: true) {
+            controller = "orderApi"
+            action = [GET: "details"]
+        }
+
+        "/api/orders/$id/items"(parseRequest: true) {
+            controller = "orderApi"
+            action = [GET: "items"]
+        }
+
+        "/api/orders/$id/shipments"(parseRequest: true) {
+            controller = "orderApi"
+            action = [GET: "shipments"]
+        }
+
+        "/api/orders/$id/invoices"(parseRequest: true) {
+            controller = "orderApi"
+            action = [GET: "invoices"]
+        }
+
+        "/api/orders/$id/print"(parseRequest: true) {
+            controller = "orderApi"
+            action = [GET: "printData"]
+        }
+
+        // Order adjustment type API (migrated orderAdjustmentType screens)
+        "/api/orderAdjustmentTypes"(parseRequest: true) {
+            controller = "orderAdjustmentTypeApi"
+            action = [GET: "list", POST: "create"]
+        }
+
+        "/api/orderAdjustmentTypes/$id"(parseRequest: true) {
+            controller = "orderAdjustmentTypeApi"
+            action = [GET: "read", PUT: "update"]
+        }
+
+        "/api/orderAdjustmentTypeCodeOptions"(parseRequest: true) {
+            controller = { "selectOptionsApi" }
+            action = [GET: "orderAdjustmentTypeCodeOptions"]
+        }
+
+        // Payment term API (migrated paymentTerm create screen)
+        "/api/paymentTerms"(parseRequest: true) {
+            controller = "paymentTermApi"
+            action = [POST: "create"]
         }
 
         "/api/orderSummaries"(parseRequest: true) {

@@ -76,11 +76,19 @@ export const ORDER_PENDING_ITEMS = `${ORDER_API}/pendingItems`;
 export const ORDER_DOCUMENT_TYPES = `${ORDER_API}/documentTypes`;
 export const ORDER_DOCUMENTS = (id) => `${ORDER_BY_ID(id)}/documents`;
 export const ORDER_ITEM_OPTIONS = (id) => `${ORDER_BY_ID(id)}/orderItemOptions`;
+export const ORDER_DETAILS = (id) => `${ORDER_BY_ID(id)}/details`;
+export const ORDER_ITEMS = (id) => `${ORDER_BY_ID(id)}/items`;
+export const ORDER_SHIPMENTS = (id) => `${ORDER_BY_ID(id)}/shipments`;
+export const ORDER_INVOICES = (id) => `${ORDER_BY_ID(id)}/invoices`;
+export const ORDER_PRINT = (id) => `${ORDER_BY_ID(id)}/print`;
 export const ORDER_ADJUSTMENTS = (id) => `${ORDER_BY_ID(id)}/adjustments`;
 export const ORDER_ADJUSTMENT_BY_ID = (id, adjustmentId) => `${ORDER_ADJUSTMENTS(id)}/${adjustmentId}`;
 export const ORDER_SUMMARIES = `${API}/orderSummaries`;
 export const ORDER_ITEM_SUMMARIES = `${API}/orderItemSummaries`;
 export const ORDER_ADJUSTMENT_TYPE_OPTIONS = `${API}/orderAdjustmentTypeOptions`;
+export const ORDER_ADJUSTMENT_TYPE_API = `${API}/orderAdjustmentTypes`;
+export const ORDER_ADJUSTMENT_TYPE_BY_ID = (id) => `${ORDER_ADJUSTMENT_TYPE_API}/${id}`;
+export const ORDER_ADJUSTMENT_TYPE_CODE_OPTIONS = `${API}/orderAdjustmentTypeCodeOptions`;
 export const BUDGET_CODE_OPTIONS = `${API}/budgetCodeOptions`;
 export const ORDER_STATUS_OPTIONS = `${API}/orderStatusOptions`;
 export const ORDER_SUMMARY_STATUS_OPTIONS = `${API}/orderSummaryStatusOptions`;
@@ -154,6 +162,7 @@ export const SHIPMENT_TYPES = `${GENERIC_API}/shipmentType`;
 
 // PAYMENT TERMS
 export const PAYMENT_TERMS_OPTION = `${API}/paymentTermOptions`;
+export const PAYMENT_TERM_API = `${API}/paymentTerms`;
 
 // USERS
 export const USERS_OPTIONS = `${API}/users`;

@@ -19,9 +19,7 @@ class PaymentTermController {
     }
 
     def create() {
-        def paymentTerm = new PaymentTerm()
-        paymentTerm.properties = params
-        return [paymentTerm: paymentTerm]
+        render(view: "/common/react", params: params)
     }
 
     def edit() {

@@ -408,6 +408,31 @@ const AsyncOrderItemSummaryList = Loadable({
   loading: Loading,
 });
 
+const AsyncOrderShow = Loadable({
+  loader: () => import('components/order/OrderShow'),
+  loading: Loading,
+});
+
+const AsyncOrderPrint = Loadable({
+  loader: () => import('components/order/OrderPrint'),
+  loading: Loading,
+});
+
+const AsyncOrderAdjustmentTypeList = Loadable({
+  loader: () => import('components/orderAdjustmentType/OrderAdjustmentTypeList'),
+  loading: Loading,
+});
+
+const AsyncOrderAdjustmentTypeForm = Loadable({
+  loader: () => import('components/orderAdjustmentType/OrderAdjustmentTypeForm'),
+  loading: Loading,
+});
+
+const AsyncPaymentTermForm = Loadable({
+  loader: () => import('components/paymentTerm/PaymentTermForm'),
+  loading: Loading,
+});
+
 const AsyncAttributeList = Loadable({
   loader: () => import('components/attribute/AttributeList'),
   loading: Loading,
@@ -832,6 +857,12 @@ const Router = () => {
             <MainLayoutRoute path="**/order/orderSummaryList" component={AsyncOrderSummaryList} />
             <MainLayoutRoute path="**/order/orderItemSummary" component={AsyncOrderItemSummaryList} />
             <MainLayoutRoute path="**/order/orderItemDetails" component={OrderItemDetailsList} />
+            <MainLayoutRoute path="**/order/show/:orderId" component={AsyncOrderShow} />
+            <MainLayoutRoute path="**/order/print/:orderId" component={AsyncOrderPrint} />
+            <MainLayoutRoute path="**/orderAdjustmentType/list" component={AsyncOrderAdjustmentTypeList} />
+            <MainLayoutRoute path="**/orderAdjustmentType/create" component={AsyncOrderAdjustmentTypeForm} />
+            <MainLayoutRoute path="**/orderAdjustmentType/edit/:orderAdjustmentTypeId" component={AsyncOrderAdjustmentTypeForm} />
+            <MainLayoutRoute path="**/paymentTerm/create" component={AsyncPaymentTermForm} />
             <MainLayoutRoute path="**/stockTransfer/create/:stockTransferId?" component={AsyncStockTransfer} />
             <MainLayoutRoute path="**/stockTransfer/createOutboundReturn/:outboundReturnId?" component={AsyncOutboundReturns} />
             <MainLayoutRoute path="**/stockTransfer/createInboundReturn/:inboundReturnId?" component={AsyncInboundReturns} />

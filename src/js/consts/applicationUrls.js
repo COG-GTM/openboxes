@@ -143,6 +143,20 @@ const ORDER_URL = {
   orderItemDetails: () => `${ORDER_URL.base}/orderItemDetails`,
 };
 
+const ORDER_ADJUSTMENT_TYPE_URL = {
+  base: `${CONTEXT_PATH}/orderAdjustmentType`,
+  list: () => `${ORDER_ADJUSTMENT_TYPE_URL.base}/list`,
+  create: () => `${ORDER_ADJUSTMENT_TYPE_URL.base}/create`,
+  edit: (id) => `${ORDER_ADJUSTMENT_TYPE_URL.base}/edit/${id}`,
+};
+
+const PAYMENT_TERM_URL = {
+  base: `${CONTEXT_PATH}/paymentTerm`,
+  list: () => `${PAYMENT_TERM_URL.base}/list`,
+  create: () => `${PAYMENT_TERM_URL.base}/create`,
+  edit: (id) => `${PAYMENT_TERM_URL.base}/edit/${id}`,
+};
+
 const PURCHASE_ORDER_URL = {
   base: `${CONTEXT_PATH}/purchaseOrder`,
   create: () => `${PURCHASE_ORDER_URL.base}/create`,
@@ -430,11 +444,13 @@ export {
   LOCATION_GROUP_URL,
   LOCATION_TYPE_URL,
   LOCATION_URL,
+  ORDER_ADJUSTMENT_TYPE_URL,
   ORDER_URL,
   ORGANIZATION_URL,
   PARTY_ROLE_URL,
   PARTY_TYPE_URL,
   PARTY_URL,
+  PAYMENT_TERM_URL,
   PICKLIST_URL,
   PRODUCT_ASSOCIATION_URL,
   PRODUCT_CATALOG_URL,

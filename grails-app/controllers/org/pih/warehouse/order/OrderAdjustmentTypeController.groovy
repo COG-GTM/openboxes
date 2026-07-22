@@ -19,21 +19,15 @@ class OrderAdjustmentTypeController {
     }
 
     def list() {
-        params.max = Math.min(params.max ? params.int('max') : 10, 100)
-        [orderAdjustmentTypes: OrderAdjustmentType.list(params), orderAdjustmentTypesTotal: OrderAdjustmentType.count()]
+        render(view: "/common/react", params: params)
     }
 
     def create() {
-        def orderAdjustmentType = new OrderAdjustmentType()
-        orderAdjustmentType.properties = params
-        def location = Location.get(session?.warehouse?.id)
-        return [orderAdjustmentType: orderAdjustmentType, locationInstance: location]
+        render(view: "/common/react", params: params)
     }
 
     def edit() {
-        def location = Location.get(session?.warehouse?.id)
-        def orderAdjustmentType = OrderAdjustmentType.get(params.id)
-        return [orderAdjustmentType: orderAdjustmentType, locationInstance: location]
+        render(view: "/common/react", params: params)
     }
 
     @Transactional
