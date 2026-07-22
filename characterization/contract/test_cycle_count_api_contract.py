@@ -2,9 +2,12 @@
 
 The workflow test drives a full count -> recount cycle on a seeded product
 that has stock but no open cycle count request. Counts are submitted with the
-true quantity on hand in the final recount, so inventory ends unchanged and
-the suite stays re-runnable (each run does add one completed cycle count
-transaction, like any real count would).
+true quantity on hand in the final recount, so inventory ends unchanged.
+The seeded dataset has no cycle counts at all, so the module deletes every
+cycle count (and the completed-count transactions and the custom-lot
+inventory item) via the generic API when it finishes, restoring the pristine
+baseline for the snapshot suite; leftovers from aborted runs are swept the
+same way before the module starts.
 
 The XLS upload endpoints (items/upload/count and items/upload/recount) are
 specified but not exercised: they need a filled-in spreadsheet fixture
@@ -24,6 +27,44 @@ CUSTOM_LOT = "ZZ-CONTRACT-LOT"
 @pytest.fixture(scope="module")
 def facility(client):
     return client.location_id("Main Warehouse")
+
+
+def _cleanup_cycle_counts(client, facility):
+    # Transactions posted by completed counts reference the cycle count and
+    # must go first (newest first; seeded transactions have no cycleCount).
+    for txn in client.get_json("/api/generic/transaction",
+                               params={"max": 50, "sort": "dateCreated",
+                                       "order": "desc"})["data"]:
+        if not txn.get("cycleCount"):
+            continue
+        client.request("DELETE", f"/api/generic/transaction/{txn['id']}")
+        if txn.get("transactionSource"):
+            client.request(
+                "DELETE",
+                f"/api/generic/transactionSource/{txn['transactionSource']['id']}")
+    # Requests reference their cycle count, so they must go before it.
+    for req in client.get_json("/api/generic/cycleCountRequest")["data"]:
+        client.request("DELETE", f"/api/generic/cycleCountRequest/{req['id']}")
+    for cc in client.get_json(
+            f"/api/facilities/{facility}/cycle-counts")["data"]:
+        for item in cc["cycleCountItems"]:
+            client.request("DELETE", f"/api/generic/cycleCountItem/{item['id']}")
+        client.request("DELETE", f"/api/generic/cycleCount/{cc['id']}")
+    # The workflow creates an (empty) inventory item for the custom lot.
+    resp = client.request(
+        "POST", "/api/generic/inventoryItem/search",
+        json={"searchAttributes": [{"property": "lotNumber",
+                                    "operator": "eq",
+                                    "value": CUSTOM_LOT}]})
+    for item in resp.json()["data"]:
+        client.request("DELETE", f"/api/generic/inventoryItem/{item['id']}")
+
+
+@pytest.fixture(scope="module", autouse=True)
+def cleanup(client, facility):
+    _cleanup_cycle_counts(client, facility)
+    yield
+    _cleanup_cycle_counts(client, facility)
 
 
 def _pick_candidate(client, facility):

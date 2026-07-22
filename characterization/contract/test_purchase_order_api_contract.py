@@ -2,8 +2,11 @@
 
 Purchase orders cannot be created through this API, so the write flow builds
 a PENDING order through the legacy purchaseOrder web controller (the same
-request the PO wizard issues) and deletes it via DELETE /api/purchaseOrders,
-keeping the suite re-runnable.
+request the PO wizard issues) and deletes it via DELETE /api/purchaseOrders.
+Generating an order number also increments the destination organization's
+PURCHASE_ORDER_NUMBER sequence, which deleting the order does not undo, so
+the module snapshots the organization's sequences up front and restores them
+when it finishes, keeping the suite re-runnable.
 """
 
 import datetime
@@ -43,6 +46,17 @@ def create_pending_order(client):
     match = re.search(r"addItems/([0-9a-f]+)", resp.headers["location"])
     assert match, resp.headers["location"]
     return match.group(1)
+
+
+@pytest.fixture(scope="module", autouse=True)
+def restore_sequences(client):
+    # Creating an order bumps the destination organization's
+    # PURCHASE_ORDER_NUMBER sequence; restore the original value afterwards.
+    org_path = f"/api/generic/organization/{MAIN_WAREHOUSE_ORGANIZATION_ID}"
+    before = client.get_json(org_path)["data"].get("sequences") or None
+    yield
+    resp = client.request("PUT", org_path, json={"sequences": before})
+    assert resp.status_code == 200, resp.text[:500]
 
 
 @pytest.fixture(scope="module")

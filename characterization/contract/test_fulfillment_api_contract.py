@@ -2,8 +2,10 @@
 
 The happy-path save() issues a real outbound stock movement (1 unit of a
 high-stock seeded lot from Main Warehouse to Boston Warehouse), which is the
-only way to pin the 200 response; the suite stays re-runnable because stock
-stays deeply positive.
+only way to pin the 200 response. The movement is created with a dedicated
+"ZZ Contract ..." description; the module rolls back its shipment and
+deletes it when it finishes (with leftover cleanup at the start), so the
+seeded data ends unchanged and the suite is re-runnable.
 """
 
 import datetime
@@ -17,6 +19,29 @@ spec = Spec("fulfillment-api.yaml")
 PRODUCT_CODE = "QX039"  # Morphine 10mg, seeded with 100,000 units
 LOT_NUMBER = "37627"
 BIN_LOCATION = "RM1-RACK1-SHELF1"
+DESCRIPTION = "ZZ Contract fulfillment"
+
+
+def _cleanup_movements(client, origin):
+    listing = client.get_json(
+        "/api/stockMovements",
+        params={"direction": "OUTBOUND", "origin": origin,
+                "max": 100, "offset": 0})["data"]
+    for sm in listing:
+        if (sm.get("description") or "").startswith(DESCRIPTION):
+            # Dispatched movements must have their shipment (and its
+            # transaction) rolled back before they can be deleted.
+            client.request("DELETE", f"/api/stockMovements/{sm['id']}/status",
+                           allow_redirects=False)
+            client.request("DELETE", f"/api/stockMovements/{sm['id']}")
+
+
+@pytest.fixture(scope="module", autouse=True)
+def cleanup(client):
+    origin = client.location_id("Main Warehouse")
+    _cleanup_movements(client, origin)
+    yield
+    _cleanup_movements(client, origin)
 
 
 @pytest.fixture(scope="module")
@@ -27,6 +52,7 @@ def valid_body(client):
     tomorrow = datetime.date.today() + datetime.timedelta(days=1)
     return {
         "fulfillmentDetails": {
+            "description": DESCRIPTION,
             "origin": origin,
             "destination": destination,
             "requestedBy": "1",
