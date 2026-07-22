@@ -278,6 +278,30 @@ const ORGANIZATION_URL = {
   }),
 };
 
+const PARTY_URL = {
+  base: `${CONTEXT_PATH}/party`,
+  list: () => `${PARTY_URL.base}/list`,
+  create: () => `${PARTY_URL.base}/create`,
+  edit: (id) => `${PARTY_URL.base}/edit/${id}`,
+  show: (id) => `${PARTY_URL.base}/show/${id}`,
+};
+
+const PARTY_ROLE_URL = {
+  base: `${CONTEXT_PATH}/partyRole`,
+  list: () => `${PARTY_ROLE_URL.base}/list`,
+  create: (partyId) => stringifyUrl({
+    url: `${PARTY_ROLE_URL.base}/create`,
+    query: partyId ? { partyId } : {},
+  }),
+  edit: (id) => `${PARTY_ROLE_URL.base}/edit/${id}`,
+  show: (id) => `${PARTY_ROLE_URL.base}/show/${id}`,
+};
+
+const PARTY_TYPE_URL = {
+  base: `${CONTEXT_PATH}/partyType`,
+  show: (id) => `${PARTY_TYPE_URL.base}/show/${id}`,
+};
+
 const CATEGORY_URL = {
   base: `${CONTEXT_PATH}/category`,
   tree: (id) => (id ? `${CATEGORY_URL.base}/tree?id=${id}` : `${CATEGORY_URL.base}/tree`),
@@ -391,6 +415,9 @@ export {
   LOCATION_URL,
   ORDER_URL,
   ORGANIZATION_URL,
+  PARTY_ROLE_URL,
+  PARTY_TYPE_URL,
+  PARTY_URL,
   PICKLIST_URL,
   PRODUCT_ASSOCIATION_URL,
   PRODUCT_CONFIGURATION_URL,

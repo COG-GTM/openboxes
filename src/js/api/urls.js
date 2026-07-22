@@ -215,6 +215,17 @@ export const ORGANIZATION_DETAILS = (id) => `${ORGANIZATION_API}/${id}/details`;
 export const PARTY_TYPE_OPTIONS = `${API}/partyTypeOptions`;
 export const ORGANIZATION_ROLE_TYPE_OPTIONS = `${API}/organizationRoleTypeOptions`;
 
+// PARTIES
+export const PARTY_API = `${API}/parties`;
+export const PARTY_BY_ID = (id) => `${PARTY_API}/${id}`;
+export const PARTY_SEARCH_API = `${PARTY_API}/search`;
+export const PARTY_DETAILS = (id) => `${PARTY_API}/${id}/details`;
+export const PARTY_ROLE_API = `${API}/partyRoles`;
+export const PARTY_ROLE_BY_ID = (id) => `${PARTY_ROLE_API}/${id}`;
+export const PARTY_ROLE_DETAILS = (id) => `${PARTY_ROLE_API}/${id}/details`;
+export const PARTY_OPTIONS = `${API}/partyOptions`;
+export const ROLE_TYPE_OPTIONS = `${API}/roleTypeOptions`;
+
 // PRODUCT SUPPLIER
 export const PRODUCT_SUPPLIER_API = `${API}/productSuppliers`;
 export const PRODUCT_SUPPLIER_BY_ID = (id) => `${PRODUCT_SUPPLIER_API}/${id}`;

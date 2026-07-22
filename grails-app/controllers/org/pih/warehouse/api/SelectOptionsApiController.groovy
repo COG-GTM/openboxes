@@ -16,6 +16,7 @@ import org.pih.warehouse.core.GlAccountType
 import org.pih.warehouse.core.GlAccountTypeCode
 import org.pih.warehouse.core.BudgetCode
 import org.pih.warehouse.core.LocationTypeCode
+import org.pih.warehouse.core.Party
 import org.pih.warehouse.core.PartyType
 import org.pih.warehouse.core.PaymentTerm
 import org.pih.warehouse.core.PreferenceType
@@ -76,6 +77,20 @@ class SelectOptionsApiController {
                     [id: it.id, label: it.name]
                 }
         render([data: partyTypes] as JSON)
+    }
+
+    def roleTypeOptions() {
+        List options = RoleType.values().collect {
+            [id: it.name(), label: it.name()]
+        }
+        render([data: options] as JSON)
+    }
+
+    def partyOptions() {
+        List options = Party.list().collect {
+            [id: it.id, label: it.id, partyType: it.partyType?.name]
+        }
+        render([data: options] as JSON)
     }
 
     def organizationRoleTypeOptions() {

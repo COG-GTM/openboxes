@@ -12,7 +12,8 @@ info:
     "/api/productAssociationTypeCodeOptions" and
     "/api/stockMovements/shipmentStatusCodes", "/api/glAccountTypeOptions",
     "/api/locationTypeCodeOptions", "/api/partyTypeOptions",
-    "/api/organizationRoleTypeOptions").
+    "/api/organizationRoleTypeOptions", "/api/roleTypeOptions",
+    "/api/partyOptions").
     All endpoints are GET-only and
     render an option list under a "data" envelope; the option shape varies
     slightly per endpoint (some include "value" and/or "variant").
@@ -97,6 +98,47 @@ paths:
       responses:
         '200':
           $ref: '#/components/responses/IdLabelOptionsOk'
+  /api/roleTypeOptions:
+    get:
+      operationId: listRoleTypeOptions
+      summary: Role type options
+      description: >
+        Returns all RoleType enum values as {id, label} pairs (both the enum
+        name). Added in Phase 2 (Batch 34) for the React party role form.
+      responses:
+        '200':
+          $ref: '#/components/responses/IdLabelOptionsOk'
+  /api/partyOptions:
+    get:
+      operationId: listPartyOptions
+      summary: Party options
+      description: >
+        Returns all Party records as {id, label, partyType} triples (label is
+        the party id, matching the legacy Party.toString(); partyType is the
+        party type name). Added in Phase 2 (Batch 34) for the React party
+        role form.
+      responses:
+        '200':
+          description: Option list.
+          content:
+            application/json:
+              schema:
+                type: object
+                required: [data]
+                properties:
+                  data:
+                    type: array
+                    items:
+                      type: object
+                      required: [id, label]
+                      properties:
+                        id:
+                          $ref: '../components/common.yaml#/components/schemas/Id'
+                        label:
+                          type: string
+                        partyType:
+                          type: string
+                          nullable: true
   /api/glAccountOptions:
     get:
       operationId: glAccountOptions

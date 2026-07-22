@@ -313,6 +313,26 @@ const AsyncOrganizationShow = Loadable({
   loading: Loading,
 });
 
+const AsyncPartyList = Loadable({
+  loader: () => import('components/party/PartyList'),
+  loading: Loading,
+});
+
+const AsyncPartyForm = Loadable({
+  loader: () => import('components/party/PartyForm'),
+  loading: Loading,
+});
+
+const AsyncPartyShow = Loadable({
+  loader: () => import('components/party/PartyShow'),
+  loading: Loading,
+});
+
+const AsyncPartyRoleForm = Loadable({
+  loader: () => import('components/partyRole/PartyRoleForm'),
+  loading: Loading,
+});
+
 const AsyncBudgetCodeList = Loadable({
   loader: () => import('components/budgetCode/BudgetCodeList'),
   loading: Loading,
@@ -848,6 +868,12 @@ const Router = () => {
             <MainLayoutRoute path="**/organization/create" component={AsyncOrganizationForm} />
             <MainLayoutRoute path="**/organization/edit/:organizationId" component={AsyncOrganizationForm} />
             <MainLayoutRoute path="**/organization/show/:organizationId" component={AsyncOrganizationShow} />
+            <MainLayoutRoute path="**/party/list" component={AsyncPartyList} />
+            <MainLayoutRoute path="**/party/create" component={AsyncPartyForm} />
+            <MainLayoutRoute path="**/party/edit/:partyId" component={AsyncPartyForm} />
+            <MainLayoutRoute path="**/party/show/:partyId" component={AsyncPartyShow} />
+            <MainLayoutRoute path="**/partyRole/create" component={AsyncPartyRoleForm} />
+            <MainLayoutRoute path="**/partyRole/edit/:partyRoleId" component={AsyncPartyRoleForm} />
             <MainLayoutRoute path="**/budgetCode/list" component={AsyncBudgetCodeList} />
             <MainLayoutRoute path="**/budgetCode/create" component={AsyncBudgetCodeForm} />
             <MainLayoutRoute path="**/budgetCode/edit/:budgetCodeId" component={AsyncBudgetCodeForm} />

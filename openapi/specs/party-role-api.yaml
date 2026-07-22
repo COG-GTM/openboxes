@@ -1,0 +1,194 @@
+openapi: 3.0.3
+info:
+  title: OpenBoxes - PartyRoleApiController
+  description: >
+    Party role endpoints handled by
+    org.pih.warehouse.api.PartyRoleApiController, routed via the standard
+    "/api/${resource}s" and "/api/${resource}s/$id" REST mappings
+    ("/api/partyRoles") plus the explicit "/api/partyRoles/$id/details"
+    mapping added in Phase 2 (Batch 34) for the React party role screens.
+    Create responds 200 (not 201) with only {"data": {"id": ...}};
+    details/update/delete respond 404 for unknown ids.
+  version: 0.1.0
+servers:
+  - url: http://localhost:8080/openboxes
+    description: Local Docker baseline (docs/migration/RUNNING_LOCALLY.md)
+security:
+  - cookieAuth: []
+paths:
+  /api/partyRoles:
+    post:
+      operationId: createPartyRole
+      summary: Create a party role
+      description: >
+        Creates a party role from the JSON body. Party and roleType are
+        required (validation error when missing); startDate/endDate are
+        optional ISO-8601 instants. Added in Phase 2 (Batch 34).
+      requestBody:
+        required: true
+        content:
+          application/json:
+            schema:
+              $ref: '#/components/schemas/PartyRoleInput'
+      responses:
+        '200':
+          description: Created; only the id is returned.
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/IdEnvelope'
+        '400':
+          $ref: '../components/common.yaml#/components/responses/ValidationError'
+  /api/partyRoles/{id}/details:
+    get:
+      operationId: partyRoleDetails
+      summary: Party role details for the React edit screen
+      description: >
+        Full party role details, including the owning party and ISO-8601
+        start/end dates. Added in Phase 2 (Batch 34).
+      parameters:
+        - name: id
+          in: path
+          required: true
+          schema:
+            $ref: '../components/common.yaml#/components/schemas/Id'
+      responses:
+        '200':
+          description: Party role details.
+          content:
+            application/json:
+              schema:
+                type: object
+                required: [data]
+                properties:
+                  data:
+                    $ref: '#/components/schemas/PartyRoleDetails'
+        '404':
+          $ref: '../components/common.yaml#/components/responses/NotFound'
+  /api/partyRoles/{id}:
+    put:
+      operationId: updatePartyRole
+      summary: Update a party role
+      description: >
+        Partially updates a party role from the JSON body (only keys present
+        in the body are bound). Added in Phase 2 (Batch 34).
+      parameters:
+        - name: id
+          in: path
+          required: true
+          schema:
+            $ref: '../components/common.yaml#/components/schemas/Id'
+      requestBody:
+        required: true
+        content:
+          application/json:
+            schema:
+              $ref: '#/components/schemas/PartyRoleInput'
+      responses:
+        '200':
+          description: Updated; only the id is returned.
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/IdEnvelope'
+        '400':
+          $ref: '../components/common.yaml#/components/responses/ValidationError'
+        '404':
+          $ref: '../components/common.yaml#/components/responses/NotFound'
+    delete:
+      operationId: deletePartyRole
+      summary: Delete a party role
+      description: >
+        Deletes the party role; responds 400 when it is still referenced
+        (data integrity violation). Added in Phase 2 (Batch 34).
+      parameters:
+        - name: id
+          in: path
+          required: true
+          schema:
+            $ref: '../components/common.yaml#/components/schemas/Id'
+      responses:
+        '204':
+          description: Deleted.
+        '400':
+          description: Party role is still referenced and cannot be deleted.
+          content:
+            application/json:
+              schema:
+                type: object
+                properties:
+                  errorCode:
+                    type: integer
+                  errorMessage:
+                    type: string
+        '404':
+          $ref: '../components/common.yaml#/components/responses/NotFound'
+components:
+  schemas:
+    IdEnvelope:
+      type: object
+      required: [data]
+      properties:
+        data:
+          type: object
+          required: [id]
+          properties:
+            id:
+              $ref: '../components/common.yaml#/components/schemas/Id'
+    PartyRoleInput:
+      type: object
+      properties:
+        party:
+          type: string
+          nullable: true
+          description: Party id.
+        roleType:
+          type: string
+          nullable: true
+          description: >
+            RoleType enum name (e.g. ROLE_SUPPLIER). Unknown values raise a
+            conversion error (HTTP 500).
+        startDate:
+          type: string
+          nullable: true
+          description: ISO-8601 instant (e.g. 2026-01-01T00:00:00Z).
+        endDate:
+          type: string
+          nullable: true
+          description: ISO-8601 instant.
+      additionalProperties: true
+    PartyRoleDetails:
+      type: object
+      description: Detail projection used by the React party role edit screen.
+      required: [id]
+      properties:
+        id:
+          $ref: '../components/common.yaml#/components/schemas/Id'
+        version:
+          type: integer
+          nullable: true
+        party:
+          type: object
+          nullable: true
+          properties:
+            id:
+              $ref: '../components/common.yaml#/components/schemas/Id'
+            partyType:
+              type: string
+              nullable: true
+              description: Party type name.
+        roleType:
+          type: string
+          nullable: true
+          description: RoleType enum name.
+        startDate:
+          type: string
+          nullable: true
+          description: ISO-8601 instant.
+        endDate:
+          type: string
+          nullable: true
+          description: ISO-8601 instant.
+  securitySchemes:
+    cookieAuth:
+      $ref: '../components/common.yaml#/components/securitySchemes/cookieAuth'

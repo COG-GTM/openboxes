@@ -14,7 +14,7 @@ import grails.gorm.transactions.Transactional
 @Transactional
 class PartyRoleController {
 
-    static allowedMethods = [save: "POST", update: "POST", delete: "POST"]
+    static allowedMethods = [delete: "POST"]
 
     def index() {
         redirect(action: "list", params: params)
@@ -26,19 +26,7 @@ class PartyRoleController {
     }
 
     def create() {
-        def partyRoleInstance = new PartyRole()
-        partyRoleInstance.properties = params
-        return [partyRoleInstance: partyRoleInstance]
-    }
-
-    def save() {
-        def partyRoleInstance = new PartyRole(params)
-        if (partyRoleInstance.save(flush: true)) {
-            flash.message = "${warehouse.message(code: 'default.created.message', args: [warehouse.message(code: 'partyRole.label', default: 'PartyRole'), partyRoleInstance.id])}"
-            redirect(action: "list", id: partyRoleInstance.id)
-        } else {
-            render(view: "create", model: [partyRoleInstance: partyRoleInstance])
-        }
+        render(view: "/common/react", params: params)
     }
 
     def show() {
@@ -52,38 +40,13 @@ class PartyRoleController {
     }
 
     def edit() {
-        def partyRoleInstance = PartyRole.get(params.id)
-        if (!partyRoleInstance) {
-            flash.message = "${warehouse.message(code: 'default.not.found.message', args: [warehouse.message(code: 'partyRole.label', default: 'PartyRole'), params.id])}"
-            redirect(action: "list")
-        } else {
-            return [partyRoleInstance: partyRoleInstance]
+        // The legacy show screen posts to this action with the id as a request
+        // parameter; redirect so the id lands in the path for the React route.
+        if (request.method == "POST" && params.id) {
+            redirect(action: "edit", id: params.id)
+            return
         }
-    }
-
-    def update() {
-        def partyRoleInstance = PartyRole.get(params.id)
-        if (partyRoleInstance) {
-            if (params.version) {
-                def version = params.version.toLong()
-                if (partyRoleInstance.version > version) {
-
-                    partyRoleInstance.errors.rejectValue("version", "default.optimistic.locking.failure", [warehouse.message(code: 'partyRole.label', default: 'PartyRole')] as Object[], "Another user has updated this PartyRole while you were editing")
-                    render(view: "edit", model: [partyRoleInstance: partyRoleInstance])
-                    return
-                }
-            }
-            partyRoleInstance.properties = params
-            if (!partyRoleInstance.hasErrors() && partyRoleInstance.save(flush: true)) {
-                flash.message = "${warehouse.message(code: 'default.updated.message', args: [warehouse.message(code: 'partyRole.label', default: 'PartyRole'), partyRoleInstance.id])}"
-                redirect(action: "list", id: partyRoleInstance.id)
-            } else {
-                render(view: "edit", model: [partyRoleInstance: partyRoleInstance])
-            }
-        } else {
-            flash.message = "${warehouse.message(code: 'default.not.found.message', args: [warehouse.message(code: 'partyRole.label', default: 'PartyRole'), params.id])}"
-            redirect(action: "list")
-        }
+        render(view: "/common/react", params: params)
     }
 
     def delete() {

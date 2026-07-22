@@ -13,7 +13,7 @@ import SelectField from 'components/form-elements/v2/SelectField';
 import TextInput from 'components/form-elements/v2/TextInput';
 import notification from 'components/Layout/notifications/notification';
 import Section from 'components/Layout/v2/Section';
-import { CONTEXT_PATH, ORGANIZATION_URL } from 'consts/applicationUrls';
+import { CONTEXT_PATH, ORGANIZATION_URL, PARTY_ROLE_URL } from 'consts/applicationUrls';
 import NotificationType from 'consts/notificationTypes';
 import useTranslate from 'hooks/useTranslate';
 import useTranslation from 'hooks/useTranslation';
@@ -326,7 +326,7 @@ const OrganizationForm = () => {
                 </li>
               ))}
             </ul>
-            <a href={`${CONTEXT_PATH}/partyRole/create?party.id=${organizationId}`}>
+            <a href={PARTY_ROLE_URL.create(organizationId)}>
               <Translate id="react.organization.addRole.label" defaultMessage="Add Party Role" />
             </a>
           </Section>

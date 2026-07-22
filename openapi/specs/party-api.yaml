@@ -1,0 +1,258 @@
+openapi: 3.0.3
+info:
+  title: OpenBoxes - PartyApiController
+  description: >
+    Party endpoints handled by org.pih.warehouse.api.PartyApiController,
+    routed via the explicit "/api/parties", "/api/parties/search",
+    "/api/parties/$id/details" and "/api/parties/$id" mappings added in
+    Phase 2 (Batch 34) for the React party screens (the generic
+    "/api/${resource}s" pattern cannot derive "partyApi" from the irregular
+    plural "parties"). Create responds 200 (not 201) with only
+    {"data": {"id": ...}}; details/update/delete respond 404 for unknown
+    ids.
+  version: 0.1.0
+servers:
+  - url: http://localhost:8080/openboxes
+    description: Local Docker baseline (docs/migration/RUNNING_LOCALLY.md)
+security:
+  - cookieAuth: []
+paths:
+  /api/parties:
+    post:
+      operationId: createParty
+      summary: Create a party
+      description: >
+        Creates a party from the JSON body ({"partyType": "<partyType id>"}).
+        Party type is required (validation error when missing). Added in
+        Phase 2 (Batch 34).
+      requestBody:
+        required: true
+        content:
+          application/json:
+            schema:
+              type: object
+              properties:
+                partyType:
+                  type: string
+                  nullable: true
+                  description: PartyType id.
+              additionalProperties: true
+      responses:
+        '200':
+          description: Created; only the id is returned.
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/IdEnvelope'
+        '400':
+          $ref: '../components/common.yaml#/components/responses/ValidationError'
+  /api/parties/search:
+    get:
+      operationId: searchParties
+      summary: Paginated party search for the React list screen
+      description: >
+        Returns a page of parties with a totalCount, for the React party
+        list. Added in Phase 2 (Batch 34).
+      parameters:
+        - name: q
+          in: query
+          required: false
+          schema:
+            type: string
+          description: Prefix search (ilike "q%") on the party id.
+        - name: partyTypeId
+          in: query
+          required: false
+          schema:
+            type: string
+          description: Restrict to parties of the given party type id.
+        - name: sort
+          in: query
+          required: false
+          schema:
+            type: string
+          description: >
+            One of id, dateCreated, lastUpdated; anything else falls back to
+            id.
+        - name: order
+          in: query
+          required: false
+          schema:
+            type: string
+            enum: [asc, desc]
+        - $ref: '../components/common.yaml#/components/parameters/max'
+        - $ref: '../components/common.yaml#/components/parameters/offset'
+      responses:
+        '200':
+          description: A page of party rows.
+          content:
+            application/json:
+              schema:
+                type: object
+                required: [data, totalCount]
+                properties:
+                  data:
+                    type: array
+                    items:
+                      type: object
+                      required: [id]
+                      properties:
+                        id:
+                          $ref: '../components/common.yaml#/components/schemas/Id'
+                        partyType:
+                          type: string
+                          nullable: true
+                          description: Party type name.
+                        roles:
+                          type: array
+                          items:
+                            type: string
+                          description: Role display names (RoleType.name), sorted.
+                  totalCount:
+                    type: integer
+  /api/parties/{id}/details:
+    get:
+      operationId: partyDetails
+      summary: Party details for the React edit/show screens
+      description: >
+        Full party details, including party type and roles. Added in Phase 2
+        (Batch 34).
+      parameters:
+        - name: id
+          in: path
+          required: true
+          schema:
+            $ref: '../components/common.yaml#/components/schemas/Id'
+      responses:
+        '200':
+          description: Party details.
+          content:
+            application/json:
+              schema:
+                type: object
+                required: [data]
+                properties:
+                  data:
+                    $ref: '#/components/schemas/PartyDetails'
+        '404':
+          $ref: '../components/common.yaml#/components/responses/NotFound'
+  /api/parties/{id}:
+    put:
+      operationId: updateParty
+      summary: Update a party
+      description: >
+        Partially updates a party from the JSON body (only keys present in
+        the body are bound; only "partyType" is supported). Added in Phase 2
+        (Batch 34).
+      parameters:
+        - name: id
+          in: path
+          required: true
+          schema:
+            $ref: '../components/common.yaml#/components/schemas/Id'
+      requestBody:
+        required: true
+        content:
+          application/json:
+            schema:
+              type: object
+              properties:
+                partyType:
+                  type: string
+                  nullable: true
+                  description: PartyType id.
+              additionalProperties: true
+      responses:
+        '200':
+          description: Updated; only the id is returned.
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/IdEnvelope'
+        '400':
+          $ref: '../components/common.yaml#/components/responses/ValidationError'
+        '404':
+          $ref: '../components/common.yaml#/components/responses/NotFound'
+    delete:
+      operationId: deleteParty
+      summary: Delete a party
+      description: >
+        Deletes the party (roles cascade); responds 400 when it is still
+        referenced (data integrity violation). Added in Phase 2 (Batch 34).
+      parameters:
+        - name: id
+          in: path
+          required: true
+          schema:
+            $ref: '../components/common.yaml#/components/schemas/Id'
+      responses:
+        '204':
+          description: Deleted.
+        '400':
+          description: Party is still referenced and cannot be deleted.
+          content:
+            application/json:
+              schema:
+                type: object
+                properties:
+                  errorCode:
+                    type: integer
+                  errorMessage:
+                    type: string
+        '404':
+          $ref: '../components/common.yaml#/components/responses/NotFound'
+components:
+  schemas:
+    IdEnvelope:
+      type: object
+      required: [data]
+      properties:
+        data:
+          type: object
+          required: [id]
+          properties:
+            id:
+              $ref: '../components/common.yaml#/components/schemas/Id'
+    PartyDetails:
+      type: object
+      description: Detail projection used by the React party edit/show screens.
+      required: [id]
+      properties:
+        id:
+          $ref: '../components/common.yaml#/components/schemas/Id'
+        version:
+          type: integer
+          nullable: true
+        dateCreated:
+          type: string
+          nullable: true
+        lastUpdated:
+          type: string
+          nullable: true
+        partyType:
+          type: object
+          nullable: true
+          properties:
+            id:
+              $ref: '../components/common.yaml#/components/schemas/Id'
+            name:
+              type: string
+              nullable: true
+        roles:
+          type: array
+          items:
+            type: object
+            properties:
+              id:
+                $ref: '../components/common.yaml#/components/schemas/Id'
+              name:
+                type: string
+                nullable: true
+                description: Role display name (RoleType.name).
+              roleType:
+                type: string
+                nullable: true
+                description: RoleType enum name.
+  securitySchemes:
+    cookieAuth:
+      $ref: '../components/common.yaml#/components/securitySchemes/cookieAuth'
