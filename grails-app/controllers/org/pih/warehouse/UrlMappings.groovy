@@ -568,7 +568,37 @@ class UrlMappings {
 
         "/api/requisitions"(parseRequest: true) {
             controller = "requisitionApi"
-            action = [POST: "create"]
+            action = [GET: "list", POST: "create"]
+        }
+
+        "/api/requisitions/$id/edit"(parseRequest: true) {
+            controller = "requisitionApi"
+            action = [POST: "edit"]
+        }
+
+        "/api/requisitions/$id/header"(parseRequest: true) {
+            controller = "requisitionApi"
+            action = [POST: "updateHeader"]
+        }
+
+        "/api/requisitions/$id/items"(parseRequest: true) {
+            controller = "requisitionApi"
+            action = [POST: "saveItems"]
+        }
+
+        "/api/requisitions/$id/pick"(parseRequest: true) {
+            controller = "requisitionApi"
+            action = [POST: "pick"]
+        }
+
+        "/api/requisitions/$id/picklist"(parseRequest: true) {
+            controller = "requisitionApi"
+            action = [POST: "updatePicklist"]
+        }
+
+        "/api/requisitions/$id/picklistItems"(parseRequest: true) {
+            controller = "requisitionApi"
+            action = [POST: "updatePicklistItems"]
         }
 
         "/api/requisitions/templates" {

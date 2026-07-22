@@ -15,6 +15,116 @@ security:
   - cookieAuth: []
 paths:
   /api/requisitions:
+    get:
+      operationId: listRequisitions
+      summary: List requisitions for the current warehouse (classic list screen)
+      description: >
+        Mirrors the legacy RequisitionController.list action - requisitions
+        are always scoped to the session warehouse as origin and filterable
+        by the same criteria as the legacy filter form. Also returns the
+        status-count statistics used by the status button bar.
+      parameters:
+        - name: q
+          in: query
+          required: false
+          schema: { type: string }
+        - name: status
+          in: query
+          required: false
+          schema: { type: string }
+        - name: type
+          in: query
+          required: false
+          schema: { type: string }
+        - name: commodityClass
+          in: query
+          required: false
+          schema: { type: string }
+        - name: destinationId
+          in: query
+          required: false
+          schema: { type: string }
+        - name: requestedById
+          in: query
+          required: false
+          schema: { type: string }
+        - name: createdById
+          in: query
+          required: false
+          schema: { type: string }
+        - name: updatedById
+          in: query
+          required: false
+          schema: { type: string }
+        - name: relatedToMe
+          in: query
+          required: false
+          schema: { type: string }
+        - name: max
+          in: query
+          required: false
+          schema: { type: integer }
+      responses:
+        '200':
+          description: Requisitions plus statistics.
+          content:
+            application/json:
+              schema:
+                type: object
+                required: [data, totalCount, statistics]
+                properties:
+                  data:
+                    type: array
+                    items:
+                      type: object
+                      required: [id]
+                      properties:
+                        id:
+                          $ref: '../components/common.yaml#/components/schemas/Id'
+                        requestNumber:
+                          type: string
+                          nullable: true
+                        name:
+                          type: string
+                          nullable: true
+                        status:
+                          type: string
+                          nullable: true
+                        type:
+                          type: string
+                          nullable: true
+                        requisitionItemCount:
+                          type: integer
+                        requestedBy:
+                          type: string
+                          nullable: true
+                        dateRequested:
+                          type: string
+                          nullable: true
+                        dateIssued:
+                          type: string
+                          nullable: true
+                        dateCreated:
+                          type: string
+                          nullable: true
+                        dateChecked:
+                          type: string
+                          nullable: true
+                        dateVerified:
+                          type: string
+                          nullable: true
+                        datePicked:
+                          type: string
+                          nullable: true
+                        lastUpdated:
+                          type: string
+                          nullable: true
+                  totalCount:
+                    type: integer
+                  statistics:
+                    type: object
+                    additionalProperties:
+                      type: integer
     post:
       operationId: createRequisition
       summary: Create a requisition (classic flow)
@@ -62,6 +172,26 @@ paths:
                 name:
                   type: string
                   nullable: true
+                requisitionItems:
+                  type: array
+                  nullable: true
+                  description: >
+                    Initial requisition items (used by the createStock screen
+                    when creating a stock requisition from a template).
+                  items:
+                    type: object
+                    required: [productId, quantity]
+                    properties:
+                      productId: { type: string }
+                      quantity: { type: integer }
+                      orderIndex: { type: integer, nullable: true }
+                      templateItemId:
+                        type: string
+                        nullable: true
+                        description: >
+                          Id of the stock list template item this item was
+                          created from; the inventory item and product package
+                          are copied from it.
       responses:
         '201':
           description: Requisition created.
@@ -288,6 +418,230 @@ paths:
           $ref: '#/components/responses/ValidationError'
         '404':
           $ref: '#/components/responses/ControllerNotFound'
+
+  /api/requisitions/{id}/edit:
+    post:
+      operationId: editRequisition
+      summary: Move a requisition to EDITING and return edit-screen data
+      description: >
+        Mirrors the legacy RequisitionController.edit action - transitions
+        the requisition status to EDITING when it has not reached that
+        status yet, then returns the details needed by the edit screen.
+      parameters:
+        - $ref: '#/components/parameters/requisitionId'
+      responses:
+        '200':
+          $ref: '#/components/responses/RequisitionDetails'
+        '404':
+          $ref: '#/components/responses/ControllerNotFound'
+
+  /api/requisitions/{id}/header:
+    post:
+      operationId: updateRequisitionHeader
+      summary: Update requisition header fields (editHeader screen)
+      description: >
+        Mirrors the legacy RequisitionController.saveHeader action. Only the
+        keys present in the body are updated.
+      parameters:
+        - $ref: '#/components/parameters/requisitionId'
+      requestBody:
+        required: true
+        content:
+          application/json:
+            schema:
+              type: object
+              properties:
+                requestNumber: { type: string, nullable: true }
+                name: { type: string, nullable: true }
+                status: { type: string, nullable: true }
+                type: { type: string, nullable: true }
+                commodityClass: { type: string, nullable: true }
+                originId: { type: string, nullable: true }
+                destinationId: { type: string, nullable: true }
+                requestedById: { type: string, nullable: true }
+                verifiedById: { type: string, nullable: true }
+                checkedById: { type: string, nullable: true }
+                deliveredById: { type: string, nullable: true }
+                receivedById: { type: string, nullable: true }
+                pickerId: { type: string, nullable: true }
+                dateRequested: { type: string, nullable: true, description: yyyy-MM-dd }
+                requestedDeliveryDate: { type: string, nullable: true, description: yyyy-MM-dd }
+                description: { type: string, nullable: true }
+      responses:
+        '200':
+          $ref: '#/components/responses/RequisitionDetails'
+        '400':
+          $ref: '#/components/responses/ValidationError'
+        '404':
+          $ref: '#/components/responses/ControllerNotFound'
+
+  /api/requisitions/{id}/items:
+    post:
+      operationId: saveRequisitionItems
+      summary: Sync requisition items (edit screen)
+      description: >
+        Mirrors the legacy RequisitionController.saveRequisitionItems action
+        - the posted items replace the requisition's items; persisted items
+        missing from the payload are deleted.
+      parameters:
+        - $ref: '#/components/parameters/requisitionId'
+      requestBody:
+        required: true
+        content:
+          application/json:
+            schema:
+              type: object
+              required: [requisitionItems]
+              properties:
+                requisitionItems:
+                  type: array
+                  items:
+                    type: object
+                    required: [productId, quantity]
+                    properties:
+                      id: { type: string, nullable: true }
+                      productId: { type: string }
+                      quantity: { type: integer }
+                      orderIndex: { type: integer, nullable: true }
+      responses:
+        '200':
+          $ref: '#/components/responses/RequisitionDetails'
+        '400':
+          $ref: '#/components/responses/ValidationError'
+        '404':
+          $ref: '#/components/responses/ControllerNotFound'
+
+  /api/requisitions/{id}/pick:
+    post:
+      operationId: pickRequisition
+      summary: Move a requisition to PICKING and return pick-screen data
+      description: >
+        Mirrors the legacy RequisitionController.pick action - requires a
+        verified requisition, transitions it to PICKING (approving pending
+        items), lazily creates the picklist, and returns the details plus
+        the available bin locations per product.
+      parameters:
+        - $ref: '#/components/parameters/requisitionId'
+      responses:
+        '200':
+          description: Requisition details plus picklist and available items.
+          content:
+            application/json:
+              schema:
+                type: object
+                required: [data]
+                properties:
+                  data:
+                    type: object
+                    required: [id, picklist, availableItems]
+                    properties:
+                      id:
+                        $ref: '../components/common.yaml#/components/schemas/Id'
+                      picklist:
+                        type: object
+                        required: [id]
+                        properties:
+                          id:
+                            $ref: '../components/common.yaml#/components/schemas/Id'
+                          picker:
+                            $ref: '#/components/schemas/NullableNamedReference'
+                          datePicked:
+                            type: string
+                            nullable: true
+                      availableItems:
+                        type: object
+                        additionalProperties:
+                          type: array
+                          items:
+                            type: object
+                            properties:
+                              inventoryItemId: { type: string, nullable: true }
+                              lotNumber: { type: string, nullable: true }
+                              expirationDate: { type: string, nullable: true }
+                              binLocation:
+                                $ref: '#/components/schemas/NullableNamedReference'
+                              quantityAvailable: { type: number }
+        '400':
+          $ref: '#/components/responses/ValidationError'
+        '404':
+          $ref: '#/components/responses/ControllerNotFound'
+
+  /api/requisitions/{id}/picklist:
+    post:
+      operationId: updateRequisitionPicklist
+      summary: Update picklist picker/date picked (pick screen)
+      description: >
+        Mirrors the picklist branch of the legacy
+        RequisitionController.saveDetails action.
+      parameters:
+        - $ref: '#/components/parameters/requisitionId'
+      requestBody:
+        required: true
+        content:
+          application/json:
+            schema:
+              type: object
+              properties:
+                pickerId: { type: string, nullable: true }
+                datePicked: { type: string, nullable: true, description: yyyy-MM-dd }
+      responses:
+        '200':
+          description: Updated picklist.
+          content:
+            application/json:
+              schema:
+                type: object
+                required: [data]
+                properties:
+                  data:
+                    type: object
+                    required: [id]
+                    properties:
+                      id:
+                        $ref: '../components/common.yaml#/components/schemas/Id'
+                      picker:
+                        $ref: '#/components/schemas/NullableNamedReference'
+                      datePicked:
+                        type: string
+                        nullable: true
+        '404':
+          $ref: '#/components/responses/ControllerNotFound'
+
+  /api/requisitions/{id}/picklistItems:
+    post:
+      operationId: updateRequisitionPicklistItems
+      summary: Create/update/remove picklist items for a requisition item
+      description: >
+        Mirrors the legacy RequisitionController.addToPicklistItems action -
+        quantity greater than zero creates or updates a picklist item, while
+        zero or negative quantity removes an existing picklist item.
+      parameters:
+        - $ref: '#/components/parameters/requisitionId'
+      requestBody:
+        required: true
+        content:
+          application/json:
+            schema:
+              type: object
+              required: [requisitionItemId, picklistItems]
+              properties:
+                requisitionItemId: { type: string }
+                picklistItems:
+                  type: array
+                  items:
+                    type: object
+                    properties:
+                      id: { type: string, nullable: true }
+                      inventoryItemId: { type: string, nullable: true }
+                      binLocationId: { type: string, nullable: true }
+                      quantity: { type: integer }
+      responses:
+        '200':
+          $ref: '#/components/responses/RequisitionDetails'
+        '400':
+          $ref: '#/components/responses/ValidationError'
+        '404':
+          $ref: '#/components/responses/ControllerNotFound'
 components:
   securitySchemes:
     cookieAuth:
@@ -430,6 +784,9 @@ components:
               status:
                 type: string
                 nullable: true
+              orderIndex:
+                type: integer
+                nullable: true
               product:
                 type: object
                 properties:
@@ -467,6 +824,9 @@ components:
                       $ref: '../components/common.yaml#/components/schemas/Id'
                     quantity:
                       type: integer
+                    inventoryItemId:
+                      type: string
+                      nullable: true
                     lotNumber:
                       type: string
                       nullable: true

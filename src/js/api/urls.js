@@ -238,6 +238,12 @@ export const REQUISITION_CONFIRM = (id) => `${REQUISITION_BY_ID(id)}/confirm`;
 export const REQUISITION_DETAILS = (id) => `${REQUISITION_BY_ID(id)}/details`;
 export const REQUISITION_DOCUMENTS = (id) => `${REQUISITION_BY_ID(id)}/documents`;
 export const REQUISITION_DOCUMENT_TYPES = `${REQUISITION_API}/documentTypes`;
+export const REQUISITION_EDIT = (id) => `${REQUISITION_BY_ID(id)}/edit`;
+export const REQUISITION_HEADER = (id) => `${REQUISITION_BY_ID(id)}/header`;
+export const REQUISITION_ITEMS = (id) => `${REQUISITION_BY_ID(id)}/items`;
+export const REQUISITION_PICK = (id) => `${REQUISITION_BY_ID(id)}/pick`;
+export const REQUISITION_PICKLIST = (id) => `${REQUISITION_BY_ID(id)}/picklist`;
+export const REQUISITION_PICKLIST_ITEMS = (id) => `${REQUISITION_BY_ID(id)}/picklistItems`;
 
 // FULL OUTBOUND IMPORT FEATURE
 export const FULFILLMENT_API = `${API}/fulfillments`;

@@ -546,6 +546,36 @@ const AsyncPicklistReturnPrint = Loadable({
   loading: Loading,
 });
 
+const AsyncRequisitionList = Loadable({
+  loader: () => import('components/requisition/RequisitionList'),
+  loading: Loading,
+});
+
+const AsyncRequisitionCreateNonStock = Loadable({
+  loader: () => import('components/requisition/RequisitionCreateNonStock'),
+  loading: Loading,
+});
+
+const AsyncRequisitionCreateStock = Loadable({
+  loader: () => import('components/requisition/RequisitionCreateStock'),
+  loading: Loading,
+});
+
+const AsyncRequisitionEdit = Loadable({
+  loader: () => import('components/requisition/RequisitionEdit'),
+  loading: Loading,
+});
+
+const AsyncRequisitionEditHeader = Loadable({
+  loader: () => import('components/requisition/RequisitionEditHeader'),
+  loading: Loading,
+});
+
+const AsyncRequisitionPick = Loadable({
+  loader: () => import('components/requisition/RequisitionPick'),
+  loading: Loading,
+});
+
 const Router = () => {
   useConnectionListener();
 
@@ -626,6 +656,12 @@ const Router = () => {
             <Route path="**/resettingInstanceInfo/index">
               <AsyncResetInstancePage />
             </Route>
+            <MainLayoutRoute path="**/requisition/list" component={AsyncRequisitionList} />
+            <MainLayoutRoute path="**/requisition/createNonStock" component={AsyncRequisitionCreateNonStock} />
+            <MainLayoutRoute path="**/requisition/createStock" component={AsyncRequisitionCreateStock} />
+            <MainLayoutRoute path="**/requisition/edit/:requisitionId" component={AsyncRequisitionEdit} />
+            <MainLayoutRoute path="**/requisition/editHeader/:requisitionId" component={AsyncRequisitionEditHeader} />
+            <MainLayoutRoute path="**/requisition/pick/:requisitionId" component={AsyncRequisitionPick} />
             <MainLayoutRoute path="**/requisition/create" component={AsyncRequisitionCreate} />
             <MainLayoutRoute path="**/requisition/chooseTemplate" component={AsyncRequisitionChooseTemplate} />
             <MainLayoutRoute path="**/requisition/confirm/:requisitionId" component={AsyncRequisitionConfirm} />

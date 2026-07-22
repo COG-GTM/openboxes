@@ -276,6 +276,22 @@ const REQUISITION_URL = {
   }),
   show: (id) => `${REQUISITION_URL.base}/show/${id}`,
   edit: (id) => `${REQUISITION_URL.base}/edit/${id}`,
+  editHeader: (id) => `${REQUISITION_URL.base}/editHeader/${id}`,
+  review: (id) => `${REQUISITION_URL.base}/review/${id}`,
+  picked: (id) => `${REQUISITION_URL.base}/picked/${id}`,
+  createStock: (templateId) => stringifyUrl({
+    url: `${REQUISITION_URL.base}/createStock`,
+    query: templateId ? { templateId } : {},
+  }),
+  createNonStock: () => `${REQUISITION_URL.base}/createNonStock`,
+  exportRequisitions: (params = {}) => stringifyUrl({
+    url: `${REQUISITION_URL.base}/exportRequisitions`,
+    query: { ...params },
+  }),
+  exportRequisitionItems: (params = {}) => stringifyUrl({
+    url: `${REQUISITION_URL.base}/exportRequisitionItems`,
+    query: { ...params },
+  }),
   pick: (id) => `${REQUISITION_URL.base}/pick/${id}`,
   confirm: (id) => `${REQUISITION_URL.base}/confirm/${id}`,
   transfer: (id) => `${REQUISITION_URL.base}/transfer/${id}`,
