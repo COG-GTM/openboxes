@@ -12,7 +12,7 @@ package org.pih.warehouse.report
 import grails.core.GrailsApplication
 import grails.util.GrailsWebMockUtil
 import grails.util.Holders
-import org.apache.commons.mail.EmailException
+import org.apache.commons.mail2.core.EmailException
 import org.apache.commons.validator.EmailValidator
 import org.grails.plugins.web.taglib.ApplicationTagLib
 import org.grails.plugins.web.taglib.RenderTagLib

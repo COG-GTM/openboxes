@@ -13,6 +13,7 @@ import grails.core.GrailsApplication
 import grails.gorm.transactions.Transactional
 import grails.validation.ValidationException
 import groovy.xml.Namespace
+import groovy.xml.XmlParser
 import java.time.Instant
 
 import org.pih.warehouse.core.date.DateParser
