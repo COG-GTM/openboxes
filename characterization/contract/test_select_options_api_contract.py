@@ -82,3 +82,14 @@ def test_shipment_status_codes_excluded_statuses(client):
         params={"excludedStatuses": "SHIPPED"},
     )
     assert "SHIPPED" not in {option["id"] for option in resp.json()["data"]}
+
+
+def test_product_type_options(client, batch8_endpoints):
+    resp = check(client, spec, "GET", "/api/productTypeOptions")
+    labels = [option["label"] for option in resp.json()["data"]]
+    assert "Default" in labels
+
+
+def test_document_type_options(client, batch8_endpoints):
+    resp = check(client, spec, "GET", "/api/documentTypeOptions")
+    assert resp.json()["data"]

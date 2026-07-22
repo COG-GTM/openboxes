@@ -160,6 +160,16 @@ class UrlMappings {
             action = [GET: "handlingRequirementsOptions"]
         }
 
+        "/api/productTypeOptions" {
+            controller = { "selectOptionsApi" }
+            action = [GET: "productTypeOptions"]
+        }
+
+        "/api/documentTypeOptions" {
+            controller = { "selectOptionsApi" }
+            action = [GET: "documentTypeOptions"]
+        }
+
         "/api/stockMovements/shipmentStatusCodes" {
             controller = { "selectOptionsApi" }
             action = [GET: "shipmentStatusCodesOptions"]
@@ -173,6 +183,36 @@ class UrlMappings {
         "/api/products/search"(parseRequest: true) {
             controller = { "productApi" }
             action = [GET: "search"]
+        }
+
+        "/api/products/mergeLogs"(parseRequest: true) {
+            controller = { "productApi" }
+            action = [GET: "mergeLogs"]
+        }
+
+        "/api/products/batchEdit"(parseRequest: true) {
+            controller = { "productApi" }
+            action = [GET: "batchEdit", POST: "batchSave"]
+        }
+
+        "/api/products/validateImport" {
+            controller = { "productApi" }
+            action = [POST: "validateImport"]
+        }
+
+        "/api/products/$id/details"(parseRequest: true) {
+            controller = { "productApi" }
+            action = [GET: "details", PUT: "updateDetails"]
+        }
+
+        "/api/products/$id/documents" {
+            controller = { "productApi" }
+            action = [POST: "uploadDocument"]
+        }
+
+        "/api/products/$id/documents/$documentId" {
+            controller = { "productApi" }
+            action = [DELETE: "deleteDocument"]
         }
 
         "/api/products/$id/$action" {

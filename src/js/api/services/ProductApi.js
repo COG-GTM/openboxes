@@ -7,6 +7,13 @@ import {
   INVENTORY_ITEM,
   LOT_NUMBERS_WITH_EXPIRATION_DATE,
   PRODUCT_API,
+  PRODUCT_BATCH_EDIT,
+  PRODUCT_DETAILS,
+  PRODUCT_DOCUMENT_BY_ID,
+  PRODUCT_DOCUMENTS,
+  PRODUCT_IMPORT_CSV,
+  PRODUCT_MERGE_LOGS,
+  PRODUCT_VALIDATE_IMPORT,
 } from 'api/urls';
 import apiClient from 'utils/apiClient';
 
@@ -34,4 +41,20 @@ export default {
     paramsSerializer: (parameters) => queryString.stringify(parameters),
 
   }),
+  getProductDetails: (id) => apiClient.get(PRODUCT_DETAILS(id)),
+  updateProductDetails: (id, payload) => apiClient.put(PRODUCT_DETAILS(id), payload),
+  getMergeLogs: (config) => apiClient.get(PRODUCT_MERGE_LOGS, config),
+  getBatchEditProducts: (config) => apiClient.get(PRODUCT_BATCH_EDIT, config),
+  batchSaveProducts: (payload) => apiClient.post(PRODUCT_BATCH_EDIT, payload),
+  validateImportCsv: (csvText) => apiClient.post(PRODUCT_VALIDATE_IMPORT, csvText, {
+    headers: { 'Content-Type': 'text/csv' },
+  }),
+  importCsv: (csvText, tags) => apiClient.post(PRODUCT_IMPORT_CSV, csvText, {
+    headers: { 'Content-Type': 'text/csv' },
+    params: tags ? { tags } : {},
+  }),
+  uploadDocument: (id, formData) => apiClient.post(PRODUCT_DOCUMENTS(id), formData, {
+    headers: { 'Content-Type': 'multipart/form-data' },
+  }),
+  deleteDocument: (id, documentId) => apiClient.delete(PRODUCT_DOCUMENT_BY_ID(id, documentId)),
 };

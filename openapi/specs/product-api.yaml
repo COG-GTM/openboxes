@@ -10,8 +10,11 @@ info:
     associatedProducts, withCatalogs, productAvailabilityAndDemand,
     productDemand), "/api/products/$productId/inventoryItems/$lotNumber",
     "/api/products/getLatestInventoryCountDate", "/api/products/import",
-    "/api/products/availableItems" and
-    "/api/products/inventoryItems/lotNumbersWithExpirationDate". Parity
+    "/api/products/availableItems",
+    "/api/products/inventoryItems/lotNumbersWithExpirationDate",
+    "/api/products/mergeLogs", "/api/products/batchEdit",
+    "/api/products/validateImport", "/api/products/$id/details" and
+    "/api/products/$id/documents". Parity
     quirks pinned here: save() responds 200 (not 201) with a {"product": ...}
     envelope (not "data"); unknown product ids on the per-product lookups do
     NOT 404 (Product.get()/load() simply yields null/empty data or a 500 when
@@ -641,6 +644,415 @@ paths:
                       additionalProperties: true
         '500':
           $ref: '../components/common.yaml#/components/responses/ServerError'
+  /api/products/mergeLogs:
+    get:
+      operationId: listProductMergeLogs
+      summary: Product merge log listing (React product/productMergeLogs screen)
+      description: >
+        Paged listing of ProductMergeLogger rows, optionally filtered by
+        exact primary/obsolete product code. Mirrors the legacy
+        ProductController.productMergeLogs screen (default max=10, offset=0).
+      parameters:
+        - $ref: '../components/common.yaml#/components/parameters/max'
+        - $ref: '../components/common.yaml#/components/parameters/offset'
+        - name: primaryProductCode
+          in: query
+          required: false
+          schema:
+            type: string
+        - name: obsoleteProductCode
+          in: query
+          required: false
+          schema:
+            type: string
+      responses:
+        '200':
+          description: Merge log rows with pagination total.
+          content:
+            application/json:
+              schema:
+                type: object
+                required: [data, totalCount]
+                properties:
+                  data:
+                    type: array
+                    items:
+                      type: object
+                      required: [id, primaryProduct, obsoleteProduct]
+                      properties:
+                        id:
+                          $ref: '../components/common.yaml#/components/schemas/Id'
+                        primaryProduct:
+                          $ref: '#/components/schemas/ProductCodeRef'
+                        obsoleteProduct:
+                          $ref: '#/components/schemas/ProductCodeRef'
+                        relatedObjectId:
+                          type: string
+                          nullable: true
+                        relatedObjectClassName:
+                          type: string
+                          nullable: true
+                        dateMerged:
+                          type: string
+                          nullable: true
+                        createdBy:
+                          type: string
+                          nullable: true
+                  totalCount:
+                    type: integer
+  /api/products/batchEdit:
+    get:
+      operationId: listBatchEditProducts
+      summary: Filtered product rows for the React product/batchEdit screen
+      description: >
+        Mirrors legacy ProductController.batchEdit - rows are only returned
+        once a categoryId or tagId filter is supplied ({"data": [],
+        "totalCount": 0} otherwise). Supports the legacy filter parameters
+        (name, productCode(+IsNull), unitOfMeasure(+IsNull),
+        brandName(+IsNull), manufacturer(+IsNull), manufacturerCode(+IsNull),
+        vendor(+IsNull), vendorCode(+IsNull), includeCategoryChildren,
+        createdById, updatedById).
+      parameters:
+        - $ref: '../components/common.yaml#/components/parameters/max'
+        - $ref: '../components/common.yaml#/components/parameters/offset'
+        - name: categoryId
+          in: query
+          required: false
+          schema:
+            type: string
+        - name: tagId
+          in: query
+          required: false
+          schema:
+            type: string
+        - name: includeCategoryChildren
+          in: query
+          required: false
+          schema:
+            type: boolean
+        - name: name
+          in: query
+          required: false
+          schema:
+            type: string
+        - name: productCode
+          in: query
+          required: false
+          schema:
+            type: string
+      responses:
+        '200':
+          description: Editable product rows with pagination total.
+          content:
+            application/json:
+              schema:
+                type: object
+                required: [data, totalCount]
+                properties:
+                  data:
+                    type: array
+                    items:
+                      type: object
+                      required: [id]
+                      properties:
+                        id:
+                          $ref: '../components/common.yaml#/components/schemas/Id'
+                        productCode:
+                          type: string
+                          nullable: true
+                        name:
+                          type: string
+                          nullable: true
+                        category:
+                          type: object
+                          properties:
+                            id:
+                              $ref: '../components/common.yaml#/components/schemas/Id'
+                            name:
+                              type: string
+                              nullable: true
+                        manufacturer:
+                          type: string
+                          nullable: true
+                        manufacturerCode:
+                          type: string
+                          nullable: true
+                        brandName:
+                          type: string
+                          nullable: true
+                        unitOfMeasure:
+                          type: string
+                          nullable: true
+                        coldChain:
+                          type: boolean
+                          nullable: true
+                        createdBy:
+                          type: string
+                          nullable: true
+                        updatedBy:
+                          type: string
+                          nullable: true
+                        dateCreated:
+                          type: string
+                          nullable: true
+                        lastUpdated:
+                          type: string
+                          nullable: true
+                  totalCount:
+                    type: integer
+    post:
+      operationId: batchSaveProducts
+      summary: Bulk product update for the React product/batchEdit screen
+      description: >
+        Accepts {"products": [{id, productCode, name, category{id},
+        manufacturer, manufacturerCode, brandName, unitOfMeasure,
+        coldChain}]}. Responds 200 with {"savedCount": n}; validation errors
+        respond 400 with {"errorMessages": [...]} (mirrors legacy batchSave).
+      requestBody:
+        required: true
+        content:
+          application/json:
+            schema:
+              type: object
+              required: [products]
+              properties:
+                products:
+                  type: array
+                  items:
+                    type: object
+                    required: [id]
+                    properties:
+                      id:
+                        $ref: '../components/common.yaml#/components/schemas/Id'
+                    additionalProperties: true
+      responses:
+        '200':
+          description: Number of products saved.
+          content:
+            application/json:
+              schema:
+                type: object
+                required: [savedCount]
+                properties:
+                  savedCount:
+                    type: integer
+        '400':
+          $ref: '../components/common.yaml#/components/responses/ValidationError'
+  /api/products/validateImport:
+    post:
+      operationId: validateImportProductsCsv
+      summary: Validate a product import CSV without persisting (React importAsCsv step 2)
+      description: >
+        Same text/csv request body contract as /api/products/import (empty
+        body or wrong content type responds 500 via IllegalArgumentException;
+        invalid rows respond 400 with {"errorMessage": ...}). Returns the
+        parsed rows plus each matched existing product's current values so
+        the UI can highlight changes. Does not persist anything.
+      requestBody:
+        required: true
+        content:
+          text/csv:
+            schema:
+              type: string
+      responses:
+        '200':
+          description: Parsed rows, CSV column headers and row count.
+          content:
+            application/json:
+              schema:
+                type: object
+                required: [data, columns, totalCount]
+                properties:
+                  data:
+                    type: array
+                    items:
+                      type: object
+                      required: [isNew]
+                      properties:
+                        isNew:
+                          type: boolean
+                        existingProduct:
+                          type: object
+                          nullable: true
+                          additionalProperties: true
+                      additionalProperties: true
+                  columns:
+                    type: array
+                    items:
+                      type: string
+                  totalCount:
+                    type: integer
+        '400':
+          $ref: '../components/common.yaml#/components/responses/ValidationError'
+        '500':
+          $ref: '../components/common.yaml#/components/responses/ServerError'
+  /api/products/{id}/details:
+    get:
+      operationId: getProductDetails
+      summary: Full product details for the React product/edit screen
+      description: >
+        Form fields, attribute values, tags (comma-joined string),
+        productType displayedFields and the read-only collections shown on
+        the legacy edit tabs (documents, packages, catalogs, groups,
+        synonyms, associations, suppliers, inventory levels). Unknown ids
+        respond 404 with {"errorMessage": ...}.
+      parameters:
+        - $ref: '#/components/parameters/productId'
+      responses:
+        '200':
+          description: Product details envelope.
+          content:
+            application/json:
+              schema:
+                type: object
+                required: [data]
+                properties:
+                  data:
+                    type: object
+                    required: [id, displayedFields, attributes, documents]
+                    properties:
+                      id:
+                        $ref: '../components/common.yaml#/components/schemas/Id'
+                      productCode:
+                        type: string
+                        nullable: true
+                      name:
+                        type: string
+                        nullable: true
+                      displayedFields:
+                        type: array
+                        items:
+                          type: string
+                      attributes:
+                        type: array
+                        items:
+                          type: object
+                          additionalProperties: true
+                      documents:
+                        type: array
+                        items:
+                          type: object
+                          additionalProperties: true
+                      tags:
+                        type: string
+                        nullable: true
+                    additionalProperties: true
+        '404':
+          $ref: '#/components/responses/ProductNotFound'
+    put:
+      operationId: updateProductDetails
+      summary: Update a product from the React product/edit screen
+      description: >
+        Accepts the form fields plus tags (comma-separated string) and
+        attributes ([{attribute: {id}, value}]), mirroring legacy
+        ProductController.update (including optimistic-lock version check and
+        required-attribute validation). Validation failures respond 400 with
+        {"errorMessages": [...]}; unknown ids respond 404.
+      parameters:
+        - $ref: '#/components/parameters/productId'
+      requestBody:
+        required: true
+        content:
+          application/json:
+            schema:
+              type: object
+              additionalProperties: true
+      responses:
+        '200':
+          description: The updated product (Product.toFullJson()) - same envelope as POST /api/products.
+          content:
+            application/json:
+              schema:
+                type: object
+                required: [product]
+                properties:
+                  product:
+                    type: object
+                    additionalProperties: true
+        '400':
+          $ref: '../components/common.yaml#/components/responses/ValidationError'
+        '404':
+          $ref: '#/components/responses/ProductNotFound'
+  /api/products/{id}/documents:
+    post:
+      operationId: uploadProductDocument
+      summary: Upload a document to a product (React product/addDocument screen)
+      description: >
+        Multipart form data with an optional "fileContents" file plus name,
+        typeId and fileUri fields (a file or a fileUri is required; typeId
+        defaults to the default document type). Mirrors legacy
+        DocumentController.uploadDocument for the product case. Disallowed
+        file types, template document types, empty payloads and >10MB files
+        respond 400; unknown product ids respond 404.
+      parameters:
+        - $ref: '#/components/parameters/productId'
+      requestBody:
+        required: true
+        content:
+          multipart/form-data:
+            schema:
+              type: object
+              properties:
+                fileContents:
+                  type: string
+                  format: binary
+                name:
+                  type: string
+                typeId:
+                  type: string
+                fileUri:
+                  type: string
+      responses:
+        '200':
+          description: The created document.
+          content:
+            application/json:
+              schema:
+                type: object
+                required: [document]
+                properties:
+                  document:
+                    type: object
+                    required: [id]
+                    properties:
+                      id:
+                        $ref: '../components/common.yaml#/components/schemas/Id'
+                      name:
+                        type: string
+                        nullable: true
+                      filename:
+                        type: string
+                        nullable: true
+                      fileUri:
+                        type: string
+                        nullable: true
+                      documentType:
+                        type: string
+                        nullable: true
+        '400':
+          $ref: '../components/common.yaml#/components/responses/ValidationError'
+        '404':
+          $ref: '#/components/responses/ProductNotFound'
+  /api/products/{id}/documents/{documentId}:
+    delete:
+      operationId: deleteProductDocument
+      summary: Remove a document from a product
+      description: >
+        Deletes the document and its product association (documents tab of
+        the React product/edit screen). Responds 204 with no body; unknown
+        product/document ids respond 404.
+      parameters:
+        - $ref: '#/components/parameters/productId'
+        - name: documentId
+          in: path
+          required: true
+          schema:
+            $ref: '../components/common.yaml#/components/schemas/Id'
+      responses:
+        '204':
+          description: Document removed.
+        '404':
+          $ref: '#/components/responses/ProductNotFound'
 components:
   parameters:
     productId:
@@ -659,6 +1071,16 @@ components:
       schema:
         $ref: '../components/common.yaml#/components/schemas/Id'
   responses:
+    ProductNotFound:
+      description: Product (or document) not found.
+      content:
+        application/json:
+          schema:
+            type: object
+            required: [errorMessage]
+            properties:
+              errorMessage:
+                type: string
     AvailableItemsOk:
       description: Available inventory grouped by bin location.
       content:
@@ -720,6 +1142,14 @@ components:
                     type: boolean
                 additionalProperties: true
   schemas:
+    ProductCodeRef:
+      type: object
+      properties:
+        id:
+          $ref: '../components/common.yaml#/components/schemas/Id'
+        productCode:
+          type: string
+          nullable: true
     Product:
       type: object
       description: >

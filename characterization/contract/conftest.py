@@ -43,6 +43,15 @@ def batch14_endpoints(client):
 
 
 @pytest.fixture(scope="session")
+def batch8_endpoints(client):
+    # The api-snapshot job runs against the pinned released image, which
+    # predates the Batch 8 product screen endpoints (mergeLogs, batchEdit,
+    # details, documents, validateImport). Skip their tests there.
+    if client.request("GET", "/api/products/mergeLogs").status_code == 404:
+        pytest.skip("Batch 8 product endpoints not present in target build")
+
+
+@pytest.fixture(scope="session")
 def supplier_id(client):
     # Resolve a supplier organization by its stable seeded code (natural key)
     # from the seeded product sources - there is no organization list API.

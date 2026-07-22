@@ -7,7 +7,8 @@ info:
     per-option mappings ("/api/categoryOptions", "/api/catalogOptions",
     "/api/productGroupOptions", "/api/tagOptions", "/api/glAccountOptions",
     "/api/paymentTermOptions", "/api/users", "/api/preferenceTypeOptions",
-    "/api/ratingTypeCodeOptions", "/api/handlingRequirementsOptions" and
+    "/api/ratingTypeCodeOptions", "/api/handlingRequirementsOptions",
+    "/api/productTypeOptions", "/api/documentTypeOptions" and
     "/api/stockMovements/shipmentStatusCodes", "/api/glAccountTypeOptions",
     "/api/locationTypeCodeOptions").
     All endpoints are GET-only and
@@ -169,6 +170,26 @@ paths:
       responses:
         '200':
           $ref: '#/components/responses/IdLabelValueOptionsOk'
+  /api/productTypeOptions:
+    get:
+      operationId: productTypeOptions
+      summary: Product type options (React product/edit screen)
+      description: >
+        Renders ProductType records with a non-empty name as id/label
+        options, sorted by name.
+      responses:
+        '200':
+          $ref: '#/components/responses/IdLabelOptionsOk'
+  /api/documentTypeOptions:
+    get:
+      operationId: documentTypeOptions
+      summary: Document type options (React product/addDocument screen)
+      description: >
+        Renders non-template DocumentType records as id/label options,
+        mirroring the legacy product/addDocument type dropdown.
+      responses:
+        '200':
+          $ref: '#/components/responses/IdLabelOptionsOk'
   /api/stockMovements/shipmentStatusCodes:
     get:
       operationId: shipmentStatusCodesOptions

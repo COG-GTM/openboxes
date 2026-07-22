@@ -1,0 +1,37 @@
+.product-page {
+  .gap-8 {
+    gap: 8px;
+  }
+
+  .product-form {
+    max-width: 900px;
+  }
+
+  .product-batch-edit-filters {
+    max-width: 700px;
+  }
+
+  .merge-log-filter-input {
+    max-width: 300px;
+  }
+
+  .import-modified-value {
+    background-color: #fff3cd;
+  }
+
+  .import-old-value {
+    color: #6c757d;
+    text-decoration: line-through;
+    font-size: 0.85em;
+  }
+
+  .nav-tabs .nav-link {
+    background: none;
+    color: #6c757d !important;
+
+    &.active {
+      background-color: #fff;
+      color: #212529 !important;
+    }
+  }
+}

@@ -79,6 +79,15 @@ export const PREPAYMENT_INVOICE_ITEM_BY_ID = (id) => `${PREPAYMENT_INVOICE_ITEM_
 
 // PRODUCT
 export const PRODUCT_API = `${API}/products`;
+export const PRODUCT_DETAILS = (id) => `${PRODUCT_API}/${id}/details`;
+export const PRODUCT_DOCUMENTS = (id) => `${PRODUCT_API}/${id}/documents`;
+export const PRODUCT_DOCUMENT_BY_ID = (id, documentId) => `${PRODUCT_API}/${id}/documents/${documentId}`;
+export const PRODUCT_MERGE_LOGS = `${PRODUCT_API}/mergeLogs`;
+export const PRODUCT_BATCH_EDIT = `${PRODUCT_API}/batchEdit`;
+export const PRODUCT_VALIDATE_IMPORT = `${PRODUCT_API}/validateImport`;
+export const PRODUCT_IMPORT_CSV = `${PRODUCT_API}/import`;
+export const PRODUCT_TYPE_OPTIONS = `${API}/productTypeOptions`;
+export const DOCUMENT_TYPE_OPTIONS = `${API}/documentTypeOptions`;
 export const INVENTORY_ITEM = (productCode, lotNumber) => `${CONTEXT_PATH}/${PRODUCT_API}/${productCode}/inventoryItems/${lotNumber}`;
 export const LOT_NUMBERS_WITH_EXPIRATION_DATE = `${PRODUCT_API}/inventoryItems/lotNumbersWithExpirationDate`;
 export const AVAILABLE_ITEMS = `${PRODUCT_API}/availableItems`;
