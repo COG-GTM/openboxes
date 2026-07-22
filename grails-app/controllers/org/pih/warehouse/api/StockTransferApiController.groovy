@@ -11,13 +11,16 @@ package org.pih.warehouse.api
 
 import grails.converters.JSON
 import org.grails.web.json.JSONObject
+import org.springframework.http.HttpStatus
 import org.pih.warehouse.core.Constants
 import org.pih.warehouse.core.Location
 import org.pih.warehouse.core.Person
+import org.pih.warehouse.core.RoleType
 import org.pih.warehouse.core.User
 import org.pih.warehouse.inventory.InventoryItem
 import org.pih.warehouse.order.Order
 import org.pih.warehouse.order.OrderIdentifierService
+import org.pih.warehouse.order.OrderItem
 import org.pih.warehouse.order.OrderStatus
 import org.pih.warehouse.order.OrderType
 import org.pih.warehouse.order.OrderTypeCode
@@ -33,6 +36,7 @@ class StockTransferApiController {
     def orderService
     def shipmentService
     def stockTransferService
+    def userService
 
     def list() {
         if (!params.location) {
@@ -271,6 +275,113 @@ class StockTransferApiController {
 
         orderService.deleteOrder(order)
         render status: 204
+    }
+
+    /**
+     * Header, auditing and summary items for the migrated stockTransfer/show
+     * screen (mirrors the legacy show.gsp, _summary.gsp and _orderSummary.gsp
+     * view models, including the action button visibility rules).
+     */
+    def details() {
+        Order order = Order.get(params.id)
+        if (!order) {
+            response.status = HttpStatus.NOT_FOUND.value()
+            render([errorCode: HttpStatus.NOT_FOUND.value(), errorMessage: "Stock transfer ${params.id} not found"] as JSON)
+            return
+        }
+        Location currentLocation = Location.get(session.warehouse.id)
+        String binReplenishmentPrefix = grailsApplication.config.openboxes.stockTransfer.binReplenishment.prefix
+        Boolean isManagerOrHigher = userService.isUserInRole(session.user.id,
+                [RoleType.ROLE_SUPERUSER, RoleType.ROLE_ADMIN, RoleType.ROLE_MANAGER])
+        // The legacy summary tab lists leaf items only (items without split children)
+        def orderItems = order.orderItems?.findAll { !it.orderItems }?.sort { a, b ->
+            a.dateCreated <=> b.dateCreated ?: a.orderIndex <=> b.orderIndex
+        } ?: []
+        render([data: [
+                id                : order.id,
+                orderNumber       : order.orderNumber,
+                name              : order.name,
+                description       : order.description,
+                status            : order.status?.name(),
+                statusLabel       : order.status ? g.message(code: "enum.OrderStatus.${order.status.name()}") : null,
+                origin            : order.origin ? [id: order.origin.id, name: order.origin.name] : null,
+                destination       : order.destination ? [id: order.destination.id, name: order.destination.name] : null,
+                createdBy         : order.createdBy ? [id: order.createdBy.id, name: order.createdBy.name] : null,
+                dateCreated       : order.dateCreated,
+                updatedBy         : order.updatedBy ? [id: order.updatedBy.id, name: order.updatedBy.name] : null,
+                lastUpdated       : order.lastUpdated,
+                completedBy       : order.completedBy ? [id: order.completedBy.id, name: order.completedBy.name] : null,
+                dateCompleted     : order.dateCompleted,
+                isInbound         : order.isInbound(currentLocation),
+                isOutbound        : order.isOutbound(currentLocation),
+                isBinReplenishment: order.orderNumber?.startsWith(binReplenishmentPrefix) ?: false,
+                canEdit           : order.status < OrderStatus.COMPLETED,
+                canDelete         : isManagerOrHigher && order.status in [OrderStatus.PENDING, OrderStatus.APPROVED],
+                orderItems        : orderItems.collect { OrderItem orderItem ->
+                    [
+                            id                    : orderItem.id,
+                            product               : orderItem.product ? [
+                                    id         : orderItem.product.id,
+                                    productCode: orderItem.product.productCode,
+                                    name       : orderItem.product.displayNameOrDefaultName,
+                                    color      : orderItem.product.color,
+                            ] : null,
+                            lotNumber             : orderItem.inventoryItem?.lotNumber,
+                            expirationDate        : orderItem.inventoryItem?.expirationDate,
+                            quantity              : orderItem.quantity,
+                            originBinLocation     : orderItem.originBinLocation?.name,
+                            destinationBinLocation: orderItem.destinationBinLocation?.name,
+                    ]
+                },
+        ]] as JSON)
+    }
+
+    /**
+     * Data for the migrated stockTransfer/print screen (mirrors the legacy
+     * print.gsp view model: parent items with split items, plus the zone and
+     * product-category attributes the page groups by).
+     */
+    def printData() {
+        Order order = Order.get(params.id)
+        if (!order) {
+            response.status = HttpStatus.NOT_FOUND.value()
+            render([errorCode: HttpStatus.NOT_FOUND.value(), errorMessage: "Stock transfer ${params.id} not found"] as JSON)
+            return
+        }
+        def orderItems = order.orderItems?.findAll { !it.parentOrderItem }?.sort { it.product?.name } ?: []
+        render([data: [
+                id         : order.id,
+                orderNumber: order.orderNumber,
+                createdBy  : order.createdBy?.name,
+                dateCreated: order.dateCreated,
+                orderItems : orderItems.collect { OrderItem orderItem ->
+                    def splitItems = orderItem.orderItems?.sort { a, b ->
+                        a.destinationBinLocation?.name <=> b.destinationBinLocation?.name ?:
+                                b.quantity <=> a.quantity
+                    } ?: []
+                    [
+                            id                    : orderItem.id,
+                            productCode           : orderItem.product?.productCode,
+                            productName           : orderItem.product?.name,
+                            coldChain             : orderItem.product?.coldChain ?: false,
+                            controlledSubstance   : orderItem.product?.controlledSubstance ?: false,
+                            hazardousMaterial     : orderItem.product?.hazardousMaterial ?: false,
+                            zoneName              : orderItem.originBinLocation?.zone?.name,
+                            originBinLocation     : orderItem.originBinLocation?.name,
+                            lotNumber             : orderItem.inventoryItem?.lotNumber,
+                            expirationDate        : orderItem.inventoryItem?.expirationDate,
+                            destinationBinLocation: orderItem.destinationBinLocation?.name,
+                            quantity              : orderItem.quantity,
+                            splitItems            : splitItems.collect {
+                                [
+                                        id                    : it.id,
+                                        destinationBinLocation: it.destinationBinLocation?.name,
+                                        quantity              : it.quantity,
+                                ]
+                            },
+                    ]
+                },
+        ]] as JSON)
     }
 
     def statusOptions() {

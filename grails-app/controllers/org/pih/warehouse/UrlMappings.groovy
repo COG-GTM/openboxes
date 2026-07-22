@@ -1553,6 +1553,17 @@ class UrlMappings {
             action = [DELETE: "removeAllItems"]
         }
 
+        // Stock Transfer API (migrated stockTransfer show / print screens)
+        "/api/stockTransfers/$id/details"(parseRequest: true) {
+            controller = { "stockTransferApi" }
+            action = [GET: "details"]
+        }
+
+        "/api/stockTransfers/$id/print"(parseRequest: true) {
+            controller = { "stockTransferApi" }
+            action = [GET: "printData"]
+        }
+
         // Requirement API
 
         "/api/requirements"(parseRequest: true) {

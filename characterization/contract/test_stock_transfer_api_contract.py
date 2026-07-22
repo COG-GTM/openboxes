@@ -117,6 +117,51 @@ def test_create_read_update_delete(client):
               path=f"/api/stockTransfers/{st_id}")
 
 
+# ---------------------------------------------------------------------------
+# Batch 25 endpoints (stockTransfer show / print read endpoints). Skipped on
+# builds that predate them.
+# ---------------------------------------------------------------------------
+
+@pytest.fixture(scope="module")
+def batch25_transfer_id(client):
+    resp = check(client, spec, "POST", "/api/stockTransfers",
+                 json=_create_payload(client))
+    st_id = resp.json()["data"]["id"]
+    if client.request("GET", f"/api/stockTransfers/{st_id}/details").status_code != 200:
+        client.request("DELETE", f"/api/stockTransfers/{st_id}")
+        pytest.skip("app build does not expose the batch 25 stock transfer endpoints")
+    yield st_id
+    client.request("DELETE", f"/api/stockTransfers/{st_id}")
+
+
+def test_details(client, batch25_transfer_id):
+    resp = check(client, spec, "GET", "/api/stockTransfers/{id}/details",
+                 path=f"/api/stockTransfers/{batch25_transfer_id}/details")
+    data = resp.json()["data"]
+    assert data["id"] == batch25_transfer_id
+    assert data["orderItems"], "created transfer should have summary items"
+
+
+def test_details_unknown(client, batch25_transfer_id):
+    resp = check(client, spec, "GET", "/api/stockTransfers/{id}/details",
+                 path="/api/stockTransfers/doesnotexist0000/details")
+    assert resp.status_code == 404
+
+
+def test_print_data(client, batch25_transfer_id):
+    resp = check(client, spec, "GET", "/api/stockTransfers/{id}/print",
+                 path=f"/api/stockTransfers/{batch25_transfer_id}/print")
+    data = resp.json()["data"]
+    assert data["orderNumber"]
+    assert data["orderItems"], "created transfer should have print items"
+
+
+def test_print_data_unknown(client, batch25_transfer_id):
+    resp = check(client, spec, "GET", "/api/stockTransfers/{id}/print",
+                 path="/api/stockTransfers/doesnotexist0000/print")
+    assert resp.status_code == 404
+
+
 def test_remove_items(client):
     resp = check(client, spec, "POST", "/api/stockTransfers",
                  json=_create_payload(client))

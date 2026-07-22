@@ -141,6 +141,8 @@ const PUTAWAY_URL = {
 
 const STOCK_TRANSFER_URL = {
   base: `${CONTEXT_PATH}/stockTransfer`,
+  list: () => `${STOCK_TRANSFER_URL.base}/list`,
+  erase: (id) => `${STOCK_TRANSFER_URL.base}/eraseStockTransfer/${id}`,
   create: () => `${STOCK_TRANSFER_URL.base}/create`,
   createOutbound: () => `${STOCK_TRANSFER_URL.base}/createOutboundReturn`,
   createInbound: () => `${STOCK_TRANSFER_URL.base}/createInboundReturn`,

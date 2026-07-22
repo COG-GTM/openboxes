@@ -8,8 +8,10 @@ info:
     "/api/stockTransfers/statusOptions", "/api/stockTransfers/candidates",
     "/api/stockTransferItems/{id}/",
     "/api/stockTransfers/{id}/sendShipment",
-    "/api/stockTransfers/{id}/rollback" and
-    "/api/stockTransfers/{id}/removeAllItems" mappings. Parity quirks pinned
+    "/api/stockTransfers/{id}/rollback",
+    "/api/stockTransfers/{id}/removeAllItems",
+    "/api/stockTransfers/{id}/details" and
+    "/api/stockTransfers/{id}/print" mappings. Parity quirks pinned
     here - create() responds 200 (not 201); list() renders a different, flat
     order summary than read(); unknown ids on read/update throw
     IllegalArgumentException and respond 500; update() binds the id from the
@@ -291,6 +293,60 @@ paths:
           description: Order rolled back (empty body).
         '500':
           $ref: '../components/common.yaml#/components/responses/ServerError'
+  /api/stockTransfers/{id}/details:
+    get:
+      operationId: getStockTransferDetails
+      summary: Stock transfer header, auditing and summary items
+      description: >
+        Batch 25 endpoint backing the migrated stockTransfer/show screen
+        (mirrors the legacy show.gsp/_summary.gsp/_orderSummary.gsp view
+        models, including the edit/delete button visibility rules).
+      parameters:
+        - $ref: '#/components/parameters/stockTransferId'
+      responses:
+        '200':
+          description: The stock transfer show view model.
+          content:
+            application/json:
+              schema:
+                type: object
+                required: [data]
+                properties:
+                  data:
+                    $ref: '#/components/schemas/StockTransferDetails'
+        '404':
+          description: Unknown order id.
+          content:
+            application/json:
+              schema:
+                $ref: '../components/common.yaml#/components/schemas/ErrorResponse'
+  /api/stockTransfers/{id}/print:
+    get:
+      operationId: getStockTransferPrintData
+      summary: Stock transfer print view model
+      description: >
+        Batch 25 endpoint backing the migrated stockTransfer/print screen
+        (parent items with split items, plus the zone and product-category
+        attributes the page groups by).
+      parameters:
+        - $ref: '#/components/parameters/stockTransferId'
+      responses:
+        '200':
+          description: The stock transfer print view model.
+          content:
+            application/json:
+              schema:
+                type: object
+                required: [data]
+                properties:
+                  data:
+                    $ref: '#/components/schemas/StockTransferPrintData'
+        '404':
+          description: Unknown order id.
+          content:
+            application/json:
+              schema:
+                $ref: '../components/common.yaml#/components/schemas/ErrorResponse'
 components:
   parameters:
     stockTransferId:
@@ -600,6 +656,180 @@ components:
         sortOrder:
           type: integer
           nullable: true
+      additionalProperties: true
+    StockTransferDetails:
+      type: object
+      required: [id, orderNumber, orderItems]
+      properties:
+        id:
+          $ref: '../components/common.yaml#/components/schemas/Id'
+        orderNumber:
+          type: string
+        name:
+          type: string
+          nullable: true
+        description:
+          type: string
+          nullable: true
+        status:
+          type: string
+          nullable: true
+          description: OrderStatus name.
+        statusLabel:
+          type: string
+          nullable: true
+          description: Localized enum.OrderStatus.* message.
+        origin:
+          type: object
+          nullable: true
+          properties:
+            id:
+              $ref: '../components/common.yaml#/components/schemas/Id'
+            name:
+              type: string
+              nullable: true
+        destination:
+          type: object
+          nullable: true
+          properties:
+            id:
+              $ref: '../components/common.yaml#/components/schemas/Id'
+            name:
+              type: string
+              nullable: true
+        createdBy:
+          type: object
+          nullable: true
+          additionalProperties: true
+        dateCreated:
+          type: string
+          nullable: true
+          description: ISO-8601 timestamp.
+        updatedBy:
+          type: object
+          nullable: true
+          additionalProperties: true
+        lastUpdated:
+          type: string
+          nullable: true
+          description: ISO-8601 timestamp.
+        completedBy:
+          type: object
+          nullable: true
+          additionalProperties: true
+        dateCompleted:
+          type: string
+          nullable: true
+          description: ISO-8601 timestamp.
+        isInbound:
+          type: boolean
+        isOutbound:
+          type: boolean
+        isBinReplenishment:
+          type: boolean
+        canEdit:
+          type: boolean
+        canDelete:
+          type: boolean
+        orderItems:
+          type: array
+          description: Leaf items only (items without split children).
+          items:
+            type: object
+            properties:
+              id:
+                $ref: '../components/common.yaml#/components/schemas/Id'
+              product:
+                type: object
+                nullable: true
+                additionalProperties: true
+              lotNumber:
+                type: string
+                nullable: true
+              expirationDate:
+                type: string
+                nullable: true
+                description: ISO-8601 timestamp.
+              quantity:
+                type: number
+                nullable: true
+              originBinLocation:
+                type: string
+                nullable: true
+              destinationBinLocation:
+                type: string
+                nullable: true
+            additionalProperties: true
+      additionalProperties: true
+    StockTransferPrintData:
+      type: object
+      required: [id, orderNumber, orderItems]
+      properties:
+        id:
+          $ref: '../components/common.yaml#/components/schemas/Id'
+        orderNumber:
+          type: string
+        createdBy:
+          type: string
+          nullable: true
+        dateCreated:
+          type: string
+          nullable: true
+          description: ISO-8601 timestamp.
+        orderItems:
+          type: array
+          description: Parent items (no parentOrderItem) sorted by product name.
+          items:
+            type: object
+            properties:
+              id:
+                $ref: '../components/common.yaml#/components/schemas/Id'
+              productCode:
+                type: string
+                nullable: true
+              productName:
+                type: string
+                nullable: true
+              coldChain:
+                type: boolean
+              controlledSubstance:
+                type: boolean
+              hazardousMaterial:
+                type: boolean
+              zoneName:
+                type: string
+                nullable: true
+              originBinLocation:
+                type: string
+                nullable: true
+              lotNumber:
+                type: string
+                nullable: true
+              expirationDate:
+                type: string
+                nullable: true
+                description: ISO-8601 timestamp.
+              destinationBinLocation:
+                type: string
+                nullable: true
+              quantity:
+                type: number
+                nullable: true
+              splitItems:
+                type: array
+                items:
+                  type: object
+                  properties:
+                    id:
+                      $ref: '../components/common.yaml#/components/schemas/Id'
+                    destinationBinLocation:
+                      type: string
+                      nullable: true
+                    quantity:
+                      type: number
+                      nullable: true
+                  additionalProperties: true
+            additionalProperties: true
       additionalProperties: true
   securitySchemes:
     cookieAuth:

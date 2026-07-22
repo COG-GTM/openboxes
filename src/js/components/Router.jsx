@@ -782,6 +782,16 @@ const AsyncStockTransferList = Loadable({
   loading: Loading,
 });
 
+const AsyncStockTransferShow = Loadable({
+  loader: () => import('components/stock-transfer/StockTransferShow'),
+  loading: Loading,
+});
+
+const AsyncStockTransferPrint = Loadable({
+  loader: () => import('components/stock-transfer/StockTransferPrint'),
+  loading: Loading,
+});
+
 const AsyncInventorySummaryList = Loadable({
   loader: () => import('components/inventory/InventorySummaryList'),
   loading: Loading,
@@ -1305,6 +1315,8 @@ const Router = () => {
             <MainLayoutRoute path="**/productCatalog/show/:id" component={AsyncProductCatalogShow} />
             <MainLayoutRoute path="**/productGroup/create" component={AsyncProductGroupCreate} />
             <MainLayoutRoute path="**/stockTransfer/list" component={AsyncStockTransferList} />
+            <MainLayoutRoute path="**/stockTransfer/show/:stockTransferId" component={AsyncStockTransferShow} />
+            <MainLayoutRoute path="**/stockTransfer/print/:stockTransferId" component={AsyncStockTransferPrint} />
             <MainLayoutRoute path="**/locationGroup/list" component={AsyncLocationGroupList} />
             <MainLayoutRoute path="**/locationGroup/create" component={AsyncLocationGroupForm} />
             <MainLayoutRoute path="**/locationGroup/edit/:locationGroupId" component={AsyncLocationGroupForm} />

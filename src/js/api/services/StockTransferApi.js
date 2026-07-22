@@ -4,7 +4,9 @@ import {
   STOCK_TRANSFER_API,
   STOCK_TRANSFER_BY_ID,
   STOCK_TRANSFER_CANDIDATES,
+  STOCK_TRANSFER_DETAILS,
   STOCK_TRANSFER_ITEM_BY_ID,
+  STOCK_TRANSFER_PRINT,
   STOCK_TRANSFER_REMOVE_ALL_ITEMS,
 } from 'api/urls';
 import apiClient from 'utils/apiClient';
@@ -12,6 +14,8 @@ import apiClient from 'utils/apiClient';
 export default {
   getStockTransfers: (config) => apiClient.get(STOCK_TRANSFER_API, config),
   getStockTransfer: (id) => apiClient.get(STOCK_TRANSFER_BY_ID(id)),
+  getStockTransferDetails: (id, config) => apiClient.get(STOCK_TRANSFER_DETAILS(id), config),
+  getStockTransferPrintData: (id, config) => apiClient.get(STOCK_TRANSFER_PRINT(id), config),
   updateStockTransfer: (id, payload) => apiClient.post(STOCK_TRANSFER_BY_ID(id), payload),
   deleteStockTransfer: (id) => apiClient.delete(STOCK_TRANSFER_BY_ID(id)),
   removeItem: (id) => apiClient.delete(STOCK_TRANSFER_ITEM_BY_ID(id)),
