@@ -32,6 +32,7 @@ import org.pih.warehouse.order.OrderAdjustmentTypeCode
 import org.pih.warehouse.order.OrderStatus
 import org.pih.warehouse.order.OrderSummaryStatus
 import org.pih.warehouse.product.Category
+import org.pih.warehouse.product.ProductActivityCode
 import org.pih.warehouse.product.ProductAssociationTypeCode
 import org.pih.warehouse.product.ProductCatalog
 import org.pih.warehouse.product.ProductField
@@ -97,6 +98,20 @@ class SelectOptionsApiController {
     def organizationRoleTypeOptions() {
         List options = RoleType.listOrganizationRoleTypes().collect {
             [id: it.name(), label: it.name()]
+        }
+        render([data: options] as JSON)
+    }
+
+    def productActivityCodeOptions() {
+        List options = ProductActivityCode.values().collect {
+            [id: it.name(), label: g.message(code: "enum.ProductActivityCode.${it.name()}", default: it.name())]
+        }
+        render([data: options] as JSON)
+    }
+
+    def productFieldOptions() {
+        List options = ProductField.values().collect {
+            [id: it.name(), label: g.message(code: "enum.ProductField.${it.name()}", default: it.name())]
         }
         render([data: options] as JSON)
     }

@@ -16,7 +16,7 @@ class ProductTypeController {
 
     ProductTypeService productTypeService
 
-    static allowedMethods = [save: "POST", update: "POST", delete: "POST"]
+    static allowedMethods = [update: "POST", delete: "POST"]
 
     def index() {
         redirect(action: "list", params: params)
@@ -28,36 +28,7 @@ class ProductTypeController {
     }
 
     def create() {
-        def productTypeInstance = new ProductType(productTypeCode: ProductTypeCode.GOOD,
-                requiredFields: [ProductField.PRODUCT_CODE, ProductField.NAME, ProductField.CATEGORY, ProductField.GL_ACCOUNT])
-        productTypeInstance.properties = params
-        return [productTypeInstance: productTypeInstance]
-    }
-
-    def save() {
-        if (params.supportedActivities) {
-            params.supportedActivities = params.list("supportedActivities") as ProductActivityCode[]
-        }
-        if (params.requiredFields) {
-            params.requiredFields = params.list("requiredFields") as ProductField[]
-        }
-        if (params.displayedFields) {
-            params.displayedFields = params.list("displayedFields") as ProductField[]
-        }
-
-        def productTypeInstance = new ProductType(params)
-        productTypeInstance.productTypeCode = ProductTypeCode.GOOD
-        productTypeInstance.requiredFields = [ProductField.PRODUCT_CODE, ProductField.NAME, ProductField.CATEGORY, ProductField.GL_ACCOUNT]
-        if (!params.code && !params.productIdentifierFormat) {
-            productTypeInstance.errors.rejectValue("productIdentifierFormat","productType.codeOrIdentifierRequired.message")
-            productTypeInstance.errors.rejectValue("code", "")
-        }
-        if (productTypeService.saveProductType(productTypeInstance)) {
-            flash.message = "${warehouse.message(code: 'default.created.message', args: [warehouse.message(code: 'productType.label', default: 'ProductType'), productTypeInstance.id])}"
-            redirect(action: "list", id: productTypeInstance.id)
-        } else {
-            render(view: "create", model: [productTypeInstance: productTypeInstance])
-        }
+        render(view: "/common/react", params: params)
     }
 
     def show() {

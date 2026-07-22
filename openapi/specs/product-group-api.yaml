@@ -2,12 +2,17 @@ openapi: 3.0.3
 info:
   title: OpenBoxes - ProductGroupApiController
   description: >
-    Product group create endpoint handled by
+    Product group (generic product / product family) create/list/read/update/
+    delete and product-membership endpoints handled by
     org.pih.warehouse.api.ProductGroupApiController, routed via the explicit
-    "/api/productGroups" mapping. Added in Phase 2 (Batch 10) to back the
-    React productGroup create screen; mirrors the legacy
-    ProductGroupController save action (create only; edit/list/show remain
-    legacy GSPs until Batch 11).
+    "/api/productGroups" mappings. Added in Phase 2 (Batch 11) to back the
+    React productGroup list/edit/show screens. Parity notes: list matches the
+    legacy list.gsp (contains match on name via "%q%"); delete detaches all
+    products before deleting like the legacy controller; addProduct with
+    isProductFamily=true assigns the product's productFamily (the legacy
+    "siblings" tab), an unknown productId is silently ignored (200), and
+    adding a productFamily to a product that already has one renders a 400
+    with an errorMessage.
   version: 0.1.0
 servers:
   - url: http://localhost:8080/openboxes
@@ -16,9 +21,52 @@ security:
   - cookieAuth: []
 paths:
   /api/productGroups:
+    get:
+      operationId: listProductGroups
+      summary: List product groups, optionally filtered by name
+      parameters:
+        - name: q
+          in: query
+          required: false
+          schema:
+            type: string
+          description: Case-insensitive contains filter (ilike "%q%") on name.
+        - name: sort
+          in: query
+          required: false
+          schema:
+            type: string
+            enum: [name, dateCreated, lastUpdated]
+          description: Sort property; defaults to name.
+        - name: order
+          in: query
+          required: false
+          schema:
+            type: string
+            enum: [asc, desc]
+        - $ref: '../components/common.yaml#/components/parameters/max'
+        - $ref: '../components/common.yaml#/components/parameters/offset'
+      responses:
+        '200':
+          description: Paged product groups.
+          content:
+            application/json:
+              schema:
+                type: object
+                required: [data, totalCount]
+                properties:
+                  data:
+                    type: array
+                    items:
+                      $ref: '#/components/schemas/ProductGroupRow'
+                  totalCount:
+                    type: integer
     post:
       operationId: createProductGroup
       summary: Create a product group
+      description: >
+        Mirrors the legacy ProductGroupController save action; added in
+        Phase 2 (Batch 10) to back the React productGroup create screen.
       requestBody:
         required: true
         content:
@@ -44,11 +92,7 @@ paths:
           content:
             application/json:
               schema:
-                type: object
-                required: [data]
-                properties:
-                  data:
-                    $ref: '#/components/schemas/ProductGroup'
+                $ref: '#/components/schemas/ProductGroupEnvelope'
         '400':
           description: Validation failure.
           content:
@@ -65,11 +109,178 @@ paths:
                     type: array
                     items:
                       type: string
+  /api/productGroups/{id}:
+    parameters:
+      - $ref: '#/components/parameters/productGroupId'
+    get:
+      operationId: readProductGroup
+      summary: Read a single product group with its products and siblings
+      responses:
+        '200':
+          description: The product group.
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/ProductGroupEnvelope'
+        '404':
+          $ref: '../components/common.yaml#/components/responses/NotFound'
+    put:
+      operationId: updateProductGroup
+      summary: Update a product group's name, category and description
+      description: Partial update; only keys present in the body are bound.
+      requestBody:
+        required: true
+        content:
+          application/json:
+            schema:
+              type: object
+              properties:
+                name:
+                  type: string
+                description:
+                  type: string
+                  nullable: true
+                category:
+                  type: string
+                  nullable: true
+                  description: Category id, or null to unset.
+      responses:
+        '200':
+          description: The updated product group.
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/ProductGroupEnvelope'
+        '400':
+          $ref: '../components/common.yaml#/components/responses/ValidationError'
+        '404':
+          $ref: '../components/common.yaml#/components/responses/NotFound'
+    delete:
+      operationId: deleteProductGroup
+      summary: Delete a product group
+      description: >
+        Removes all products from the group before deleting it, like the
+        legacy ProductGroupController.delete action.
+      responses:
+        '204':
+          description: Product group deleted (empty body).
+        '400':
+          description: Product group could not be deleted.
+          content:
+            application/json:
+              schema:
+                $ref: '../components/common.yaml#/components/schemas/ErrorResponse'
+        '404':
+          $ref: '../components/common.yaml#/components/responses/NotFound'
+  /api/productGroups/{id}/products:
+    parameters:
+      - $ref: '#/components/parameters/productGroupId'
+    post:
+      operationId: addProductToProductGroup
+      summary: Add a product to a product group (or product family)
+      description: >
+        With isProductFamily=true the product is added to the group's
+        siblings (legacy "siblings" tab, i.e. its productFamily); otherwise
+        the product is added to the group's products. An unknown productId
+        is silently ignored (200). Adding a productFamily to a product that
+        already has one renders 400 with an errorMessage
+        (productGroup.productFamily.duplicate.error).
+      requestBody:
+        required: true
+        content:
+          application/json:
+            schema:
+              type: object
+              required: [productId]
+              properties:
+                productId:
+                  type: string
+                isProductFamily:
+                  type: boolean
+                  default: false
+      responses:
+        '200':
+          description: The updated product group.
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/ProductGroupEnvelope'
+        '400':
+          description: Invalid product or category mismatch.
+          content:
+            application/json:
+              schema:
+                $ref: '../components/common.yaml#/components/schemas/ErrorResponse'
+        '404':
+          $ref: '../components/common.yaml#/components/responses/NotFound'
+  /api/productGroups/{id}/products/{productId}:
+    parameters:
+      - $ref: '#/components/parameters/productGroupId'
+      - name: productId
+        in: path
+        required: true
+        schema:
+          $ref: '../components/common.yaml#/components/schemas/Id'
+        description: Product id to remove from the group.
+    delete:
+      operationId: removeProductFromProductGroup
+      summary: Remove a product from a product group (or product family)
+      parameters:
+        - name: isProductFamily
+          in: query
+          required: false
+          schema:
+            type: boolean
+          description: >
+            When true, unsets the product's productFamily instead of removing
+            it from the group's products.
+      responses:
+        '200':
+          description: The updated product group.
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/ProductGroupEnvelope'
+        '404':
+          $ref: '../components/common.yaml#/components/responses/NotFound'
 components:
-  securitySchemes:
-    cookieAuth:
-      $ref: '../components/common.yaml#/components/securitySchemes/cookieAuth'
+  parameters:
+    productGroupId:
+      name: id
+      in: path
+      required: true
+      schema:
+        $ref: '../components/common.yaml#/components/schemas/Id'
+      description: >
+        Product group id. Unknown ids raise ObjectNotFoundException, rendered
+        as HTTP 404 by ErrorsController.handleNotFound.
   schemas:
+    ProductGroupRow:
+      type: object
+      required: [id, name]
+      properties:
+        id:
+          $ref: '../components/common.yaml#/components/schemas/Id'
+        name:
+          type: string
+        category:
+          type: string
+          nullable: true
+          description: Category name (Category.toString()).
+        productCount:
+          type: integer
+        dateCreated:
+          type: string
+          nullable: true
+        lastUpdated:
+          type: string
+          nullable: true
+    ProductGroupEnvelope:
+      type: object
+      required: [data]
+      properties:
+        data:
+          $ref: '#/components/schemas/ProductGroup'
     ProductGroup:
       type: object
       required: [id, name]
@@ -89,10 +300,52 @@ components:
               $ref: '../components/common.yaml#/components/schemas/Id'
             name:
               type: string
-              nullable: true
+        version:
+          type: integer
         dateCreated:
           type: string
           nullable: true
         lastUpdated:
           type: string
           nullable: true
+        products:
+          type: array
+          items:
+            $ref: '#/components/schemas/ProductGroupProduct'
+        siblings:
+          type: array
+          items:
+            $ref: '#/components/schemas/ProductGroupProduct'
+    ProductGroupProduct:
+      type: object
+      required: [id]
+      properties:
+        id:
+          $ref: '../components/common.yaml#/components/schemas/Id'
+        productCode:
+          type: string
+          nullable: true
+        name:
+          type: string
+          nullable: true
+        category:
+          type: string
+          nullable: true
+        unitOfMeasure:
+          type: string
+          nullable: true
+        manufacturer:
+          type: string
+          nullable: true
+        manufacturerCode:
+          type: string
+          nullable: true
+        vendor:
+          type: string
+          nullable: true
+        vendorCode:
+          type: string
+          nullable: true
+  securitySchemes:
+    cookieAuth:
+      $ref: '../components/common.yaml#/components/securitySchemes/cookieAuth'

@@ -141,6 +141,30 @@ paths:
           description: Product source deleted (empty body).
         '500':
           $ref: '../components/common.yaml#/components/responses/ServerError'
+  /api/productSuppliers/{id}/details:
+    get:
+      operationId: productSupplierDetails
+      summary: Read product source details for the React show screen
+      description: >
+        Renders the fields the legacy productSupplier/show.gsp displayed,
+        several of which (upc, ndc, supplierName, manufacturerName,
+        modelNumber, standardLeadTimeDays, comments) are not part of
+        ProductSupplier.toJson(). Added in Phase 2 (Batch 11).
+      parameters:
+        - $ref: '#/components/parameters/productSupplierId'
+      responses:
+        '200':
+          description: Product source show-screen details.
+          content:
+            application/json:
+              schema:
+                type: object
+                required: [data]
+                properties:
+                  data:
+                    $ref: '#/components/schemas/ProductSupplierDetails'
+        '404':
+          $ref: '../components/common.yaml#/components/responses/NotFound'
   /api/productSuppliers/export:
     get:
       operationId: exportProductSuppliers
@@ -244,6 +268,91 @@ components:
       properties:
         data:
           $ref: '../components/common.yaml#/components/schemas/ProductSupplier'
+    ProductSupplierDetails:
+      type: object
+      required: [id]
+      properties:
+        id:
+          $ref: '../components/common.yaml#/components/schemas/Id'
+        code:
+          type: string
+          nullable: true
+        name:
+          type: string
+          nullable: true
+        product:
+          type: object
+          nullable: true
+          properties:
+            id:
+              $ref: '../components/common.yaml#/components/schemas/Id'
+            name:
+              type: string
+            productCode:
+              type: string
+        productCode:
+          type: string
+          nullable: true
+        upc:
+          type: string
+          nullable: true
+        ndc:
+          type: string
+          nullable: true
+        supplier:
+          type: object
+          nullable: true
+          properties:
+            id:
+              $ref: '../components/common.yaml#/components/schemas/Id'
+            name:
+              type: string
+              nullable: true
+        supplierCode:
+          type: string
+          nullable: true
+        supplierName:
+          type: string
+          nullable: true
+        modelNumber:
+          type: string
+          nullable: true
+        brandName:
+          type: string
+          nullable: true
+        manufacturer:
+          type: object
+          nullable: true
+          properties:
+            id:
+              $ref: '../components/common.yaml#/components/schemas/Id'
+            name:
+              type: string
+              nullable: true
+        manufacturerCode:
+          type: string
+          nullable: true
+        manufacturerName:
+          type: string
+          nullable: true
+        standardLeadTimeDays:
+          type: number
+          nullable: true
+        minOrderQuantity:
+          type: number
+          nullable: true
+        ratingTypeCode:
+          type: string
+          nullable: true
+        comments:
+          type: string
+          nullable: true
+        dateCreated:
+          type: string
+          nullable: true
+        lastUpdated:
+          type: string
+          nullable: true
   securitySchemes:
     cookieAuth:
       $ref: '../components/common.yaml#/components/securitySchemes/cookieAuth'

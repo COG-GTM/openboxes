@@ -57,9 +57,7 @@ async function cleanupTestData(page: Page): Promise<void> {
     .then((r) => r.json());
   for (const group of groups.data) {
     if ((group.label ?? '').startsWith(GROUP_NAME_PREFIX)) {
-      await page.request.post(url('/productGroup/delete'), {
-        form: { id: group.id },
-      });
+      await page.request.delete(url(`/api/productGroups/${group.id}`));
     }
   }
 }
@@ -240,8 +238,6 @@ test.describe('product catalog batch 10 React screens', () => {
       (g: { label?: string }) => g.label === groupName,
     );
     expect(created).toBeTruthy();
-    await page.request.post(url('/productGroup/delete'), {
-      form: { id: created.id },
-    });
+    await page.request.delete(url(`/api/productGroups/${created.id}`));
   });
 });

@@ -13,7 +13,8 @@ info:
     "/api/stockMovements/shipmentStatusCodes", "/api/glAccountTypeOptions",
     "/api/locationTypeCodeOptions", "/api/partyTypeOptions",
     "/api/organizationRoleTypeOptions", "/api/roleTypeOptions",
-    "/api/partyOptions").
+    "/api/partyOptions", "/api/productActivityCodeOptions",
+    "/api/productFieldOptions").
     All endpoints are GET-only and
     render an option list under a "data" envelope; the option shape varies
     slightly per endpoint (some include "value" and/or "variant").
@@ -101,6 +102,30 @@ paths:
         Returns every LocationTypeCode enum value as {id, label} pairs (both
         the enum name). Added in Phase 2 (Batch 32) for the React
         locationType form.
+      responses:
+        '200':
+          $ref: '#/components/responses/IdLabelOptionsOk'
+  /api/productActivityCodeOptions:
+    get:
+      operationId: listProductActivityCodeOptions
+      summary: Product activity code options
+      description: >
+        Returns every ProductActivityCode enum value as {id, label} pairs
+        (id is the enum name, label is the enum.ProductActivityCode.* message
+        or the enum name when no message exists). Added in Phase 2 (Batch 11)
+        for the React productType create form.
+      responses:
+        '200':
+          $ref: '#/components/responses/IdLabelOptionsOk'
+  /api/productFieldOptions:
+    get:
+      operationId: listProductFieldOptions
+      summary: Product field options
+      description: >
+        Returns every ProductField enum value as {id, label} pairs (id is
+        the enum name, label is the enum.ProductField.* message or the enum
+        name when no message exists). Added in Phase 2 (Batch 11) for the
+        React productType create form.
       responses:
         '200':
           $ref: '#/components/responses/IdLabelOptionsOk'

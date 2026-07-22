@@ -1,0 +1,140 @@
+openapi: 3.0.3
+info:
+  title: OpenBoxes - ProductTypeApiController
+  description: >
+    Product type create/delete endpoints handled by
+    org.pih.warehouse.api.ProductTypeApiController, routed via the explicit
+    "/api/productTypes" and "/api/productTypes/$id" mappings. Added in
+    Phase 2 (Batch 11) to back the React productType create screen. Parity
+    quirks preserved from the legacy save action: productTypeCode is always
+    forced to GOOD and requiredFields to [PRODUCT_CODE, NAME, CATEGORY,
+    GL_ACCOUNT] regardless of input; a request with neither code nor
+    productIdentifierFormat is rejected with the
+    productType.codeOrIdentifierRequired.message validation error. Delete
+    refuses the default product type and types with existing products (400).
+  version: 0.1.0
+servers:
+  - url: http://localhost:8080/openboxes
+    description: Local Docker baseline (docs/migration/RUNNING_LOCALLY.md)
+security:
+  - cookieAuth: []
+paths:
+  /api/productTypes:
+    post:
+      operationId: createProductType
+      summary: Create a product type
+      requestBody:
+        required: true
+        content:
+          application/json:
+            schema:
+              type: object
+              required: [name]
+              properties:
+                name:
+                  type: string
+                code:
+                  type: string
+                  nullable: true
+                productIdentifierFormat:
+                  type: string
+                  nullable: true
+                sequenceNumber:
+                  type: integer
+                  nullable: true
+                  description: Defaults to 0 when absent or empty.
+                supportedActivities:
+                  type: array
+                  items:
+                    type: string
+                  description: ProductActivityCode enum names.
+                displayedFields:
+                  type: array
+                  items:
+                    type: string
+                  description: ProductField enum names.
+      responses:
+        '201':
+          description: Created product type.
+          content:
+            application/json:
+              schema:
+                type: object
+                required: [data]
+                properties:
+                  data:
+                    $ref: '#/components/schemas/ProductType'
+        '400':
+          $ref: '../components/common.yaml#/components/responses/ValidationError'
+  /api/productTypes/{id}:
+    parameters:
+      - name: id
+        in: path
+        required: true
+        schema:
+          $ref: '../components/common.yaml#/components/schemas/Id'
+        description: >
+          Product type id. Unknown ids raise ObjectNotFoundException,
+          rendered as HTTP 404 by ErrorsController.handleNotFound.
+    delete:
+      operationId: deleteProductType
+      summary: Delete a product type
+      description: >
+        Refuses to delete the configured default product type or a type that
+        still has products (both 400 with an errorMessage).
+      responses:
+        '204':
+          description: Product type deleted (empty body).
+        '400':
+          description: Product type cannot be deleted.
+          content:
+            application/json:
+              schema:
+                $ref: '../components/common.yaml#/components/schemas/ErrorResponse'
+        '404':
+          $ref: '../components/common.yaml#/components/responses/NotFound'
+components:
+  schemas:
+    ProductType:
+      type: object
+      required: [id, name, productTypeCode]
+      properties:
+        id:
+          $ref: '../components/common.yaml#/components/schemas/Id'
+        name:
+          type: string
+        code:
+          type: string
+          nullable: true
+        productTypeCode:
+          type: string
+          enum: [GOOD, SERVICE, FIXED_ASSET, ASSET_USAGE]
+          description: Always GOOD for types created through this endpoint.
+        productIdentifierFormat:
+          type: string
+          nullable: true
+        sequenceNumber:
+          type: integer
+          nullable: true
+        supportedActivities:
+          type: array
+          items:
+            type: string
+        requiredFields:
+          type: array
+          items:
+            type: string
+          description: Always [CATEGORY, GL_ACCOUNT, NAME, PRODUCT_CODE] (sorted).
+        displayedFields:
+          type: array
+          items:
+            type: string
+        dateCreated:
+          type: string
+          nullable: true
+        lastUpdated:
+          type: string
+          nullable: true
+  securitySchemes:
+    cookieAuth:
+      $ref: '../components/common.yaml#/components/securitySchemes/cookieAuth'

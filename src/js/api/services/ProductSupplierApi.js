@@ -3,6 +3,7 @@ import {
   PREFERENCE_TYPE_OPTIONS,
   PRODUCT_SUPPLIER_API,
   PRODUCT_SUPPLIER_BY_ID,
+  PRODUCT_SUPPLIER_DETAILS,
   PRODUCT_SUPPLIER_PREFERENCES_BY_ID,
   RATING_TYPE_OPTIONS,
 } from 'api/urls';
@@ -13,6 +14,7 @@ export default {
   getRatingTypeOptions: (config) => apiClient.get(RATING_TYPE_OPTIONS, config),
   deleteProductSupplier: (id) => apiClient.delete(PRODUCT_SUPPLIER_BY_ID(id)),
   getProductSupplier: (id) => apiClient.get(PRODUCT_SUPPLIER_BY_ID(id)),
+  getProductSupplierDetails: (id) => apiClient.get(PRODUCT_SUPPLIER_DETAILS(id)),
   getAttributes: (config) => apiClient.get(ATTRIBUTES, config),
   deleteProductSupplierPreference: (id) => apiClient.delete(PRODUCT_SUPPLIER_PREFERENCES_BY_ID(id)),
   saveDetails: (payload) => apiClient.post(PRODUCT_SUPPLIER_API, payload),

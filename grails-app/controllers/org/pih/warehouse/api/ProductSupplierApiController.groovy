@@ -36,6 +36,48 @@ class ProductSupplierApiController {
         render status: 204
     }
 
+    // Backs the React productSupplier show screen; renders the fields the
+    // legacy show.gsp displayed (several are not part of toJson()).
+    def details() {
+        ProductSupplier productSupplier = ProductSupplier.get(params.id)
+        if (!productSupplier) {
+            throw new ObjectNotFoundException(params.id, ProductSupplier.class.toString())
+        }
+        render([data: [
+                id                  : productSupplier.id,
+                code                : productSupplier.code,
+                name                : productSupplier.name,
+                product             : productSupplier.product ? [
+                        id         : productSupplier.product.id,
+                        name       : productSupplier.product.name,
+                        productCode: productSupplier.product.productCode,
+                ] : null,
+                productCode         : productSupplier.productCode,
+                upc                 : productSupplier.upc,
+                ndc                 : productSupplier.ndc,
+                supplier            : productSupplier.supplier ? [
+                        id  : productSupplier.supplier.id,
+                        name: productSupplier.supplier.name,
+                ] : null,
+                supplierCode        : productSupplier.supplierCode,
+                supplierName        : productSupplier.supplierName,
+                modelNumber         : productSupplier.modelNumber,
+                brandName           : productSupplier.brandName,
+                manufacturer        : productSupplier.manufacturer ? [
+                        id  : productSupplier.manufacturer.id,
+                        name: productSupplier.manufacturer.name,
+                ] : null,
+                manufacturerCode    : productSupplier.manufacturerCode,
+                manufacturerName    : productSupplier.manufacturerName,
+                standardLeadTimeDays: productSupplier.standardLeadTimeDays,
+                minOrderQuantity    : productSupplier.minOrderQuantity,
+                ratingTypeCode      : productSupplier.ratingTypeCode?.name(),
+                comments            : productSupplier.comments,
+                dateCreated         : productSupplier.dateCreated,
+                lastUpdated         : productSupplier.lastUpdated,
+        ]] as JSON)
+    }
+
     def create(ProductSupplierDetailsCommand productSupplierDetailsCommand) {
         if (productSupplierDetailsCommand.hasErrors()) {
             throw new ValidationException("Invalid product source", productSupplierDetailsCommand.errors)

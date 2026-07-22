@@ -63,6 +63,28 @@ def test_create_read_update_delete(client, supplier_id):
         assert resp.status_code == 204
 
 
+def test_details(client):
+    # Only source builds of this branch expose the details endpoint (added
+    # in Phase 2 Batch 11 for the React show screen).
+    listing = client.get_json("/api/productSuppliers",
+                              params={"max": "1"})["data"]
+    assert listing, "seeded dataset should have product sources"
+    ps_id = listing[0]["id"]
+    if client.request("GET",
+                      f"/api/productSuppliers/{ps_id}/details").status_code == 404:
+        pytest.skip("app build does not expose /api/productSuppliers/{id}/details")
+    resp = check(client, spec, "GET", "/api/productSuppliers/{id}/details",
+                 path=f"/api/productSuppliers/{ps_id}/details")
+    assert resp.json()["data"]["id"] == ps_id
+
+
+def test_details_unknown(client):
+    # On builds without the endpoint the unmapped URL also responds 404.
+    resp = check(client, spec, "GET", "/api/productSuppliers/{id}/details",
+                 path="/api/productSuppliers/doesnotexist0000/details")
+    assert resp.status_code == 404
+
+
 def test_create_invalid(client):
     # name and supplier are required by ProductSupplierDetailsCommand.
     resp = check(client, spec, "POST", "/api/productSuppliers", json={})

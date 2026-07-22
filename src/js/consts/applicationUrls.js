@@ -60,6 +60,7 @@ const PRODUCT_GROUP_URL = {
   list: () => `${PRODUCT_GROUP_URL.base}/list`,
   create: () => `${PRODUCT_GROUP_URL.base}/create`,
   edit: (id) => `${PRODUCT_GROUP_URL.base}/edit/${id}`,
+  show: (id) => `${PRODUCT_GROUP_URL.base}/show/${id}`,
 };
 
 const LOCATION_URL = {
@@ -353,7 +354,14 @@ const PRODUCT_SUPPLIER_URL = {
   list: () => `${PRODUCT_SUPPLIER_URL.base}/list`,
   create: () => `${PRODUCT_SUPPLIER_URL.base}/create`,
   edit: (id) => `${PRODUCT_SUPPLIER_URL.base}/create/${id}`,
+  show: (id) => `${PRODUCT_SUPPLIER_URL.base}/show/${id}`,
   export: () => `${PRODUCT_SUPPLIER_URL.base}/export?format=xls`,
+};
+
+const PRODUCT_TYPE_URL = {
+  base: `${CONTEXT_PATH}/productType`,
+  list: () => `${PRODUCT_TYPE_URL.base}/list`,
+  create: () => `${PRODUCT_TYPE_URL.base}/create`,
 };
 
 const REQUISITION_URL = {
@@ -457,6 +465,7 @@ export {
   PRODUCT_CONFIGURATION_URL,
   PRODUCT_GROUP_URL,
   PRODUCT_SUPPLIER_URL,
+  PRODUCT_TYPE_URL,
   PRODUCT_URL,
   PURCHASE_ORDER_URL,
   PUTAWAY_URL,
