@@ -1,0 +1,569 @@
+openapi: 3.0.3
+info:
+  title: OpenBoxes - RequisitionTemplateApiController
+  description: >
+    Requisition template (stock list) endpoints handled by
+    org.pih.warehouse.api.RequisitionTemplateApiController, added for the
+    React migration of the legacy requisitionTemplate create/edit/editHeader/
+    batch/sendMail screens. Routed via the "/api/requisitionTemplates/..."
+    URL mappings.
+  version: 0.1.0
+servers:
+  - url: http://localhost:8080/openboxes
+    description: Local Docker baseline (docs/migration/RUNNING_LOCALLY.md)
+security:
+  - cookieAuth: []
+paths:
+  /api/requisitionTemplates:
+    post:
+      operationId: createRequisitionTemplate
+      summary: Create a stock list template
+      description: >
+        Mirrors the legacy RequisitionTemplateController.save action - creates
+        a requisition with isTemplate=true and status CREATED. Origin defaults
+        to the session warehouse.
+      requestBody:
+        required: true
+        content:
+          application/json:
+            schema:
+              $ref: '#/components/schemas/TemplateHeaderRequest'
+      responses:
+        '201':
+          $ref: '#/components/responses/TemplateDetails'
+        '400':
+          $ref: '#/components/responses/ValidationError'
+
+  /api/requisitionTemplates/{id}:
+    get:
+      operationId: readRequisitionTemplate
+      summary: Read a stock list template
+      description: >
+        Mirrors the model of the legacy requisitionTemplate edit/editHeader/
+        batch/sendMail screens - the template header plus the stock list items
+        (legacy JsonController.getRequisitionItems), sorted by the template's
+        sortByCode.
+      parameters:
+        - $ref: '#/components/parameters/templateId'
+      responses:
+        '200':
+          $ref: '#/components/responses/TemplateDetails'
+        '404':
+          $ref: '#/components/responses/ControllerNotFound'
+
+  /api/requisitionTemplates/{id}/header:
+    post:
+      operationId: updateRequisitionTemplateHeader
+      summary: Update a stock list template header
+      description: >
+        Mirrors the legacy RequisitionTemplateController.update action (the
+        editHeader screen).
+      parameters:
+        - $ref: '#/components/parameters/templateId'
+      requestBody:
+        required: true
+        content:
+          application/json:
+            schema:
+              $ref: '#/components/schemas/TemplateHeaderRequest'
+      responses:
+        '200':
+          $ref: '#/components/responses/TemplateDetails'
+        '400':
+          $ref: '#/components/responses/ValidationError'
+        '404':
+          $ref: '#/components/responses/ControllerNotFound'
+
+  /api/requisitionTemplates/{id}/items:
+    post:
+      operationId: addRequisitionTemplateItem
+      summary: Add a stock list item
+      description: >
+        Mirrors the legacy JsonController.addToRequisitionItems action.
+        Adding a product that is already on the stock list returns 400.
+      parameters:
+        - $ref: '#/components/parameters/templateId'
+      requestBody:
+        required: true
+        content:
+          application/json:
+            schema:
+              type: object
+              required: [productId]
+              properties:
+                productId:
+                  type: string
+                quantity:
+                  type: integer
+                  nullable: true
+                orderIndex:
+                  type: integer
+                  nullable: true
+      responses:
+        '200':
+          description: The created stock list item.
+          content:
+            application/json:
+              schema:
+                type: object
+                required: [data]
+                properties:
+                  data:
+                    $ref: '#/components/schemas/TemplateItem'
+        '400':
+          $ref: '#/components/responses/ValidationError'
+        '404':
+          $ref: '#/components/responses/ControllerNotFound'
+
+  /api/requisitionTemplates/{id}/items/{itemId}:
+    delete:
+      operationId: removeRequisitionTemplateItem
+      summary: Remove a stock list item
+      description: Mirrors the legacy JsonController.removeRequisitionItem action.
+      parameters:
+        - $ref: '#/components/parameters/templateId'
+        - name: itemId
+          in: path
+          required: true
+          schema:
+            $ref: '../components/common.yaml#/components/schemas/Id'
+          description: Requisition item id.
+      responses:
+        '204':
+          description: Item removed.
+        '404':
+          $ref: '#/components/responses/ControllerNotFound'
+
+  /api/requisitionTemplates/{id}/updateItems:
+    post:
+      operationId: updateRequisitionTemplateItems
+      summary: Update stock list item quantities and packages
+      description: Mirrors the legacy JsonController.updateRequisitionItems action.
+      parameters:
+        - $ref: '#/components/parameters/templateId'
+      requestBody:
+        required: true
+        content:
+          application/json:
+            schema:
+              type: object
+              required: [items]
+              properties:
+                items:
+                  type: array
+                  items:
+                    type: object
+                    required: [id]
+                    properties:
+                      id:
+                        type: string
+                      quantity:
+                        type: integer
+                        nullable: true
+                      productPackageId:
+                        type: string
+                        nullable: true
+      responses:
+        '200':
+          $ref: '#/components/responses/TemplateDetails'
+        '400':
+          $ref: '#/components/responses/ValidationError'
+        '404':
+          $ref: '#/components/responses/ControllerNotFound'
+
+  /api/requisitionTemplates/{id}/importData:
+    post:
+      operationId: parseRequisitionTemplateImport
+      summary: Parse stock list import data
+      description: >
+        Mirrors the legacy RequisitionTemplateController.importData action -
+        parses CSV/TSV text and returns the parsed rows plus validation
+        errors, without persisting anything.
+      parameters:
+        - $ref: '#/components/parameters/templateId'
+      requestBody:
+        required: true
+        content:
+          application/json:
+            schema:
+              type: object
+              required: [csv]
+              properties:
+                csv:
+                  type: string
+                delimiter:
+                  type: string
+                  nullable: true
+                skipLines:
+                  type: integer
+                  nullable: true
+      responses:
+        '200':
+          description: Parsed rows and validation errors.
+          content:
+            application/json:
+              schema:
+                type: object
+                required: [data, errors]
+                properties:
+                  data:
+                    type: array
+                    items:
+                      type: array
+                      items:
+                        type: string
+                        nullable: true
+                  errors:
+                    type: array
+                    items:
+                      type: string
+        '400':
+          $ref: '#/components/responses/ValidationError'
+        '404':
+          $ref: '#/components/responses/ControllerNotFound'
+
+  /api/requisitionTemplates/{id}/import:
+    post:
+      operationId: importRequisitionTemplateItems
+      summary: Import stock list items from parsed rows
+      description: >
+        Mirrors the legacy RequisitionTemplateController.doImport action -
+        inserts/updates stock list items from the rows returned by importData
+        ([productCode, productName, quantity, unitOfMeasure]).
+      parameters:
+        - $ref: '#/components/parameters/templateId'
+      requestBody:
+        required: true
+        content:
+          application/json:
+            schema:
+              type: object
+              required: [data]
+              properties:
+                data:
+                  type: array
+                  items:
+                    type: array
+                    items:
+                      type: string
+                      nullable: true
+      responses:
+        '200':
+          description: Import counts and per-row errors.
+          content:
+            application/json:
+              schema:
+                type: object
+                required: [data, errors]
+                properties:
+                  data:
+                    type: object
+                    required: [insertCount, updateCount, ignoreCount]
+                    properties:
+                      insertCount:
+                        type: integer
+                      updateCount:
+                        type: integer
+                      ignoreCount:
+                        type: integer
+                  errors:
+                    type: array
+                    items:
+                      type: string
+        '404':
+          $ref: '#/components/responses/ControllerNotFound'
+
+  /api/requisitionTemplates/{id}/addProductCodes:
+    post:
+      operationId: addRequisitionTemplateProductCodes
+      summary: Bulk add stock list items by product code
+      description: >
+        Mirrors the legacy RequisitionTemplateController.addToRequisitionItems
+        action - adds each existing product code with quantity 1, ignoring
+        unknown codes and products already on the list.
+      parameters:
+        - $ref: '#/components/parameters/templateId'
+      requestBody:
+        required: true
+        content:
+          application/json:
+            schema:
+              type: object
+              required: [productCodes]
+              properties:
+                productCodes:
+                  type: array
+                  items:
+                    type: string
+      responses:
+        '200':
+          description: Processed and ignored product codes.
+          content:
+            application/json:
+              schema:
+                type: object
+                required: [data]
+                properties:
+                  data:
+                    type: object
+                    required: [processedProductCodes, ignoredProductCodes]
+                    properties:
+                      processedProductCodes:
+                        type: array
+                        items:
+                          type: string
+                      ignoredProductCodes:
+                        type: array
+                        items:
+                          type: string
+        '404':
+          $ref: '#/components/responses/ControllerNotFound'
+
+components:
+  securitySchemes:
+    cookieAuth:
+      $ref: '../components/common.yaml#/components/securitySchemes/cookieAuth'
+
+  parameters:
+    templateId:
+      name: id
+      in: path
+      required: true
+      schema:
+        $ref: '../components/common.yaml#/components/schemas/Id'
+      description: Requisition template id.
+
+  responses:
+    ControllerNotFound:
+      description: >
+        Unknown requisition template id. Rendered directly by the controller
+        with errorCode and errorMessage.
+      content:
+        application/json:
+          schema:
+            type: object
+            required: [errorCode, errorMessage]
+            properties:
+              errorCode:
+                type: integer
+                enum: [404]
+              errorMessage:
+                type: string
+
+    ValidationError:
+      description: Validation errors.
+      content:
+        application/json:
+          schema:
+            type: object
+            required: [errorCode, errorMessage]
+            properties:
+              errorCode:
+                type: integer
+                enum: [400]
+              errorMessage:
+                type: string
+              errors:
+                type: array
+                items:
+                  type: string
+
+    TemplateDetails:
+      description: Requisition template details.
+      content:
+        application/json:
+          schema:
+            type: object
+            required: [data]
+            properties:
+              data:
+                $ref: '#/components/schemas/TemplateDetails'
+
+  schemas:
+    TemplateHeaderRequest:
+      type: object
+      properties:
+        type:
+          type: string
+          nullable: true
+        name:
+          type: string
+          nullable: true
+        originId:
+          type: string
+          nullable: true
+        destinationId:
+          type: string
+          nullable: true
+        requestedById:
+          type: string
+          nullable: true
+        replenishmentPeriod:
+          type: integer
+          nullable: true
+        replenishmentTypeCode:
+          type: string
+          nullable: true
+          enum: [PUSH, PULL, null]
+        sortByCode:
+          type: string
+          nullable: true
+          enum: [DEFAULT, SORT_INDEX, CATEGORY, null]
+        description:
+          type: string
+          nullable: true
+        isPublished:
+          type: boolean
+          nullable: true
+
+    NamedReference:
+      type: object
+      nullable: true
+      required: [id]
+      properties:
+        id:
+          $ref: '../components/common.yaml#/components/schemas/Id'
+        name:
+          type: string
+          nullable: true
+        email:
+          type: string
+          nullable: true
+
+    TemplateItem:
+      type: object
+      required: [id, product]
+      properties:
+        id:
+          $ref: '../components/common.yaml#/components/schemas/Id'
+        quantity:
+          type: integer
+          nullable: true
+        monthlyDemand:
+          type: number
+          nullable: true
+        productPackageId:
+          type: string
+          nullable: true
+        totalCost:
+          type: number
+          nullable: true
+        product:
+          type: object
+          required: [id]
+          properties:
+            id:
+              $ref: '../components/common.yaml#/components/schemas/Id'
+            productCode:
+              type: string
+              nullable: true
+            name:
+              type: string
+              nullable: true
+            displayName:
+              type: string
+              nullable: true
+            category:
+              type: string
+              nullable: true
+            unitOfMeasure:
+              type: string
+              nullable: true
+            pricePerUnit:
+              type: number
+              nullable: true
+            active:
+              type: boolean
+              nullable: true
+            color:
+              type: string
+              nullable: true
+            packages:
+              type: array
+              nullable: true
+              items:
+                type: object
+                properties:
+                  id:
+                    $ref: '../components/common.yaml#/components/schemas/Id'
+                  quantity:
+                    type: integer
+                    nullable: true
+                  uom:
+                    type: object
+                    nullable: true
+                    properties:
+                      code:
+                        type: string
+                        nullable: true
+                      name:
+                        type: string
+                        nullable: true
+
+    TemplateDetails:
+      type: object
+      required: [id, isTemplate, requisitionItems]
+      properties:
+        id:
+          $ref: '../components/common.yaml#/components/schemas/Id'
+        requestNumber:
+          type: string
+          nullable: true
+        name:
+          type: string
+          nullable: true
+        description:
+          type: string
+          nullable: true
+        status:
+          type: string
+          nullable: true
+        type:
+          type: string
+          nullable: true
+        isTemplate:
+          type: boolean
+        isPublished:
+          type: boolean
+        version:
+          type: integer
+          nullable: true
+        origin:
+          $ref: '#/components/schemas/NamedReference'
+        destination:
+          $ref: '#/components/schemas/NamedReference'
+        requestedBy:
+          $ref: '#/components/schemas/NamedReference'
+        createdBy:
+          $ref: '#/components/schemas/NamedReference'
+        updatedBy:
+          $ref: '#/components/schemas/NamedReference'
+        dateCreated:
+          type: string
+          nullable: true
+        lastUpdated:
+          type: string
+          nullable: true
+        replenishmentPeriod:
+          type: integer
+          nullable: true
+        replenishmentTypeCode:
+          type: string
+          nullable: true
+        sortByCode:
+          type: string
+          nullable: true
+        commodityClass:
+          type: string
+          nullable: true
+        totalCost:
+          type: number
+          nullable: true
+        requisitionItemCount:
+          type: integer
+        hasRoleFinance:
+          type: boolean
+        requisitionItems:
+          type: array
+          items:
+            $ref: '#/components/schemas/TemplateItem'

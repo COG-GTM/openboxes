@@ -31,17 +31,7 @@ class RequisitionItemController {
     }
 
     def list() {
-        println "List requisition items " + params
-
-        def dateRequestedFrom = params.dateRequestedFrom ? Date.parse("MM/dd/yyyy", params.dateRequestedFrom) : null
-        def dateRequestedTo = params.dateRequestedTo ? Date.parse("MM/dd/yyyy", params.dateRequestedTo) : null
-
-        params.max = Math.min(params.max ? params.int('max') : 10, 100)
-        params.offset = params.offset ?: 0
-        def location = Location.get(session.warehouse.id)
-        def requisitionItemInstanceList = requisitionService.getCanceledRequisitionItems(location, params.list("cancelReasonCode"), dateRequestedFrom, dateRequestedTo, params.max, params.offset)
-
-        render(view: "list", model: [requisitionItemInstanceList: requisitionItemInstanceList, requisitionItemInstanceTotal: requisitionItemInstanceList.totalCount])
+        render(view: "/common/react")
     }
 
     def listCanceled() {

@@ -784,7 +784,59 @@ class UrlMappings {
             action = [GET: "printDraft"]
         }
 
+        // Requisition Template API (requisitionTemplate screens migrated to React)
+
+        "/api/requisitionTemplates"(parseRequest: true) {
+            controller = "requisitionTemplateApi"
+            action = [POST: "create"]
+        }
+
+        "/api/requisitionTemplates/$id" {
+            controller = "requisitionTemplateApi"
+            action = [GET: "read"]
+        }
+
+        "/api/requisitionTemplates/$id/header"(parseRequest: true) {
+            controller = "requisitionTemplateApi"
+            action = [POST: "updateHeader"]
+        }
+
+        "/api/requisitionTemplates/$id/items"(parseRequest: true) {
+            controller = "requisitionTemplateApi"
+            action = [POST: "addItem"]
+        }
+
+        "/api/requisitionTemplates/$id/items/$itemId" {
+            controller = "requisitionTemplateApi"
+            action = [DELETE: "removeItem"]
+        }
+
+        "/api/requisitionTemplates/$id/updateItems"(parseRequest: true) {
+            controller = "requisitionTemplateApi"
+            action = [POST: "updateItems"]
+        }
+
+        "/api/requisitionTemplates/$id/importData"(parseRequest: true) {
+            controller = "requisitionTemplateApi"
+            action = [POST: "importData"]
+        }
+
+        "/api/requisitionTemplates/$id/import"(parseRequest: true) {
+            controller = "requisitionTemplateApi"
+            action = [POST: "doImport"]
+        }
+
+        "/api/requisitionTemplates/$id/addProductCodes"(parseRequest: true) {
+            controller = "requisitionTemplateApi"
+            action = [POST: "addProductCodes"]
+        }
+
         // Requisition Item API (requisitionItem/change screen migrated to React)
+
+        "/api/requisitionItems" {
+            controller = "requisitionItemApi"
+            action = [GET: "list"]
+        }
 
         "/api/requisitionItems/$id" {
             controller = "requisitionItemApi"

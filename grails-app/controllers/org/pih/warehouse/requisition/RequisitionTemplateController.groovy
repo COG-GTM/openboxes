@@ -35,12 +35,7 @@ class RequisitionTemplateController {
     }
 
     def create() {
-        println params
-        def requisition = new Requisition(status: RequisitionStatus.CREATED)
-        requisition.type = params.type as RequisitionType
-        requisition.isTemplate = true
-        requisition.origin = Location.get(session?.warehouse?.id)
-        [requisition: requisition]
+        render(view: "/common/react")
     }
 
     def edit() {
@@ -49,7 +44,7 @@ class RequisitionTemplateController {
             flash.message = "Could not find requisition with ID ${params.id}"
             redirect(action: "list")
         } else {
-            [requisition: requisition]
+            render(view: "/common/react")
         }
     }
 
@@ -59,7 +54,7 @@ class RequisitionTemplateController {
             flash.message = "Could not find requisition with ID ${params.id}"
             redirect(action: "list")
         } else {
-            [requisition: requisition]
+            render(view: "/common/react")
         }
     }
 
@@ -72,7 +67,7 @@ class RequisitionTemplateController {
             flash.error = "${warehouse.message(code: 'stockList.noManagerAssociated.label')}"
             redirect(controller: "requisitionTemplate", action: "show", params: [id: params.id])
         } else {
-            [requisition: requisition]
+            render(view: "/common/react")
         }
     }
 
@@ -342,10 +337,7 @@ class RequisitionTemplateController {
     }
 
     def batch() {
-        def requisition = Requisition.get(params.id)
-
-
-        [requisition: requisition]
+        render(view: "/common/react")
     }
 
     def importData() {

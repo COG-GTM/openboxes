@@ -758,6 +758,36 @@ const AsyncRequisitionItemChange = Loadable({
   loading: Loading,
 });
 
+const AsyncRequisitionItemList = Loadable({
+  loader: () => import('components/requisition/RequisitionItemList'),
+  loading: Loading,
+});
+
+const AsyncStockListTemplateCreate = Loadable({
+  loader: () => import('components/stock-list/template/StockListTemplateCreate'),
+  loading: Loading,
+});
+
+const AsyncStockListTemplateEdit = Loadable({
+  loader: () => import('components/stock-list/template/StockListTemplateEdit'),
+  loading: Loading,
+});
+
+const AsyncStockListTemplateEditHeader = Loadable({
+  loader: () => import('components/stock-list/template/StockListTemplateEditHeader'),
+  loading: Loading,
+});
+
+const AsyncStockListTemplateBatch = Loadable({
+  loader: () => import('components/stock-list/template/StockListTemplateBatch'),
+  loading: Loading,
+});
+
+const AsyncStockListTemplateSendMail = Loadable({
+  loader: () => import('components/stock-list/template/StockListTemplateSendMail'),
+  loading: Loading,
+});
+
 const AsyncPicklistPrint = Loadable({
   loader: () => import('components/requisition/PicklistPrint'),
   loading: Loading,
@@ -919,10 +949,16 @@ const Router = () => {
             <MainLayoutRoute path="**/requisition/transfer/:requisitionId" component={AsyncRequisitionTransfer} />
             <MainLayoutRoute path="**/requisition/printDraft/:requisitionId" component={AsyncRequisitionPrintDraft} />
             <MainLayoutRoute path="**/requisitionItem/change/:requisitionItemId" component={AsyncRequisitionItemChange} />
+            <MainLayoutRoute path="**/requisitionItem/list" component={AsyncRequisitionItemList} />
             <MainLayoutRoute path="**/picklist/print/:requisitionId" component={AsyncPicklistPrint} />
             <MainLayoutRoute path="**/picklist/returnPrint/:orderId" component={AsyncPicklistReturnPrint} />
             <MainLayoutRoute path="**/purchaseOrder/list" component={AsyncPurchaseOrderList} />
             <MainLayoutRoute path="**/requisitionTemplate/list" component={AsyncStockList} />
+            <MainLayoutRoute path="**/requisitionTemplate/create" component={AsyncStockListTemplateCreate} />
+            <MainLayoutRoute path="**/requisitionTemplate/edit/:templateId" component={AsyncStockListTemplateEdit} />
+            <MainLayoutRoute path="**/requisitionTemplate/editHeader/:templateId" component={AsyncStockListTemplateEditHeader} />
+            <MainLayoutRoute path="**/requisitionTemplate/batch/:templateId" component={AsyncStockListTemplateBatch} />
+            <MainLayoutRoute path="**/requisitionTemplate/sendMail/:templateId" component={AsyncStockListTemplateSendMail} />
             <MainLayoutRoute path="**/product/list" component={AsyncProductsList} />
             <MainLayoutRoute path="**/product/edit/:id" component={AsyncProductForm} />
             <MainLayoutRoute path="**/product/addDocument/:id" component={AsyncProductAddDocument} />

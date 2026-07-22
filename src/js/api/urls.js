@@ -309,6 +309,18 @@ export const REQUISITION_PICK = (id) => `${REQUISITION_BY_ID(id)}/pick`;
 export const REQUISITION_PICKLIST = (id) => `${REQUISITION_BY_ID(id)}/picklist`;
 export const REQUISITION_PICKLIST_ITEMS = (id) => `${REQUISITION_BY_ID(id)}/picklistItems`;
 
+// REQUISITION TEMPLATE (stock list template screens)
+export const REQUISITION_TEMPLATE_API = `${API}/requisitionTemplates`;
+export const REQUISITION_TEMPLATE_BY_ID = (id) => `${REQUISITION_TEMPLATE_API}/${id}`;
+export const REQUISITION_TEMPLATE_HEADER = (id) => `${REQUISITION_TEMPLATE_BY_ID(id)}/header`;
+export const REQUISITION_TEMPLATE_ITEMS = (id) => `${REQUISITION_TEMPLATE_BY_ID(id)}/items`;
+export const REQUISITION_TEMPLATE_ITEM = (id, itemId) => `${REQUISITION_TEMPLATE_BY_ID(id)}/items/${itemId}`;
+export const REQUISITION_TEMPLATE_UPDATE_ITEMS = (id) => `${REQUISITION_TEMPLATE_BY_ID(id)}/updateItems`;
+export const REQUISITION_TEMPLATE_IMPORT_DATA = (id) => `${REQUISITION_TEMPLATE_BY_ID(id)}/importData`;
+export const REQUISITION_TEMPLATE_IMPORT = (id) => `${REQUISITION_TEMPLATE_BY_ID(id)}/import`;
+export const REQUISITION_TEMPLATE_ADD_PRODUCT_CODES = (id) => `${REQUISITION_TEMPLATE_BY_ID(id)}/addProductCodes`;
+export const STOCKLIST_SEND_MAIL = (id) => `${STOCKLIST_API}/sendMail/${id}`;
+
 // FULL OUTBOUND IMPORT FEATURE
 export const FULFILLMENT_API = `${API}/fulfillments`;
 export const PACKING_LIST = `${CONTEXT_PATH}/packingList`;

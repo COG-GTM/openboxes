@@ -35,6 +35,46 @@ class RequisitionItemApiController extends BaseApiController {
     }
 
     def inventoryService
+    def requisitionService
+
+    /**
+     * Mirrors the legacy RequisitionItemController.list action: canceled
+     * requisition items on issued requisitions originating from the session
+     * warehouse, filterable by cancel reason code and date requested.
+     */
+    def list() {
+        Location location = Location.get(session.warehouse.id)
+        Date dateRequestedFrom = params.dateRequestedFrom ?
+                Date.parse("yyyy-MM-dd", params.dateRequestedFrom) : null
+        Date dateRequestedTo = params.dateRequestedTo ?
+                Date.parse("yyyy-MM-dd", params.dateRequestedTo) : null
+        def max = Math.min(params.max ? params.int('max') : 10, 100)
+        def offset = params.offset ? params.int('offset') : 0
+        def requisitionItems = requisitionService.getCanceledRequisitionItems(location,
+                params.list("cancelReasonCode"), dateRequestedFrom, dateRequestedTo, max, offset)
+        render([data: requisitionItems.collect { RequisitionItem requisitionItem ->
+            [
+                    id                : requisitionItem.id,
+                    requisition       : [
+                            id           : requisitionItem.requisition?.id,
+                            requestNumber: requisitionItem.requisition?.requestNumber,
+                            name         : requisitionItem.requisition?.name,
+                            dateRequested: requisitionItem.requisition?.dateRequested?.format("yyyy-MM-dd"),
+                    ],
+                    product           : [
+                            id                : requisitionItem.product?.id,
+                            productCode       : requisitionItem.product?.productCode,
+                            name              : requisitionItem.product?.name,
+                            genericProductName: requisitionItem.product?.genericProduct?.name,
+                    ],
+                    cancelReasonCode  : requisitionItem.cancelReasonCode,
+                    cancelComments    : requisitionItem.cancelComments,
+                    quantityApproved  : requisitionItem.quantityApproved,
+                    quantityCanceled  : requisitionItem.quantityCanceled,
+                    quantity          : requisitionItem.quantity,
+            ]
+        }, totalCount: requisitionItems.totalCount ?: 0] as JSON)
+    }
 
     /**
      * Data backing the migrated requisitionItem/change screen (legacy

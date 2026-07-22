@@ -51,6 +51,14 @@ def batch15_endpoints(client):
 
 
 @pytest.fixture(scope="session")
+def batch17_endpoints(client):
+    # Same rationale as batch14_endpoints for the Batch 17 requisition
+    # template and canceled requisition item endpoints.
+    if client.request("GET", "/api/requisitionItems").status_code != 200:
+        pytest.skip("Batch 17 endpoints not present in target build")
+
+
+@pytest.fixture(scope="session")
 def batch4_endpoints(client):
     # The api-snapshot job runs against the pinned released image, which
     # predates the Batch 4 inventory/stock-card endpoints. Skip their tests

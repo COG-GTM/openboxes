@@ -13,6 +13,111 @@ servers:
 security:
   - cookieAuth: []
 paths:
+  /api/requisitionItems:
+    get:
+      operationId: listCanceledRequisitionItems
+      summary: List canceled requisition items
+      description: >
+        Mirrors the legacy RequisitionItemController.list action - canceled
+        requisition items on issued requisitions originating from the session
+        warehouse, filterable by cancel reason code and date requested
+        (yyyy-MM-dd), with max/offset pagination.
+      parameters:
+        - name: cancelReasonCode
+          in: query
+          required: false
+          schema:
+            type: array
+            items:
+              type: string
+          style: form
+          explode: true
+        - name: dateRequestedFrom
+          in: query
+          required: false
+          schema:
+            type: string
+            format: date
+        - name: dateRequestedTo
+          in: query
+          required: false
+          schema:
+            type: string
+            format: date
+        - name: max
+          in: query
+          required: false
+          schema:
+            type: integer
+        - name: offset
+          in: query
+          required: false
+          schema:
+            type: integer
+      responses:
+        '200':
+          description: Canceled requisition items.
+          content:
+            application/json:
+              schema:
+                type: object
+                required: [data, totalCount]
+                properties:
+                  totalCount:
+                    type: integer
+                  data:
+                    type: array
+                    items:
+                      type: object
+                      required: [id, requisition, product]
+                      properties:
+                        id:
+                          $ref: '../components/common.yaml#/components/schemas/Id'
+                        requisition:
+                          type: object
+                          properties:
+                            id:
+                              $ref: '../components/common.yaml#/components/schemas/Id'
+                            requestNumber:
+                              type: string
+                              nullable: true
+                            name:
+                              type: string
+                              nullable: true
+                            dateRequested:
+                              type: string
+                              format: date
+                              nullable: true
+                        product:
+                          type: object
+                          properties:
+                            id:
+                              $ref: '../components/common.yaml#/components/schemas/Id'
+                            productCode:
+                              type: string
+                              nullable: true
+                            name:
+                              type: string
+                              nullable: true
+                            genericProductName:
+                              type: string
+                              nullable: true
+                        cancelReasonCode:
+                          type: string
+                          nullable: true
+                        cancelComments:
+                          type: string
+                          nullable: true
+                        quantityApproved:
+                          type: integer
+                          nullable: true
+                        quantityCanceled:
+                          type: integer
+                          nullable: true
+                        quantity:
+                          type: integer
+                          nullable: true
+
   /api/requisitionItems/{id}:
     get:
       operationId: readRequisitionItem
