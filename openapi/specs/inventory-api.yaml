@@ -7,7 +7,11 @@ info:
     "/api/facilities/$facilityId/inventories/import" (importCsv),
     "/api/facilities/$facilityId/inventories/reorderReport"
     (GET -> getReorderReport), "/api/inventories/expirationHistoryReport"
-    (GET -> getExpirationHistoryReport),
+    (GET -> getExpirationHistoryReport), "/api/inventories/browse"
+    (GET -> browse), "/api/inventories/transactionCandidates"
+    (GET -> getTransactionCandidates), "/api/inventories/binLocationDetails"
+    (GET -> getBinLocationDetails), "/api/inventories/adjustStock"
+    (POST -> adjustStock),
     "/api/facilities/$facilityId/inventories/summary"
     (GET -> getInventorySummary),
     "/api/facilities/$facilityId/inventories/expiredStock"
@@ -361,6 +365,258 @@ paths:
                   operation description).
         '400':
           $ref: '../components/common.yaml#/components/responses/ValidationError'
+  /api/inventories/browse:
+    get:
+      operationId: browseInventory
+      summary: Paginated product search with quantity on hand
+      description: >
+        Backs the React inventory browser (migrated from the legacy
+        inventory/browse GSP). Searches active products for the given (or
+        session) location and returns quantity on hand per product.
+      parameters:
+        - name: locationId
+          in: query
+          required: false
+          schema:
+            $ref: '../components/common.yaml#/components/schemas/Id'
+          description: Defaults to the session warehouse.
+        - name: searchTerms
+          in: query
+          required: false
+          schema:
+            type: string
+          description: Space-separated product search terms.
+        - name: categoryId
+          in: query
+          required: false
+          schema:
+            $ref: '../components/common.yaml#/components/schemas/Id'
+          description: Category id filter (defaults to the root category).
+        - name: tags
+          in: query
+          required: false
+          schema:
+            type: string
+          description: Repeatable tag ids to filter by.
+        - name: catalogs
+          in: query
+          required: false
+          schema:
+            type: string
+          description: Repeatable product catalog ids to filter by.
+        - $ref: '../components/common.yaml#/components/parameters/max'
+        - $ref: '../components/common.yaml#/components/parameters/offset'
+      responses:
+        '200':
+          description: One page of product rows plus the total match count.
+          content:
+            application/json:
+              schema:
+                type: object
+                required: [data, totalCount]
+                properties:
+                  data:
+                    type: array
+                    items:
+                      $ref: '#/components/schemas/BrowseProduct'
+                  totalCount:
+                    type: integer
+  /api/inventories/transactionCandidates:
+    get:
+      operationId: getTransactionCandidates
+      summary: Per-bin inventory item rows for selected products
+      description: >
+        Backs the React record-transaction screen (migrated from the legacy
+        inventory/createTransaction GSP). Returns one row per product/bin
+        location/inventory item combination with quantity on hand.
+      parameters:
+        - name: locationId
+          in: query
+          required: false
+          schema:
+            $ref: '../components/common.yaml#/components/schemas/Id'
+          description: Defaults to the session warehouse.
+        - name: transactionTypeId
+          in: query
+          required: false
+          schema:
+            type: string
+          description: Transaction type id (echoed back in the response).
+        - name: product.id
+          in: query
+          required: false
+          schema:
+            type: string
+          description: >
+            Repeatable product ids. At least one product.id or
+            inventoryItem.id is required; omitting both raises
+            IllegalArgumentException (500).
+        - name: inventoryItem.id
+          in: query
+          required: false
+          schema:
+            type: string
+          description: >
+            Repeatable inventory item ids, used by the legacy
+            expiring/expired stock lists. Only consulted when no
+            product.id values are supplied.
+      responses:
+        '200':
+          description: Candidate rows plus the resolved transaction type.
+          content:
+            application/json:
+              schema:
+                type: object
+                required: [data, totalCount]
+                properties:
+                  transactionType:
+                    type: object
+                    nullable: true
+                    properties:
+                      id:
+                        type: string
+                        nullable: true
+                      name:
+                        type: string
+                        nullable: true
+                      transactionCode:
+                        type: string
+                        nullable: true
+                  data:
+                    type: array
+                    items:
+                      $ref: '#/components/schemas/TransactionCandidate'
+                  totalCount:
+                    type: integer
+        '500':
+          $ref: '../components/common.yaml#/components/responses/ServerError'
+  /api/inventories/binLocationDetails:
+    get:
+      operationId: getBinLocationDetails
+      summary: Details for a single product/bin location/lot pairing
+      description: >
+        Backs the React adjust-stock screen (migrated from the legacy
+        inventory/editBinLocation GSP dialog). Resolves the product by code,
+        the bin location by name within the location, and the inventory item
+        by lot number.
+      parameters:
+        - name: locationId
+          in: query
+          required: false
+          schema:
+            $ref: '../components/common.yaml#/components/schemas/Id'
+          description: Defaults to the session warehouse.
+        - name: productCode
+          in: query
+          required: false
+          schema:
+            type: string
+          description: Product code (e.g. "10001").
+        - name: binLocation
+          in: query
+          required: false
+          schema:
+            type: string
+          description: Bin location name within the location.
+        - name: lotNumber
+          in: query
+          required: false
+          schema:
+            type: string
+          description: Lot number (empty for the default lot).
+      responses:
+        '200':
+          description: Resolved references and the current quantity on hand.
+          content:
+            application/json:
+              schema:
+                type: object
+                required: [data]
+                properties:
+                  data:
+                    type: object
+                    required: [location, quantityOnHand]
+                    properties:
+                      location:
+                        type: object
+                        nullable: true
+                        additionalProperties: true
+                      binLocation:
+                        type: object
+                        nullable: true
+                        additionalProperties: true
+                      product:
+                        type: object
+                        nullable: true
+                        additionalProperties: true
+                      inventoryItem:
+                        type: object
+                        nullable: true
+                        additionalProperties: true
+                      quantityOnHand:
+                        type: integer
+  /api/inventories/adjustStock:
+    post:
+      operationId: adjustStock
+      summary: Adjust the stock level of one inventory item / bin location
+      description: >
+        Backs the React adjust-stock screen (migrated from the legacy
+        inventoryItem/adjustStock action). Creates an adjustment transaction
+        that sets the quantity on hand to newQuantity. Validation failures
+        (unchanged quantity, missing reason code/comment, another transaction
+        at the same instant) respond 400.
+      requestBody:
+        required: true
+        content:
+          application/json:
+            schema:
+              type: object
+              required: [inventoryItemId, newQuantity]
+              properties:
+                locationId:
+                  type: string
+                  nullable: true
+                  description: Defaults to the session warehouse.
+                inventoryItemId:
+                  type: string
+                binLocationId:
+                  type: string
+                  nullable: true
+                currentQuantity:
+                  type: integer
+                  nullable: true
+                newQuantity:
+                  type: integer
+                reasonCode:
+                  type: string
+                  nullable: true
+                  description: ReasonCode enum name (e.g. DAMAGED_PRODUCT).
+                comment:
+                  type: string
+                  nullable: true
+      responses:
+        '200':
+          description: Adjustment applied.
+          content:
+            application/json:
+              schema:
+                type: object
+                required: [data]
+                properties:
+                  data:
+                    type: object
+                    properties:
+                      inventoryItemId:
+                        type: string
+                        nullable: true
+                      productId:
+                        type: string
+                        nullable: true
+                      newQuantity:
+                        type: integer
+                        nullable: true
+        '400':
+          $ref: '../components/common.yaml#/components/responses/ValidationError'
 components:
   securitySchemes:
     cookieAuth:
@@ -374,6 +630,108 @@ components:
         $ref: '../components/common.yaml#/components/schemas/Id'
       description: Facility (warehouse) id.
   schemas:
+    BrowseProduct:
+      type: object
+      description: One inventory browser row (product plus quantity on hand).
+      required: [id, productCode, name, quantityOnHand]
+      properties:
+        id:
+          $ref: '../components/common.yaml#/components/schemas/Id'
+        productCode:
+          type: string
+        name:
+          type: string
+        displayName:
+          type: string
+          nullable: true
+        color:
+          type: string
+          nullable: true
+        productType:
+          type: string
+          nullable: true
+        category:
+          type: object
+          nullable: true
+          properties:
+            id:
+              type: string
+              nullable: true
+            name:
+              type: string
+              nullable: true
+        tags:
+          type: array
+          items:
+            type: object
+            properties:
+              id:
+                type: string
+                nullable: true
+              tag:
+                type: string
+                nullable: true
+        catalogs:
+          type: array
+          items:
+            type: object
+            properties:
+              id:
+                type: string
+                nullable: true
+              name:
+                type: string
+                nullable: true
+        quantityOnHand:
+          type: integer
+          nullable: true
+    TransactionCandidate:
+      type: object
+      description: >
+        One product / bin location / inventory item row with quantity on
+        hand.
+      required: [product, quantityOnHand]
+      properties:
+        product:
+          type: object
+          properties:
+            id:
+              type: string
+              nullable: true
+            productCode:
+              type: string
+              nullable: true
+            name:
+              type: string
+              nullable: true
+            unitOfMeasure:
+              type: string
+              nullable: true
+        binLocation:
+          type: object
+          nullable: true
+          properties:
+            id:
+              type: string
+              nullable: true
+            name:
+              type: string
+              nullable: true
+        inventoryItem:
+          type: object
+          nullable: true
+          properties:
+            id:
+              type: string
+              nullable: true
+            lotNumber:
+              type: string
+              nullable: true
+            expirationDate:
+              type: string
+              nullable: true
+        quantityOnHand:
+          type: integer
     InventorySummaryItem:
       type: object
       description: One inventory summary row (getInventorySummary rendering).

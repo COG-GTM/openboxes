@@ -1948,7 +1948,9 @@ class InventoryService implements ApplicationContextAware {
 
         // Reports and QoH calculations get messed up if two transactions for a product exist at the same exact time.
         if (hasTransactionEntriesOnDate(location, transactionDate, [inventoryItem.product])) {
-            command.errors.rejectValue("transactionDate", "adjustStock.invalid.transactionDate.duplicate.message")
+            // AdjustStockCommand has no transactionDate property, so attach the
+            // error to newQuantity to avoid a NotReadablePropertyException.
+            command.errors.rejectValue("newQuantity", "adjustStock.invalid.transactionDate.duplicate.message")
         }
 
         if (command.validate() && !command.hasErrors()) {

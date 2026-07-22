@@ -52,15 +52,6 @@ class ConsumptionController {
             return
         }
 
-        String[] defaultTransactionTypeIds = [
-                Constants.TRANSFER_OUT_TRANSACTION_TYPE_ID,
-                Constants.CONSUMPTION_TRANSACTION_TYPE_ID
-        ]
-
-        command.defaultTransactionTypes = defaultTransactionTypeIds.collect {TransactionType.get(it)}
-        command.selectedTransactionTypes = command.defaultTransactionTypes
-        command.transactionTypes = command.defaultTransactionTypes
-
         // If any parameters have changed we need to reset filters
         if (command.parametersHash && command.hasParameterChanged()) {
             command.selectedProperties = []
@@ -74,7 +65,6 @@ class ConsumptionController {
             }
         }
 
-
         // Hack to fix PIMS-2728
         if (command.selectedProperties) {
             if (command.selectedProperties instanceof java.lang.String) {
@@ -82,231 +72,13 @@ class ConsumptionController {
             }
         }
 
-        def tags = command.selectedTags.collect { it.tag }.asList()
-        def products = tags ? inventoryService.getProductsByTags(tags) : null
-
-        // Add an entire day to account for the 24 hour period on the end date
-        Date toDate = command.toDate ? command.toDate + 1 : null
-
-        // Set to midnight
-        if (toDate) {
-            toDate.clearTime()
-        }
-
-        // Get all transactions
-        command.debits = inventoryService.getDebitsBetweenDates(command.fromLocations,
-                command.selectedLocations, command.fromDate, toDate,
-                command.selectedTransactionTypes)
-        // Get credits for INBOUND RETURNS, selectedLocations = sources, fromLocation = destination inventory
-        command.credits = inventoryService.getCreditsBetweenDates(command.selectedLocations, command.fromLocations, command.fromDate, toDate)
-
-        def transactions = []
-        transactions.addAll(command.debits)
-        transactions.addAll(command.credits?.findAll { it.incomingShipment?.isFromReturnOrder })
-
-        // Sort transaction by date ascending
-        transactions = transactions.sort { it.transactionDate }
-
-        // Used within the transaction block to see if we need to add all destinations to command.toLocations
-        // which occurs if there are no toLocations selected
-        boolean toLocationsEmpty = command.toLocations.empty
         boolean fromLocationsEmpty = command.fromLocations.empty
 
-        // Some transactions don't have a destination (e.g. expired, consumed, etc)
-        if (toLocationsEmpty) {
-            def debitLocations = transactions.findAll { it.destination != null }.collect {
-                it.destination
-            }
-            def creditLocations = transactions.findAll { it.source != null && it.incomingShipment?.isFromReturnOrder }.collect {
-                it.source
-            }
-            command.toLocations.addAll(debitLocations)
-            command.toLocations.addAll(creditLocations)
-        }
-
-        // Keep track of all the transaction types (we may want to select a subset of these)
-        // FIXME Hard-code transaction types (OBPIH-2059)
-        command.transactionTypes = transactions*.transactionType.unique()
-
-        def userHasFinanceRole = userService.hasRoleFinance(session?.user)
-
-        // Iterate over all transactions
-        transactions.each { Transaction transaction ->
-
-            // Iterate over all transaction entries
-            transaction.transactionEntries.each { TransactionEntry transactionEntry ->
-                def product = transactionEntry.inventoryItem.product
-                def currentRow = command.rows[product]
-                if (!currentRow) {
-                    command.rows[product] = new ShowConsumptionRowCommand()
-                    command.rows[product].command = command
-                    command.rows[product].product = product
-                    command.rows[product].pricePerUnit = userHasFinanceRole ? product?.pricePerUnit : 0
-                }
-
-                // Keep track of quantity out based on transaction type
-                if (transaction.transactionType.id == Constants.TRANSFER_OUT_TRANSACTION_TYPE_ID) {
-                    command.rows[product].transferOutQuantity += transactionEntry.quantity
-                    command.rows[product].transferOutTransactions << transaction
-
-                    // Initialize transfer out by location map
-                    if(transaction.destination && transaction.destination != transaction.source) {
-                        def transferOutQuantity = command.rows[product].transferOutMap[transaction.destination]
-
-                        if (!transferOutQuantity) {
-                            command.rows[product].transferOutMap[transaction.destination] = 0
-                        }
-
-                        command.rows[product].transferOutMap[transaction.destination] += transactionEntry.quantity
-                    }
-
-                    def isFromPutawayOrder = transaction?.outgoingShipment?.isFromPutawayOrder
-                    def isFromTransferOrder = transaction?.outgoingShipment?.isFromTransferOrder
-                    def isInternalTransfer = isFromPutawayOrder || isFromTransferOrder
-                    def isFromReturnOrder = transaction?.outgoingShipment?.isFromReturnOrder
-
-                    if (isFromReturnOrder || !isInternalTransfer) {
-                        command.rows[product].issuedQuantity += transactionEntry.quantity
-                    }
-                } else if (transaction.transactionType.id == Constants.EXPIRATION_TRANSACTION_TYPE_ID) {
-                    command.rows[product].expiredQuantity += transactionEntry.quantity
-                    command.rows[product].expiredTransactions << transaction
-                } else if (transaction.transactionType.id == Constants.DAMAGE_TRANSACTION_TYPE_ID) {
-                    command.rows[product].damagedQuantity += transactionEntry.quantity
-                    command.rows[product].damagedTransactions << transaction
-                } else if (transaction.transactionType.id == Constants.TRANSFER_IN_TRANSACTION_TYPE_ID) {
-                    command.rows[product].transferInQuantity += transactionEntry.quantity
-                    command.rows[product].transferInTransactions << transaction
-
-                    // Initialize transfer out by location map
-                    def transferInQuantity = command.rows[product].transferInMap[transaction.source]
-                    if (!transferInQuantity) {
-                        command.rows[product].transferInMap[transaction.source] = 0
-                    }
-
-                    if(transaction?.incomingShipment?.isFromReturnOrder) {
-                        command.rows[product].returnedQuantity += transactionEntry.quantity
-                    }
-
-                    // Add to the total transfer out per location
-                    command.rows[product].transferInMap[transaction.source] += transactionEntry.quantity
-
-                } else if (transaction.transactionType.id == Constants.CONSUMPTION_TRANSACTION_TYPE_ID) {
-                    command.rows[product].consumedQuantity += transactionEntry.quantity
-                }
-
-                command.rows[product].totalConsumptionQuantity = command.rows[product].issuedQuantity + command.rows[product].consumedQuantity - command.rows[product].returnedQuantity
-
-                String dateKey = transaction.transactionDate.format("yyyy-MM")
-                command.selectedDates.add(dateKey)
-
-                // Capture month breakdown for all debits and credits
-                if (transaction.transactionType.transactionCode == TransactionCode.DEBIT) {
-                    // Add to total transfer out by month (initialize transfer out by month map)
-                    def transferOutMonthlyQuantity = command.rows[product].transferOutMonthlyMap[dateKey]
-                    if (!transferOutMonthlyQuantity) {
-                        command.rows[product].transferOutMonthlyMap[dateKey] = 0
-                    }
-
-                    if (transaction.transactionType.id == Constants.TRANSFER_OUT_TRANSACTION_TYPE_ID) {
-                        if (transaction?.order?.orderType?.code != Constants.PUTAWAY_ORDER && transaction?.order?.orderType?.code != OrderTypeCode.TRANSFER_ORDER.name()) {
-                            command.rows[product].transferOutMonthlyMap[dateKey] += transactionEntry.quantity
-                        }
-                    } else if (transaction.transactionType.id == Constants.CONSUMPTION_TRANSACTION_TYPE_ID) {
-                        command.rows[product].transferOutMonthlyMap[dateKey] += transactionEntry.quantity
-                    }
-
-                } else if (transaction.transactionType.transactionCode == TransactionCode.CREDIT) {
-                    // Add to total transfer in by month (initialize transfer out by month map)
-                    def transferInMonthlyQuantity = command.rows[product].transferInMonthlyMap[dateKey]
-                    if (!transferInMonthlyQuantity) {
-                        command.rows[product].transferInMonthlyMap[dateKey] = 0
-                    }
-
-                    if (transaction.transactionType.id == Constants.TRANSFER_IN_TRANSACTION_TYPE_ID
-                            && transaction?.order?.orderType?.code == Constants.RETURN_ORDER) {
-                        command.rows[product].transferInMonthlyMap[dateKey] -= transactionEntry.quantity
-
-                    }
-                }
-
-                // All transactions
-                command.rows[product].transactions << transaction
-            }
-        }
-
-        // Calculate the on hand quantity for all products returned by the getTransactions() call above
-        if (command.fromLocations) {
-            products = command.rows.keySet().asList()
-
-            // Filter products by selected products
-            if (command.selectedProducts) {
-                List<String> selectedIds = command.selectedProducts*.id
-                command.rows.keySet().removeAll { row -> !(row.id in selectedIds) }
-            }
-
-            // Filter products by tags
-            if (command.selectedTags) {
-                def productsToRemove = products.findAll { product ->
-                    !command.selectedTags.intersect(product.tags)
-                }
-
-                def iterator = command.rows.keySet().iterator()
-                while (iterator.hasNext()) {
-                    if (productsToRemove.contains(iterator.next())) {
-                        iterator.remove()
-                    }
-                }
-            }
-
-            // Filter products by categories
-            if (command.selectedCategories) {
-                def productsToRemove = products.findAll { product ->
-                    !command.selectedCategories.contains(product.category)
-                }
-
-                def iterator = command.rows.keySet().iterator()
-                while (iterator.hasNext()) {
-                    if (productsToRemove.contains(iterator.next())) {
-                        iterator.remove()
-                    }
-                }
-            }
-            products = command.rows.keySet().asList()
-
-            // Calculate quantity on hand for filtered products
-            if (!fromLocationsEmpty && command.includeQuantityOnHand) {
-                command.fromLocations.each { location ->
-                    if (location.inventory) {
-                        def onHandQuantityMap = productAvailabilityService.getCurrentInventory(location)
-
-                        // For each product, add to the onhand quantity map
-                        products.each { product ->
-                            def onHandQuantity = onHandQuantityMap[product]
-                            if (onHandQuantity) {
-                                command.rows[product].onHandQuantity += onHandQuantity
-                            }
-                        }
-                    }
-                }
-            }
-        }
-
-        // We want to sort the transaction types and toLocations
-        command?.transactionTypes?.unique()?.sort()
-        command?.toLocations?.unique()?.sort()
-
-        // If there are no selected locations, we select all of the possible destinations
-        if (!command?.selectedLocations) {
-            command.selectedLocations = command.toLocations
-        }
-
-        if (!command?.selectedTransactionTypes) {
-            command.selectedTransactionTypes = command.transactionTypes
-        }
-
-        // Export as CSV
+        // Export as CSV (the React screen fetches its data through
+        // /api/consumption/summary, so only compute the report here)
         if (params.format == "csv") {
+            def userHasFinanceRole = userService.hasRoleFinance(session?.user)
+            consumptionService.buildShowConsumption(command, userHasFinanceRole)
 
             def csvrows = []
             command.rows.each { key, ShowConsumptionRowCommand row ->
@@ -362,9 +134,7 @@ class ConsumptionController {
             render(contentType: "text/csv", text: csv.toString(), encoding: "UTF-8")
             return
         } else {
-            println "Render as HTML " + params
-
-            [command: command]
+            render(view: "/common/react", params: params)
         }
     }
 
@@ -389,13 +159,7 @@ class ConsumptionController {
 
 
     def pivot(ConsumptionCommand command) {
-
-        use(TimeCategory) {
-            command.endDate = command?.endDate ?: new Date()
-            command.startDate = command?.startDate ?: new Date() - 6.months
-        }
-
-        [command: command]
+        render(view: "/common/react", params: params)
     }
 
     def list(ConsumptionCommand command) {
@@ -419,7 +183,7 @@ class ConsumptionController {
             return
         }
 
-        [command: command]
+        render(view: "/common/react", params: params)
     }
 
     def aggregate(ConsumptionCommand command) {

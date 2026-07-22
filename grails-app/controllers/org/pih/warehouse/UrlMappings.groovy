@@ -1275,6 +1275,41 @@ class UrlMappings {
             action = [GET: "getExpirationHistoryReport"]
         }
 
+        "/api/inventories/browse" {
+            controller = { "inventoryApi" }
+            action = [GET: "browse"]
+        }
+
+        "/api/inventories/transactionCandidates" {
+            controller = { "inventoryApi" }
+            action = [GET: "getTransactionCandidates"]
+        }
+
+        "/api/inventories/binLocationDetails" {
+            controller = { "inventoryApi" }
+            action = [GET: "getBinLocationDetails"]
+        }
+
+        "/api/inventories/adjustStock"(parseRequest: true) {
+            controller = { "inventoryApi" }
+            action = [POST: "adjustStock"]
+        }
+
+        /**
+         * Consumption API endpoints
+         */
+
+        "/api/consumption/aggregate" {
+            controller = { "consumptionApi" }
+            action = [GET: "aggregate"]
+        }
+
+        "/api/consumption/summary" {
+            controller = { "consumptionApi" }
+            action = [GET: "summary"]
+        }
+
+
         // Error handling
 
         "401"(controller: "errors", action: "handleUnauthorized")

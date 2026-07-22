@@ -1,0 +1,190 @@
+openapi: 3.0.3
+info:
+  title: OpenBoxes - ConsumptionApiController
+  description: >
+    Consumption reporting data handled by
+    org.pih.warehouse.api.ConsumptionApiController, routed via the explicit
+    "/api/consumption/aggregate" (GET -> aggregate) and
+    "/api/consumption/summary" (GET -> summary) mappings. Backs the React
+    consumption list/pivot/report screens migrated from the legacy
+    consumption/list, consumption/pivot and consumption/show GSPs.
+  version: 0.1.0
+servers:
+  - url: http://localhost:8080/openboxes
+    description: Local Docker baseline (docs/migration/RUNNING_LOCALLY.md)
+security:
+  - cookieAuth: []
+paths:
+  /api/consumption/aggregate:
+    get:
+      operationId: getConsumptionAggregate
+      summary: Raw consumption fact rows for a location and date range
+      description: >
+        Same payload as the legacy /consumption/aggregate JSON endpoint -
+        one row per ConsumptionFact (product x transaction date). The date
+        range defaults to the last six months; the location defaults to the
+        session warehouse.
+      parameters:
+        - name: locationId
+          in: query
+          required: false
+          schema:
+            $ref: '../components/common.yaml#/components/schemas/Id'
+          description: Defaults to the session warehouse.
+        - name: categoryId
+          in: query
+          required: false
+          schema:
+            $ref: '../components/common.yaml#/components/schemas/Id'
+          description: Optional product category filter.
+        - name: startDate
+          in: query
+          required: false
+          schema:
+            type: string
+          description: 'Start of the range, format MM/dd/yyyy.'
+        - name: endDate
+          in: query
+          required: false
+          schema:
+            type: string
+          description: 'End of the range, format MM/dd/yyyy.'
+      responses:
+        '200':
+          description: Consumption fact rows.
+          content:
+            application/json:
+              schema:
+                type: object
+                required: [data]
+                properties:
+                  data:
+                    type: array
+                    items:
+                      $ref: '#/components/schemas/ConsumptionFactRow'
+  /api/consumption/summary:
+    get:
+      operationId: getConsumptionSummary
+      summary: Consumption report rows for a location and date range
+      description: >
+        Same computation as the legacy /consumption/show report (issued,
+        consumed, returned, total consumption, monthly average and months of
+        stock remaining per product). The date range defaults to the last
+        month; the location defaults to the session warehouse.
+      parameters:
+        - name: locationId
+          in: query
+          required: false
+          schema:
+            $ref: '../components/common.yaml#/components/schemas/Id'
+          description: Defaults to the session warehouse.
+        - name: startDate
+          in: query
+          required: false
+          schema:
+            type: string
+          description: 'Start of the range, format MM/dd/yyyy.'
+        - name: endDate
+          in: query
+          required: false
+          schema:
+            type: string
+          description: 'End of the range, format MM/dd/yyyy.'
+      responses:
+        '200':
+          description: Consumption report rows plus the row count.
+          content:
+            application/json:
+              schema:
+                type: object
+                required: [data, totalCount]
+                properties:
+                  data:
+                    type: array
+                    items:
+                      $ref: '#/components/schemas/ConsumptionSummaryRow'
+                  totalCount:
+                    type: integer
+components:
+  securitySchemes:
+    cookieAuth:
+      $ref: '../components/common.yaml#/components/securitySchemes/cookieAuth'
+  schemas:
+    ConsumptionFactRow:
+      type: object
+      description: One ConsumptionFact rendering.
+      required: [id, quantity]
+      properties:
+        id:
+          type: integer
+        productCode:
+          type: string
+          nullable: true
+        productName:
+          type: string
+          nullable: true
+        categoryName:
+          type: string
+          nullable: true
+        year:
+          type: integer
+          nullable: true
+        month:
+          type: integer
+          nullable: true
+        day:
+          type: integer
+          nullable: true
+        quantity:
+          type: number
+        unitCost:
+          type: number
+          nullable: true
+        unitPrice:
+          type: number
+          nullable: true
+    ConsumptionSummaryRow:
+      type: object
+      description: One consumption report row (per product).
+      required: [productId, productCode, productName]
+      properties:
+        productId:
+          $ref: '../components/common.yaml#/components/schemas/Id'
+        productCode:
+          type: string
+        productName:
+          type: string
+        category:
+          type: string
+          nullable: true
+        unitOfMeasure:
+          type: string
+          nullable: true
+        unitPrice:
+          type: number
+          nullable: true
+        issuedQuantity:
+          type: number
+          nullable: true
+        consumedQuantity:
+          type: number
+          nullable: true
+        returnedQuantity:
+          type: number
+          nullable: true
+        totalConsumptionQuantity:
+          type: number
+          nullable: true
+        totalConsumptionValue:
+          type: number
+          nullable: true
+        monthlyQuantity:
+          type: number
+          nullable: true
+        onHandQuantity:
+          type: number
+          nullable: true
+        numberOfMonthsRemaining:
+          type: number
+          nullable: true
+          description: 0 when there is no monthly consumption.

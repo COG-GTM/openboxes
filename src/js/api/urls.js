@@ -266,6 +266,17 @@ export const TRANSACTION_LOCATION_OPTIONS = `${TRANSACTION_API}/locationOptions`
 export const TRANSACTION_BY_ID = (id) => `${TRANSACTION_API}/${id}`;
 export const TRANSACTION_ENTRY_BY_ID = (id, entryId) => `${TRANSACTION_API}/${id}/entries/${entryId}`;
 export const EXPIRATION_HISTORY_REPORT = `${API}/inventories/expirationHistoryReport`;
+export const INVENTORY_BROWSE = `${API}/inventories/browse`;
+export const INVENTORY_TRANSACTION_CANDIDATES = `${API}/inventories/transactionCandidates`;
+export const INVENTORY_BIN_LOCATION_DETAILS = `${API}/inventories/binLocationDetails`;
+export const INVENTORY_ADJUST_STOCK = `${API}/inventories/adjustStock`;
+
+// CONSUMPTION
+export const CONSUMPTION_AGGREGATE = `${API}/consumption/aggregate`;
+export const CONSUMPTION_SUMMARY = `${API}/consumption/summary`;
+
+// STOCK ADJUSTMENTS
+export const STOCK_ADJUSTMENTS_API = `${API}/stockAdjustments`;
 
 // ATTRIBUTES
 export const ATTRIBUTE_BY_ID = (id) => `${ATTRIBUTES}/${id}`;

@@ -9,7 +9,10 @@ info:
     (GET -> locationOptions), "/api/transactions/$id" (GET -> read,
     PUT -> update) and "/api/transactions/$id/entries/$entryId"
     (DELETE -> deleteEntry) mappings. Added for the React migration of the
-    inventory/listDailyTransactions and inventory/editTransaction screens.
+    inventory/listDailyTransactions and inventory/editTransaction screens,
+    plus the generic "/api/${resource}s" mapping ("/api/transactions",
+    POST -> create) backing the React record-transaction screen migrated from
+    the legacy inventory/createTransaction GSP.
   version: 0.1.0
 servers:
   - url: http://localhost:8080/openboxes
@@ -17,6 +20,115 @@ servers:
 security:
   - cookieAuth: []
 paths:
+  /api/transactions:
+    post:
+      operationId: createTransaction
+      summary: Create an inventory transaction with one or more entries
+      description: >
+        Creates a Transaction of the given type. Adjustment types
+        (Adjustment credit/debit) get an ADJUST_INVENTORY transaction
+        source; Transfer Out accepts destinationId and Transfer In accepts
+        sourceId. Debit entries are validated against the on-hand quantity.
+        Parity quirks - missing/invalid transactionTypeId or empty entries
+        raise IllegalArgumentException (500); validation failures raise
+        ValidationException (400).
+      requestBody:
+        required: true
+        content:
+          application/json:
+            schema:
+              type: object
+              required: [transactionTypeId, entries]
+              properties:
+                transactionTypeId:
+                  type: string
+                  description: TransactionType id (e.g. "2" Consumed, "10" Adjustment debit).
+                locationId:
+                  type: string
+                  nullable: true
+                  description: Defaults to the session warehouse.
+                transactionDate:
+                  type: string
+                  nullable: true
+                  description: 'Format MM/dd/yyyy HH:mm; defaults to now.'
+                comment:
+                  type: string
+                  nullable: true
+                sourceId:
+                  type: string
+                  nullable: true
+                  description: Source location id (Transfer In only).
+                destinationId:
+                  type: string
+                  nullable: true
+                  description: Destination location id (Transfer Out only).
+                entries:
+                  type: array
+                  items:
+                    type: object
+                    properties:
+                      inventoryItemId:
+                        type: string
+                        nullable: true
+                      productId:
+                        type: string
+                        nullable: true
+                        description: >
+                          Used with lotNumber/expirationDate when
+                          inventoryItemId is not given.
+                      lotNumber:
+                        type: string
+                        nullable: true
+                      expirationDate:
+                        type: string
+                        nullable: true
+                        description: 'Format MM/dd/yyyy.'
+                      binLocationId:
+                        type: string
+                        nullable: true
+                      quantity:
+                        type: integer
+                      reasonCode:
+                        type: string
+                        nullable: true
+                      comment:
+                        type: string
+                        nullable: true
+      responses:
+        '200':
+          description: Transaction created.
+          content:
+            application/json:
+              schema:
+                type: object
+                required: [data]
+                properties:
+                  data:
+                    type: object
+                    required: [id]
+                    properties:
+                      id:
+                        $ref: '../components/common.yaml#/components/schemas/Id'
+                      transactionNumber:
+                        type: string
+                        nullable: true
+                      transactionType:
+                        type: object
+                        properties:
+                          id:
+                            type: string
+                            nullable: true
+                          name:
+                            type: string
+                            nullable: true
+                      productIds:
+                        type: array
+                        items:
+                          type: string
+        '400':
+          $ref: '../components/common.yaml#/components/responses/ValidationError'
+        '500':
+          $ref: '../components/common.yaml#/components/responses/ServerError'
   /api/transactions/daily:
     get:
       operationId: listDailyTransactions
