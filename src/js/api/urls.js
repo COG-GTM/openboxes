@@ -63,6 +63,15 @@ export const INVOICE_SUBMIT = (id) => `${INVOICE_BY_ID(id)}/submit`;
 export const INVOICE_ORDERS = (id) => `${INVOICE_BY_ID(id)}/orders`;
 export const INVOICE_SHIPMENTS = (id) => `${INVOICE_BY_ID(id)}/shipments`;
 export const REMOVE_INVOICE_ITEM = (id) => `${INVOICE_API}/${id}/removeItem`;
+export const INVOICE_DETAILS = (id) => `${INVOICE_BY_ID(id)}/details`;
+export const INVOICE_DOCUMENT_TYPES = `${INVOICE_API}/documentTypes`;
+export const INVOICE_DOCUMENTS = (id) => `${INVOICE_BY_ID(id)}/documents`;
+export const INVOICE_DOCUMENT_BY_ID = (id, documentId) => `${INVOICE_DOCUMENTS(id)}/${documentId}`;
+
+// ORDER
+export const ORDER_API = `${API}/orders`;
+export const ORDER_BY_ID = (id) => `${ORDER_API}/${id}`;
+export const ORDER_COMMENTS = (id) => `${ORDER_BY_ID(id)}/comments`;
 
 // INVOICE ITEM
 export const INVOICE_ITEM_API = `${API}/invoiceItems`;
@@ -106,6 +115,9 @@ export const GL_ACCOUNTS_OPTION = `${API}/glAccountOptions`;
 export const GL_ACCOUNT_API = `${API}/glAccounts`;
 export const GL_ACCOUNT_BY_ID = (id) => `${GL_ACCOUNT_API}/${id}`;
 export const GL_ACCOUNT_TYPE_OPTIONS = `${API}/glAccountTypeOptions`;
+export const GL_ACCOUNT_TYPE_API = `${API}/glAccountTypes`;
+export const GL_ACCOUNT_TYPE_BY_ID = (id) => `${GL_ACCOUNT_TYPE_API}/${id}`;
+export const GL_ACCOUNT_TYPE_CODE_OPTIONS = `${API}/glAccountTypeCodeOptions`;
 
 // BUDGET CODES
 export const BUDGET_CODE_API = `${API}/budgetCodes`;

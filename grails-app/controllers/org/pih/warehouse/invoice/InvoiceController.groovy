@@ -41,13 +41,7 @@ class InvoiceController {
     }
 
     def show() {
-        def invoiceInstance = Invoice.get(params.id)
-        if (!invoiceInstance) {
-            flash.message = "${warehouse.message(code: 'default.not.found.message', args: [warehouse.message(code: 'invoice.label', default: 'Invoice'), params.id])}"
-            redirect(action: "list")
-        } else {
-            [invoiceInstance: invoiceInstance]
-        }
+        render(view: "/common/react", params: params)
     }
 
     def rollback() {
@@ -120,15 +114,7 @@ class InvoiceController {
     }
 
     def addDocument() {
-        Invoice invoiceInstance = Invoice.get(params.id)
-        List<DocumentType> documentTypes = documentService.getNonTemplateDocumentTypes()
-
-        if (!invoiceInstance) {
-            flash.message = "${warehouse.message(code: 'default.not.found.message', args: [warehouse.message(code: 'invoice.label', default: 'Invoice'), params.id])}"
-            redirect(action: "list")
-        } else {
-            return [invoiceInstance: invoiceInstance, documentTypes: documentTypes]
-        }
+        render(view: "/common/react", params: params)
     }
 
     def editDocument() {

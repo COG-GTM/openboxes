@@ -130,6 +130,141 @@ paths:
           $ref: '../components/common.yaml#/components/responses/ValidationError'
         '500':
           $ref: '#/components/responses/UnknownInvoiceError'
+  /api/invoices/{id}/details:
+    get:
+      operationId: getInvoiceDetails
+      summary: Full invoice read model for the React invoice show screen
+      description: >
+        Header, auditing, item rows and documents in a single response,
+        mirroring the data rendered by the legacy invoice/show GSP. Added in
+        Phase 2 (Batch 27).
+      parameters:
+        - $ref: '#/components/parameters/invoiceId'
+      responses:
+        '200':
+          description: The invoice details.
+          content:
+            application/json:
+              schema:
+                type: object
+                required: [data]
+                properties:
+                  data:
+                    $ref: '#/components/schemas/InvoiceDetails'
+        '404':
+          description: Unknown invoice id.
+          content:
+            application/json:
+              schema:
+                $ref: '../components/common.yaml#/components/schemas/ErrorResponse'
+  /api/invoices/documentTypes:
+    get:
+      operationId: getInvoiceDocumentTypes
+      summary: Non-template document types for the invoice add document screen
+      description: >
+        Mirrors documentService.getNonTemplateDocumentTypes used by the
+        legacy InvoiceController.addDocument action, sorted by name. Added in
+        Phase 2 (Batch 27).
+      responses:
+        '200':
+          description: Document type options.
+          content:
+            application/json:
+              schema:
+                type: object
+                required: [data]
+                properties:
+                  data:
+                    type: array
+                    items:
+                      type: object
+                      required: [id, value, label]
+                      properties:
+                        id:
+                          $ref: '../components/common.yaml#/components/schemas/Id'
+                        value:
+                          $ref: '../components/common.yaml#/components/schemas/Id'
+                        label:
+                          type: string
+                          nullable: true
+  /api/invoices/{id}/documents:
+    post:
+      operationId: uploadInvoiceDocument
+      summary: Upload a document (file or URL) onto an invoice
+      description: >
+        Multipart upload mirroring the invoice branch of the legacy
+        DocumentController.uploadDocument action; accepts either an uploaded
+        file part (fileContents) or a URL (fileUri). Added in Phase 2
+        (Batch 27).
+      parameters:
+        - $ref: '#/components/parameters/invoiceId'
+      requestBody:
+        required: true
+        content:
+          multipart/form-data:
+            schema:
+              type: object
+              properties:
+                fileContents:
+                  type: string
+                  format: binary
+                name:
+                  type: string
+                documentNumber:
+                  type: string
+                typeId:
+                  type: string
+                fileUri:
+                  type: string
+      responses:
+        '201':
+          description: Created document.
+          content:
+            application/json:
+              schema:
+                type: object
+                required: [data]
+                properties:
+                  data:
+                    $ref: '#/components/schemas/InvoiceDocument'
+        '400':
+          description: >
+            Missing file/URL, disallowed extension, too-large file, or
+            validation errors.
+          content:
+            application/json:
+              schema:
+                $ref: '../components/common.yaml#/components/schemas/ErrorResponse'
+        '404':
+          description: Unknown invoice id.
+          content:
+            application/json:
+              schema:
+                $ref: '../components/common.yaml#/components/schemas/ErrorResponse'
+  /api/invoices/{id}/documents/{documentId}:
+    delete:
+      operationId: deleteInvoiceDocument
+      summary: Remove a document from an invoice
+      description: >
+        Mirrors the legacy InvoiceController.deleteDocument action. Added in
+        Phase 2 (Batch 27).
+      parameters:
+        - $ref: '#/components/parameters/invoiceId'
+        - name: documentId
+          in: path
+          required: true
+          schema:
+            $ref: '../components/common.yaml#/components/schemas/Id'
+          description: Document id attached to the invoice.
+      responses:
+        '204':
+          description: Deleted; no content.
+        '404':
+          description: Unknown invoice or document id.
+          content:
+            application/json:
+              schema:
+                $ref: '../components/common.yaml#/components/schemas/ErrorResponse'
   /api/invoices/{id}/items:
     get:
       operationId: getInvoiceItems
@@ -486,6 +621,204 @@ components:
                   type: string
                   nullable: true
   schemas:
+    InvoiceDetails:
+      type: object
+      description: >
+        Full read model rendered by InvoiceApiController.details() for the
+        React invoice show screen.
+      required: [id, invoiceNumber, items, documents]
+      properties:
+        id:
+          $ref: '../components/common.yaml#/components/schemas/Id'
+        invoiceNumber:
+          type: string
+        vendorInvoiceNumber:
+          type: string
+          nullable: true
+        name:
+          type: string
+          nullable: true
+        description:
+          type: string
+          nullable: true
+        status:
+          type: string
+          nullable: true
+        vendor:
+          $ref: '#/components/schemas/IdName'
+        partyFrom:
+          $ref: '#/components/schemas/IdName'
+        createdBy:
+          $ref: '#/components/schemas/IdName'
+        updatedBy:
+          $ref: '#/components/schemas/IdName'
+        currencyUom:
+          type: object
+          nullable: true
+          properties:
+            id:
+              type: string
+              nullable: true
+            code:
+              type: string
+              nullable: true
+            name:
+              type: string
+              nullable: true
+        invoiceType:
+          type: object
+          nullable: true
+          properties:
+            id:
+              type: string
+              nullable: true
+            code:
+              type: string
+              nullable: true
+            name:
+              type: string
+              nullable: true
+        totalValue:
+          type: number
+          nullable: true
+        totalValueNormalized:
+          type: number
+          nullable: true
+        defaultCurrencyCode:
+          type: string
+          nullable: true
+        dateCreated:
+          type: string
+          nullable: true
+        lastUpdated:
+          type: string
+          nullable: true
+        dateInvoiced:
+          type: string
+          nullable: true
+        dateSubmitted:
+          type: string
+          nullable: true
+        datePosted:
+          type: string
+          nullable: true
+        orders:
+          type: array
+          items:
+            type: object
+            properties:
+              id:
+                type: string
+                nullable: true
+              orderNumber:
+                type: string
+                nullable: true
+        shipments:
+          type: array
+          items:
+            type: object
+            properties:
+              id:
+                type: string
+                nullable: true
+              shipmentNumber:
+                type: string
+                nullable: true
+        items:
+          type: array
+          items:
+            $ref: '#/components/schemas/InvoiceDetailsItem'
+        documents:
+          type: array
+          items:
+            $ref: '#/components/schemas/InvoiceDocument'
+      additionalProperties: true
+    InvoiceDetailsItem:
+      type: object
+      required: [id]
+      properties:
+        id:
+          $ref: '../components/common.yaml#/components/schemas/Id'
+        productCode:
+          type: string
+          nullable: true
+        description:
+          type: string
+          nullable: true
+        orderNumber:
+          type: string
+          nullable: true
+        glAccountCode:
+          type: string
+          nullable: true
+        budgetCodeCode:
+          type: string
+          nullable: true
+        quantity:
+          type: integer
+          nullable: true
+        quantityPerUom:
+          type: number
+          nullable: true
+        unitPrice:
+          type: number
+          nullable: true
+        amount:
+          type: number
+          nullable: true
+        inverse:
+          type: boolean
+          nullable: true
+        isAdjustment:
+          type: boolean
+      additionalProperties: true
+    InvoiceDocument:
+      type: object
+      description: >
+        Document rendering emitted by InvoiceApiController.documentToJson();
+        editable=false for documents inherited from the invoiced orders.
+      required: [id, editable]
+      properties:
+        id:
+          $ref: '../components/common.yaml#/components/schemas/Id'
+        name:
+          type: string
+          nullable: true
+        filename:
+          type: string
+          nullable: true
+        fileUri:
+          type: string
+          nullable: true
+        size:
+          type: integer
+          nullable: true
+        lastUpdated:
+          type: string
+          nullable: true
+        documentType:
+          type: object
+          nullable: true
+          properties:
+            id:
+              type: string
+              nullable: true
+            name:
+              type: string
+              nullable: true
+        editable:
+          type: boolean
+      additionalProperties: true
+    IdName:
+      type: object
+      nullable: true
+      properties:
+        id:
+          type: string
+          nullable: true
+        name:
+          type: string
+          nullable: true
     Invoice:
       type: object
       description: Invoice.toJson() rendering.

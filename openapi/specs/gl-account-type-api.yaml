@@ -1,0 +1,189 @@
+openapi: 3.0.3
+info:
+  title: OpenBoxes - GlAccountTypeApiController
+  description: >
+    GL account type list/read/create/update/delete endpoints handled by
+    org.pih.warehouse.api.GlAccountTypeApiController, routed via the standard
+    "/api/${resource}s" and "/api/${resource}s/$id" REST mappings. Added in
+    Phase 2 (Batch 27) to back the React glAccountType list/create/edit
+    screens.
+  version: 0.1.0
+servers:
+  - url: http://localhost:8080/openboxes
+    description: Local Docker baseline (docs/migration/RUNNING_LOCALLY.md)
+security:
+  - cookieAuth: []
+paths:
+  /api/glAccountTypes:
+    get:
+      operationId: listGlAccountTypes
+      summary: List GL account types
+      description: >
+        Paged list mirroring the legacy glAccountType/list screen; max is
+        capped at 100 (default 10).
+      parameters:
+        - name: sort
+          in: query
+          required: false
+          schema:
+            type: string
+          description: GlAccountType property to sort by (e.g. code, name).
+        - name: order
+          in: query
+          required: false
+          schema:
+            type: string
+            enum: [asc, desc]
+          description: Sort direction, only applied when sort is provided.
+        - $ref: '../components/common.yaml#/components/parameters/max'
+        - $ref: '../components/common.yaml#/components/parameters/offset'
+      responses:
+        '200':
+          description: Paged GL account types.
+          content:
+            application/json:
+              schema:
+                type: object
+                required: [data, totalCount]
+                properties:
+                  data:
+                    type: array
+                    items:
+                      $ref: '#/components/schemas/GlAccountType'
+                  totalCount:
+                    type: integer
+    post:
+      operationId: createGlAccountType
+      summary: Create a GL account type
+      requestBody:
+        required: true
+        content:
+          application/json:
+            schema:
+              $ref: '#/components/schemas/GlAccountTypeInput'
+      responses:
+        '201':
+          description: Created GL account type.
+          content:
+            application/json:
+              schema:
+                type: object
+                required: [data]
+                properties:
+                  data:
+                    $ref: '#/components/schemas/GlAccountType'
+        '400':
+          $ref: '../components/common.yaml#/components/responses/ValidationError'
+  /api/glAccountTypes/{id}:
+    parameters:
+      - name: id
+        in: path
+        required: true
+        schema:
+          $ref: '../components/common.yaml#/components/schemas/Id'
+        description: >
+          GL account type id. Unknown ids raise ObjectNotFoundException,
+          rendered as HTTP 404 by ErrorsController.handleNotFound.
+    get:
+      operationId: readGlAccountType
+      summary: Read a single GL account type
+      responses:
+        '200':
+          description: The GL account type.
+          content:
+            application/json:
+              schema:
+                type: object
+                required: [data]
+                properties:
+                  data:
+                    $ref: '#/components/schemas/GlAccountType'
+        '404':
+          $ref: '../components/common.yaml#/components/responses/NotFound'
+    put:
+      operationId: updateGlAccountType
+      summary: Update a GL account type
+      description: >
+        Partial update; only keys present in the body are bound. Also mapped
+        for POST via the standard "/api/${resource}s/$id" REST mapping.
+      requestBody:
+        required: true
+        content:
+          application/json:
+            schema:
+              $ref: '#/components/schemas/GlAccountTypeInput'
+      responses:
+        '200':
+          description: The updated GL account type.
+          content:
+            application/json:
+              schema:
+                type: object
+                required: [data]
+                properties:
+                  data:
+                    $ref: '#/components/schemas/GlAccountType'
+        '400':
+          $ref: '../components/common.yaml#/components/responses/ValidationError'
+        '404':
+          $ref: '../components/common.yaml#/components/responses/NotFound'
+    delete:
+      operationId: deleteGlAccountType
+      summary: Delete a GL account type
+      responses:
+        '204':
+          description: Deleted; no content.
+        '400':
+          description: >
+            GL account type is referenced by other records (foreign key
+            constraint) and cannot be deleted.
+          content:
+            application/json:
+              schema:
+                $ref: '../components/common.yaml#/components/schemas/ErrorResponse'
+        '404':
+          $ref: '../components/common.yaml#/components/responses/NotFound'
+        '500':
+          $ref: '../components/common.yaml#/components/responses/ServerError'
+components:
+  schemas:
+    GlAccountType:
+      type: object
+      description: >
+        GL account type rendering emitted by
+        GlAccountTypeApiController.toJson().
+      required: [id, code, glAccountTypeCode]
+      properties:
+        id:
+          $ref: '../components/common.yaml#/components/schemas/Id'
+        code:
+          type: string
+        name:
+          type: string
+          nullable: true
+        glAccountTypeCode:
+          type: string
+          enum: [ASSET, EXPENSE, LIABILITY, EQUITY, REVENUE]
+        dateCreated:
+          type: string
+          nullable: true
+        lastUpdated:
+          type: string
+          nullable: true
+      additionalProperties: true
+    GlAccountTypeInput:
+      type: object
+      description: Partial-update input; only keys present are bound.
+      properties:
+        code:
+          type: string
+        name:
+          type: string
+          nullable: true
+        glAccountTypeCode:
+          type: string
+          enum: [ASSET, EXPENSE, LIABILITY, EQUITY, REVENUE]
+      additionalProperties: true
+  securitySchemes:
+    cookieAuth:
+      $ref: '../components/common.yaml#/components/securitySchemes/cookieAuth'

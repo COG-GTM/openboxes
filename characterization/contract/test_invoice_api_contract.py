@@ -7,11 +7,46 @@ controller source but only their unknown-id error branches are exercised
 snapshot suite's empty-list pin).
 """
 
+import pytest
+
 from oas import Spec, check
 
 spec = Spec("invoice-api.yaml")
 
 UNKNOWN = "doesnotexist0000"
+
+
+@pytest.fixture(scope="module")
+def batch27_endpoints(client):
+    # The pinned released image predates the Batch 27 invoice show /
+    # addDocument endpoints; only source builds of this branch expose them.
+    if client.request("GET", "/api/invoices/documentTypes").status_code != 200:
+        pytest.skip("app build does not expose the Batch 27 invoice endpoints")
+
+
+def test_document_types(client, batch27_endpoints):
+    resp = check(client, spec, "GET", "/api/invoices/documentTypes")
+    labels = [o["label"] for o in resp.json()["data"]]
+    assert labels == sorted(labels, key=lambda x: (x is None, x))
+
+
+def test_details_unknown(client, batch27_endpoints):
+    resp = check(client, spec, "GET", "/api/invoices/{id}/details",
+                 path=f"/api/invoices/{UNKNOWN}/details")
+    assert resp.status_code == 404
+
+
+def test_upload_document_unknown_invoice(client, batch27_endpoints):
+    resp = check(client, spec, "POST", "/api/invoices/{id}/documents",
+                 path=f"/api/invoices/{UNKNOWN}/documents",
+                 files={"fileContents": ("contract.txt", b"contract", "text/plain")})
+    assert resp.status_code == 404
+
+
+def test_delete_document_unknown_invoice(client, batch27_endpoints):
+    resp = check(client, spec, "DELETE", "/api/invoices/{id}/documents/{documentId}",
+                 path=f"/api/invoices/{UNKNOWN}/documents/{UNKNOWN}")
+    assert resp.status_code == 404
 
 
 def test_list(client):

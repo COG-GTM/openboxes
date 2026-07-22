@@ -424,13 +424,7 @@ class OrderController {
 
 
     def addComment() {
-        def orderInstance = Order.get(params?.id)
-        if (!orderInstance) {
-            flash.message = "${warehouse.message(code: 'default.not.found.message', args: [warehouse.message(code: 'order.label', default: 'Order'), params.id])}"
-            redirect(action: "list")
-        } else {
-            return [orderInstance: orderInstance, commentInstance: new Comment()]
-        }
+        render(view: "/common/react", params: params)
     }
 
     def editComment() {

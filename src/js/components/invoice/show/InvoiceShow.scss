@@ -1,0 +1,32 @@
+.invoice-show {
+  background-color: white;
+
+  .summary-header {
+    .status-badge {
+      display: inline-block;
+      padding: 2px 8px;
+      border-radius: 4px;
+      background-color: #e9ecef;
+      font-size: 0.8rem;
+      text-transform: uppercase;
+    }
+  }
+
+  .details-table {
+    .detail-label {
+      font-weight: 600;
+      width: 40%;
+    }
+  }
+
+  .items-table {
+    .inverse-item {
+      color: #6c757d;
+      font-style: italic;
+    }
+  }
+
+  .empty-state {
+    color: #6c757d;
+  }
+}

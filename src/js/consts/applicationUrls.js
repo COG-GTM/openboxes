@@ -70,6 +70,7 @@ const STOCK_MOVEMENT_URL = {
 
 const INVOICE_URL = {
   base: `${CONTEXT_PATH}/invoice`,
+  list: () => `${INVOICE_URL.base}/list`,
   create: () => `${INVOICE_URL.base}/create`,
   edit: (id) => `${INVOICE_URL.create()}/${id}`,
   show: (id) => `${INVOICE_URL.base}/show/${id}`,
@@ -178,6 +179,18 @@ const GL_ACCOUNT_URL = {
   edit: (id) => `${GL_ACCOUNT_URL.base}/edit/${id}`,
 };
 
+const GL_ACCOUNT_TYPE_URL = {
+  base: `${CONTEXT_PATH}/glAccountType`,
+  list: () => `${GL_ACCOUNT_TYPE_URL.base}/list`,
+  create: () => `${GL_ACCOUNT_TYPE_URL.base}/create`,
+  edit: (id) => `${GL_ACCOUNT_TYPE_URL.base}/edit/${id}`,
+};
+
+const DOCUMENT_URL = {
+  base: `${CONTEXT_PATH}/document`,
+  download: (id) => `${DOCUMENT_URL.base}/download/${id}`,
+};
+
 const LOCATION_GROUP_URL = {
   base: `${CONTEXT_PATH}/locationGroup`,
   list: () => `${LOCATION_GROUP_URL.base}/list`,
@@ -268,6 +281,8 @@ export {
   CONSUMPTION_URL,
   CYCLE_COUNT,
   DASHBOARD_URL,
+  DOCUMENT_URL,
+  GL_ACCOUNT_TYPE_URL,
   GL_ACCOUNT_URL,
   INVENTORY_ITEM_URL,
   INVENTORY_URL,

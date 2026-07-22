@@ -32,6 +32,35 @@ paths:
       responses:
         '200':
           $ref: '#/components/responses/IdLabelOptionsOk'
+  /api/glAccountTypeCodeOptions:
+    get:
+      operationId: glAccountTypeCodeOptions
+      summary: GL account type code (enum) options
+      description: >
+        Returns the GlAccountTypeCode enum values (ASSET, EXPENSE, LIABILITY,
+        EQUITY, REVENUE) as {id, value, label} triples, all equal to the enum
+        name. Added in Phase 2 (Batch 27) for the React glAccountType form.
+      responses:
+        '200':
+          description: Option list.
+          content:
+            application/json:
+              schema:
+                type: object
+                required: [data]
+                properties:
+                  data:
+                    type: array
+                    items:
+                      type: object
+                      required: [id, value, label]
+                      properties:
+                        id:
+                          type: string
+                        value:
+                          type: string
+                        label:
+                          type: string
   /api/locationTypeCodeOptions:
     get:
       operationId: listLocationTypeCodeOptions

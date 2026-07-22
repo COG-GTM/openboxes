@@ -308,6 +308,31 @@ const AsyncGlAccountForm = Loadable({
   loading: Loading,
 });
 
+const AsyncGlAccountTypeList = Loadable({
+  loader: () => import('components/glAccountType/GlAccountTypeList'),
+  loading: Loading,
+});
+
+const AsyncGlAccountTypeForm = Loadable({
+  loader: () => import('components/glAccountType/GlAccountTypeForm'),
+  loading: Loading,
+});
+
+const AsyncInvoiceShow = Loadable({
+  loader: () => import('components/invoice/show/InvoiceShow'),
+  loading: Loading,
+});
+
+const AsyncInvoiceAddDocument = Loadable({
+  loader: () => import('components/invoice/addDocument/InvoiceAddDocument'),
+  loading: Loading,
+});
+
+const AsyncOrderAddComment = Loadable({
+  loader: () => import('components/order/OrderAddComment'),
+  loading: Loading,
+});
+
 const AsyncAttributeList = Loadable({
   loader: () => import('components/attribute/AttributeList'),
   loading: Loading,
@@ -490,6 +515,9 @@ const Router = () => {
             <MainLayoutRoute path="**/stocklistManagement/index/:productId?" component={AsyncManagement} />
             <MainLayoutRoute path="**/invoice/create/:invoiceId?" component={AsyncInvoice} />
             <MainLayoutRoute path="**/invoice/list" component={AsyncInvoiceList} />
+            <MainLayoutRoute path="**/invoice/show/:invoiceId" component={AsyncInvoiceShow} />
+            <MainLayoutRoute path="**/invoice/addDocument/:invoiceId" component={AsyncInvoiceAddDocument} />
+            <MainLayoutRoute path="**/order/addComment/:orderId" component={AsyncOrderAddComment} />
             <MainLayoutRoute path="**/stockTransfer/create/:stockTransferId?" component={AsyncStockTransfer} />
             <MainLayoutRoute path="**/stockTransfer/createOutboundReturn/:outboundReturnId?" component={AsyncOutboundReturns} />
             <MainLayoutRoute path="**/stockTransfer/createInboundReturn/:inboundReturnId?" component={AsyncInboundReturns} />
@@ -532,6 +560,9 @@ const Router = () => {
             <MainLayoutRoute path="**/glAccount/list" component={AsyncGlAccountList} />
             <MainLayoutRoute path="**/glAccount/create" component={AsyncGlAccountForm} />
             <MainLayoutRoute path="**/glAccount/edit/:glAccountId" component={AsyncGlAccountForm} />
+            <MainLayoutRoute path="**/glAccountType/list" component={AsyncGlAccountTypeList} />
+            <MainLayoutRoute path="**/glAccountType/create" component={AsyncGlAccountTypeForm} />
+            <MainLayoutRoute path="**/glAccountType/edit/:glAccountTypeId" component={AsyncGlAccountTypeForm} />
             <MainLayoutRoute path="**/attribute/list" component={AsyncAttributeList} />
             <MainLayoutRoute path="**/attribute/create" component={AsyncAttributeForm} />
             <MainLayoutRoute path="**/attribute/edit/:id" component={AsyncAttributeForm} />

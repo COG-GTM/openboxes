@@ -1,5 +1,7 @@
 """Contract tests for SelectOptionsApiController (select-options-api.yaml)."""
 
+import pytest
+
 from oas import Spec, check
 
 spec = Spec("select-options-api.yaml")
@@ -7,6 +9,16 @@ spec = Spec("select-options-api.yaml")
 
 def test_gl_account_options(client):
     check(client, spec, "GET", "/api/glAccountOptions")
+
+
+def test_gl_account_type_code_options(client):
+    # The pinned released image predates this endpoint; only source builds
+    # of this branch expose it.
+    if client.request("GET", "/api/glAccountTypeCodeOptions").status_code != 200:
+        pytest.skip("app build does not expose /api/glAccountTypeCodeOptions")
+    resp = check(client, spec, "GET", "/api/glAccountTypeCodeOptions")
+    values = {o["value"] for o in resp.json()["data"]}
+    assert values == {"ASSET", "EXPENSE", "LIABILITY", "EQUITY", "REVENUE"}
 
 
 def test_product_group_options(client):

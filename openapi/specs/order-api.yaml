@@ -1,0 +1,167 @@
+openapi: 3.0.3
+info:
+  title: OpenBoxes - OrderApiController
+  description: >
+    Order read and comment-creation endpoints handled by
+    org.pih.warehouse.api.OrderApiController. Read is routed via the standard
+    "/api/${resource}s/$id" REST mapping; comment creation via the custom
+    "/api/orders/$id/comments" mapping. Added in Phase 2 (Batch 27) to back
+    the React order addComment screen.
+  version: 0.1.0
+servers:
+  - url: http://localhost:8080/openboxes
+    description: Local Docker baseline (docs/migration/RUNNING_LOCALLY.md)
+security:
+  - cookieAuth: []
+paths:
+  /api/orders/{id}:
+    parameters:
+      - name: id
+        in: path
+        required: true
+        schema:
+          $ref: '../components/common.yaml#/components/schemas/Id'
+        description: Order id.
+    get:
+      operationId: readOrder
+      summary: Read a minimal order summary
+      description: >
+        Minimal order rendering (number, name, status, order type) used by
+        the migrated order addComment screen header.
+      responses:
+        '200':
+          description: The order summary.
+          content:
+            application/json:
+              schema:
+                type: object
+                required: [data]
+                properties:
+                  data:
+                    $ref: '#/components/schemas/OrderSummary'
+        '404':
+          description: Unknown order id.
+          content:
+            application/json:
+              schema:
+                $ref: '../components/common.yaml#/components/schemas/ErrorResponse'
+  /api/orders/{id}/comments:
+    parameters:
+      - name: id
+        in: path
+        required: true
+        schema:
+          $ref: '../components/common.yaml#/components/schemas/Id'
+        description: Order id.
+    post:
+      operationId: createOrderComment
+      summary: Add a comment to an order
+      description: >
+        Mirrors the create branch of the legacy OrderController.saveComment
+        action: the sender is always the current session user; recipient is
+        optional.
+      requestBody:
+        required: true
+        content:
+          application/json:
+            schema:
+              type: object
+              required: [comment]
+              properties:
+                comment:
+                  type: string
+                  maxLength: 255
+                recipient:
+                  type: object
+                  nullable: true
+                  properties:
+                    id:
+                      $ref: '../components/common.yaml#/components/schemas/Id'
+      responses:
+        '201':
+          description: Created comment.
+          content:
+            application/json:
+              schema:
+                type: object
+                required: [data]
+                properties:
+                  data:
+                    $ref: '#/components/schemas/OrderComment'
+        '400':
+          description: Validation errors (e.g. blank comment).
+          content:
+            application/json:
+              schema:
+                $ref: '../components/common.yaml#/components/schemas/ErrorResponse'
+        '404':
+          description: Unknown order id.
+          content:
+            application/json:
+              schema:
+                $ref: '../components/common.yaml#/components/schemas/ErrorResponse'
+components:
+  schemas:
+    OrderSummary:
+      type: object
+      required: [id, orderNumber]
+      properties:
+        id:
+          $ref: '../components/common.yaml#/components/schemas/Id'
+        orderNumber:
+          type: string
+        name:
+          type: string
+          nullable: true
+        description:
+          type: string
+          nullable: true
+        status:
+          type: string
+          nullable: true
+        orderType:
+          type: object
+          nullable: true
+          properties:
+            id:
+              type: string
+              nullable: true
+            code:
+              type: string
+              nullable: true
+            name:
+              type: string
+              nullable: true
+        isPutawayOrder:
+          type: boolean
+      additionalProperties: true
+    OrderComment:
+      type: object
+      required: [id, comment]
+      properties:
+        id:
+          $ref: '../components/common.yaml#/components/schemas/Id'
+        comment:
+          type: string
+        sender:
+          type: object
+          nullable: true
+          properties:
+            id:
+              $ref: '../components/common.yaml#/components/schemas/Id'
+            name:
+              type: string
+              nullable: true
+        recipient:
+          type: object
+          nullable: true
+          properties:
+            id:
+              $ref: '../components/common.yaml#/components/schemas/Id'
+            name:
+              type: string
+              nullable: true
+      additionalProperties: true
+  securitySchemes:
+    cookieAuth:
+      $ref: '../components/common.yaml#/components/securitySchemes/cookieAuth'
