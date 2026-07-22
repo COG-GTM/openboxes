@@ -116,7 +116,7 @@ class CreateInboundReturn extends Component {
     }
   }
 
-  componentWillReceiveProps(nextProps) {
+  UNSAFE_componentWillReceiveProps(nextProps) {
     if (nextProps.inboundReturnsTranslationsFetched && nextProps.location.id) {
       if (!this.dataFetched) {
         this.dataFetched = true;

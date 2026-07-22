@@ -80,7 +80,7 @@ class PutAwayCheckPage extends Component {
     this.save = this.save.bind(this);
   }
 
-  componentWillReceiveProps(nextProps) {
+  UNSAFE_componentWillReceiveProps(nextProps) {
     showLocationChangedAlert(
       this.props.translate, this.state.location, nextProps.location,
       () => { window.location = `${ORDER_URL.list()}?orderType=PUTAWAY_ORDER&status=PENDING`; },

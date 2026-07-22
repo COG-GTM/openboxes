@@ -170,7 +170,7 @@ class SubstitutionsModal extends Component {
     );
   }
 
-  componentWillReceiveProps(nextProps) {
+  UNSAFE_componentWillReceiveProps(nextProps) {
     const {
       fieldConfig: {
         attributes,

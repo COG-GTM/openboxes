@@ -176,7 +176,7 @@ class PackingSplitLineModal extends Component {
     );
   }
 
-  componentWillReceiveProps(nextProps) {
+  UNSAFE_componentWillReceiveProps(nextProps) {
     const {
       fieldConfig: { attributes, getDynamicAttr },
     } = nextProps;

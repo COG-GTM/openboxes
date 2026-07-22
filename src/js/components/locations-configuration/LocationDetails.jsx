@@ -230,7 +230,7 @@ class LocationDetails extends Component {
     }
   }
 
-  componentWillReceiveProps(nextProps) {
+  UNSAFE_componentWillReceiveProps(nextProps) {
     if (!this.dataFetched && nextProps.locConfTranslationsFetched) {
       this.dataFetched = true;
       this.fetchSupportedActivities();

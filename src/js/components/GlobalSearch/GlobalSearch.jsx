@@ -1,4 +1,4 @@
-import React, { useState } from 'react';
+import React, { useEffect, useState } from 'react';
 
 import PropTypes from 'prop-types';
 import { RiCloseLine, RiSearchLine } from 'react-icons/ri';
@@ -24,9 +24,15 @@ const ValueContainer = ({ children, ...props }) => (
 );
 
 const GlobalSearch = ({
-  className, visible, renderButton, debounceTime, minSearchLength, translate,
+  className, visible, renderButton, debounceTime, minSearchLength, translate, onVisibilityChange,
 }) => {
   const [isVisible, setIsVisible] = useState(visible);
+
+  useEffect(() => {
+    if (onVisibilityChange) {
+      onVisibilityChange(isVisible);
+    }
+  }, [isVisible]);
 
   const searchItems = debounceGlobalSearch(debounceTime, minSearchLength);
 
@@ -154,10 +160,12 @@ GlobalSearch.propTypes = {
   minSearchLength: PropTypes.number.isRequired,
   className: PropTypes.string,
   translate: PropTypes.func.isRequired,
+  onVisibilityChange: PropTypes.func,
 };
 
 GlobalSearch.defaultProps = {
   renderButton: undefined,
   visible: false,
   className: '',
+  onVisibilityChange: undefined,
 };

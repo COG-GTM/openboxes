@@ -106,7 +106,7 @@ class DetailsModal extends Component {
     this.onOpen = this.onOpen.bind(this);
   }
 
-  componentWillReceiveProps(nextProps) {
+  UNSAFE_componentWillReceiveProps(nextProps) {
     const {
       fieldConfig: { attributes, getDynamicAttr },
     } = nextProps;

@@ -39,7 +39,6 @@ const FilterForm = ({
   disableAutoUpdateFilterParams,
   onSubmit,
 }) => {
-  const [amountFilled, setAmountFilled] = useState(0);
   const [filtersHidden, setFiltersHidden] = useState(hidden);
   const formRef = useRef(null);
 
@@ -73,22 +72,20 @@ const FilterForm = ({
   useTranslation('button');
 
   // Calculate which object's values are not empty
-  const countFilled = (values) => {
-    setAmountFilled(Object.entries(values)
-      .filter(([key, value]) => {
-        // Ignore accounting for filter that is disabled
-        const dynamicAttributes = _.invoke(filterFields, `${key}.getDynamicAttr`, formProps);
-        const attributes = _.get(filterFields, `${key}.attributes`);
-        if (dynamicAttributes?.disabled || attributes?.disabled) return false;
+  const countFilled = (values) => Object.entries(values)
+    .filter(([key, value]) => {
+      // Ignore accounting for filter that is disabled
+      const dynamicAttributes = _.invoke(filterFields, `${key}.getDynamicAttr`, formProps);
+      const attributes = _.get(filterFields, `${key}.attributes`);
+      if (dynamicAttributes?.disabled || attributes?.disabled) return false;
 
-        // Ignore filter that is not specified in filterFields config
-        // and that is not a search field
-        if (!filterFields[key] && key !== searchFieldId) return false;
-        // evaluate filter value
-        if (typeof value === 'object') return !_.isEmpty(value);
-        return !!value;
-      }).length);
-  };
+      // Ignore filter that is not specified in filterFields config
+      // and that is not a search field
+      if (!filterFields[key] && key !== searchFieldId) return false;
+      // evaluate filter value
+      if (typeof value === 'object') return !_.isEmpty(value);
+      return !!value;
+    }).length;
 
   const onClearHandler = (form) => {
     if (onClear && typeof onClear === 'function') {
@@ -141,7 +138,7 @@ const FilterForm = ({
         initialValues={{ ...defaultValues }}
         render={({ values, handleSubmit, form }) => {
           formRef.current = form;
-          countFilled(values);
+          const amountFilled = countFilled(values);
           return (
             <form onSubmit={handleSubmit} className="w-100 m-0">
               <div className="classic-form with-description align-items-center flex-wrap">

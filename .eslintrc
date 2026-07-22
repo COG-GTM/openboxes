@@ -22,6 +22,7 @@
   ],
   "rules": {
     "react/prop-types": "warn",
+    "camelcase": ["error", { "properties": "never", "ignoreDestructuring": false, "allow": ["^UNSAFE_"] }],
     "arrow-parens": "warn",
     "implicit-arrow-linebreak": "off",
     "react/destructuring-assignment": "warn",

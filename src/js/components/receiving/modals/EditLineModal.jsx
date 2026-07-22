@@ -126,7 +126,7 @@ class EditLineModal extends Component {
     this.validate = this.validate.bind(this);
   }
 
-  componentWillReceiveProps(nextProps) {
+  UNSAFE_componentWillReceiveProps(nextProps) {
     const {
       fieldConfig: { attributes, getDynamicAttr },
     } = nextProps;

@@ -66,7 +66,7 @@ class PutAwayPage extends Component {
     }
   }
 
-  componentWillReceiveProps(nextProps) {
+  UNSAFE_componentWillReceiveProps(nextProps) {
     if (nextProps.putAwayTranslationsFetched) {
       if (!this.dataFetched) {
         this.dataFetched = true;

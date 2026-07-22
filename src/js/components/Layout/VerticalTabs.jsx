@@ -13,7 +13,7 @@ class VerticalTabs extends Component {
     };
   }
 
-  componentWillReceiveProps(nextProps) {
+  UNSAFE_componentWillReceiveProps(nextProps) {
     if (Object.keys(this.props.tabs).length !== Object.keys(nextProps.tabs).length) {
       this.setState({ activeTab: Object.keys(nextProps.tabs)[0] });
     }

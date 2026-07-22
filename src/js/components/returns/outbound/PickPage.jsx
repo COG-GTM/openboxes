@@ -129,7 +129,7 @@ class PickPage extends Component {
     }
   }
 
-  componentWillReceiveProps(nextProps) {
+  UNSAFE_componentWillReceiveProps(nextProps) {
     if (nextProps.outboundReturnsTranslationsFetched && !this.dataFetched) {
       this.dataFetched = true;
       this.fetchOutboundReturn();

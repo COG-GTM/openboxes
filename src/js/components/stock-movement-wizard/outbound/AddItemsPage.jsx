@@ -432,7 +432,7 @@ class AddItemsPage extends Component {
     }
   }
 
-  componentWillReceiveProps(nextProps) {
+  UNSAFE_componentWillReceiveProps(nextProps) {
     if (nextProps.stockMovementTranslationsFetched && !this.dataFetched) {
       this.dataFetched = true;
 

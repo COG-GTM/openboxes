@@ -38,7 +38,7 @@ class OutboundReturns extends Component {
     }
   }
 
-  componentWillReceiveProps(nextProps) {
+  UNSAFE_componentWillReceiveProps(nextProps) {
     if (this.props.locale && this.props.locale !== nextProps.locale) {
       this.props.fetchTranslations(nextProps.locale, 'outboundReturns');
       this.props.fetchTranslations(nextProps.locale, 'stockMovement');

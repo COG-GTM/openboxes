@@ -42,6 +42,5 @@ exports[`search input should match snapshot 1`] = `
     type="text"
     value=""
   />
-  
 </div>
 `;

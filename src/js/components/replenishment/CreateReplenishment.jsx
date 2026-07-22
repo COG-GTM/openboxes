@@ -212,7 +212,7 @@ class CreateReplenishment extends Component {
     this.props.hideInfoBar(InfoBar.STOCK_REPLENISHMENT_DESCRIPTION);
   }
 
-  componentWillReceiveProps(nextProps) {
+  UNSAFE_componentWillReceiveProps(nextProps) {
     if (nextProps.replenishmentTranslationsFetched) {
       if (!this.dataFetched) {
         this.dataFetched = true;

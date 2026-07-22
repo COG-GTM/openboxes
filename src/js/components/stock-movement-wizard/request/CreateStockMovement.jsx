@@ -255,7 +255,7 @@ class CreateStockMovement extends Component {
     this.fetchRequisitionTypes();
   }
 
-  componentWillReceiveProps(nextProps) {
+  UNSAFE_componentWillReceiveProps(nextProps) {
     if (!this.props.match.params.stockMovementId && this.state.setInitialValues
       && nextProps.location.id) {
       this.setInitialValues(nextProps.location, nextProps.user);
