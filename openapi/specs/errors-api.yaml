@@ -1,0 +1,92 @@
+openapi: 3.0.3
+info:
+  title: OpenBoxes - ErrorsApiController
+  description: >
+    Error details endpoint handled by org.pih.warehouse.api.ErrorsApiController,
+    routed via the explicit "/api/errors/lastError" mapping. Added in Phase 2
+    (Batch 47) to back the React error screens (error, errors/dataAccess).
+    ErrorsController stashes the last server-side error in the session before
+    redirecting to the React error route; this endpoint returns that stash plus
+    the error-report mail configuration used by the "report as bug" form.
+  version: 0.1.0
+servers:
+  - url: http://localhost:8080/openboxes
+    description: Local Docker baseline (docs/migration/RUNNING_LOCALLY.md)
+security:
+  - cookieAuth: []
+paths:
+  /api/errors/lastError:
+    get:
+      operationId: getErrorDetails
+      summary: Get details of the last server-side error for this session
+      # Accessible without authentication (like the legacy error GSPs, which
+      # ErrorsController could render for unauthenticated users).
+      security: []
+      responses:
+        '200':
+          description: >
+            The last stashed error (null when no error has occurred in this
+            session), mail configuration and the current user (null when
+            unauthenticated). Reading consumes the stash: a subsequent call
+            returns error null until a new error occurs.
+          content:
+            application/json:
+              schema:
+                type: object
+                required: [data]
+                properties:
+                  data:
+                    type: object
+                    required: [mailEnabled, recipients]
+                    properties:
+                      error:
+                        type: object
+                        nullable: true
+                        properties:
+                          statusCode:
+                            type: integer
+                            nullable: true
+                          message:
+                            type: string
+                            nullable: true
+                          uri:
+                            type: string
+                            nullable: true
+                          exceptionClass:
+                            type: string
+                            nullable: true
+                          exceptionMessage:
+                            type: string
+                            nullable: true
+                          stackTrace:
+                            type: array
+                            items:
+                              type: string
+                          timestamp:
+                            type: string
+                            nullable: true
+                      mailEnabled:
+                        type: boolean
+                      recipients:
+                        type: array
+                        items:
+                          type: string
+                      user:
+                        type: object
+                        nullable: true
+                        properties:
+                          id:
+                            $ref: '../components/common.yaml#/components/schemas/Id'
+                          name:
+                            type: string
+                            nullable: true
+                          username:
+                            type: string
+                            nullable: true
+                          email:
+                            type: string
+                            nullable: true
+components:
+  securitySchemes:
+    cookieAuth:
+      $ref: '../components/common.yaml#/components/securitySchemes/cookieAuth'

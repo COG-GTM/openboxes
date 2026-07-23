@@ -82,6 +82,7 @@ class ApiController {
     def getMenuConfig() {
         Location location = Location.get(session.warehouse?.id)
 
+        // No menu before a location has been chosen (e.g. the location chooser screen)
         if (!location || (!location.supports(ActivityCode.MANAGE_INVENTORY) && location.supports(ActivityCode.SUBMIT_REQUEST))) {
             render([data: [menuConfig: []]] as JSON)
             return
@@ -153,8 +154,8 @@ class ApiController {
 
         User user = User.get(session?.user?.id)
         Location location = Location.get(session.warehouse?.id)
-        String highestRole = user.getHighestRole(location)
-        List currentLocationRoles = user.getRolesByCurrentLocation(location)?.roleType*.name()
+        String highestRole = location ? user.getHighestRole(location) : null
+        List currentLocationRoles = location ? user.getRolesByCurrentLocation(location)?.roleType*.name() : []
         boolean isSuperuser = userService.isSuperuser(session?.user)
         boolean isUserAdmin = userService.isUserAdmin(session?.user)
         boolean isUserApprover = userService.hasRolePurchaseApprover(session?.user)

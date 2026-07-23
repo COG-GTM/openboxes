@@ -1,0 +1,108 @@
+.error-page {
+  padding: 24px;
+
+  &__summary {
+    margin-bottom: 16px;
+  }
+
+  &__title {
+    color: var(--blue-800);
+    font-size: 24px;
+    font-weight: 500;
+  }
+
+  &__doc {
+    display: flex;
+    flex-direction: column;
+    max-width: 320px;
+  }
+
+  &__bubble {
+    position: relative;
+    background: var(--blue-201);
+    color: var(--blue-800);
+    border-radius: 8px;
+    padding: 16px;
+    margin-bottom: 16px;
+
+    &::after {
+      content: "";
+      position: absolute;
+      bottom: -14px;
+      left: 48px;
+      border-width: 14px 14px 0;
+      border-style: solid;
+      border-color: var(--blue-201) transparent;
+    }
+  }
+
+  &__image {
+    padding-left: 45px;
+
+    img {
+      max-width: 100px;
+      border-radius: 4px;
+    }
+  }
+
+  &__details {
+    margin-top: 24px;
+
+    h2 {
+      font-size: 18px;
+      font-weight: 500;
+      color: var(--blue-800);
+    }
+  }
+
+  &__details-box {
+    background-color: var(--blue-201);
+    border-radius: 4px;
+    padding: 12px;
+    margin-bottom: 16px;
+  }
+
+  &__stack-trace {
+    max-height: 300px;
+    overflow: auto;
+    background-color: var(--blue-201);
+    border-radius: 4px;
+    padding: 12px;
+    font-size: 12px;
+  }
+
+  &__dialog {
+    .ReactModal__Overlay--after-open {
+      z-index: 100 !important;
+      display: flex;
+      flex-direction: column;
+      align-items: center;
+      justify-content: center;
+      background-color: rgba(0, 0, 0, 0.15) !important;
+    }
+
+    .ReactModal__Content--after-open {
+      position: relative !important;
+      width: 70vw;
+      max-width: 1000px;
+      padding: 24px !important;
+      inset: 0 !important;
+      box-shadow: 0 4px 4px rgba(0, 0, 0, 0.25);
+    }
+  }
+
+  &__dialog-table {
+    width: 100%;
+
+    td {
+      padding: 6px;
+      vertical-align: top;
+    }
+
+    td:first-child {
+      width: 160px;
+      font-weight: 600;
+      color: var(--blue-800);
+    }
+  }
+}

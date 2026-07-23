@@ -248,15 +248,24 @@ class DashboardController {
             return
         }
 
-        def loginLocationsMap = locationService.getLoginLocationsMap(user, warehouse, true)
-        def savedLocations = user.warehouse && loginLocationsMap.containsValue(user.warehouse) ? [user.warehouse] : null
-
         if (userAgentIdentService.isMobile()) {
             redirect(controller: "mobile", action: "chooseLocation")
             return
         }
 
-        [savedLocations: savedLocations, loginLocationsMap: loginLocationsMap]
+        // Surface any flash message (e.g. "location disabled") to the React
+        // chooser, which renders it as a neutral status banner like the old GSP
+        if (flash.message && !params.message) {
+            String message = g.message(code: flash.message, default: flash.message)
+            Map redirectParams = [message: message]
+            if (params.targetUri) {
+                redirectParams.targetUri = params.targetUri
+            }
+            redirect(action: "chooseLocation", params: redirectParams)
+            return
+        }
+
+        render(view: "/common/react")
     }
 
 

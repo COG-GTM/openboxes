@@ -15,7 +15,7 @@ import org.pih.warehouse.core.LocationStatus
 
 class SecurityInterceptor {
 
-    static ArrayList controllersWithAuthUserNotRequired = ['test', 'errors']
+    static ArrayList controllersWithAuthUserNotRequired = ['test', 'errors', 'errorsApi']
     static ArrayList actionsWithAuthUserNotRequired = ['status', 'test', 'login', 'logout', 'handleLogin', 'signup', 'handleSignup', 'signupConfig', 'json', 'updateAuthUserLocale', 'viewLogo', 'changeLocation', 'menu']
 
     static ArrayList controllersWithLocationNotRequired = ['categoryApi', 'productApi', 'genericApi', 'api']

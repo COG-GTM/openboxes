@@ -375,6 +375,7 @@ const AUTH_URL = {
   base: `${CONTEXT_PATH}/auth`,
   login: () => `${AUTH_URL.base}/login`,
   signup: () => `${AUTH_URL.base}/signup`,
+  logout: () => `${AUTH_URL.base}/logout`,
 };
 
 const BATCH_URL = {
@@ -681,6 +682,24 @@ const DATA_EXPORT_URL = {
   }),
 };
 
+const CHOOSE_LOCATION_URL = {
+  base: `${CONTEXT_PATH}/dashboard/chooseLocation`,
+  list: () => CHOOSE_LOCATION_URL.base,
+  select: (id, targetUri) => stringifyUrl({
+    url: `${CHOOSE_LOCATION_URL.base}/${id}`,
+    query: targetUri ? { targetUri } : {},
+  }),
+};
+
+const ERROR_URL = {
+  base: `${CONTEXT_PATH}/errors`,
+  showError: () => `${ERROR_URL.base}/showError`,
+  accessDenied: () => `${ERROR_URL.base}/handleForbidden`,
+  dataAccess: () => `${ERROR_URL.base}/handleInvalidDataAccess`,
+  methodNotAllowed: () => `${ERROR_URL.base}/handleMethodNotAllowed`,
+  processError: () => `${CONTEXT_PATH}/errors/processError`,
+};
+
 const MOBILE_URL = {
   base: `${CONTEXT_PATH}/mobile`,
   index: () => `${MOBILE_URL.base}/index`,
@@ -708,6 +727,7 @@ export {
   BATCH_URL,
   BUDGET_CODE_URL,
   CATEGORY_URL,
+  CHOOSE_LOCATION_URL,
   CONSUMPTION_URL,
   CREATE_SHIPMENT_URL,
   CYCLE_COUNT,
@@ -715,6 +735,7 @@ export {
   DATA_EXPORT_URL,
   DELIVERY_NOTE_URL,
   DOCUMENT_URL,
+  ERROR_URL,
   EVENT_TYPE_URL,
   GL_ACCOUNT_TYPE_URL,
   GL_ACCOUNT_URL,

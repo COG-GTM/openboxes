@@ -1,0 +1,92 @@
+openapi: 3.0.3
+info:
+  title: OpenBoxes - LoginLocationsApiController
+  description: >
+    Login locations endpoint handled by
+    org.pih.warehouse.api.LoginLocationsApiController, routed via the explicit
+    "/api/loginLocations" mapping. Added in Phase 2 (Batch 47) to back the
+    React dashboard/chooseLocation screen. Returns the locations the current
+    user may log into, grouped by organization name (sorted, null last),
+    mirroring LocationService.getLoginLocationsMap.
+  version: 0.1.0
+servers:
+  - url: http://localhost:8080/openboxes
+    description: Local Docker baseline (docs/migration/RUNNING_LOCALLY.md)
+security:
+  - cookieAuth: []
+paths:
+  /api/loginLocations:
+    get:
+      operationId: listLoginLocations
+      summary: List locations the current user may log into
+      responses:
+        '200':
+          description: >
+            Login locations grouped by organization name, the user's saved
+            (default) location when it is among the login locations, and
+            the current user's last-login metadata for the screen footer.
+          content:
+            application/json:
+              schema:
+                type: object
+                required: [data]
+                properties:
+                  data:
+                    type: object
+                    required: [loginLocations, savedLocations, user]
+                    properties:
+                      loginLocations:
+                        type: object
+                        description: >
+                          Map of organization name (the literal string "null"
+                          for locations without an organization) to the list
+                          of login locations for that organization.
+                        additionalProperties:
+                          type: array
+                          items:
+                            $ref: '#/components/schemas/LoginLocation'
+                      savedLocations:
+                        type: array
+                        items:
+                          $ref: '#/components/schemas/LoginLocation'
+                      user:
+                        type: object
+                        required: [id, name, username]
+                        properties:
+                          id:
+                            $ref: '../components/common.yaml#/components/schemas/Id'
+                          name:
+                            type: string
+                          username:
+                            type: string
+                          lastLoginDate:
+                            type: string
+                            nullable: true
+components:
+  securitySchemes:
+    cookieAuth:
+      $ref: '../components/common.yaml#/components/securitySchemes/cookieAuth'
+  schemas:
+    LoginLocation:
+      type: object
+      required: [id, name]
+      properties:
+        id:
+          $ref: '../components/common.yaml#/components/schemas/Id'
+        name:
+          type: string
+        foregroundColor:
+          type: string
+          nullable: true
+        backgroundColor:
+          type: string
+          nullable: true
+        organizationName:
+          type: string
+          nullable: true
+        locationType:
+          type: string
+          nullable: true
+        locationGroup:
+          type: string
+          nullable: true

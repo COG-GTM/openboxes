@@ -498,6 +498,16 @@ class UrlMappings {
             action = [POST: "createTrigger", DELETE: "deleteTrigger"]
         }
 
+        "/api/loginLocations"(parseRequest: true) {
+            controller = { "loginLocationsApi" }
+            action = [GET: "list"]
+        }
+
+        "/api/errors/lastError"(parseRequest: true) {
+            controller = { "errorsApi" }
+            action = [GET: "details"]
+        }
+
         // Quartz job list endpoints for the React quartz/list screen (Phase 2 Batch 45)
         "/api/jobs/list"(parseRequest: true) {
             controller = { "jobsApi" }

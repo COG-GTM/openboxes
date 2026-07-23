@@ -267,6 +267,12 @@ export const USER_CREATE_API = `${API}/users/create`;
 export const USER_DETAILS = (id) => `${API}/users/${id}/details`;
 export const USER_PHOTO = (id) => `${API}/users/${id}/photo`;
 
+// LOGIN LOCATIONS
+export const LOGIN_LOCATIONS_API = `${API}/loginLocations`;
+
+// LAST ERROR (general error screen: error details + report-a-bug mail config)
+export const LAST_ERROR_API = `${API}/errors/lastError`;
+
 // PUTAWAY
 export const PUTAWAY_GENERATE_PDF = (id) => `/putAway/generatePdf/${id}`;
 

@@ -40,8 +40,18 @@ class ErrorsController {
                 return
             }
 
-            render(view: "/error")
+            stashErrorDetails()
+            redirect(action: "showError")
         }
+    }
+
+    /**
+     * Landing page for the React general error screen. Non-AJAX error handlers
+     * stash the error details in the session and redirect here so the SPA route
+     * (/errors/showError) matches the browser URL.
+     */
+    def showError() {
+        render(view: "/common/react")
     }
 
     def handleNotFound() {
@@ -99,7 +109,7 @@ class ErrorsController {
             response.status = 403
             render([errorCode: 403, errorMessage: "Access denied"] as JSON)
         } else {
-            render(view: "/errors/accessDenied")
+            render(view: "/common/react")
         }
     }
 
@@ -108,7 +118,12 @@ class ErrorsController {
         if (RequestUtil.isAjax(request)) {
             render([errorCode: 500, errorMessage: "Illegal data access"] as JSON)
         } else {
-            render(view: "/errors/dataAccess")
+            if (request.forwardURI?.endsWith("handleInvalidDataAccess")) {
+                render(view: "/common/react")
+                return
+            }
+            stashErrorDetails()
+            redirect(action: "handleInvalidDataAccess")
         }
     }
 
@@ -117,7 +132,11 @@ class ErrorsController {
             render([errorCode: 405, errorMessage: "Method not allowed"] as JSON)
             return
         }
-        render(view: "/errors/methodNotAllowed")
+        if (request.forwardURI?.endsWith("handleMethodNotAllowed")) {
+            render(view: "/common/react")
+            return
+        }
+        redirect(action: "handleMethodNotAllowed")
     }
 
     def handleValidationErrors() {
@@ -135,7 +154,8 @@ class ErrorsController {
             ] as JSON)
             return
         }
-        render(view: "/error")
+        stashErrorDetails()
+        redirect(action: "showError")
     }
 
     def handleConstraintViolation() {
@@ -152,9 +172,29 @@ class ErrorsController {
 
             Throwable root = ExceptionUtils.getRootCause(request.getAttribute('exception'))
             render([errorCode: 500, errorMessage: root.getMessage()])
+            return
         }
 
-        render(view: '/error')
+        stashErrorDetails()
+        redirect(action: "showError")
+    }
+
+    /**
+     * Stores the details of the current error in the session so the React error
+     * screen can fetch them via GET /api/errors/details after the redirect.
+     */
+    private void stashErrorDetails() {
+        Throwable exception = (request.getAttribute('exception') ?: request.getAttribute("jakarta.servlet.error.exception")) as Throwable
+        Throwable root = exception ? ExceptionUtils.getRootCause(exception) : null
+        session.lastErrorDetails = [
+                statusCode      : request.getAttribute('jakarta.servlet.error.status_code'),
+                message         : request.getAttribute('jakarta.servlet.error.message') ?: exception?.message,
+                uri             : request.getAttribute('jakarta.servlet.error.request_uri') ?: request.forwardURI,
+                exceptionClass  : root?.class?.name,
+                exceptionMessage: root?.message ?: exception?.message,
+                stackTrace      : root ? root.stackTrace.collect { it.toString() }.take(200) : [],
+                timestamp       : new Date(),
+        ]
     }
 
     def sendFeedback() {

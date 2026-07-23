@@ -190,7 +190,8 @@ test.describe('product catalog batch 11 React screens', () => {
     // both on the legacy GSP and the React route; skip when the seeded
     // admin user lacks that role.
     test.skip(
-      (await page.locator('#root').count()) === 0,
+      (await page.locator('#root').count()) === 0
+        || page.url().includes('/errors/handleForbidden'),
       'productSupplier/edit requires ROLE_PRODUCT_MANAGER (Access Denied served)',
     );
     await expect(page.locator('#root')).toBeVisible();
