@@ -1,0 +1,200 @@
+openapi: 3.0.3
+info:
+  title: OpenBoxes - AuthApiController
+  description: >
+    Authentication endpoints handled by org.pih.warehouse.api.AuthApiController,
+    routed via explicit mappings in UrlMappings.groovy ("/api/auth/login",
+    "/api/auth/signup", "/api/auth/signupConfig"). Added in Phase 2
+    (Batch 41) to back the React auth/login and auth/signup screens; they
+    mirror the legacy AuthController.handleLogin/handleSignup actions. All
+    three endpoints are anonymous.
+  version: 0.1.0
+servers:
+  - url: http://localhost:8080/openboxes
+    description: Local Docker baseline (docs/migration/RUNNING_LOCALLY.md)
+security:
+  - cookieAuth: []
+paths:
+  /api/auth/login:
+    post:
+      operationId: login
+      summary: Authenticate and populate the HTTP session
+      description: >
+        Mirrors AuthController.handleLogin - resolves the user by username or
+        email, resolves the session timezone (saved user timezone, then
+        browserTimezone, then America/New_York), rejects inactive accounts,
+        and on success stores the user (and, when rememberLastLocation, the
+        warehouse) in the session. Responds 401 with an errorMessage for
+        unknown users, inactive accounts and bad passwords.
+      security: []
+      requestBody:
+        required: true
+        content:
+          application/json:
+            schema:
+              type: object
+              required: [username, password]
+              properties:
+                username:
+                  type: string
+                  description: Username or email address.
+                password:
+                  type: string
+                browserTimezone:
+                  type: string
+                  nullable: true
+                targetUri:
+                  type: string
+                  nullable: true
+                  description: >
+                    Post-login redirect (used when no session targetUri was
+                    stored by SecurityInterceptor).
+      responses:
+        '200':
+          description: Authenticated; the session cookie is now logged in.
+          content:
+            application/json:
+              schema:
+                type: object
+                required: [data]
+                properties:
+                  data:
+                    type: object
+                    required: [redirectUrl]
+                    properties:
+                      redirectUrl:
+                        type: string
+        '401':
+          $ref: '../components/common.yaml#/components/responses/Unauthorized'
+  /api/auth/signupConfig:
+    get:
+      operationId: getSignupConfig
+      summary: Signup feature configuration for the React signup screen
+      security: []
+      responses:
+        '200':
+          description: Signup configuration.
+          content:
+            application/json:
+              schema:
+                type: object
+                required: [data]
+                properties:
+                  data:
+                    type: object
+                    required: [enabled, recaptchaConfigured, recaptchaEnabled,
+                               additionalQuestionsEnabled, additionalQuestions,
+                               supportedLocales]
+                    properties:
+                      enabled:
+                        type: boolean
+                      recaptchaConfigured:
+                        type: boolean
+                      recaptchaEnabled:
+                        type: boolean
+                      recaptchaSiteKey:
+                        type: string
+                        nullable: true
+                      additionalQuestionsEnabled:
+                        type: boolean
+                      additionalQuestions:
+                        type: array
+                        items:
+                          type: object
+                          properties:
+                            id:
+                              type: string
+                              nullable: true
+                            label:
+                              type: string
+                              nullable: true
+                            options:
+                              type: array
+                              nullable: true
+                              items:
+                                type: object
+                                properties:
+                                  key:
+                                    type: string
+                                    nullable: true
+                                  value:
+                                    type: string
+                                    nullable: true
+                      supportedLocales:
+                        type: array
+                        items:
+                          type: object
+                          required: [code, name]
+                          properties:
+                            code:
+                              type: string
+                            name:
+                              type: string
+  /api/auth/signup:
+    post:
+      operationId: signup
+      summary: Register a new (inactive) user account
+      description: >
+        Mirrors AuthController.handleSignup - creates an inactive user with
+        username set to the email address, validates the optional reCAPTCHA
+        challenge when enabled, assigns default roles and publishes a
+        UserSignupEvent. Responds 400 when the signup feature is disabled or
+        validation fails.
+      security: []
+      requestBody:
+        required: true
+        content:
+          application/json:
+            schema:
+              type: object
+              required: [firstName, lastName, email, password, passwordConfirm]
+              properties:
+                firstName:
+                  type: string
+                lastName:
+                  type: string
+                email:
+                  type: string
+                password:
+                  type: string
+                passwordConfirm:
+                  type: string
+                locale:
+                  type: string
+                  nullable: true
+                timezone:
+                  type: string
+                  nullable: true
+                additionalQuestions:
+                  type: object
+                  nullable: true
+                  additionalProperties: true
+                g-recaptcha-response:
+                  type: string
+                  nullable: true
+      responses:
+        '201':
+          description: Account created (inactive, pending review).
+          content:
+            application/json:
+              schema:
+                type: object
+                required: [data]
+                properties:
+                  data:
+                    type: object
+                    required: [id, email]
+                    properties:
+                      id:
+                        $ref: '../components/common.yaml#/components/schemas/Id'
+                      email:
+                        type: string
+                      message:
+                        type: string
+                        nullable: true
+        '400':
+          $ref: '../components/common.yaml#/components/responses/ValidationError'
+components:
+  securitySchemes:
+    cookieAuth:
+      $ref: '../components/common.yaml#/components/securitySchemes/cookieAuth'

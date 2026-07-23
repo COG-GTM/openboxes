@@ -2,7 +2,7 @@ import { Page, expect } from '@playwright/test';
 import { ADMIN, LOCATIONS, url } from './constants';
 
 /**
- * Logs in through the legacy GSP login form and selects the working location
+ * Logs in through the React login screen and selects the working location
  * (depot) when the app asks for one.
  */
 export async function login(
@@ -17,6 +17,7 @@ export async function login(
   await page.fill('#username', username);
   await page.fill('#password', password);
   await page.click('#loginButton, button[type="submit"], form button');
+  await page.waitForURL(/chooseLocation|dashboard/);
   await page.waitForLoadState('domcontentloaded');
   if (page.url().includes('chooseLocation')) {
     await page.click(`a:has-text("${location}")`);

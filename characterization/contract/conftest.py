@@ -75,6 +75,14 @@ def batch22_endpoints(client):
 
 
 @pytest.fixture(scope="session")
+def batch41_endpoints(client):
+    # Same rationale as batch14_endpoints for the Batch 41 admin/auth/batch/
+    # document screen endpoints.
+    if client.request("GET", "/api/admin/status").status_code == 404:
+        pytest.skip("Batch 41 admin/auth screen endpoints not present in target build")
+
+
+@pytest.fixture(scope="session")
 def batch17_endpoints(client):
     # Same rationale as batch14_endpoints for the Batch 17 requisition
     # template and canceled requisition item endpoints.

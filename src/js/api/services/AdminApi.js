@@ -7,7 +7,11 @@ import {
   ADMIN_MAIL,
   ADMIN_PLUGINS,
   ADMIN_SETTINGS,
+  ADMIN_STATUS_API,
   ADMIN_STOCK_ALERTS_TRIGGER,
+  ADMIN_UPGRADE_API,
+  ADMIN_UPGRADE_DEPLOY_API,
+  ADMIN_UPGRADE_DOWNLOAD_API,
 } from 'api/urls';
 import apiClient from 'utils/apiClient';
 
@@ -26,4 +30,8 @@ export default {
   sendMail: (formData) => apiClient.post(ADMIN_MAIL, formData),
   getSettings: () => apiClient.get(ADMIN_SETTINGS),
   triggerStockAlerts: () => apiClient.post(ADMIN_STOCK_ALERTS_TRIGGER),
+  getStatus: () => apiClient.get(ADMIN_STATUS_API),
+  getUpgrade: () => apiClient.get(ADMIN_UPGRADE_API),
+  downloadUpgrade: (payload) => apiClient.post(ADMIN_UPGRADE_DOWNLOAD_API, payload),
+  deployUpgrade: (payload) => apiClient.post(ADMIN_UPGRADE_DEPLOY_API, payload),
 };

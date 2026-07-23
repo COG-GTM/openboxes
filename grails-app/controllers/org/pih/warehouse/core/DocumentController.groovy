@@ -62,9 +62,7 @@ class DocumentController {
     }
 
     def create() {
-        def documentInstance = new Document()
-        documentInstance.properties = params
-        return [documentInstance: documentInstance]
+        render(view: "/common/react", params: params)
     }
 
     def save() {
@@ -91,7 +89,9 @@ class DocumentController {
             flash.message = "${warehouse.message(code: 'default.created.message', args: [warehouse.message(code: 'document.label', default: 'Document'), documentInstance.id])}"
             redirect(action: "edit", id: documentInstance.id)
         } else {
-            render(view: "create", model: [documentInstance: documentInstance])
+            flash.message = documentInstance.errors.allErrors ?
+                    documentInstance.errors.allErrors.first().toString() : null
+            redirect(action: "create")
         }
     }
 

@@ -16,6 +16,7 @@ const ADMIN_URL = {
   showDatabaseStatus: () => `${ADMIN_URL.base}/showDatabaseStatus`,
   showDatabaseProcessList: () => `${ADMIN_URL.base}/showDatabaseProcessList`,
   showUpgrade: () => `${ADMIN_URL.base}/showUpgrade`,
+  status: () => `${ADMIN_URL.base}/status`,
 };
 
 const DASHBOARD_URL = {
@@ -363,6 +364,22 @@ const GL_ACCOUNT_TYPE_URL = {
 const DOCUMENT_URL = {
   base: `${CONTEXT_PATH}/document`,
   download: (id) => `${DOCUMENT_URL.base}/download/${id}`,
+  list: () => `${DOCUMENT_URL.base}/list`,
+  create: () => `${DOCUMENT_URL.base}/create`,
+  edit: (id) => `${DOCUMENT_URL.base}/edit/${id}`,
+};
+
+const AUTH_URL = {
+  base: `${CONTEXT_PATH}/auth`,
+  login: () => `${AUTH_URL.base}/login`,
+  signup: () => `${AUTH_URL.base}/signup`,
+};
+
+const BATCH_URL = {
+  base: `${CONTEXT_PATH}/batch`,
+  importData: () => `${BATCH_URL.base}/importData`,
+  downloadExcel: (type) => `${BATCH_URL.base}/downloadExcel?type=${type}`,
+  downloadTemplate: (template) => `${BATCH_URL.base}/downloadTemplate?template=${template}`,
 };
 
 const LOCATION_GROUP_URL = {
@@ -641,7 +658,9 @@ const CYCLE_COUNT = {
 export {
   ADMIN_URL,
   ATTRIBUTE_URL,
+  AUTH_URL,
   BARCODE_URL,
+  BATCH_URL,
   BUDGET_CODE_URL,
   CATEGORY_URL,
   CONSUMPTION_URL,

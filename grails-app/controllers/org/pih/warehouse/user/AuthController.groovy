@@ -51,6 +51,7 @@ class AuthController {
         if (session.user) {
             flash.message = "You have already logged in."
             redirect(controller: "dashboard", action: "index")
+            return
         }
 
         if (userAgentIdentService.isMobile()) {
@@ -58,6 +59,7 @@ class AuthController {
             return
         }
 
+        render(view: "/common/react", params: params)
     }
 
 
@@ -118,10 +120,7 @@ class AuthController {
             } else {
                 // Invalid password
                 flash.message = "${warehouse.message(code: 'auth.incorrectPassword.label', args: [params.username])}"
-                userInstance = new User(username: params['username'])
-                userInstance.errors.rejectValue("version", "default.authentication.failure",
-                        [warehouse.message(code: 'user.label', default: 'User')] as Object[], "${warehouse.message(code: 'auth.unableToAuthenticateUser.message')}")
-                render(view: "login", model: [userInstance: userInstance])
+                redirect(action: 'login', params: [username: params.username])
             }
         } else {
             flash.message = "${warehouse.message(code: 'auth.userNotFound.message', args: [params.username])}"
@@ -156,13 +155,16 @@ class AuthController {
             flash.message = "Apologies, but the signup feature is disabled on your system. " +
                     "Please contact a system administrator for access."
             redirect(controller: "auth", action: "login")
+            return
         }
         Boolean configured = grailsApplication.config.openboxes.signup.recaptcha.v2.secretKey?.trim()
         if (!configured) {
             flash.message = "Apologies, but reCAPTCHA is not set up on this system. " +
                     "Please contact a system administrator for access."
             redirect(controller: "auth", action: "login")
+            return
         }
+        render(view: "/common/react", params: params)
     }
 
     /**
@@ -203,10 +205,10 @@ class AuthController {
                 grailsApplication.mainContext.publishEvent(new UserSignupEvent(userInstance, params.additionalQuestions))
 
             } else {
-                // If there's an error, reset the password to what the user entered and redirect to signup
-                userInstance.password = params.password
-                userInstance.passwordConfirm = params.passwordConfirm
-                render(view: "signup", model: [userInstance: userInstance])
+                // If there's an error, redirect back to the (React) signup screen
+                flash.message = userInstance.errors.allErrors ?
+                        "${warehouse.message(code: 'default.errors.summary.message', default: 'Please correct the errors below and try again.')}" : null
+                redirect(action: "signup")
                 return
             }
         }

@@ -5,9 +5,13 @@ info:
     Admin console endpoints handled by org.pih.warehouse.api.AdminApiController,
     added in Phase 2 (Batch 40) for the React admin screens (admin/index,
     admin/controllerActions, admin/cache, admin/plugins, admin/sendMail,
-    admin/showSettings). Routed by the explicit /api/admin/* mappings in
-    grails-app/controllers/org/pih/warehouse/UrlMappings.groovy. All endpoints
-    require the admin role (RoleInterceptor adminControllers).
+    admin/showSettings), plus the Batch 41 status/upgrade endpoints backing
+    the React admin/status and admin/showUpgrade screens. Routed by the
+    explicit /api/admin/* mappings in
+    grails-app/controllers/org/pih/warehouse/UrlMappings.groovy. Endpoints
+    require the admin role (RoleInterceptor adminControllers), except
+    /api/admin/status which is anonymous for parity with the legacy GSP, and
+    the upgrade endpoints which require ROLE_SUPERUSER (RBAC rules).
   version: 0.1.0
 servers:
   - url: http://localhost:8080/openboxes
@@ -431,10 +435,172 @@ paths:
           $ref: '#/components/responses/Message'
         '401':
           $ref: '../components/common.yaml#/components/responses/Unauthorized'
+  /api/admin/status:
+    get:
+      operationId: getAdminStatus
+      summary: Application status (versions, artefact counts, plugins, controllers)
+      security: []
+      responses:
+        '200':
+          description: Application status snapshot.
+          content:
+            application/json:
+              schema:
+                type: object
+                required: [data]
+                properties:
+                  data:
+                    type: object
+                    required: [appVersion, grailsVersion, jvmVersion, controllerCount,
+                               domainCount, serviceCount, tagLibCount, plugins, controllers]
+                    properties:
+                      appVersion:
+                        type: string
+                        nullable: true
+                      grailsVersion:
+                        type: string
+                        nullable: true
+                      jvmVersion:
+                        type: string
+                      controllerCount:
+                        type: integer
+                      domainCount:
+                        type: integer
+                      serviceCount:
+                        type: integer
+                      tagLibCount:
+                        type: integer
+                      plugins:
+                        type: array
+                        items:
+                          type: object
+                          required: [name]
+                          properties:
+                            name:
+                              type: string
+                            version:
+                              type: string
+                              nullable: true
+                      controllers:
+                        type: array
+                        items:
+                          type: object
+                          required: [logicalName, className]
+                          properties:
+                            logicalName:
+                              type: string
+                            className:
+                              type: string
+  /api/admin/upgrade:
+    get:
+      operationId: getAdminUpgrade
+      summary: Current upgrade (download/deploy) state from the session
+      responses:
+        '200':
+          description: >
+            Upgrade state; all fields are null/0/false when no download has
+            been started in this session.
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/UpgradeStateResponse'
+        '401':
+          $ref: '../components/common.yaml#/components/responses/Unauthorized'
+  /api/admin/upgrade/download:
+    post:
+      operationId: downloadAdminUpgrade
+      summary: Start a web archive (WAR) download
+      description: >
+        Mirrors the legacy AdminController.download action - stores an
+        UpgradeCommand in the session pointing at "warehouse.war". Responds
+        400 when remoteWebArchiveUrl is missing.
+      requestBody:
+        required: true
+        content:
+          application/json:
+            schema:
+              type: object
+              properties:
+                remoteWebArchiveUrl:
+                  type: string
+      responses:
+        '200':
+          description: Download initialized.
+          content:
+            application/json:
+              schema:
+                allOf:
+                  - $ref: '#/components/schemas/UpgradeStateResponse'
+                  - type: object
+                    properties:
+                      message:
+                        type: string
+        '400':
+          $ref: '../components/common.yaml#/components/responses/ValidationError'
+        '401':
+          $ref: '../components/common.yaml#/components/responses/Unauthorized'
+  /api/admin/upgrade/deploy:
+    post:
+      operationId: deployAdminUpgrade
+      summary: Copy the downloaded web archive to the web container path
+      description: >
+        Mirrors the legacy AdminController.deploy action. Responds 400 when
+        no archive has been downloaded in this session.
+      requestBody:
+        required: true
+        content:
+          application/json:
+            schema:
+              type: object
+              properties:
+                localWebArchivePath:
+                  type: string
+      responses:
+        '200':
+          description: Archive copied.
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/UpgradeStateResponse'
+        '400':
+          $ref: '../components/common.yaml#/components/responses/ValidationError'
+        '401':
+          $ref: '../components/common.yaml#/components/responses/Unauthorized'
 components:
   securitySchemes:
     cookieAuth:
       $ref: '../components/common.yaml#/components/securitySchemes/cookieAuth'
+  schemas:
+    UpgradeStateResponse:
+      type: object
+      required: [data]
+      properties:
+        data:
+          type: object
+          required: [progressPercentage, downloadCancelled, downloadDone]
+          properties:
+            remoteWebArchiveUrl:
+              type: string
+              nullable: true
+            remoteFileSize:
+              type: integer
+              nullable: true
+              description: -1 when the remote URL cannot be reached.
+            localFileSize:
+              type: integer
+              nullable: true
+            localWebArchivePath:
+              type: string
+              nullable: true
+            localWebArchiveAbsolutePath:
+              type: string
+              nullable: true
+            progressPercentage:
+              type: integer
+            downloadCancelled:
+              type: boolean
+            downloadDone:
+              type: boolean
   responses:
     Message:
       description: Status message.

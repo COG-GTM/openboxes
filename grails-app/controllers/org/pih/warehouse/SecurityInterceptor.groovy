@@ -16,10 +16,10 @@ import org.pih.warehouse.core.LocationStatus
 class SecurityInterceptor {
 
     static ArrayList controllersWithAuthUserNotRequired = ['test', 'errors']
-    static ArrayList actionsWithAuthUserNotRequired = ['status', 'test', 'login', 'logout', 'handleLogin', 'signup', 'handleSignup', 'json', 'updateAuthUserLocale', 'viewLogo', 'changeLocation', 'menu']
+    static ArrayList actionsWithAuthUserNotRequired = ['status', 'test', 'login', 'logout', 'handleLogin', 'signup', 'handleSignup', 'signupConfig', 'json', 'updateAuthUserLocale', 'viewLogo', 'changeLocation', 'menu']
 
     static ArrayList controllersWithLocationNotRequired = ['categoryApi', 'productApi', 'genericApi', 'api']
-    static ArrayList actionsWithLocationNotRequired = ['status', 'test', 'login', 'logout', 'handleLogin', 'signup', 'handleSignup', 'json', 'updateAuthUserLocale', 'viewLogo', 'chooseLocation', 'menu']
+    static ArrayList actionsWithLocationNotRequired = ['status', 'test', 'login', 'logout', 'handleLogin', 'signup', 'handleSignup', 'signupConfig', 'json', 'updateAuthUserLocale', 'viewLogo', 'chooseLocation', 'menu']
 
     def authService
 
@@ -66,6 +66,13 @@ class SecurityInterceptor {
         // When there's no authenticated user in the session and a request requires authentication
         // we redirect to the auth login page.  targetUri is the URI the user was trying to get to.
         else if (!session.user && !(actionsWithAuthUserNotRequired.contains(actionName))) {
+            // AJAX/JSON requests (e.g. the React login screen's own API calls) are
+            // not navigable pages, so they should never become the login redirect.
+            if (RequestUtil.isAjax(request)) {
+                redirect(controller: "errors", action: "handleUnauthorized")
+                return false
+            }
+
             def targetUri = ""
             // We only want to handle GETs because POSTs would be much more difficult
             if (request.method == "GET") {
@@ -83,11 +90,6 @@ class SecurityInterceptor {
                 session.targetUri = targetUri
             } else {
                 log.info "Not saving targetUri " + targetUri
-            }
-
-            if (RequestUtil.isAjax(request)) {
-                redirect(controller: "errors", action: "handleUnauthorized")
-                return false
             }
 
             redirect(controller: 'auth', action: 'login')

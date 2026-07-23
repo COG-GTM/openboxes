@@ -478,6 +478,36 @@ const AsyncOrganizationShow = Loadable({
   loading: Loading,
 });
 
+const AsyncAdminStatus = Loadable({
+  loader: () => import('components/admin/AdminStatus'),
+  loading: Loading,
+});
+
+const AsyncAdminUpgrade = Loadable({
+  loader: () => import('components/admin/AdminUpgrade'),
+  loading: Loading,
+});
+
+const AsyncLoginPage = Loadable({
+  loader: () => import('components/auth/LoginPage'),
+  loading: Loading,
+});
+
+const AsyncSignupPage = Loadable({
+  loader: () => import('components/auth/SignupPage'),
+  loading: Loading,
+});
+
+const AsyncBatchImportData = Loadable({
+  loader: () => import('components/batch/BatchImportData'),
+  loading: Loading,
+});
+
+const AsyncDocumentCreate = Loadable({
+  loader: () => import('components/document/DocumentCreate'),
+  loading: Loading,
+});
+
 const AsyncAdminIndex = Loadable({
   loader: () => import('components/admin/AdminIndex'),
   loading: Loading,
@@ -1457,6 +1487,12 @@ const Router = () => {
             <MainLayoutRoute path="**/organization/create" component={AsyncOrganizationForm} />
             <MainLayoutRoute path="**/organization/edit/:organizationId" component={AsyncOrganizationForm} />
             <MainLayoutRoute path="**/organization/show/:organizationId" component={AsyncOrganizationShow} />
+            <Route path="**/auth/login"><AsyncLoginPage /></Route>
+            <Route path="**/auth/signup"><AsyncSignupPage /></Route>
+            <MainLayoutRoute path="**/admin/status" component={AsyncAdminStatus} />
+            <MainLayoutRoute path="**/admin/showUpgrade" component={AsyncAdminUpgrade} />
+            <MainLayoutRoute path="**/batch/importData" component={AsyncBatchImportData} />
+            <MainLayoutRoute path="**/document/create" component={AsyncDocumentCreate} />
             <MainLayoutRoute path="**/admin/index" component={AsyncAdminIndex} />
             <MainLayoutRoute path="**/admin/controllerActions" component={AsyncAdminControllerActions} />
             <MainLayoutRoute path="**/admin/cache" component={AsyncAdminCache} />

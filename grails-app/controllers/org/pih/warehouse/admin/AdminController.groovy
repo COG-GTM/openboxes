@@ -53,16 +53,15 @@ class AdminController {
     def plugins() {
         render(view: "/common/react", params: params)
     }
-    def status() {}
+
+    def status() {
+        render(view: "/common/react", params: params)
+    }
 
     def static LOCAL_TEMP_WEBARCHIVE_PATH = "warehouse.war"
 
     def showUpgrade(UpgradeCommand command) {
-        log.info "show upgrade " + params
-
-        [
-                command: session.command
-        ]
+        render(view: "/common/react", params: params)
     }
 
     def evictDomainCache() {

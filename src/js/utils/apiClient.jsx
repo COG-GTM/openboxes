@@ -74,9 +74,13 @@ export const handleError = (error) => {
     }
 
     case 401:
-      confirmAlert({
-        customUI: (props) => (<LoginModal {...props} />),
-      });
+      // On the standalone auth screens the user is expected to be
+      // unauthenticated, so don't pop the "session expired" login modal there
+      if (!/\/auth\/(login|signup)/.test(window.location.pathname)) {
+        confirmAlert({
+          customUI: (props) => (<LoginModal {...props} />),
+        });
+      }
       break;
     case 403:
       notification(NotificationType.WARNING)({

@@ -267,6 +267,23 @@ export const PARTY_TYPE_OPTIONS = `${API}/partyTypeOptions`;
 export const PARTY_TYPE_CODE_OPTIONS = `${API}/partyTypeCodeOptions`;
 export const ORGANIZATION_ROLE_TYPE_OPTIONS = `${API}/organizationRoleTypeOptions`;
 
+// ADMIN
+export const ADMIN_STATUS_API = `${API}/admin/status`;
+export const ADMIN_UPGRADE_API = `${API}/admin/upgrade`;
+export const ADMIN_UPGRADE_DOWNLOAD_API = `${ADMIN_UPGRADE_API}/download`;
+export const ADMIN_UPGRADE_DEPLOY_API = `${ADMIN_UPGRADE_API}/deploy`;
+
+// AUTH
+export const AUTH_LOGIN_API = `${API}/auth/login`;
+export const AUTH_SIGNUP_API = `${API}/auth/signup`;
+export const AUTH_SIGNUP_CONFIG_API = `${API}/auth/signupConfig`;
+
+// BATCH IMPORT
+export const BATCH_IMPORT_DATA_API = `${API}/batch/importData`;
+
+// DOCUMENTS
+export const DOCUMENT_API = `${API}/documents`;
+
 // ADMIN CONSOLE (Phase 2 Batch 40)
 export const ADMIN_API = `${API}/admin`;
 export const ADMIN_CONTROLLERS = `${ADMIN_API}/controllers`;

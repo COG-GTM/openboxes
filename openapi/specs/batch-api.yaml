@@ -1,0 +1,104 @@
+openapi: 3.0.3
+info:
+  title: OpenBoxes - BatchApiController
+  description: >
+    Data import endpoint handled by org.pih.warehouse.api.BatchApiController,
+    routed via an explicit mapping in UrlMappings.groovy
+    ("/api/batch/importData"). Added in Phase 2 (Batch 41) to back the React
+    batch/importData screen; mirrors the legacy BatchController.importData
+    action (multipart upload, validate/preview, then import with
+    importNow=true reusing the file stored in the session).
+  version: 0.1.0
+servers:
+  - url: http://localhost:8080/openboxes
+    description: Local Docker baseline (docs/migration/RUNNING_LOCALLY.md)
+security:
+  - cookieAuth: []
+paths:
+  /api/batch/importData:
+    post:
+      operationId: importData
+      summary: Upload/validate an Excel import file, optionally import it
+      description: >
+        Multipart form post. On the first (upload) call the file is stored
+        as the session's local file and validated; the response contains the
+        parsed rows for preview. A follow-up call with importNow=true (file
+        optional - the session file is reused) executes the import.
+        Validation problems are reported in errorMessages with a 200 status
+        (parity with the legacy command-object error rendering); only
+        upload/IO failures and a missing file respond 400.
+      requestBody:
+        required: true
+        content:
+          multipart/form-data:
+            schema:
+              type: object
+              properties:
+                importFile:
+                  type: string
+                  format: binary
+                importType:
+                  type: string
+                  description: One of the import types from the legacy screen (category, inventory, inventoryLevel, location, person, ...).
+                date:
+                  type: string
+                  description: Stock count date; required when importType=inventory.
+                importNow:
+                  type: string
+                  description: '"true" to execute the import instead of just validating.'
+      responses:
+        '200':
+          description: Upload/validation (or import) result.
+          content:
+            application/json:
+              schema:
+                type: object
+                required: [data, errorMessages]
+                properties:
+                  data:
+                    type: object
+                    required: [filename, importedSuccessfully]
+                    properties:
+                      filename:
+                        type: string
+                      importType:
+                        type: string
+                        nullable: true
+                      date:
+                        type: string
+                        nullable: true
+                      location:
+                        type: object
+                        nullable: true
+                        properties:
+                          id:
+                            $ref: '../components/common.yaml#/components/schemas/Id'
+                          name:
+                            type: string
+                      columnMap:
+                        type: object
+                        nullable: true
+                        additionalProperties: true
+                      rows:
+                        type: array
+                        nullable: true
+                        items:
+                          type: object
+                          additionalProperties: true
+                      importedSuccessfully:
+                        type: boolean
+                      message:
+                        type: string
+                        nullable: true
+                  errorMessages:
+                    type: array
+                    items:
+                      type: string
+        '400':
+          $ref: '../components/common.yaml#/components/responses/ValidationError'
+        '401':
+          $ref: '../components/common.yaml#/components/responses/Unauthorized'
+components:
+  securitySchemes:
+    cookieAuth:
+      $ref: '../components/common.yaml#/components/securitySchemes/cookieAuth'

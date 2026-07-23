@@ -5,9 +5,9 @@ import { captureStep, resetStepCounter } from '../fixtures/screenshots';
 /**
  * Flow 1: Login / logout.
  *
- * Characterizes the legacy GSP auth flow: form login, mandatory location
- * choice, an authenticated session (user menu + API access), logout, and
- * rejection of bad credentials.
+ * Characterizes the auth flow (React login screen as of Batch 41): form
+ * login, mandatory location choice, an authenticated session (user menu +
+ * API access), logout, and rejection of bad credentials.
  */
 test.describe('login', () => {
   test.beforeEach(() => resetStepCounter());
@@ -20,7 +20,7 @@ test.describe('login', () => {
     await page.fill('#username', ADMIN.username);
     await page.fill('#password', ADMIN.password);
     await page.click('button[type="submit"], form button');
-    await page.waitForLoadState('domcontentloaded');
+    await page.waitForURL(/chooseLocation|dashboard/);
 
     // First navigation after login forces a location choice.
     expect(page.url()).toContain('/dashboard/chooseLocation');
@@ -52,7 +52,8 @@ test.describe('login', () => {
     await page.click('button[type="submit"], form button');
     await page.waitForLoadState('domcontentloaded');
 
-    // Re-rendered login form (via /auth/handleLogin), no session established.
+    // Still on the login screen (GSP re-render or React inline error), no
+    // session established.
     expect(page.url()).toMatch(/\/auth\/(login|handleLogin)/);
     await expect(page.locator('#username')).toBeVisible();
 

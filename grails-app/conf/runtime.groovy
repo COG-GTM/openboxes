@@ -119,6 +119,7 @@ openboxes.security.rbac.rules = [
     [controller: 'stockMovementApi', actions: ['delete'], accessRules: [ minimumRequiredRole: RoleType.ROLE_ASSISTANT]],
     [controller: 'product', actions: ['merge'], accessRules: [ minimumRequiredRole: RoleType.ROLE_ADMIN]],
     [controller: 'user', actions: ['changePassword'], accessRules: [ minimumRequiredRole: RoleType.ROLE_AUTHENTICATED]],
+    [controller: 'adminApi', actions: ['upgrade', 'upgradeDownload', 'upgradeDeploy'], accessRules: [ minimumRequiredRole: RoleType.ROLE_SUPERUSER]],
     // Other controller actions that might need explicit rules
     //[controller: 'putawayItemApi', actions: ['removingItem'], access: [RoleType.ROLE_MANAGER]],
 ]

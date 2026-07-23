@@ -1,0 +1,84 @@
+openapi: 3.0.3
+info:
+  title: OpenBoxes - DocumentApiController
+  description: >
+    Document creation endpoint handled by
+    org.pih.warehouse.api.DocumentApiController, routed via an explicit
+    mapping in UrlMappings.groovy ("/api/documents"). Added in Phase 2
+    (Batch 41) to back the React document/create screen; mirrors the legacy
+    DocumentController.save action (multipart upload, empty-file rejection,
+    10MB size gate).
+  version: 0.1.0
+servers:
+  - url: http://localhost:8080/openboxes
+    description: Local Docker baseline (docs/migration/RUNNING_LOCALLY.md)
+security:
+  - cookieAuth: []
+paths:
+  /api/documents:
+    post:
+      operationId: createDocument
+      summary: Create a standalone document from an uploaded file
+      description: >
+        Multipart form post with the file in "fileContents" and an optional
+        "documentType.id". Responds 400 when the file is missing/empty or
+        when domain validation fails (e.g. files >= 10MB skip the metadata
+        assignment, so fileContents is null and validation rejects it).
+      requestBody:
+        required: true
+        content:
+          multipart/form-data:
+            schema:
+              type: object
+              required: [fileContents]
+              properties:
+                fileContents:
+                  type: string
+                  format: binary
+                documentType.id:
+                  type: string
+      responses:
+        '200':
+          description: Document created.
+          content:
+            application/json:
+              schema:
+                type: object
+                required: [data]
+                properties:
+                  data:
+                    type: object
+                    required: [id, name, filename]
+                    properties:
+                      id:
+                        $ref: '../components/common.yaml#/components/schemas/Id'
+                      name:
+                        type: string
+                      filename:
+                        type: string
+                      extension:
+                        type: string
+                        nullable: true
+                      contentType:
+                        type: string
+                        nullable: true
+                      documentType:
+                        type: object
+                        nullable: true
+                        properties:
+                          id:
+                            $ref: '../components/common.yaml#/components/schemas/Id'
+                          name:
+                            type: string
+                            nullable: true
+                      message:
+                        type: string
+                        nullable: true
+        '400':
+          $ref: '../components/common.yaml#/components/responses/ValidationError'
+        '401':
+          $ref: '../components/common.yaml#/components/responses/Unauthorized'
+components:
+  securitySchemes:
+    cookieAuth:
+      $ref: '../components/common.yaml#/components/securitySchemes/cookieAuth'

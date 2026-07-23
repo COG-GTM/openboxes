@@ -11,7 +11,7 @@ import Router from 'components/Router';
 const onMissingTranslation = ({ translationId }) => `${translationId}`;
 
 const TRANSLATION_PREFIXES = ['default', 'dashboard', 'combinedShipments', 'productsConfiguration',
-  'locationsConfiguration', 'loadData', 'notification'];
+  'locationsConfiguration', 'loadData', 'notification', 'admin', 'auth', 'batch', 'document'];
 
 // TODO: Refactor fetching app context (fetchSessionInfo)
 // TODO: Refactor fetching menu config
@@ -30,6 +30,18 @@ class MainRouter extends React.Component {
       this.props.setActiveLanguage(this.props.locale);
       this.props.fetchMenuConfig();
       TRANSLATION_PREFIXES.forEach((prefix) => this.props.fetchTranslations('', prefix));
+    }).catch(() => {
+      // Unauthenticated (e.g. the standalone login/signup screens): initialize
+      // localization with a default language so <Translate> falls back to
+      // defaultMessage instead of crashing.
+      this.props.initialize({
+        languages: [{ code: 'en', name: 'English' }],
+        options: {
+          renderToStaticMarkup,
+          onMissingTranslation,
+        },
+      });
+      this.props.setActiveLanguage('en');
     });
   }
 
