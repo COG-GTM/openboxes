@@ -252,8 +252,7 @@ class DashboardController {
         def savedLocations = user.warehouse && loginLocationsMap.containsValue(user.warehouse) ? [user.warehouse] : null
 
         if (userAgentIdentService.isMobile()) {
-            render (view: "/mobile/chooseLocation",
-                    model: [savedLocations: savedLocations, loginLocationsMap: loginLocationsMap])
+            redirect(controller: "mobile", action: "chooseLocation")
             return
         }
 

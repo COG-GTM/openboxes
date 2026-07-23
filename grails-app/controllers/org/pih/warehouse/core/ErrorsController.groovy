@@ -35,7 +35,8 @@ class ErrorsController {
             render([errorCode: 500, cause: root?.class, errorMessage: message] as JSON)
         } else {
             if (userAgentIdentService.isMobile()) {
-                render(view: "/mobile/error")
+                session.lastError = buildErrorDetails()
+                redirect(controller: "mobile", action: "error")
                 return
             }
 
@@ -56,7 +57,29 @@ class ErrorsController {
             }
             render([errorCode: 404, errorMessage: errorMessage] as JSON)
         } else {
-            render(view: "/errors/notFound")
+            // Present on a servlet error dispatch (404 status or exception mapped to this
+            // action) but never on the redirect follow-up request, so no redirect loop.
+            String errorUri = request.getAttribute('jakarta.servlet.error.request_uri')
+                    ?: (request.exception ? request.forwardURI : null)
+            if (errorUri) {
+                session.lastError = [
+                        errorCode   : 404,
+                        errorMessage: request?.exception?.message,
+                        uri         : errorUri,
+                ]
+                Throwable rootCause = request.exception ? ExceptionUtils.getRootCause(request.exception) : null
+                Map redirectParams = [:]
+                if (params.id) {
+                    redirectParams.id = params.id
+                } else if (rootCause instanceof org.hibernate.ObjectNotFoundException) {
+                    redirectParams.id = rootCause.identifier
+                }
+                if (params.resource) redirectParams.resource = params.resource
+                redirect(controller: "errors", action: "handleNotFound", params: redirectParams)
+                return
+            }
+            response.status = 404
+            render(view: "/common/react")
         }
     }
 
@@ -185,6 +208,28 @@ class ErrorsController {
             flash.message = "${warehouse.message(code: 'email.errorReportDisabled.message')}"
         }
         redirect(controller: "dashboard", action: "index")
+    }
+
+    private Map buildErrorDetails() {
+        Throwable exception = (request.getAttribute('exception')
+                ?: request.getAttribute("jakarta.servlet.error.exception")) as Throwable
+        Throwable root = exception ? ExceptionUtils.getRootCause(exception) : null
+        List<String> stackTrace = null
+        if (exception) {
+            StringWriter writer = new StringWriter()
+            exception.printStackTrace(new PrintWriter(writer))
+            stackTrace = writer.toString().readLines()
+        }
+        return [
+                errorCode       : (request.getAttribute('jakarta.servlet.error.status_code') ?: 500) as Integer,
+                errorMessage    : request.getAttribute('jakarta.servlet.error.message')?.toString(),
+                servletName     : request.getAttribute('jakarta.servlet.error.servlet_name')?.toString(),
+                uri             : (request.getAttribute('jakarta.servlet.error.request_uri') ?: request.forwardURI)?.toString(),
+                exceptionMessage: (root?.message ?: exception?.message)?.toString(),
+                causedBy        : exception?.cause?.message?.toString(),
+                className       : (root ?: exception)?.class?.name,
+                stackTrace      : stackTrace,
+        ]
     }
 
 }

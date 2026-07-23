@@ -423,6 +423,21 @@ const AsyncLocationGroupShow = Loadable({
   loading: Loading,
 });
 
+const AsyncNotFoundPage = Loadable({
+  loader: () => import('components/errors/NotFoundPage'),
+  loading: Loading,
+});
+
+const AsyncErrorDetailsPage = Loadable({
+  loader: () => import('components/errors/ErrorDetailsPage'),
+  loading: Loading,
+});
+
+const AsyncMobileChooseLocation = Loadable({
+  loader: () => import('components/mobile/MobileChooseLocation'),
+  loading: Loading,
+});
+
 const AsyncEventTypeList = Loadable({
   loader: () => import('components/eventType/EventTypeList'),
   loading: Loading,
@@ -1392,6 +1407,8 @@ const Router = () => {
             <Route path="**/mobile/productList" component={AsyncMobileProductList} />
             <Route path="**/mobile/productDetails/:productId" component={AsyncMobileProductDetails} />
             <Route path="**/mobile/outboundList" component={AsyncMobileOutboundList} />
+            <Route path="**/mobile/chooseLocation" component={AsyncMobileChooseLocation} />
+            <Route path="**/mobile/error" component={AsyncErrorDetailsPage} />
             <Route exact path="**/mobile" component={AsyncMobileDashboard} />
             <MainLayoutRoute path="**/putAway/create/:putAwayId?" component={AsyncPutAwayMainPage} />
             <MainLayoutRoute path="**/stockMovement/list" component={StockMovementList} />
@@ -1590,6 +1607,7 @@ const Router = () => {
             <MainLayoutRoute path="**/localization/create" component={AsyncLocalizationForm} />
             <MainLayoutRoute path="**/localization/edit/:localizationId" component={AsyncLocalizationForm} />
             <MainLayoutRoute path="**/jobs/show/:jobName" component={AsyncJobShow} />
+            <MainLayoutRoute path="**/errors/handleNotFound/:id?" component={AsyncNotFoundPage} />
             <MainLayoutRoute path="**/quartz/list" component={AsyncQuartzJobList} />
             <MainLayoutRoute path="**/migration/materializedViews" component={AsyncMaterializedViews} />
             <MainLayoutRoute path="**/migration/productAvailability" component={AsyncMigrationProductAvailability} />

@@ -483,6 +483,11 @@ class UrlMappings {
             action = [GET: "localeOptions"]
         }
 
+        "/api/errors/details"(parseRequest: true) {
+            controller = { "errorApi" }
+            action = [GET: "details"]
+        }
+
         "/api/jobs/details"(parseRequest: true) {
             controller = { "jobsApi" }
             action = [GET: "read"]
@@ -2706,6 +2711,7 @@ class UrlMappings {
         "500"(controller: "errors", action: "handleUnauthorized", exception: AuthenticationException)
         "500"(controller: "errors", action: "handleConstraintViolation", exception: SQLIntegrityConstraintViolationException)
         "/"(controller: "dashboard", action: "index")
+        "/index"(redirect: [controller: "dashboard", action: "index"])
     }
 
 

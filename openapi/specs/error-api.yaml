@@ -1,0 +1,80 @@
+openapi: 3.0.3
+info:
+  title: OpenBoxes - ErrorApiController
+  description: >
+    Last-error details endpoint handled by
+    org.pih.warehouse.api.ErrorApiController, routed via the explicit
+    "/api/errors/details" mapping. Added in Phase 2 (Batch 48) to back the
+    React error screens (errors/handleNotFound and mobile/error):
+    ErrorsController stashes the details of the last server-side error in
+    the HTTP session before redirecting to the React screen, which then
+    fetches them from this endpoint.
+  version: 0.1.0
+servers:
+  - url: http://localhost:8080/openboxes
+    description: Local Docker baseline (docs/migration/RUNNING_LOCALLY.md)
+security:
+  - cookieAuth: []
+paths:
+  /api/errors/details:
+    get:
+      operationId: getErrorDetails
+      summary: Read the last error details captured for this session
+      description: >
+        Returns whatever ErrorsController stashed for the current session's
+        last non-AJAX error, or {"data": null} when no error has been
+        captured. The payload shape differs slightly between 404s (uri and
+        errorMessage only) and exceptions (servletName, exceptionMessage,
+        causedBy, className, stackTrace).
+      responses:
+        '200':
+          description: The last captured error details, or null.
+          content:
+            application/json:
+              schema:
+                type: object
+                required: [data]
+                properties:
+                  data:
+                    $ref: '#/components/schemas/ErrorDetails'
+components:
+  securitySchemes:
+    cookieAuth:
+      $ref: '../components/common.yaml#/components/securitySchemes/cookieAuth'
+  schemas:
+    ErrorDetails:
+      type: object
+      nullable: true
+      description: Null when no error has been captured for this session yet.
+      properties:
+        errorCode:
+          type: integer
+          description: HTTP status code of the captured error (404 or 500).
+        errorMessage:
+          type: string
+          nullable: true
+          description: Servlet error message, when available.
+        servletName:
+          type: string
+          nullable: true
+        uri:
+          type: string
+          nullable: true
+          description: The request URI that triggered the error.
+        exceptionMessage:
+          type: string
+          nullable: true
+          description: Root cause exception message.
+        causedBy:
+          type: string
+          nullable: true
+        className:
+          type: string
+          nullable: true
+          description: Root cause exception class name.
+        stackTrace:
+          type: array
+          nullable: true
+          items:
+            type: string
+      additionalProperties: true

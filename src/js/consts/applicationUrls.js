@@ -21,6 +21,7 @@ const ADMIN_URL = {
 
 const DASHBOARD_URL = {
   base: `${CONTEXT_PATH}/dashboard`,
+  chooseLocation: (id) => `${DASHBOARD_URL.base}/chooseLocation/${id}`,
 };
 
 const LOCATION_CONFIGURATION_URL = {

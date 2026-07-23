@@ -237,6 +237,9 @@ export const LOCALIZATION_OVERRIDE_BY_ID = (id) => `${LOCALIZATION_OVERRIDE_API}
 export const LOCALIZATION_OVERRIDE_IMPORT = `${LOCALIZATION_OVERRIDE_API}/import`;
 export const LOCALE_OPTIONS = `${API}/localeOptions`;
 
+// ERRORS
+export const ERROR_DETAILS_API = `${API}/errors/details`;
+
 // JOBS
 export const JOBS_DETAILS_API = `${API}/jobs/details`;
 export const JOBS_TRIGGERS_API = `${API}/jobs/triggers`;
