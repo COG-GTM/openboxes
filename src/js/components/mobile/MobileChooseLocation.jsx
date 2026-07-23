@@ -3,7 +3,7 @@ import React, { useEffect, useState } from 'react';
 import _ from 'lodash';
 import { useSelector } from 'react-redux';
 
-import { LOCATION_API } from 'api/urls';
+import { LOCATION_API, USER_BY_ID } from 'api/urls';
 import MobileLayout from 'components/mobile/MobileLayout';
 import { DASHBOARD_URL } from 'consts/applicationUrls';
 import useTranslate from 'hooks/useTranslate';
@@ -18,11 +18,23 @@ const MobileChooseLocation = () => {
 
   const translate = useTranslate();
 
-  const savedLocationId = useSelector((state) => state.session.savedLocationId);
+  const userId = useSelector((state) => state.session.user?.id);
 
   const [isLoading, setIsLoading] = useState(true);
   const [locations, setLocations] = useState([]);
   const [locationGroups, setLocationGroups] = useState([]);
+  const [savedLocationId, setSavedLocationId] = useState(null);
+
+  useEffect(() => {
+    if (!userId) {
+      return;
+    }
+    apiClient.get(USER_BY_ID(userId))
+      .then((response) => {
+        setSavedLocationId(_.get(response, 'data.data.warehouse.id') ?? null);
+      })
+      .catch(() => setSavedLocationId(null));
+  }, [userId]);
 
   useEffect(() => {
     const params = {
