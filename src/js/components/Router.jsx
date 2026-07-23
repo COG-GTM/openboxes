@@ -1313,6 +1313,31 @@ const AsyncRequisitionPick = Loadable({
   loading: Loading,
 });
 
+const AsyncMobileDashboard = Loadable({
+  loader: () => import('components/mobile/MobileDashboard'),
+  loading: Loading,
+});
+
+const AsyncMobileLogin = Loadable({
+  loader: () => import('components/mobile/MobileLogin'),
+  loading: Loading,
+});
+
+const AsyncMobileProductList = Loadable({
+  loader: () => import('components/mobile/MobileProductList'),
+  loading: Loading,
+});
+
+const AsyncMobileProductDetails = Loadable({
+  loader: () => import('components/mobile/MobileProductDetails'),
+  loading: Loading,
+});
+
+const AsyncMobileOutboundList = Loadable({
+  loader: () => import('components/mobile/MobileOutboundList'),
+  loading: Loading,
+});
+
 const Router = () => {
   useConnectionListener();
 
@@ -1332,6 +1357,12 @@ const Router = () => {
       <BrowserRouter>
         <FlashScopeListenerWrapper>
           <Switch>
+            <Route path="**/mobile/login" component={AsyncMobileLogin} />
+            <Route path="**/mobile/index" component={AsyncMobileDashboard} />
+            <Route path="**/mobile/productList" component={AsyncMobileProductList} />
+            <Route path="**/mobile/productDetails/:productId" component={AsyncMobileProductDetails} />
+            <Route path="**/mobile/outboundList" component={AsyncMobileOutboundList} />
+            <Route exact path="**/mobile" component={AsyncMobileDashboard} />
             <MainLayoutRoute path="**/putAway/create/:putAwayId?" component={AsyncPutAwayMainPage} />
             <MainLayoutRoute path="**/stockMovement/list" component={StockMovementList} />
             <MainLayoutRoute path="**/stockMovement/createOutbound/:stockMovementId?" component={AsyncStockMovement} />

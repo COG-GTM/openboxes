@@ -19,6 +19,11 @@ const TRANSLATION_PREFIXES = ['default', 'dashboard', 'combinedShipments', 'prod
 
 class MainRouter extends React.Component {
   componentDidMount() {
+    // The mobile login screen is rendered without an authenticated session;
+    // skip the session bootstrap there (it would only trigger a 401 modal).
+    if (window.location.pathname.endsWith('/mobile/login')) {
+      return;
+    }
     this.props.fetchSessionInfo().then(() => {
       this.props.initialize({
         languages: this.props.supportedLocales,

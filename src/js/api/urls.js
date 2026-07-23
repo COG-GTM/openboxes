@@ -619,3 +619,9 @@ export const REPORT_SHIPPING = (id) => `${API}/reports/shippingReport/${id}`;
 
 // DATA EXPORT
 export const DATA_EXPORT_API = `${API}/dataExports`;
+
+// MOBILE
+export const MOBILE_DASHBOARD = `${API}/mobile/dashboard`;
+export const MOBILE_PRODUCT_SUMMARIES = `${API}/mobile/productSummaries`;
+export const MOBILE_PRODUCT_SUMMARY_BY_ID = (id) => `${MOBILE_PRODUCT_SUMMARIES}/${id}`;
+export const MOBILE_OUTBOUND_ITEMS = `${API}/mobile/outboundItems`;

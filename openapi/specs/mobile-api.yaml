@@ -1,0 +1,253 @@
+openapi: 3.0.3
+info:
+  title: OpenBoxes - MobileApiController
+  description: >
+    Endpoints handled by org.pih.warehouse.api.MobileApiController, added in
+    Phase 2 Batch 49 to back the React mobile screens (mobile/index,
+    mobile/productList, mobile/productDetails, mobile/outboundList). Routed
+    via the explicit "/api/mobile/*" mappings in UrlMappings.groovy. All
+    endpoints operate on the session's current location.
+  version: 0.1.0
+servers:
+  - url: http://localhost:8080/openboxes
+    description: Local Docker baseline (docs/migration/RUNNING_LOCALLY.md)
+security:
+  - cookieAuth: []
+paths:
+  /api/mobile/dashboard:
+    get:
+      operationId: getMobileDashboard
+      summary: Mobile dashboard indicator counts
+      description: >
+        Product summary, purchase order and requisition counts for the current
+        location, mirroring the legacy MobileController.index model. Names and
+        Font Awesome classes are returned verbatim as the legacy screen
+        hardcoded them.
+      responses:
+        '400':
+          $ref: '#/components/responses/MissingLocation'
+        '200':
+          description: Dashboard indicators in a "data" envelope.
+          content:
+            application/json:
+              schema:
+                type: object
+                required: [data]
+                properties:
+                  data:
+                    type: array
+                    items:
+                      type: object
+                      required: [id, name, class, count]
+                      properties:
+                        id:
+                          type: string
+                          enum: [inventoryItems, purchaseOrders, replenishmentOrders]
+                        name:
+                          type: string
+                        class:
+                          type: string
+                        count:
+                          type: integer
+                      additionalProperties: false
+  /api/mobile/productSummaries:
+    get:
+      operationId: listMobileProductSummaries
+      summary: Paginated product summaries for the current location
+      description: >
+        Mirrors the legacy MobileController.productList model, ordered by
+        product ascending. Defaults to max=10, offset=0.
+      parameters:
+        - $ref: '../components/common.yaml#/components/parameters/max'
+        - $ref: '../components/common.yaml#/components/parameters/offset'
+      responses:
+        '400':
+          $ref: '#/components/responses/MissingLocation'
+        '200':
+          description: Product summaries with a total count.
+          content:
+            application/json:
+              schema:
+                type: object
+                required: [data, totalCount]
+                properties:
+                  data:
+                    type: array
+                    items:
+                      $ref: '#/components/schemas/MobileProductSummary'
+                  totalCount:
+                    type: integer
+  /api/mobile/productSummaries/{id}:
+    get:
+      operationId: getMobileProductSummary
+      summary: Product summary details for one product at the current location
+      description: >
+        Looks the product up by id or product code, mirroring the legacy
+        MobileController.productDetails action. When the product has no
+        summary at the current location, responds 200 with {"data": null}
+        and an errorMessage (the legacy screen redirected with a flash
+        message).
+      parameters:
+        - name: id
+          in: path
+          required: true
+          description: Product id or product code.
+          schema:
+            type: string
+      responses:
+        '400':
+          $ref: '#/components/responses/MissingLocation'
+        '200':
+          description: Product summary details, or data=null when unavailable.
+          content:
+            application/json:
+              schema:
+                type: object
+                required: [data]
+                properties:
+                  data:
+                    type: object
+                    nullable: true
+                    required: [product, quantityOnHand]
+                    properties:
+                      product:
+                        $ref: '#/components/schemas/MobileProduct'
+                      quantityOnHand:
+                        type: number
+                    additionalProperties: false
+                  errorMessage:
+                    type: string
+  /api/mobile/outboundItems:
+    get:
+      operationId: listMobileOutboundItems
+      summary: Pending outbound stock movements from the current location
+      description: >
+        Mirrors the legacy MobileController.outboundList action (direction
+        OUTBOUND, status PENDING, origin defaulting to the session location).
+        Defaults to max=10, offset=0.
+      parameters:
+        - name: origin.id
+          in: query
+          required: false
+          description: Origin location id; defaults to the session location.
+          schema:
+            $ref: '../components/common.yaml#/components/schemas/Id'
+        - $ref: '../components/common.yaml#/components/parameters/max'
+        - $ref: '../components/common.yaml#/components/parameters/offset'
+      responses:
+        '400':
+          $ref: '#/components/responses/MissingLocation'
+        '200':
+          description: Outbound stock movement rows with a total count.
+          content:
+            application/json:
+              schema:
+                type: object
+                required: [data, totalCount]
+                properties:
+                  data:
+                    type: array
+                    items:
+                      type: object
+                      required: [id, identifier, destination]
+                      properties:
+                        id:
+                          $ref: '../components/common.yaml#/components/schemas/Id'
+                        status:
+                          type: string
+                          nullable: true
+                        identifier:
+                          type: string
+                          nullable: true
+                        destination:
+                          type: object
+                          properties:
+                            id:
+                              $ref: '../components/common.yaml#/components/schemas/Id'
+                            name:
+                              type: string
+                              nullable: true
+                            locationNumber:
+                              type: string
+                              nullable: true
+                          additionalProperties: false
+                        requestedDeliveryDate:
+                          type: string
+                          nullable: true
+                          description: Formatted as "dd MMM yyyy" like the legacy screen.
+                      additionalProperties: false
+                  totalCount:
+                    type: integer
+                    nullable: true
+components:
+  responses:
+    MissingLocation:
+      description: >
+        No current location chosen on the session yet
+        (POST /api/chooseLocation/{id} first).
+      content:
+        application/json:
+          schema:
+            $ref: '../components/common.yaml#/components/schemas/ErrorResponse'
+  securitySchemes:
+    cookieAuth:
+      $ref: '../components/common.yaml#/components/securitySchemes/cookieAuth'
+  schemas:
+    MobileProduct:
+      type: object
+      required: [id, productCode, name]
+      properties:
+        id:
+          $ref: '../components/common.yaml#/components/schemas/Id'
+        productCode:
+          type: string
+        name:
+          type: string
+        description:
+          type: string
+          nullable: true
+        unitOfMeasure:
+          type: string
+          nullable: true
+        thumbnailId:
+          type: string
+          nullable: true
+        handlingIcons:
+          type: array
+          items:
+            type: object
+            properties:
+              icon:
+                type: string
+              color:
+                type: string
+                nullable: true
+              label:
+                type: string
+                nullable: true
+            additionalProperties: false
+        attributes:
+          type: array
+          items:
+            type: object
+            properties:
+              name:
+                type: string
+                nullable: true
+              value:
+                type: string
+                nullable: true
+              unitOfMeasure:
+                type: string
+                nullable: true
+            additionalProperties: false
+      additionalProperties: false
+    MobileProductSummary:
+      type: object
+      required: [product, quantityOnHand]
+      properties:
+        product:
+          $ref: '#/components/schemas/MobileProduct'
+        quantityOnHand:
+          type: number
+      additionalProperties: false

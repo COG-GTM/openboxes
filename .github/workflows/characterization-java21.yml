@@ -65,7 +65,7 @@ jobs:
       # builds run here; the rest of the suite encodes the behavior of the
       # pinned baseline image and runs in characterization-tests.yml.
       - name: Run OpenAPI contract tests (source-build-only endpoints)
-        run: ./characterization/contract/run.sh test_inventory_api_contract.py test_transaction_api_contract.py test_budget_code_api_contract.py test_gl_account_api_contract.py test_location_group_screens_api_contract.py test_location_type_api_contract.py test_event_type_api_contract.py test_localization_override_api_contract.py test_jobs_api_contract.py test_order_api_contract.py test_select_options_api_contract.py test_requisition_template_api_contract.py test_shipment_api_contract.py test_shipment_workflow_api_contract.py test_stock_movement_detail_api_contract.py test_admin_api_contract.py test_auth_api_contract.py test_batch_api_contract.py test_document_api_contract.py
+        run: ./characterization/contract/run.sh test_inventory_api_contract.py test_transaction_api_contract.py test_budget_code_api_contract.py test_gl_account_api_contract.py test_location_group_screens_api_contract.py test_location_type_api_contract.py test_event_type_api_contract.py test_localization_override_api_contract.py test_jobs_api_contract.py test_order_api_contract.py test_select_options_api_contract.py test_requisition_template_api_contract.py test_shipment_api_contract.py test_shipment_workflow_api_contract.py test_stock_movement_detail_api_contract.py test_admin_api_contract.py test_auth_api_contract.py test_batch_api_contract.py test_document_api_contract.py test_mobile_api_contract.py
 
       - name: Set up Node
         uses: actions/setup-node@v4

@@ -2374,6 +2374,26 @@ class UrlMappings {
             action = [GET: "list"]
         }
 
+        "/api/mobile/dashboard" {
+            controller = "mobileApi"
+            action = [GET: "dashboard"]
+        }
+
+        "/api/mobile/productSummaries" {
+            controller = "mobileApi"
+            action = [GET: "productSummaries"]
+        }
+
+        "/api/mobile/productSummaries/$id" {
+            controller = "mobileApi"
+            action = [GET: "productSummaryDetails"]
+        }
+
+        "/api/mobile/outboundItems" {
+            controller = "mobileApi"
+            action = [GET: "outboundItems"]
+        }
+
         "/api/reports/on-order-summary" {
             controller = "reportApi"
             action = [GET: "onOrderSummary"]
