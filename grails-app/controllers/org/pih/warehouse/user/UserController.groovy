@@ -54,19 +54,7 @@ class UserController {
      * Show list of users
      */
     def list() {
-
-        println params
-        def userInstanceList = []
-        def userInstanceTotal = 0
-
-        params.max = Math.min(params.max ? params.int('max') : 15, 100)
-
-        def query = params.q ? "%" + params.q + "%" : ""
-
-        userInstanceList = userService.findUsers(query, params)
-        userInstanceTotal = userInstanceList.totalCount
-
-        [userInstanceList: userInstanceList, userInstanceTotal: userInstanceTotal]
+        render(view: "/common/react", params: params)
     }
 
 
@@ -169,13 +157,7 @@ class UserController {
      * Show a user
      */
     def show() {
-        def userInstance = User.get(params.id)
-        if (!userInstance) {
-            flash.message = "${warehouse.message(code: 'default.not.found.message', args: [warehouse.message(code: 'user.label'), params.id])}"
-            redirect(action: "list")
-        } else {
-            [userInstance: userInstance]
-        }
+        render(view: "/common/react", params: params)
     }
 
     /**
@@ -192,14 +174,7 @@ class UserController {
     }
 
     def cropPhoto() {
-        log.info "change photo for given user"
-        def userInstance = User.get(params.id)
-        if (!userInstance) {
-            flash.message = "${warehouse.message(code: 'default.not.found.message', args: [warehouse.message(code: 'user.label'), params.id])}"
-            redirect(action: "list")
-        } else {
-            [userInstance: userInstance]
-        }
+        render(view: "/common/react", params: params)
     }
 
 
@@ -215,15 +190,7 @@ class UserController {
      * Show the edit form for a user
      */
     def edit() {
-
-        def userInstance = User.get(params.id)
-        if (!userInstance) {
-            flash.message = "${warehouse.message(code: 'default.not.found.message', args: [warehouse.message(code: 'user.label'), params.id])}"
-            redirect(action: "list")
-        } else {
-            def locations = locationService.getLoginLocations(session.warehouse).sort()
-            return [userInstance: userInstance, locations: locations]
-        }
+        render(view: "/common/react", params: params)
     }
 
 
@@ -233,12 +200,15 @@ class UserController {
             flash.message = "${warehouse.message(code: 'default.not.found.message', args: [warehouse.message(code: 'user.label'), params.id])}"
         } else {
             userInstance.active = !userInstance.active
-            if (!userInstance.hasErrors() && userInstance.save(flush: true)) {
+            boolean saved = User.withTransaction {
+                !userInstance.hasErrors() && userInstance.save(flush: true)
+            }
+            if (saved) {
                 flash.message = "${warehouse.message(code: 'default.updated.message', args: [warehouse.message(code: 'user.label'), userInstance.id])}"
                 sendUserStatusChanged(userInstance)
             } else {
-                def locations = Location.AllDepotWardAndPharmacy()
-                render(view: "edit", model: [userInstance: userInstance, locations: locations])
+                flash.error = "${warehouse.message(code: 'default.not.updated.message', args: [warehouse.message(code: 'user.label'), userInstance.id])}"
+                redirect(action: "edit", id: userInstance.id)
                 return
             }
         }
@@ -255,9 +225,8 @@ class UserController {
             if (params.version) {
                 def version = params.version.toLong()
                 if (userInstance.version > version) {
-                    userInstance.errors.rejectValue("version", "default.optimistic.locking.failure", [warehouse.message(code: 'user.label')] as Object[], "Another user has updated this User while you were editing")
-                    def locations = Location.AllDepotWardAndPharmacy()
-                    render(view: "edit", model: [userInstance: userInstance, locations: locations])
+                    flash.error = "Another user has updated this User while you were editing"
+                    redirect(action: "edit", id: userInstance.id)
                     return
                 }
             }
@@ -280,10 +249,8 @@ class UserController {
                 redirect(action: "edit", id: userInstance.id)
 
             } catch (ValidationException e) {
-                userInstance = User.read(params.id)
-                userInstance.errors = e.errors
-                def locations = Location.AllDepotWardAndPharmacy()
-                render(view: "edit", model: [userInstance: userInstance, locations: locations])
+                flash.error = e.errors.allErrors.collect { g.message(error: it) }.join('; ')
+                redirect(action: "edit", id: params.id)
             }
 
         } else {
@@ -300,11 +267,8 @@ class UserController {
                 flash.message = "${warehouse.message(code: 'default.updated.message', args: [warehouse.message(code: 'user.label'), user.id])}"
                 redirect(action: "edit", id: user.id)
             } catch (ValidationException e) {
-                // This read function is used to avoid getting lazy initialization exceptions in
-                // rendering the edit page, it is done like in the update function above
-                user = User.read(params.id)
-                user.errors = e.errors
-                render(view: "edit", model: [userInstance: user])
+                flash.error = e.errors.allErrors.collect { g.message(error: it) }.join('; ')
+                redirect(action: "edit", id: user.id)
             } catch (AuthenticationException e) {
                 flash.error = e.message
                 redirect(action: "edit", id: user.id)

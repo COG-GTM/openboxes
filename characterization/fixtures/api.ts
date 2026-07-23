@@ -55,18 +55,32 @@ export async function ensureUserActive(username: string, password: string): Prom
   }
   const admin = await newApiSession(ADMIN.username, ADMIN.password);
   try {
-    const listHtml = await (await admin.get(url(`/user/list?q=${username}`))).text();
-    // The list row links the user's edit page with the username as link text
-    // (the page also links the *current* user's edit page in the navbar).
-    const match = listHtml.match(
-      new RegExp(`/user/(?:show|edit)/([0-9a-f]+)"[^>]*>\\s*${username}\\b`),
-    );
-    expect(match, `user ${username} should exist in the demo dataset`).toBeTruthy();
-    const userId = match![1];
-    const res = await admin.post(url('/user/update'), {
-      form: { id: userId, active: 'on' },
-    });
-    expect(res.ok()).toBeTruthy();
+    // The user list is a React screen backed by the /api/users/list endpoint.
+    // The baseline (released) image predates that endpoint, so fall back to
+    // scraping the legacy GSP user list there.
+    const listRes = await admin.get(url(`/api/users/list?q=${username}`));
+    if (listRes.status() === 200) {
+      const users = (await listRes.json()).data as Array<{ id: string; username: string }>;
+      const user = users.find((u) => u.username === username);
+      expect(user, `user ${username} should exist in the demo dataset`).toBeTruthy();
+      const res = await admin.put(url(`/api/users/${user!.id}`), {
+        data: { active: true },
+      });
+      expect(res.ok()).toBeTruthy();
+    } else {
+      const listHtml = await (await admin.get(url(`/user/list?q=${username}`))).text();
+      // The list row links the user's edit page with the username as link text
+      // (the page also links the *current* user's edit page in the navbar).
+      const match = listHtml.match(
+        new RegExp(`/user/(?:show|edit)/([0-9a-f]+)"[^>]*>\\s*${username}\\b`),
+      );
+      expect(match, `user ${username} should exist in the demo dataset`).toBeTruthy();
+      const userId = match![1];
+      const res = await admin.post(url('/user/update'), {
+        form: { id: userId, active: 'on' },
+      });
+      expect(res.ok()).toBeTruthy();
+    }
   } finally {
     await admin.dispose();
   }

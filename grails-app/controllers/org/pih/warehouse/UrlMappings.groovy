@@ -592,11 +592,6 @@ class UrlMappings {
             action = [GET: "read"]
         }
 
-        "/api/users/$id/photo" {
-            controller = { "userApi" }
-            action = [POST: "uploadPhoto"]
-        }
-
         "/api/paymentTermOptions"(parseRequest: true) {
             controller = { "selectOptionsApi" }
             action = [GET: "paymentTermOptions"]
@@ -605,6 +600,46 @@ class UrlMappings {
         "/api/users" {
             controller = { "selectOptionsApi" }
             action = [GET: "usersOptions"]
+        }
+
+        "/api/users/list"(parseRequest: true) {
+            controller = { "userApi" }
+            action = [GET: "list"]
+        }
+
+        "/api/users/$id"(parseRequest: true) {
+            controller = { "userApi" }
+            action = [GET: "read", PUT: "update", DELETE: "delete"]
+        }
+
+        "/api/users/$id/password"(parseRequest: true) {
+            controller = { "userApi" }
+            action = [PUT: "changePassword"]
+        }
+
+        "/api/users/$id/photo"(parseRequest: false) {
+            controller = { "userApi" }
+            action = [POST: "uploadPhoto"]
+        }
+
+        "/api/users/$id/locationRoles"(parseRequest: true) {
+            controller = { "userApi" }
+            action = [POST: "saveLocationRole"]
+        }
+
+        "/api/users/$id/locationRoles/$locationRoleId"(parseRequest: true) {
+            controller = { "userApi" }
+            action = [DELETE: "deleteLocationRole"]
+        }
+
+        "/api/roleOptions" {
+            controller = { "selectOptionsApi" }
+            action = [GET: "roleOptions"]
+        }
+
+        "/api/loginLocationOptions" {
+            controller = { "selectOptionsApi" }
+            action = [GET: "loginLocationOptions"]
         }
 
         "/api/preferenceTypeOptions" {

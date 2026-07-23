@@ -195,6 +195,14 @@ export const PAYMENT_TERM_BY_ID = (id) => `${PAYMENT_TERM_API}/${id}`;
 
 // USERS
 export const USERS_OPTIONS = `${API}/users`;
+export const USER_LIST_API = `${API}/users/list`;
+export const USER_BY_ID = (id) => `${API}/users/${id}`;
+export const USER_PASSWORD = (id) => `${API}/users/${id}/password`;
+export const USER_PHOTO = (id) => `${API}/users/${id}/photo`;
+export const USER_LOCATION_ROLES = (id) => `${API}/users/${id}/locationRoles`;
+export const USER_LOCATION_ROLE_BY_ID = (id, locationRoleId) => `${API}/users/${id}/locationRoles/${locationRoleId}`;
+export const ROLE_OPTIONS = `${API}/roleOptions`;
+export const LOGIN_LOCATION_OPTIONS = `${API}/loginLocationOptions`;
 
 // PREFERENCE TYPES
 export const PREFERENCE_TYPE_OPTIONS = `${API}/preferenceTypeOptions`;
@@ -265,7 +273,6 @@ export const ROLE_BY_ID = (id) => `${API}/roles/${id}`;
 // USER
 export const USER_CREATE_API = `${API}/users/create`;
 export const USER_DETAILS = (id) => `${API}/users/${id}/details`;
-export const USER_PHOTO = (id) => `${API}/users/${id}/photo`;
 
 // LOGIN LOCATIONS
 export const LOGIN_LOCATIONS_API = `${API}/loginLocations`;

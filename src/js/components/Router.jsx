@@ -603,6 +603,26 @@ const AsyncPersonShow = Loadable({
   loading: Loading,
 });
 
+const AsyncUserList = Loadable({
+  loader: () => import('components/user/UserList'),
+  loading: Loading,
+});
+
+const AsyncUserShow = Loadable({
+  loader: () => import('components/user/UserShow'),
+  loading: Loading,
+});
+
+const AsyncUserForm = Loadable({
+  loader: () => import('components/user/UserForm'),
+  loading: Loading,
+});
+
+const AsyncUserCropPhoto = Loadable({
+  loader: () => import('components/user/UserCropPhoto'),
+  loading: Loading,
+});
+
 const AsyncSupplierList = Loadable({
   loader: () => import('components/supplier/SupplierList'),
   loading: Loading,
@@ -1669,6 +1689,10 @@ const Router = () => {
             <MainLayoutRoute path="**/person/create" component={AsyncPersonForm} />
             <MainLayoutRoute path="**/person/edit/:personId" component={AsyncPersonForm} />
             <MainLayoutRoute path="**/person/show/:personId" component={AsyncPersonShow} />
+            <MainLayoutRoute path="**/user/list" component={AsyncUserList} />
+            <MainLayoutRoute path="**/user/show/:userId" component={AsyncUserShow} />
+            <MainLayoutRoute path="**/user/edit/:userId" component={AsyncUserForm} />
+            <MainLayoutRoute path="**/user/cropPhoto/:userId" component={AsyncUserCropPhoto} />
             <MainLayoutRoute path="**/supplier/list" component={AsyncSupplierList} />
             <MainLayoutRoute path="**/supplier/show/:supplierId" component={AsyncSupplierShow} />
             <MainLayoutRoute path="**/party/list" component={AsyncPartyList} />

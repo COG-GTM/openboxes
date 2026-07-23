@@ -32,6 +32,26 @@ def test_order_adjustment_type_code_options(client):
                       "SHIPPING_CHARGE", "MISCELLANEOUS_CHARGE", "FEE"}
 
 
+def test_role_options(client):
+    # The pinned released image predates this endpoint; only source builds
+    # of this branch expose it.
+    if client.request("GET", "/api/roleOptions").status_code != 200:
+        pytest.skip("app build does not expose /api/roleOptions")
+    resp = check(client, spec, "GET", "/api/roleOptions")
+    data = resp.json()["data"]
+    assert data, "seeded dataset should have roles"
+    assert len({o["id"] for o in data}) == len(data)
+
+
+def test_login_location_options(client):
+    # The pinned released image predates this endpoint; only source builds
+    # of this branch expose it.
+    if client.request("GET", "/api/loginLocationOptions").status_code != 200:
+        pytest.skip("app build does not expose /api/loginLocationOptions")
+    resp = check(client, spec, "GET", "/api/loginLocationOptions")
+    assert resp.json()["data"], "seeded dataset should have login locations"
+
+
 def test_product_group_options(client):
     check(client, spec, "GET", "/api/productGroupOptions")
 

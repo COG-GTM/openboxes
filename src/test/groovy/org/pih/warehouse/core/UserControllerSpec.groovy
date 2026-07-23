@@ -78,23 +78,11 @@ class UserControllerSpec extends Specification implements ControllerUnitTest<Use
         User.count() == 2
     }
 
-    void "test get list of users with wrong query param"() {
+    void "test list renders the React app shell"() {
         when:
-        controller.params.q = "ZZZZZZ"
-        def listOfUsers = controller.list()
+        controller.list()
 
         then:
-        listOfUsers.userInstanceList.size() == 0
-        listOfUsers.userInstanceTotal == 0
-    }
-
-    void "test get list of users with proper query param"() {
-        when:
-        controller.params.q = "Asd"
-        def listOfUsers = controller.list()
-
-        then:
-        listOfUsers.userInstanceList.size() == 1
-        listOfUsers.userInstanceTotal == 1
+        view == '/common/react'
     }
 }

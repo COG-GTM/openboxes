@@ -554,8 +554,12 @@ const USER_URL = {
   show: (id) => `${USER_URL.base}/show/${id}`,
   edit: (id) => `${USER_URL.base}/edit/${id}`,
   changePhoto: (id) => `${USER_URL.base}/changePhoto/${id}`,
-  impersonate: (id) => `${USER_URL.base}/impersonate/${id}`,
+  cropPhoto: (id) => `${USER_URL.base}/cropPhoto/${id}`,
+  viewPhoto: (id) => `${USER_URL.base}/viewPhoto/${id}`,
   viewThumb: (id) => `${USER_URL.base}/viewThumb/${id}`,
+  impersonate: (id) => `${USER_URL.base}/impersonate/${id}`,
+  toggleActivation: (id) => `${USER_URL.base}/toggleActivation/${id}`,
+  sendTestEmail: (id) => `${USER_URL.base}/sendTestEmail/${id}`,
 };
 
 const ROLE_URL = {

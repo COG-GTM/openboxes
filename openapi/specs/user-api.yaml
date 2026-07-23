@@ -2,14 +2,16 @@ openapi: 3.0.3
 info:
   title: OpenBoxes - UserApiController
   description: >
-    User endpoints handled by org.pih.warehouse.api.UserApiController,
-    routed via explicit "/api/users/create", "/api/users/{id}/details"
-    and "/api/users/{id}/photo" mappings (plain GET /api/users is the
-    pre-existing user select-options endpoint). Added in Phase 2
-    (Batch 45) to back the React user/create and user/changePhoto
-    screens. Role assignment is intentionally not exposed, matching the
-    legacy create form. New users are created inactive, matching the
-    legacy UserController.save behavior.
+    User list/create/read/update/delete, password, photo and
+    location-role endpoints handled by
+    org.pih.warehouse.api.UserApiController, routed via the explicit
+    "/api/users/list", "/api/users/create" and "/api/users/$id..."
+    mappings. Added in Phase 2 (Batches 45 and 46) to back the React
+    user create/changePhoto and list/show/edit/cropPhoto screens.
+    New users are created inactive, matching the legacy
+    UserController.save behavior. Note that "/api/users" (GET) is a
+    separate select-options endpoint (see select-options-api.yaml),
+    which is why the list endpoint lives at "/api/users/list".
   version: 0.1.0
 servers:
   - url: http://localhost:8080/openboxes
@@ -17,6 +19,62 @@ servers:
 security:
   - cookieAuth: []
 paths:
+  /api/users/list:
+    get:
+      operationId: listUsers
+      summary: List users, optionally filtered
+      description: >
+        Backs the React user list screen; requires an admin session
+        (RoleInterceptor adminActions). Filtering matches the legacy
+        user/list behavior - "q" is wrapped in %...% and matched (like)
+        against firstName, lastName, email and username; "status"
+        filters on the active flag.
+      parameters:
+        - name: q
+          in: query
+          required: false
+          schema:
+            type: string
+          description: >
+            Substring filter (like "%q%"); case sensitivity follows the
+            database collation (case-insensitive on the default MySQL setup).
+        - name: status
+          in: query
+          required: false
+          schema:
+            type: string
+            enum: ['true', 'false']
+          description: Filter on the active flag; omit for all users.
+        - name: sort
+          in: query
+          required: false
+          schema:
+            type: string
+            enum: [username, firstName, lastName, email, active, lastLoginDate]
+          description: Sort property; other values are ignored.
+        - name: order
+          in: query
+          required: false
+          schema:
+            type: string
+            enum: [asc, desc]
+        - $ref: '../components/common.yaml#/components/parameters/max'
+        - $ref: '../components/common.yaml#/components/parameters/offset'
+      responses:
+        '200':
+          description: Paged users.
+          content:
+            application/json:
+              schema:
+                type: object
+                required: [data, totalCount]
+                properties:
+                  data:
+                    type: array
+                    items:
+                      $ref: '#/components/schemas/UserListItem'
+                  totalCount:
+                    type: integer
   /api/users/create:
     post:
       operationId: createUser
@@ -49,54 +107,159 @@ paths:
           content:
             application/json:
               schema:
-                type: object
-                required: [data]
-                properties:
-                  data:
-                    $ref: '#/components/schemas/User'
+                $ref: '#/components/schemas/UserDetailsResponse'
         '400':
-          description: Validation failed.
-          content:
-            application/json:
-              schema:
-                type: object
-                required: [errorCode, errorMessages]
-                properties:
-                  errorCode:
-                    type: integer
-                  errorMessages:
-                    type: array
-                    items:
-                      type: string
-  /api/users/{id}/details:
+          $ref: '#/components/responses/UserValidationError'
+  /api/users/{id}:
+    parameters:
+      - name: id
+        in: path
+        required: true
+        schema:
+          $ref: '../components/common.yaml#/components/schemas/Id'
+        description: >
+          User id. Unknown ids raise ObjectNotFoundException, rendered
+          as HTTP 404 by ErrorsController.handleNotFound.
     get:
       operationId: readUser
-      summary: Read a user
-      parameters:
-        - $ref: '#/components/parameters/userId'
+      summary: Read a single user with roles and location roles
       responses:
         '200':
           description: The user.
           content:
             application/json:
               schema:
-                type: object
-                required: [data]
-                properties:
-                  data:
-                    $ref: '#/components/schemas/User'
+                $ref: '#/components/schemas/UserDetailsResponse'
         '404':
-          $ref: '#/components/responses/UserNotFound'
+          $ref: '../components/common.yaml#/components/responses/NotFound'
+    put:
+      operationId: updateUser
+      summary: Update user details, default location and roles
+      description: >
+        Delegates to UserService.updateUser, which validates that the
+        requesting user may add/remove the requested roles and rejects
+        the localization-mode locale. Only whitelisted fields are bound
+        (username, firstName, lastName, email, locale, timezone, active,
+        rememberLastLocation, warehouse, roles).
+      requestBody:
+        required: false
+        content:
+          application/json:
+            schema:
+              $ref: '#/components/schemas/UserUpdateRequest'
+      responses:
+        '200':
+          description: The updated user.
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/UserDetailsResponse'
+        '400':
+          $ref: '#/components/responses/UserValidationError'
+        '404':
+          $ref: '../components/common.yaml#/components/responses/NotFound'
+    delete:
+      operationId: deleteUser
+      summary: Delete a user
+      description: >
+        Deleting your own account is rejected with HTTP 400, matching
+        the legacy user/delete behavior.
+      responses:
+        '204':
+          description: Deleted; no content.
+        '400':
+          description: >
+            Attempted self-deletion, or the user is referenced by other
+            records (foreign key constraint) and cannot be deleted.
+          content:
+            application/json:
+              schema:
+                $ref: '../components/common.yaml#/components/schemas/ValidationErrorResponse'
+        '404':
+          $ref: '../components/common.yaml#/components/responses/NotFound'
+        '500':
+          $ref: '../components/common.yaml#/components/responses/ServerError'
+  /api/users/{id}/details:
+    get:
+      operationId: readUserDetails
+      summary: Read a user (Batch 45 route)
+      description: >
+        Alternate mapping to the same read action as GET /api/users/{id},
+        kept for the React user/changePhoto screen (Batch 45).
+      parameters:
+        - name: id
+          in: path
+          required: true
+          schema:
+            $ref: '../components/common.yaml#/components/schemas/Id'
+      responses:
+        '200':
+          description: The user.
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/UserDetailsResponse'
+        '404':
+          $ref: '../components/common.yaml#/components/responses/NotFound'
+  /api/users/{id}/password:
+    parameters:
+      - name: id
+        in: path
+        required: true
+        schema:
+          $ref: '../components/common.yaml#/components/schemas/Id'
+    put:
+      operationId: changeUserPassword
+      summary: Change a user's password
+      description: >
+        Delegates to UserService.changePassword. Returns 403 when the
+        requesting user is not allowed to edit passwords
+        (AuthenticationException), 400 on validation failure (blank or
+        mismatched passwords).
+      requestBody:
+        required: true
+        content:
+          application/json:
+            schema:
+              type: object
+              required: [password, passwordConfirm]
+              properties:
+                password:
+                  type: string
+                passwordConfirm:
+                  type: string
+      responses:
+        '200':
+          description: Password changed; returns the user.
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/UserDetailsResponse'
+        '400':
+          $ref: '#/components/responses/UserValidationError'
+        '403':
+          description: Requesting user may not edit user passwords.
+          content:
+            application/json:
+              schema:
+                $ref: '../components/common.yaml#/components/schemas/ErrorResponse'
+        '404':
+          $ref: '../components/common.yaml#/components/responses/NotFound'
   /api/users/{id}/photo:
+    parameters:
+      - name: id
+        in: path
+        required: true
+        schema:
+          $ref: '../components/common.yaml#/components/schemas/Id'
     post:
       operationId: uploadUserPhoto
-      summary: Upload a user's photo
+      summary: Upload a user photo
       description: >
-        Multipart upload; the "photo" part must be a PNG, JPEG or GIF
-        smaller than 1MB (same rules as the legacy
-        UserController.uploadPhoto action).
-      parameters:
-        - $ref: '#/components/parameters/userId'
+        Multipart upload of a "photo" part; accepts image/png, image/jpeg
+        and image/gif under 1 MB, matching the legacy user/uploadPhoto
+        action. The stored photo is served by the legacy
+        user/viewPhoto/{id} and user/viewThumb/{id} actions.
       requestBody:
         required: true
         content:
@@ -110,64 +273,284 @@ paths:
                   format: binary
       responses:
         '200':
-          description: Uploaded; returns the refreshed user.
+          description: Photo stored; returns the user.
           content:
             application/json:
               schema:
-                type: object
-                required: [data]
-                properties:
-                  data:
-                    $ref: '#/components/schemas/User'
+                $ref: '#/components/schemas/UserDetailsResponse'
         '400':
-          description: Missing, wrong-type or too-large photo.
+          description: Missing part, unsupported content type or > 1 MB.
           content:
             application/json:
               schema:
-                $ref: '../components/common.yaml#/components/schemas/ErrorResponse'
+                $ref: '../components/common.yaml#/components/schemas/ValidationErrorResponse'
         '404':
-          $ref: '#/components/responses/UserNotFound'
+          $ref: '../components/common.yaml#/components/responses/NotFound'
+  /api/users/{id}/locationRoles:
+    parameters:
+      - name: id
+        in: path
+        required: true
+        schema:
+          $ref: '../components/common.yaml#/components/schemas/Id'
+    post:
+      operationId: addUserLocationRoles
+      summary: Add location roles to a user
+      description: >
+        Delegates to UserService.saveLocationRole, which validates that
+        the requesting user may assign the requested roles.
+      requestBody:
+        required: true
+        content:
+          application/json:
+            schema:
+              type: object
+              required: [location, role]
+              properties:
+                location:
+                  type: object
+                  required: [id]
+                  properties:
+                    id:
+                      $ref: '../components/common.yaml#/components/schemas/Id'
+                role:
+                  type: array
+                  items:
+                    type: object
+                    required: [id]
+                    properties:
+                      id:
+                        $ref: '../components/common.yaml#/components/schemas/Id'
+      responses:
+        '200':
+          description: Location roles added; returns the user.
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/UserDetailsResponse'
+        '400':
+          $ref: '#/components/responses/UserValidationError'
+        '404':
+          $ref: '../components/common.yaml#/components/responses/NotFound'
+  /api/users/{id}/locationRoles/{locationRoleId}:
+    parameters:
+      - name: id
+        in: path
+        required: true
+        schema:
+          $ref: '../components/common.yaml#/components/schemas/Id'
+      - name: locationRoleId
+        in: path
+        required: true
+        schema:
+          $ref: '../components/common.yaml#/components/schemas/Id'
+    delete:
+      operationId: deleteUserLocationRole
+      summary: Delete one of a user's location roles
+      responses:
+        '200':
+          description: Location role deleted; returns the user.
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/UserDetailsResponse'
+        '400':
+          $ref: '#/components/responses/UserValidationError'
+        '404':
+          $ref: '../components/common.yaml#/components/responses/NotFound'
 components:
-  parameters:
-    userId:
-      name: id
-      in: path
-      required: true
-      schema:
-        type: string
-      description: User id.
   responses:
-    UserNotFound:
-      description: No user for the given id.
+    UserValidationError:
+      description: Validation failed.
       content:
         application/json:
           schema:
-            $ref: '../components/common.yaml#/components/schemas/ErrorResponse'
+            $ref: '../components/common.yaml#/components/schemas/ValidationErrorResponse'
   schemas:
-    User:
+    UserListItem:
       type: object
-      required: [id, username, active, hasPhoto]
+      description: Row rendering emitted by UserApiController.toListJson().
+      required: [id, active]
       properties:
         id:
-          type: string
+          $ref: '../components/common.yaml#/components/schemas/Id'
         username:
           type: string
+          nullable: true
+        name:
+          type: string
+          nullable: true
+        email:
+          type: string
+          nullable: true
+        active:
+          type: boolean
+        locale:
+          type: string
+          nullable: true
+          description: Locale code (e.g. en, fr).
+        localeDisplayName:
+          type: string
+          nullable: true
+        roles:
+          type: string
+          nullable: true
+          description: Comma-joined role descriptions.
+        lastLoginDate:
+          type: string
+          nullable: true
+      additionalProperties: true
+    UserDetailsResponse:
+      type: object
+      required: [data]
+      properties:
+        data:
+          $ref: '#/components/schemas/UserDetails'
+    UserDetails:
+      type: object
+      description: Detail rendering emitted by UserApiController.toDetailsJson().
+      required: [id, active, roles, locationRoles]
+      properties:
+        id:
+          $ref: '../components/common.yaml#/components/schemas/Id'
+        username:
+          type: string
+          nullable: true
         firstName:
           type: string
           nullable: true
         lastName:
           type: string
           nullable: true
-        email:
+        name:
           type: string
           nullable: true
-        locale:
+        email:
           type: string
           nullable: true
         active:
           type: boolean
+        locale:
+          type: string
+          nullable: true
+        localeDisplayName:
+          type: string
+          nullable: true
+        timezone:
+          type: string
+          nullable: true
+        rememberLastLocation:
+          type: boolean
+          nullable: true
         hasPhoto:
           type: boolean
+        warehouse:
+          type: object
+          nullable: true
+          properties:
+            id:
+              $ref: '../components/common.yaml#/components/schemas/Id'
+            name:
+              type: string
+              nullable: true
+        roles:
+          type: array
+          items:
+            type: object
+            properties:
+              id:
+                $ref: '../components/common.yaml#/components/schemas/Id'
+              roleType:
+                type: string
+                nullable: true
+              description:
+                type: string
+                nullable: true
+        locationRoles:
+          type: array
+          items:
+            type: object
+            properties:
+              id:
+                $ref: '../components/common.yaml#/components/schemas/Id'
+              location:
+                type: object
+                nullable: true
+                properties:
+                  id:
+                    $ref: '../components/common.yaml#/components/schemas/Id'
+                  name:
+                    type: string
+                    nullable: true
+                  locationGroup:
+                    type: string
+                    nullable: true
+                  locationType:
+                    type: string
+                    nullable: true
+              role:
+                type: object
+                nullable: true
+                properties:
+                  id:
+                    $ref: '../components/common.yaml#/components/schemas/Id'
+                  roleType:
+                    type: string
+                    nullable: true
+                  description:
+                    type: string
+                    nullable: true
+              highestActive:
+                type: boolean
+                nullable: true
+        lastLoginDate:
+          type: string
+          nullable: true
+        dateCreated:
+          type: string
+          nullable: true
+        lastUpdated:
+          type: string
+          nullable: true
+        version:
+          type: integer
+          nullable: true
+      additionalProperties: true
+    UserUpdateRequest:
+      type: object
+      properties:
+        username:
+          type: string
+        firstName:
+          type: string
+        lastName:
+          type: string
+        email:
+          type: string
+        locale:
+          type: string
+          description: Locale code; empty string clears the locale.
+        timezone:
+          type: string
+        active:
+          type: boolean
+        rememberLastLocation:
+          type: boolean
+        warehouse:
+          type: object
+          nullable: true
+          properties:
+            id:
+              type: string
+              nullable: true
+        roles:
+          type: array
+          description: >
+            Full replacement set of role ids; omit to leave roles
+            unchanged.
+          items:
+            type: string
+      additionalProperties: true
   securitySchemes:
     cookieAuth:
       $ref: '../components/common.yaml#/components/securitySchemes/cookieAuth'

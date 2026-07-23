@@ -47,6 +47,7 @@ class RoleInterceptor {
         'product'        : ['create'],
         'person'         : ['list'],
         'user'           : ['list'],
+        'userApi'        : ['list'],
         'location'       : ['edit'],
         'shipper'        : ['create'],
         'locationGroup'  : ['create'],

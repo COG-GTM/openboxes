@@ -121,6 +121,30 @@ paths:
       responses:
         '200':
           $ref: '#/components/responses/IdLabelOptionsOk'
+  /api/roleOptions:
+    get:
+      operationId: listRoleOptions
+      summary: Role options
+      description: >
+        Returns all roles as {id, label} pairs (label is the role
+        description, falling back to the RoleType enum name), sorted by
+        description. Added in Phase 2 (Batch 46) for the React user edit
+        screen.
+      responses:
+        '200':
+          $ref: '#/components/responses/IdLabelOptionsOk'
+  /api/loginLocationOptions:
+    get:
+      operationId: listLoginLocationOptions
+      summary: Login location options
+      description: >
+        Returns the locations the current session may log into
+        (LocationService.getLoginLocations), sorted, as {id, label}
+        pairs (label is the location name). Added in Phase 2 (Batch 46)
+        for the React user edit screen.
+      responses:
+        '200':
+          $ref: '#/components/responses/IdLabelOptionsOk'
   /api/locationTypeCodeOptions:
     get:
       operationId: listLocationTypeCodeOptions
