@@ -7,7 +7,7 @@
     <sqlFile path="views/product-demand-view.sql"/>
   </changeSet>
   <changeSet id="1580848680306-1b" author="jmiranda" runOnChange="true" runAlways="true" failOnError="true">
-    <preConditions onFail="MARK_RAN">
+    <preConditions onFail="CONTINUE">
       <not>
         <tableExists tableName="product_demand_details" />
       </not>
@@ -78,7 +78,7 @@
     <sqlFile path="views/order-summary-helper-views.sql"/>
   </changeSet>
   <changeSet id="1580848680306-23b" author="awalkowiak" runOnChange="true" runAlways="true" failOnError="true">
-    <preConditions onFail="MARK_RAN">
+    <preConditions onFail="CONTINUE">
       <not>
         <tableExists tableName="order_summary_mv" />
       </not>
@@ -171,7 +171,7 @@
     <sqlFile path="views/inventory-transaction-summary-helper-views.sql"/>
   </changeSet>
   <changeSet id="1748970410098-5b" author="kchelstowski" runOnChange="true" runAlways="true" failOnError="true">
-    <preConditions onFail="MARK_RAN">
+    <preConditions onFail="CONTINUE">
       <and>
         <not>
           <indexExists indexName="idx_product_code_inventory" schemaName="inventory_movement_summary" />
