@@ -13,7 +13,6 @@ import fr.opensagres.xdocreport.converter.ConverterTypeTo
 import fr.w3blog.zpl.utils.ZebraUtils
 import grails.core.GrailsApplication
 import grails.gorm.transactions.Transactional
-import grails.gorm.PagedResultList
 import grails.validation.Validateable
 import org.apache.http.client.fluent.Request
 import org.apache.http.entity.ContentType
@@ -52,13 +51,8 @@ class DocumentController {
         redirect(action: "list", params: params)
     }
 
-    def list(DocumentFilterCommand command) {
-
-        log.info "params: " + params
-
-        PagedResultList<Document> documentInstanceList = documentService.getDocuments(command)
-
-        [documentInstanceList: documentInstanceList, documentInstanceTotal: documentInstanceList.totalCount]
+    def list() {
+        render(view: "/common/react", params: params)
     }
 
     def create() {
@@ -96,23 +90,21 @@ class DocumentController {
     }
 
     def show() {
-        def documentInstance = Document.get(params.id)
-        if (!documentInstance) {
-            flash.message = "${warehouse.message(code: 'default.not.found.message', args: [warehouse.message(code: 'document.label', default: 'Document'), params.id])}"
-            redirect(action: "list")
-        } else {
-            [documentInstance: documentInstance]
+        // The legacy document/show GSP posted its Edit/Delete buttons here with the id as
+        // a request parameter; the React route needs the id in the path.
+        if (request.method == "POST" && params.id) {
+            redirect(uri: "/document/show/${params.id}")
+            return
         }
+        render(view: "/common/react", params: params)
     }
 
     def edit() {
-        def documentInstance = Document.get(params.id)
-        if (!documentInstance) {
-            flash.message = "${warehouse.message(code: 'default.not.found.message', args: [warehouse.message(code: 'document.label', default: 'Document'), params.id])}"
-            redirect(action: "list")
-        } else {
-            return [documentInstance: documentInstance]
+        if (request.method == "POST" && params.id) {
+            redirect(uri: "/document/edit/${params.id}")
+            return
         }
+        render(view: "/common/react", params: params)
     }
 
     def update() {
@@ -121,22 +113,14 @@ class DocumentController {
 
         def documentInstance = Document.get(params.id)
         if (documentInstance) {
-            if (params.version) {
-                def version = params.version.toLong()
-                if (documentInstance.version > version) {
-                    documentInstance.errors.rejectValue("version", "default.optimistic.locking.failure", [warehouse.message(code: 'document.label', default: 'Document')] as Object[], "Another user has updated this Document while you were editing")
-                    render(view: "edit", model: [documentInstance: documentInstance])
-                    return
-                }
-            }
-
             documentInstance.properties = params
 
             if (!documentInstance.hasErrors() && documentInstance.save(flush: true)) {
                 flash.message = "${warehouse.message(code: 'default.updated.message', args: [warehouse.message(code: 'document.label', default: 'Document'), documentInstance.id])}"
                 redirect(action: "list", id: documentInstance.id)
             } else {
-                render(view: "edit", model: [documentInstance: documentInstance])
+                flash.message = "${warehouse.message(code: 'document.cannotSave.message', args: [documentInstance.errors])}"
+                redirect(uri: "/document/edit/${documentInstance.id}")
             }
         } else {
             flash.message = "${warehouse.message(code: 'default.not.found.message', args: [warehouse.message(code: 'document.label', default: 'Document'), params.id])}"
@@ -311,47 +295,13 @@ class DocumentController {
     }
 
     /**
-     * @deprecated
+     * @deprecated file replacement is handled by the React document edit screen
+     * (POST /api/documents/{id}/content); the old URL redirects there.
      */
     def upload() {
-
-        log.info "Upload " + params
-
-        def documentInstance = Document.get(params.id)
-        if (documentInstance) {
-            if (params.version) {
-                def version = params.version.toLong()
-                if (documentInstance.version > version) {
-                    documentInstance.errors.rejectValue("version", "default.optimistic.locking.failure", [warehouse.message(code: 'document.label', default: 'Document')] as Object[], "Another user has updated this Document while you were editing")
-                    render(view: "edit", model: [documentInstance: documentInstance])
-                    return
-                }
-            }
-
-            def file = request.getFile("fileContents")
-            if (file?.empty) {
-                flash.message = "${g.message(code: 'file')}"
-            } else {
-
-                // Only change the name if it was never modified from the original filename
-                if (documentInstance.filename == documentInstance.name) {
-                    documentInstance.name = file.originalFilename
-                }
-
-                documentInstance.filename = file.originalFilename
-                documentInstance.fileContents = file.bytes
-                documentInstance.extension = FileUtil.getExtension(file.originalFilename)
-                documentInstance.contentType = file.contentType
-            }
-
-            if (!documentInstance.hasErrors() && documentInstance.save(flush: true)) {
-                flash.message = "${warehouse.message(code: 'default.updated.message', args: [warehouse.message(code: 'document.label', default: 'Document'), documentInstance.id])}"
-                redirect(action: "edit", id: documentInstance.id)
-            } else {
-                render(view: "edit", model: [documentInstance: documentInstance])
-            }
+        if (params.id) {
+            redirect(uri: "/document/edit/${params.id}")
         } else {
-            flash.message = "${warehouse.message(code: 'default.not.found.message', args: [warehouse.message(code: 'document.label', default: 'Document'), params.id])}"
             redirect(action: "list")
         }
     }

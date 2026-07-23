@@ -668,6 +668,26 @@ const AsyncGlAccountTypeForm = Loadable({
   loading: Loading,
 });
 
+const AsyncDocumentList = Loadable({
+  loader: () => import('components/document/DocumentList'),
+  loading: Loading,
+});
+
+const AsyncDocumentForm = Loadable({
+  loader: () => import('components/document/DocumentForm'),
+  loading: Loading,
+});
+
+const AsyncDocumentShow = Loadable({
+  loader: () => import('components/document/DocumentShow'),
+  loading: Loading,
+});
+
+const AsyncEventTypeForm = Loadable({
+  loader: () => import('components/eventType/EventTypeForm'),
+  loading: Loading,
+});
+
 const AsyncInvoiceShow = Loadable({
   loader: () => import('components/invoice/show/InvoiceShow'),
   loading: Loading,
@@ -1562,6 +1582,11 @@ const Router = () => {
             <MainLayoutRoute path="**/glAccountType/list" component={AsyncGlAccountTypeList} />
             <MainLayoutRoute path="**/glAccountType/create" component={AsyncGlAccountTypeForm} />
             <MainLayoutRoute path="**/glAccountType/edit/:glAccountTypeId" component={AsyncGlAccountTypeForm} />
+            <MainLayoutRoute path="**/document/list" component={AsyncDocumentList} />
+            <MainLayoutRoute path="**/document/edit/:documentId" component={AsyncDocumentForm} />
+            <MainLayoutRoute path="**/document/show/:documentId" component={AsyncDocumentShow} />
+            <MainLayoutRoute path="**/eventType/create" component={AsyncEventTypeForm} />
+            <MainLayoutRoute path="**/eventType/edit/:eventTypeId" component={AsyncEventTypeForm} />
             <MainLayoutRoute path="**/attribute/list" component={AsyncAttributeList} />
             <MainLayoutRoute path="**/attribute/create" component={AsyncAttributeForm} />
             <MainLayoutRoute path="**/attribute/edit/:id" component={AsyncAttributeForm} />

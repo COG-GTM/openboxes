@@ -11,10 +11,12 @@ package org.pih.warehouse.api
 
 import grails.converters.JSON
 import grails.gorm.transactions.Transactional
+import grails.validation.ValidationException
 import org.hibernate.ObjectNotFoundException
 import org.springframework.dao.DataIntegrityViolationException
 import org.springframework.http.HttpStatus
 
+import org.pih.warehouse.core.EventCode
 import org.pih.warehouse.core.EventType
 
 class EventTypeApiController {
@@ -42,6 +44,30 @@ class EventTypeApiController {
     }
 
     @Transactional
+    def create() {
+        EventType eventType = new EventType()
+        bindEventType(eventType, request.JSON)
+        if (eventType.hasErrors() || !eventType.save(flush: true)) {
+            throw new ValidationException("Invalid event type", eventType.errors)
+        }
+        response.status = HttpStatus.CREATED.value()
+        render([data: toJson(eventType)] as JSON)
+    }
+
+    @Transactional
+    def update() {
+        EventType eventType = EventType.get(params.id)
+        if (!eventType) {
+            throw new ObjectNotFoundException(params.id, EventType.class.toString())
+        }
+        bindEventType(eventType, request.JSON)
+        if (eventType.hasErrors() || !eventType.save(flush: true)) {
+            throw new ValidationException("Invalid event type", eventType.errors)
+        }
+        render([data: toJson(eventType)] as JSON)
+    }
+
+    @Transactional
     def delete() {
         EventType eventType = EventType.get(params.id)
         if (!eventType) {
@@ -57,6 +83,26 @@ class EventTypeApiController {
             return
         }
         render status: HttpStatus.NO_CONTENT.value()
+    }
+
+    private void bindEventType(EventType eventType, jsonObject) {
+        if (jsonObject.containsKey("name")) {
+            eventType.name = jsonObject.name ?: null
+        }
+        if (jsonObject.containsKey("description")) {
+            eventType.description = jsonObject.description ?: null
+        }
+        if (jsonObject.containsKey("sortOrder")) {
+            eventType.sortOrder = jsonObject.sortOrder != null && jsonObject.sortOrder != ""
+                    ? jsonObject.sortOrder as Integer
+                    : null
+        }
+        if (jsonObject.containsKey("eventCode")) {
+            eventType.eventCode = jsonObject.eventCode
+                    ? jsonObject.eventCode as EventCode
+                    : null
+        }
+        eventType.validate()
     }
 
     private static Map toJson(EventType eventType) {

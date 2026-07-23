@@ -11,27 +11,29 @@ package org.pih.warehouse.core
 
 import grails.testing.gorm.DataTest
 import grails.testing.web.controllers.ControllerUnitTest
+import org.grails.web.json.JSONObject
 import spock.lang.Specification
 
-class EventTypeControllerTests extends Specification implements ControllerUnitTest<EventTypeController>, DataTest {
+import org.pih.warehouse.api.EventTypeApiController
+
+class EventTypeControllerTests extends Specification implements ControllerUnitTest<EventTypeApiController>, DataTest {
 
     Class[] getDomainClassesToMock() {
         [EventType]
     }
-    def stubMessager = new Expando()
 
     void "test saving valid EventType"() {
         when:
-        stubMessager.message = { args -> return "success" }
-        controller.metaClass.warehouse = stubMessager
-        controller.params.name = "testEvent"
-        controller.params.eventCode = EventCode.SCHEDULED
+        request.contentType = "application/json"
         request.method = "POST"
-        controller.save()
+        request.content = '{ "name": "testEvent", "eventCode": "SCHEDULED" }'
+        controller.create()
 
         then:
-        response.redirectedUrl.startsWith('/eventType/list/')
-        flash.message != null
+        response.status == 201
+        JSONObject json = new JSONObject(response.contentAsString)
+        json.data.name == "testEvent"
+        json.data.eventCode == "SCHEDULED"
         EventType.count() == 1
     }
 }

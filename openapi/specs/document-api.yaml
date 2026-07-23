@@ -2,12 +2,13 @@ openapi: 3.0.3
 info:
   title: OpenBoxes - DocumentApiController
   description: >
-    Document creation endpoint handled by
-    org.pih.warehouse.api.DocumentApiController, routed via an explicit
-    mapping in UrlMappings.groovy ("/api/documents"). Added in Phase 2
-    (Batch 41) to back the React document/create screen; mirrors the legacy
-    DocumentController.save action (multipart upload, empty-file rejection,
-    10MB size gate).
+    Document create/list/read/update/delete and file-content upload endpoints
+    handled by org.pih.warehouse.api.DocumentApiController, routed via explicit
+    mappings in UrlMappings.groovy. Creation (multipart upload, Batch 41) backs
+    the React document/create screen and mirrors the legacy
+    DocumentController.save action (empty-file rejection, 10MB size gate).
+    List/read/update/delete and content replacement (Batch 42) back the React
+    document list/edit/show screens.
   version: 0.1.0
 servers:
   - url: http://localhost:8080/openboxes
@@ -78,7 +79,257 @@ paths:
           $ref: '../components/common.yaml#/components/responses/ValidationError'
         '401':
           $ref: '../components/common.yaml#/components/responses/Unauthorized'
+    get:
+      operationId: listDocuments
+      summary: List documents
+      description: >
+        Paged list mirroring the legacy document/list screen, backed by
+        DocumentService.getDocuments (case-insensitive name substring search
+        via q, exact documentType.id filter, optional sort/order, paging via
+        max/offset).
+      parameters:
+        - name: q
+          in: query
+          required: false
+          schema:
+            type: string
+          description: Case-insensitive substring match on document name.
+        - name: documentType.id
+          in: query
+          required: false
+          schema:
+            type: string
+          description: Filter by exact document type id.
+        - name: sort
+          in: query
+          required: false
+          schema:
+            type: string
+          description: Document property to sort by (e.g. name, extension).
+        - name: order
+          in: query
+          required: false
+          schema:
+            type: string
+            enum: [asc, desc]
+          description: Sort direction, only applied when sort is provided.
+        - $ref: '../components/common.yaml#/components/parameters/max'
+        - $ref: '../components/common.yaml#/components/parameters/offset'
+      responses:
+        '200':
+          description: Paged documents.
+          content:
+            application/json:
+              schema:
+                type: object
+                required: [data, totalCount]
+                properties:
+                  data:
+                    type: array
+                    items:
+                      $ref: '#/components/schemas/Document'
+                  totalCount:
+                    type: integer
+  /api/documents/{id}:
+    parameters:
+      - name: id
+        in: path
+        required: true
+        schema:
+          $ref: '../components/common.yaml#/components/schemas/Id'
+        description: >
+          Document id. Unknown ids raise ObjectNotFoundException, rendered
+          as HTTP 404 by ErrorsController.handleNotFound.
+    get:
+      operationId: readDocument
+      summary: Read a single document (metadata only, no file contents)
+      responses:
+        '200':
+          description: The document.
+          content:
+            application/json:
+              schema:
+                type: object
+                required: [data]
+                properties:
+                  data:
+                    $ref: '#/components/schemas/Document'
+        '404':
+          $ref: '../components/common.yaml#/components/responses/NotFound'
+    put:
+      operationId: updateDocument
+      summary: Update document metadata
+      description: >
+        Partial update; only keys present in the body are bound. Also mapped
+        for POST via the standard "/api/${resource}s/$id" REST mapping.
+      requestBody:
+        required: true
+        content:
+          application/json:
+            schema:
+              $ref: '#/components/schemas/DocumentInput'
+      responses:
+        '200':
+          description: The updated document.
+          content:
+            application/json:
+              schema:
+                type: object
+                required: [data]
+                properties:
+                  data:
+                    $ref: '#/components/schemas/Document'
+        '400':
+          $ref: '../components/common.yaml#/components/responses/ValidationError'
+        '404':
+          $ref: '../components/common.yaml#/components/responses/NotFound'
+    delete:
+      operationId: deleteDocument
+      summary: Delete a document
+      responses:
+        '204':
+          description: Deleted; no content.
+        '400':
+          description: >
+            Document is referenced by other records (foreign key constraint)
+            and cannot be deleted.
+          content:
+            application/json:
+              schema:
+                $ref: '../components/common.yaml#/components/schemas/ErrorResponse'
+        '404':
+          $ref: '../components/common.yaml#/components/responses/NotFound'
+        '500':
+          $ref: '../components/common.yaml#/components/responses/ServerError'
+  /api/documents/{id}/content:
+    parameters:
+      - name: id
+        in: path
+        required: true
+        schema:
+          $ref: '../components/common.yaml#/components/schemas/Id'
+        description: Document id.
+    post:
+      operationId: uploadDocumentContent
+      summary: Replace the file contents of an existing document
+      description: >
+        Multipart replacement of the stored file, mirroring the legacy
+        document/upload action (empty-file check, 10MB size limit,
+        Document.isAllowedFile validation; the document name follows the new
+        filename only when it still equals the old filename).
+      requestBody:
+        required: true
+        content:
+          multipart/form-data:
+            schema:
+              type: object
+              required: [fileContents]
+              properties:
+                fileContents:
+                  type: string
+                  format: binary
+      responses:
+        '200':
+          description: The updated document.
+          content:
+            application/json:
+              schema:
+                type: object
+                required: [data]
+                properties:
+                  data:
+                    $ref: '#/components/schemas/Document'
+        '400':
+          description: >
+            Empty file, file larger than 10MB, or disallowed content
+            type/extension.
+          content:
+            application/json:
+              schema:
+                $ref: '../components/common.yaml#/components/schemas/ErrorResponse'
+        '404':
+          $ref: '../components/common.yaml#/components/responses/NotFound'
 components:
+  schemas:
+    Document:
+      type: object
+      description: >
+        Document metadata rendering emitted by
+        DocumentApiController.toJson(); never includes file contents.
+      required: [id]
+      properties:
+        id:
+          $ref: '../components/common.yaml#/components/schemas/Id'
+        name:
+          type: string
+          nullable: true
+        filename:
+          type: string
+          nullable: true
+        extension:
+          type: string
+          nullable: true
+        contentType:
+          type: string
+          nullable: true
+        fileUri:
+          type: string
+          nullable: true
+        documentNumber:
+          type: string
+          nullable: true
+        documentType:
+          type: object
+          nullable: true
+          properties:
+            id:
+              $ref: '../components/common.yaml#/components/schemas/Id'
+            name:
+              type: string
+              nullable: true
+          additionalProperties: true
+        size:
+          type: integer
+          nullable: true
+          description: Stored file size in bytes (0 when only a fileUri is set).
+        image:
+          type: boolean
+          description: Whether the stored content type is an image type.
+        dateCreated:
+          type: string
+          nullable: true
+        lastUpdated:
+          type: string
+          nullable: true
+      additionalProperties: true
+    DocumentInput:
+      type: object
+      description: Partial-update input; only keys present are bound.
+      properties:
+        name:
+          type: string
+          nullable: true
+        documentType:
+          type: object
+          nullable: true
+          description: Reference by id; null clears the document type.
+          properties:
+            id:
+              $ref: '../components/common.yaml#/components/schemas/Id'
+          additionalProperties: true
+        extension:
+          type: string
+          nullable: true
+        contentType:
+          type: string
+          nullable: true
+        fileUri:
+          type: string
+          nullable: true
+        documentNumber:
+          type: string
+          nullable: true
+      additionalProperties: true
   securitySchemes:
     cookieAuth:
       $ref: '../components/common.yaml#/components/securitySchemes/cookieAuth'

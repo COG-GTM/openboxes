@@ -14,7 +14,7 @@ import grails.gorm.transactions.Transactional
 @Transactional
 class EventTypeController {
 
-    static allowedMethods = [save: "POST", update: "POST", delete: "POST"]
+    static allowedMethods = [delete: "POST"]
 
     def index() {
         redirect(action: "list", params: params)
@@ -25,19 +25,7 @@ class EventTypeController {
     }
 
     def create() {
-        def eventTypeInstance = new EventType()
-        eventTypeInstance.properties = params
-        return [eventTypeInstance: eventTypeInstance]
-    }
-
-    def save() {
-        def eventTypeInstance = new EventType(params)
-        if (eventTypeInstance.save(flush: true)) {
-            flash.message = "${warehouse.message(code: 'default.created.message', args: [warehouse.message(code: 'eventType.label', default: 'EventType'), eventTypeInstance.id])}"
-            redirect(action: "list", id: eventTypeInstance.id)
-        } else {
-            render(view: "create", model: [eventTypeInstance: eventTypeInstance])
-        }
+        render(view: "/common/react", params: params)
     }
 
     def show() {
@@ -45,38 +33,13 @@ class EventTypeController {
     }
 
     def edit() {
-        def eventTypeInstance = EventType.get(params.id)
-        if (!eventTypeInstance) {
-            flash.message = "${warehouse.message(code: 'default.not.found.message', args: [warehouse.message(code: 'eventType.label', default: 'EventType'), params.id])}"
-            redirect(action: "list")
-        } else {
-            return [eventTypeInstance: eventTypeInstance]
+        // The legacy eventType/show GSP posts its Edit button here with the id as a
+        // request parameter; the React route needs the id in the path.
+        if (request.method == "POST" && params.id) {
+            redirect(uri: "/eventType/edit/${params.id}")
+            return
         }
-    }
-
-    def update() {
-        def eventTypeInstance = EventType.get(params.id)
-        if (eventTypeInstance) {
-            if (params.version) {
-                def version = params.version.toLong()
-                if (eventTypeInstance.version > version) {
-
-                    eventTypeInstance.errors.rejectValue("version", "default.optimistic.locking.failure", [warehouse.message(code: 'eventType.label', default: 'EventType')] as Object[], "Another user has updated this EventType while you were editing")
-                    render(view: "edit", model: [eventTypeInstance: eventTypeInstance])
-                    return
-                }
-            }
-            eventTypeInstance.properties = params
-            if (!eventTypeInstance.hasErrors() && eventTypeInstance.save(flush: true)) {
-                flash.message = "${warehouse.message(code: 'default.updated.message', args: [warehouse.message(code: 'eventType.label', default: 'EventType'), eventTypeInstance.id])}"
-                redirect(action: "list", id: eventTypeInstance.id)
-            } else {
-                render(view: "edit", model: [eventTypeInstance: eventTypeInstance])
-            }
-        } else {
-            flash.message = "${warehouse.message(code: 'default.not.found.message', args: [warehouse.message(code: 'eventType.label', default: 'EventType'), params.id])}"
-            redirect(action: "list")
-        }
+        render(view: "/common/react", params: params)
     }
 
     def delete() {

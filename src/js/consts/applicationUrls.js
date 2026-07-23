@@ -367,6 +367,7 @@ const DOCUMENT_URL = {
   list: () => `${DOCUMENT_URL.base}/list`,
   create: () => `${DOCUMENT_URL.base}/create`,
   edit: (id) => `${DOCUMENT_URL.base}/edit/${id}`,
+  show: (id) => `${DOCUMENT_URL.base}/show/${id}`,
 };
 
 const AUTH_URL = {

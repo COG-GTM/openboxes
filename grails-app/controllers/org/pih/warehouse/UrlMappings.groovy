@@ -279,7 +279,12 @@ class UrlMappings {
         // Document endpoint for the React document/create screen
         "/api/documents"(parseRequest: false) {
             controller = { "documentApi" }
-            action = [POST: "create"]
+            action = [GET: "list", POST: "create"]
+        }
+
+        "/api/documents/$id"(parseRequest: true) {
+            controller = { "documentApi" }
+            action = [GET: "read", PUT: "update", DELETE: "delete"]
         }
 
         // Admin console endpoints for the React admin screens (Phase 2 Batch 40)
@@ -450,12 +455,12 @@ class UrlMappings {
 
         "/api/eventTypes"(parseRequest: true) {
             controller = { "eventTypeApi" }
-            action = [GET: "list"]
+            action = [GET: "list", POST: "create"]
         }
 
         "/api/eventTypes/$id"(parseRequest: true) {
             controller = { "eventTypeApi" }
-            action = [GET: "read", DELETE: "delete"]
+            action = [GET: "read", PUT: "update", POST: "update", DELETE: "delete"]
         }
 
         "/api/localizationOverrides"(parseRequest: true) {
@@ -521,6 +526,16 @@ class UrlMappings {
         "/api/documentTypeOptions" {
             controller = { "selectOptionsApi" }
             action = [GET: "documentTypeOptions"]
+        }
+
+        "/api/eventCodeOptions" {
+            controller = { "selectOptionsApi" }
+            action = [GET: "eventCodeOptions"]
+        }
+
+        "/api/documents/$id/content"(parseRequest: false) {
+            controller = { "documentApi" }
+            action = [POST: "uploadContent"]
         }
 
         "/api/productAssociationTypeCodeOptions" {

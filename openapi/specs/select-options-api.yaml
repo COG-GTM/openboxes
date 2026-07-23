@@ -15,7 +15,8 @@ info:
     "/api/partyTypeOptions",
     "/api/organizationRoleTypeOptions", "/api/roleTypeOptions",
     "/api/partyOptions", "/api/productActivityCodeOptions",
-    "/api/productFieldOptions", "/api/validationCodeOptions").
+    "/api/productFieldOptions", "/api/validationCodeOptions",
+    "/api/eventCodeOptions").
     All endpoints are GET-only and
     render an option list under a "data" envelope; the option shape varies
     slightly per endpoint (some include "value" and/or "variant").
@@ -373,10 +374,34 @@ paths:
       summary: Document type options (React product/addDocument screen)
       description: >
         Renders non-template DocumentType records as id/label options,
-        mirroring the legacy product/addDocument type dropdown.
+        mirroring the legacy product/addDocument type dropdown. With
+        includeTemplates=true (Phase 2, Batch 42, for the React document
+        list/edit screens) renders every DocumentType sorted by name,
+        mirroring the legacy document/list filter and document/edit type
+        dropdowns.
+      parameters:
+        - name: includeTemplates
+          in: query
+          required: false
+          schema:
+            type: boolean
+          description: >
+            When true, include template document types (all DocumentType
+            records); defaults to false (non-template types only).
       responses:
         '200':
           $ref: '#/components/responses/IdLabelOptionsOk'
+  /api/eventCodeOptions:
+    get:
+      operationId: eventCodeOptions
+      summary: Event code (enum) options
+      description: >
+        Returns every EventCode enum value as {id, value, label} triples,
+        all equal to the enum name. Added in Phase 2 (Batch 42) for the
+        React eventType form.
+      responses:
+        '200':
+          $ref: '#/components/responses/IdLabelValueOptionsOk'
   /api/orderAdjustmentTypeOptions:
     get:
       operationId: orderAdjustmentTypeOptions

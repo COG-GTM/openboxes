@@ -131,6 +131,16 @@ export const PRODUCT_CATALOG_IMPORT_ITEMS = (id) => `${PRODUCT_CATALOG_API}/${id
 export const PRODUCT_IMPORT_CSV = `${PRODUCT_API}/import`;
 export const PRODUCT_TYPE_OPTIONS = `${API}/productTypeOptions`;
 export const DOCUMENT_TYPE_OPTIONS = `${API}/documentTypeOptions`;
+
+// DOCUMENTS
+export const DOCUMENT_API = `${API}/documents`;
+export const DOCUMENT_BY_ID = (id) => `${DOCUMENT_API}/${id}`;
+export const DOCUMENT_CONTENT = (id) => `${DOCUMENT_API}/${id}/content`;
+
+// EVENT TYPES
+export const EVENT_TYPE_API = `${API}/eventTypes`;
+export const EVENT_TYPE_BY_ID = (id) => `${EVENT_TYPE_API}/${id}`;
+export const EVENT_CODE_OPTIONS = `${API}/eventCodeOptions`;
 export const INVENTORY_ITEM = (productCode, lotNumber) => `${CONTEXT_PATH}/${PRODUCT_API}/${productCode}/inventoryItems/${lotNumber}`;
 export const LOT_NUMBERS_WITH_EXPIRATION_DATE = `${PRODUCT_API}/inventoryItems/lotNumbersWithExpirationDate`;
 export const AVAILABLE_ITEMS = `${PRODUCT_API}/availableItems`;
@@ -221,10 +231,6 @@ export const LOCATION_TYPE_API = `${API}/locationTypes`;
 export const LOCATION_TYPE_BY_ID = (id) => `${LOCATION_TYPE_API}/${id}`;
 export const LOCATION_TYPE_CODE_OPTIONS = `${API}/locationTypeCodeOptions`;
 
-// EVENT TYPES
-export const EVENT_TYPE_API = `${API}/eventTypes`;
-export const EVENT_TYPE_BY_ID = (id) => `${EVENT_TYPE_API}/${id}`;
-
 // LOCALIZATION OVERRIDES
 export const LOCALIZATION_OVERRIDE_API = `${API}/localizationOverrides`;
 export const LOCALIZATION_OVERRIDE_BY_ID = (id) => `${LOCALIZATION_OVERRIDE_API}/${id}`;
@@ -280,9 +286,6 @@ export const AUTH_SIGNUP_CONFIG_API = `${API}/auth/signupConfig`;
 
 // BATCH IMPORT
 export const BATCH_IMPORT_DATA_API = `${API}/batch/importData`;
-
-// DOCUMENTS
-export const DOCUMENT_API = `${API}/documents`;
 
 // ADMIN CONSOLE (Phase 2 Batch 40)
 export const ADMIN_API = `${API}/admin`;
