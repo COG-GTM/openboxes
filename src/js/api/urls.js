@@ -594,6 +594,21 @@ export const CATEGORY_DETAILS = (id) => `${CATEGORY_API}/${id}/details`;
 export const CATEGORY_ASSIGNING_PARENT_TO_PRODUCT = `${CATEGORY_API}/assigningParentToProduct`;
 export const UNIT_OF_MEASURE_CLASS_OPTIONS = `${GENERIC_API}/unitOfMeasureClass/`;
 
+// LOCALIZATION RECORDS (Localization domain CRUD, not message lookup)
+export const LOCALIZATION_RECORD_API = `${API}/localizations`;
+export const LOCALIZATION_RECORD_BY_ID = (id) => `${LOCALIZATION_RECORD_API}/${id}`;
+export const LOCALIZATION_RECORD_DETAILS = (id) => `${LOCALIZATION_RECORD_API}/${id}/details`;
+
+// MIGRATION ADMIN DASHBOARD
+export const MIGRATION_API = `${API}/migration`;
+export const MIGRATION_DATA_MIGRATION = `${MIGRATION_API}/dataMigration`;
+export const MIGRATION_DATA_QUALITY = `${MIGRATION_API}/dataQuality`;
+export const MIGRATION_RECEIPTS_WITHOUT_TRANSACTION = `${MIGRATION_API}/receiptsWithoutTransaction`;
+export const MIGRATION_SHIPMENTS_WITHOUT_TRANSACTIONS = `${MIGRATION_API}/shipmentsWithoutTransactions`;
+export const MIGRATION_STOCK_MOVEMENTS_WITHOUT_SHIPMENT_ITEMS = `${MIGRATION_API}/stockMovementsWithoutShipmentItems`;
+export const MIGRATION_DIMENSION_TABLES = `${MIGRATION_API}/dimensionTables`;
+export const MIGRATION_FACT_TABLES = `${MIGRATION_API}/factTables`;
+
 // BATCH 37 REPORTS
 export const REPORT_BIN_LOCATION = `${API}/reports/binLocationReport`;
 export const REPORT_CYCLE_COUNT = `${API}/reports/cycleCountReport`;

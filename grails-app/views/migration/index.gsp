@@ -8,7 +8,7 @@
     <div class="dialog">
         <div class="button-bar">
             <div id="migration-status" class="right tag tag-info">None</div>
-            <g:link class="button" action="index"><g:message code="default.list.label" args="[g.message(code:'migrations.label', default: 'Migrations')]"/></g:link>
+            <g:link class="button" action="legacy"><g:message code="default.list.label" args="[g.message(code:'migrations.label', default: 'Migrations')]"/></g:link>
         </div>
         <g:if test="${flash.message}">
             <div class="message">${flash.message}</div>
@@ -18,10 +18,6 @@
         </div>
         <div class="tabs">
             <ul>
-                <li><a href="${request.contextPath}/migration/dataQuality"><warehouse:message code="data.quality.label" default="Quality"/></a></li>
-                <li><a href="${request.contextPath}/migration/dataMigration"><warehouse:message code="data.migration.label" default="Migration"/></a></li>
-                <li><a href="${request.contextPath}/migration/dimensionTables"><warehouse:message code="data.dimensions.label" default="Dimensions"/></a></li>
-                <li><a href="${request.contextPath}/migration/factTables"><warehouse:message code="data.facts.label" default="Facts"/></a></li>
                 <li><a href="${request.contextPath}/migration/materializedViews"><warehouse:message code="data.materializedViews.label" default="Materialized Views"/></a></li>
                 <li><a href="${request.contextPath}/migration/productAvailability"><warehouse:message code="data.productAvailability.label" default="Product Availability" /></a></li>
             </ul>

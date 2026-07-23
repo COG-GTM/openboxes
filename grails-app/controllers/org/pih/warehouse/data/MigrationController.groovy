@@ -20,18 +20,11 @@ import org.hibernate.criterion.CriteriaSpecification
 import org.pih.warehouse.auth.AuthService
 import org.pih.warehouse.core.Constants
 import org.pih.warehouse.core.Location
-import org.pih.warehouse.inventory.Transaction
 import org.pih.warehouse.inventory.TransactionCode
 import org.pih.warehouse.inventory.TransactionType
 import org.pih.warehouse.jobs.DataMigrationJob
 import org.pih.warehouse.product.Product
 import org.pih.warehouse.product.ProductAvailability
-import org.pih.warehouse.reporting.ConsumptionFact
-import org.pih.warehouse.reporting.DateDimension
-import org.pih.warehouse.reporting.LocationDimension
-import org.pih.warehouse.reporting.LotDimension
-import org.pih.warehouse.reporting.ProductDimension
-import org.pih.warehouse.reporting.TransactionFact
 
 @Transactional
 class MigrationController {
@@ -43,65 +36,29 @@ class MigrationController {
     TransactionSourceMigrationService transactionSourceMigrationService
 
     def index() {
-
+        render(view: "/common/react", params: params)
     }
 
+    // Legacy tabbed dashboard, kept reachable for the tabs that have not
+    // been migrated to React yet (materializedViews, productAvailability).
+    def legacy() {
+        render(view: "index")
+    }
 
     def dataQuality() {
-
+        render(view: "/common/react", params: params)
     }
 
     def dataMigration() {
-
-        def organizations = migrationService.getSuppliersForMigration()
-        def productSuppliers = migrationService.getProductsForMigration()
-        TransactionType inventoryTransactionType = TransactionType.load(Constants.INVENTORY_TRANSACTION_TYPE_ID)
-        TransactionType productInventoryTransactionType = TransactionType.load(Constants.PRODUCT_INVENTORY_TRANSACTION_TYPE_ID)
-        Integer inventoryTransactionCount = Transaction.countByTransactionType(inventoryTransactionType)
-        Integer productInventoryTransactionCount = Transaction.countByTransactionType(productInventoryTransactionType)
-        Location currentLocation = Location.get(session.warehouse.id)
-        Integer productInventoryTransactionInCurrentLocationCount = Transaction.countByTransactionTypeAndInventory(productInventoryTransactionType, currentLocation.inventory)
-        List<Product> productsWithProductInventoryTransactionInCurrentLocation = migrationService.getProductsWithTransactions(currentLocation, productInventoryTransactionType)
-        Map<String, List<String>> overlappingTransactions = migrationService.getOtherOverlappingTransactions(currentLocation, productInventoryTransactionType)
-        Integer amountOfMissingInventoryImportTransactionSources = transactionSourceMigrationService.getAmountOfMissingInventoryImportTransactionSources()
-        Integer amountOfMissingCycleCountTransactionSources = transactionSourceMigrationService.getAmountOfMissingCycleCountTransactionSources()
-        // The amount of missing record stock transaction sources can only be determined if previous migrations
-        // were completed (inventory import, cycle count related)
-        Integer amountOfMissingRecordStockTransactionSources =
-                ((amountOfMissingInventoryImportTransactionSources + amountOfMissingCycleCountTransactionSources) == 0)
-                        ? transactionSourceMigrationService.getAmountOfMissingRecordStockTransactionSources()
-                        : null
-
-        [
-                organizationCount        : organizations.size(),
-                inventoryTransactionCount: inventoryTransactionCount,
-                productInventoryTransactionCount: productInventoryTransactionCount,
-                productInventoryTransactionInCurrentLocationCount: productInventoryTransactionInCurrentLocationCount,
-                productsWithProductInventoryTransactionInCurrentLocation: productsWithProductInventoryTransactionInCurrentLocation?.productCode,
-                productSupplierCount     : productSuppliers.size(),
-                overlappingTransactions  : overlappingTransactions,
-                amountOfMissingInventoryImportTransactionSources: amountOfMissingInventoryImportTransactionSources,
-                amountOfMissingCycleCountTransactionSources: amountOfMissingCycleCountTransactionSources,
-                amountOfMissingRecordStockTransactionSources: amountOfMissingRecordStockTransactionSources
-        ]
+        render(view: "/common/react", params: params)
     }
 
     def dimensionTables() {
-        [
-                locationDimensionCount: LocationDimension.count(),
-                productDimensionCount : ProductDimension.count(),
-                lotDimensionCount     : LotDimension.count(),
-                dateDimensionCount    : DateDimension.count(),
-        ]
+        render(view: "/common/react", params: params)
     }
 
     def factTables() {
-        def stockoutFactCount = dataService.executeQuery("select count(*) as count from stockout_fact")[0]?.count ?: 0
-        [
-                transactionFactCount     : TransactionFact.count(),
-                consumptionFactCount     : ConsumptionFact.count(),
-                stockoutFactCount        : stockoutFactCount,
-        ]
+        render(view: "/common/react", params: params)
     }
 
     def materializedViews() {

@@ -4,10 +4,12 @@ info:
   description: >
     Localized-message lookup handled by
     org.pih.warehouse.api.LocalizationApiController, routed via the standard
-    "/api/${resource}s" REST mappings as the "localization" resource
-    (only list() and read() exist). Responses are the bare DTO renderings
+    "/api/${resource}s" REST mappings as the "localization" resource.
+    list() and read() return the bare DTO renderings
     (LocalizedMessagesDto/LocalizedMessageDto.toJson()) with no "data"
-    envelope.
+    envelope. Phase 2 (Batch 44) added details() (explicitly mapped at
+    /api/localizations/{id}/details, since read() localizes a message code)
+    and delete() for the migrated localization/show screen.
   version: 0.1.0
 servers:
   - url: http://localhost:8080/openboxes
@@ -103,7 +105,84 @@ paths:
                     nullable: true
                   currentLocale:
                     type: string
+    delete:
+      operationId: deleteLocalization
+      summary: Delete a localization record
+      description: Deletes the Localization domain record with the given id.
+      parameters:
+        - name: id
+          in: path
+          required: true
+          description: Localization record id.
+          schema:
+            $ref: '../components/common.yaml#/components/schemas/Id'
+      responses:
+        '204':
+          description: Deleted.
+        '400':
+          description: Localization is still referenced and cannot be deleted.
+          content:
+            application/json:
+              schema:
+                type: object
+                properties:
+                  errorCode:
+                    type: integer
+                  errorMessage:
+                    type: string
+        '404':
+          $ref: '../components/common.yaml#/components/responses/NotFound'
+  /api/localizations/{id}/details:
+    get:
+      operationId: readLocalizationDetails
+      summary: Read a localization record
+      description: >
+        Returns the Localization domain record (database message override)
+        with the given id. Explicitly mapped so it does not hit read(),
+        which localizes a message code.
+      parameters:
+        - name: id
+          in: path
+          required: true
+          description: Localization record id.
+          schema:
+            $ref: '../components/common.yaml#/components/schemas/Id'
+      responses:
+        '200':
+          description: The localization record.
+          content:
+            application/json:
+              schema:
+                type: object
+                required: [data]
+                properties:
+                  data:
+                    $ref: '#/components/schemas/Localization'
+        '404':
+          $ref: '../components/common.yaml#/components/responses/NotFound'
 components:
+  schemas:
+    Localization:
+      type: object
+      required: [id]
+      properties:
+        id:
+          $ref: '../components/common.yaml#/components/schemas/Id'
+        code:
+          type: string
+          nullable: true
+        locale:
+          type: string
+          nullable: true
+        text:
+          type: string
+          nullable: true
+        dateCreated:
+          type: string
+          nullable: true
+        lastUpdated:
+          type: string
+          nullable: true
   securitySchemes:
     cookieAuth:
       $ref: '../components/common.yaml#/components/securitySchemes/cookieAuth'

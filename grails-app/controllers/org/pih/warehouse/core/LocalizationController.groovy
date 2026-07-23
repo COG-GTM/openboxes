@@ -66,13 +66,7 @@ class LocalizationController {
     }
 
     def show() {
-        def localizationInstance = Localization.get(params.id)
-        if (!localizationInstance) {
-            flash.message = "${warehouse.message(code: 'default.not.found.message', args: [warehouse.message(code: 'localization.label', default: 'Localization'), params.id])}"
-            redirect(action: "list")
-        } else {
-            [localizationInstance: localizationInstance]
-        }
+        render(view: "/common/react", params: params)
     }
 
     def edit() {

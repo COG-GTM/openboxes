@@ -403,6 +403,7 @@ const LOCALIZATION_URL = {
   list: () => `${LOCALIZATION_URL.base}/list`,
   create: () => `${LOCALIZATION_URL.base}/create`,
   edit: (id) => `${LOCALIZATION_URL.base}/edit/${id}`,
+  show: (id) => `${LOCALIZATION_URL.base}/show/${id}`,
   export: (locale) => `${LOCALIZATION_URL.base}/export?locale=${locale}`,
 };
 
@@ -470,6 +471,16 @@ const PARTY_ROLE_URL = {
   }),
   edit: (id) => `${PARTY_ROLE_URL.base}/edit/${id}`,
   show: (id) => `${PARTY_ROLE_URL.base}/show/${id}`,
+};
+
+const MIGRATION_URL = {
+  base: `${CONTEXT_PATH}/migration`,
+  index: () => `${MIGRATION_URL.base}/index`,
+  dataQuality: () => `${MIGRATION_URL.base}/dataQuality`,
+  dataMigration: () => `${MIGRATION_URL.base}/dataMigration`,
+  dimensionTables: () => `${MIGRATION_URL.base}/dimensionTables`,
+  factTables: () => `${MIGRATION_URL.base}/factTables`,
+  legacy: () => `${MIGRATION_URL.base}/legacy`,
 };
 
 const PARTY_TYPE_URL = {
@@ -686,6 +697,7 @@ export {
   LOCATION_GROUP_URL,
   LOCATION_TYPE_URL,
   LOCATION_URL,
+  MIGRATION_URL,
   ORDER_ADJUSTMENT_TYPE_URL,
   ORDER_URL,
   ORGANIZATION_URL,

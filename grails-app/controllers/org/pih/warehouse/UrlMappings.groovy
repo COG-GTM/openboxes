@@ -184,6 +184,50 @@ class UrlMappings {
             action = [POST: "update", PUT: "update", DELETE: "delete"]
         }
 
+        // Localization record details for the React localization screens;
+        // explicit mapping so it does not hit LocalizationApiController.read
+        // (which localizes a message code).
+        "/api/localizations/$id/details"(parseRequest: true) {
+            controller = { "localizationApi" }
+            action = [GET: "details"]
+        }
+
+        // Migration admin dashboard endpoints (React migration screens)
+        "/api/migration/dataMigration"(parseRequest: true) {
+            controller = { "migrationApi" }
+            action = [GET: "dataMigration"]
+        }
+
+        "/api/migration/dataQuality"(parseRequest: true) {
+            controller = { "migrationApi" }
+            action = [GET: "dataQuality"]
+        }
+
+        "/api/migration/receiptsWithoutTransaction"(parseRequest: true) {
+            controller = { "migrationApi" }
+            action = [GET: "receiptsWithoutTransaction"]
+        }
+
+        "/api/migration/shipmentsWithoutTransactions"(parseRequest: true) {
+            controller = { "migrationApi" }
+            action = [GET: "shipmentsWithoutTransactions"]
+        }
+
+        "/api/migration/stockMovementsWithoutShipmentItems"(parseRequest: true) {
+            controller = { "migrationApi" }
+            action = [GET: "stockMovementsWithoutShipmentItems"]
+        }
+
+        "/api/migration/dimensionTables"(parseRequest: true) {
+            controller = { "migrationApi" }
+            action = [GET: "dimensionTables"]
+        }
+
+        "/api/migration/factTables"(parseRequest: true) {
+            controller = { "migrationApi" }
+            action = [GET: "factTables"]
+        }
+
         "/api/partyRoles/$id/details"(parseRequest: true) {
             controller = { "partyRoleApi" }
             action = [GET: "details"]

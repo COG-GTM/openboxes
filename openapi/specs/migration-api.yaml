@@ -1,0 +1,282 @@
+openapi: 3.0.3
+info:
+  title: OpenBoxes - MigrationApiController
+  description: >
+    Read-only endpoints for the migration admin dashboard handled by
+    org.pih.warehouse.api.MigrationApiController, explicitly mapped under
+    /api/migration/*. Added in Phase 2 (Batch 44) for the migrated
+    migration/dataMigration, migration/dataQuality, migration/dimensionTables
+    and migration/factTables screens. The counts mirror the models the legacy
+    GSP screens rendered; dataMigration reflects the session's current
+    location.
+  version: 0.1.0
+servers:
+  - url: http://localhost:8080/openboxes
+    description: Local Docker baseline (docs/migration/RUNNING_LOCALLY.md)
+security:
+  - cookieAuth: []
+paths:
+  /api/migration/dataMigration:
+    get:
+      operationId: getDataMigration
+      summary: Data migration counts for the current location
+      responses:
+        '200':
+          description: Counts and details shown on the Data Migration tab.
+          content:
+            application/json:
+              schema:
+                type: object
+                required: [data]
+                properties:
+                  data:
+                    type: object
+                    required:
+                      - organizationCount
+                      - productSupplierCount
+                      - inventoryTransactionCount
+                      - productInventoryTransactionCount
+                      - productInventoryTransactionInCurrentLocationCount
+                      - productsWithProductInventoryTransactionInCurrentLocation
+                      - overlappingTransactions
+                      - amountOfMissingInventoryImportTransactionSources
+                      - amountOfMissingCycleCountTransactionSources
+                    properties:
+                      organizationCount:
+                        type: integer
+                        description: Suppliers eligible for organization migration.
+                      productSupplierCount:
+                        type: integer
+                        description: Products eligible for product supplier migration.
+                      inventoryTransactionCount:
+                        type: integer
+                      productInventoryTransactionCount:
+                        type: integer
+                      productInventoryTransactionInCurrentLocationCount:
+                        type: integer
+                      productsWithProductInventoryTransactionInCurrentLocation:
+                        type: array
+                        description: Product codes with deprecated product inventory transactions in the current location.
+                        items:
+                          type: string
+                          nullable: true
+                      overlappingTransactions:
+                        type: object
+                        description: Product code -> overlapping transaction descriptions.
+                        additionalProperties:
+                          type: array
+                          items:
+                            type: string
+                      amountOfMissingInventoryImportTransactionSources:
+                        type: integer
+                      amountOfMissingCycleCountTransactionSources:
+                        type: integer
+                      amountOfMissingRecordStockTransactionSources:
+                        type: integer
+                        nullable: true
+                        description: Null until the inventory import and cycle count migrations are complete.
+  /api/migration/dataQuality:
+    get:
+      operationId: getDataQuality
+      summary: Data quality indicator counts
+      responses:
+        '200':
+          description: Counts shown on the Data Quality tab.
+          content:
+            application/json:
+              schema:
+                type: object
+                required: [data]
+                properties:
+                  data:
+                    type: object
+                    required:
+                      - receiptsWithoutTransactionCount
+                      - shipmentsWithoutTransactionsCount
+                      - stockMovementsWithoutShipmentItemsCount
+                    properties:
+                      receiptsWithoutTransactionCount:
+                        type: integer
+                      shipmentsWithoutTransactionsCount:
+                        type: integer
+                      stockMovementsWithoutShipmentItemsCount:
+                        type: integer
+  /api/migration/receiptsWithoutTransaction:
+    get:
+      operationId: listReceiptsWithoutTransaction
+      summary: Receipts that have been received without an inbound transaction
+      responses:
+        '200':
+          description: Receipts without transactions, sorted by shipment number.
+          content:
+            application/json:
+              schema:
+                type: object
+                required: [data, totalCount]
+                properties:
+                  data:
+                    type: array
+                    items:
+                      type: object
+                      properties:
+                        shipmentId:
+                          type: string
+                          nullable: true
+                        shipmentNumber:
+                          type: string
+                          nullable: true
+                        shipmentStatus:
+                          type: string
+                          nullable: true
+                        shipmentName:
+                          type: string
+                          nullable: true
+                        receiptNumber:
+                          type: string
+                          nullable: true
+                        receiptStatus:
+                          type: string
+                          nullable: true
+                  totalCount:
+                    type: integer
+  /api/migration/shipmentsWithoutTransactions:
+    get:
+      operationId: listShipmentsWithoutTransactions
+      summary: Shipped shipments without an outbound transaction
+      responses:
+        '200':
+          description: Shipments without transactions.
+          content:
+            application/json:
+              schema:
+                type: object
+                required: [data, totalCount]
+                properties:
+                  data:
+                    type: array
+                    items:
+                      type: object
+                      properties:
+                        shipmentId:
+                          type: string
+                          nullable: true
+                        shipmentNumber:
+                          type: string
+                          nullable: true
+                        shipmentStatus:
+                          type: string
+                          nullable: true
+                        origin:
+                          type: string
+                          nullable: true
+                        destination:
+                          type: string
+                          nullable: true
+                  totalCount:
+                    type: integer
+  /api/migration/stockMovementsWithoutShipmentItems:
+    get:
+      operationId: listStockMovementsWithoutShipmentItems
+      summary: Issued stock movements without shipment items
+      responses:
+        '200':
+          description: Stock movements without shipment items, sorted by date created.
+          content:
+            application/json:
+              schema:
+                type: object
+                required: [data, totalCount]
+                properties:
+                  data:
+                    type: array
+                    items:
+                      type: object
+                      properties:
+                        id:
+                          type: string
+                          nullable: true
+                        identifier:
+                          type: string
+                          nullable: true
+                        status:
+                          type: string
+                          nullable: true
+                        dateCreated:
+                          type: string
+                          nullable: true
+                        origin:
+                          type: string
+                          nullable: true
+                        requested:
+                          type: string
+                          nullable: true
+                        picked:
+                          type: string
+                          nullable: true
+                        shipped:
+                          type: string
+                          nullable: true
+                        issued:
+                          type: string
+                          nullable: true
+                  totalCount:
+                    type: integer
+  /api/migration/dimensionTables:
+    get:
+      operationId: getDimensionTables
+      summary: Reporting dimension table counts
+      responses:
+        '200':
+          description: Counts shown on the Dimensions tab.
+          content:
+            application/json:
+              schema:
+                type: object
+                required: [data]
+                properties:
+                  data:
+                    type: object
+                    required:
+                      - dateDimensionCount
+                      - locationDimensionCount
+                      - lotDimensionCount
+                      - productDimensionCount
+                    properties:
+                      dateDimensionCount:
+                        type: integer
+                      locationDimensionCount:
+                        type: integer
+                      lotDimensionCount:
+                        type: integer
+                      productDimensionCount:
+                        type: integer
+  /api/migration/factTables:
+    get:
+      operationId: getFactTables
+      summary: Reporting fact table counts
+      responses:
+        '200':
+          description: Counts shown on the Facts tab.
+          content:
+            application/json:
+              schema:
+                type: object
+                required: [data]
+                properties:
+                  data:
+                    type: object
+                    required:
+                      - transactionFactCount
+                      - consumptionFactCount
+                      - stockoutFactCount
+                    properties:
+                      transactionFactCount:
+                        type: integer
+                      consumptionFactCount:
+                        type: integer
+                      stockoutFactCount:
+                        type: integer
+components:
+  securitySchemes:
+    cookieAuth:
+      $ref: '../components/common.yaml#/components/securitySchemes/cookieAuth'

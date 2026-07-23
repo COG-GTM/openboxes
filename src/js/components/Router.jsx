@@ -608,6 +608,36 @@ const AsyncPartyTypeShow = Loadable({
   loading: Loading,
 });
 
+const AsyncLocalizationShow = Loadable({
+  loader: () => import('components/localization/LocalizationShow'),
+  loading: Loading,
+});
+
+const AsyncMigrationIndex = Loadable({
+  loader: () => import('components/migration/MigrationIndex'),
+  loading: Loading,
+});
+
+const AsyncMigrationDataQuality = Loadable({
+  loader: () => import('components/migration/MigrationDataQuality'),
+  loading: Loading,
+});
+
+const AsyncMigrationDataMigration = Loadable({
+  loader: () => import('components/migration/MigrationDataMigration'),
+  loading: Loading,
+});
+
+const AsyncMigrationDimensionTables = Loadable({
+  loader: () => import('components/migration/MigrationDimensionTables'),
+  loading: Loading,
+});
+
+const AsyncMigrationFactTables = Loadable({
+  loader: () => import('components/migration/MigrationFactTables'),
+  loading: Loading,
+});
+
 const AsyncBudgetCodeList = Loadable({
   loader: () => import('components/budgetCode/BudgetCodeList'),
   loading: Loading,
@@ -1517,6 +1547,12 @@ const Router = () => {
             <MainLayoutRoute path="**/partyType/create" component={AsyncPartyTypeForm} />
             <MainLayoutRoute path="**/partyType/edit/:partyTypeId" component={AsyncPartyTypeForm} />
             <MainLayoutRoute path="**/partyType/show/:partyTypeId" component={AsyncPartyTypeShow} />
+            <MainLayoutRoute path="**/localization/show/:localizationId" component={AsyncLocalizationShow} />
+            <MainLayoutRoute path="**/migration/index" component={AsyncMigrationIndex} />
+            <MainLayoutRoute path="**/migration/dataQuality" component={AsyncMigrationDataQuality} />
+            <MainLayoutRoute path="**/migration/dataMigration" component={AsyncMigrationDataMigration} />
+            <MainLayoutRoute path="**/migration/dimensionTables" component={AsyncMigrationDimensionTables} />
+            <MainLayoutRoute path="**/migration/factTables" component={AsyncMigrationFactTables} />
             <MainLayoutRoute path="**/budgetCode/list" component={AsyncBudgetCodeList} />
             <MainLayoutRoute path="**/budgetCode/create" component={AsyncBudgetCodeForm} />
             <MainLayoutRoute path="**/budgetCode/edit/:budgetCodeId" component={AsyncBudgetCodeForm} />
