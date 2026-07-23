@@ -10,7 +10,11 @@
 package org.pih.warehouse.api
 
 import grails.converters.JSON
+import grails.gorm.transactions.NotTransactional
 import grails.gorm.transactions.Transactional
+
+import org.hibernate.criterion.CriteriaSpecification
+import org.springframework.http.HttpStatus
 
 import org.pih.warehouse.auth.AuthService
 import org.pih.warehouse.core.Constants
@@ -19,6 +23,7 @@ import org.pih.warehouse.data.TransactionSourceMigrationService
 import org.pih.warehouse.inventory.Transaction
 import org.pih.warehouse.inventory.TransactionType
 import org.pih.warehouse.product.Product
+import org.pih.warehouse.product.ProductAvailability
 import org.pih.warehouse.reporting.ConsumptionFact
 import org.pih.warehouse.reporting.DateDimension
 import org.pih.warehouse.reporting.LocationDimension
@@ -32,6 +37,9 @@ class MigrationApiController {
     def dataService
     def migrationService
     TransactionSourceMigrationService transactionSourceMigrationService
+    def locationService
+    def productAvailabilityService
+    def reportService
 
     def dataMigration() {
         def organizations = migrationService.getSuppliersForMigration()
@@ -135,5 +143,93 @@ class MigrationApiController {
                 consumptionFactCount: ConsumptionFact.count(),
                 stockoutFactCount   : stockoutFactCount,
         ]] as JSON)
+    }
+
+    def materializedViews() {
+        def productDemandCount = dataService.executeQuery("select count(*) as count from product_demand_details")[0]?.count ?: 0
+        def productAvailabilityCount = dataService.executeQuery("select count(*) as count from product_availability")[0]?.count ?: 0
+        render([data: [
+                productDemandCount      : productDemandCount,
+                productAvailabilityCount: productAvailabilityCount,
+        ]] as JSON)
+    }
+
+    def productAvailability() {
+        def countByLocation = ProductAvailability.createCriteria().list {
+            resultTransformer(CriteriaSpecification.ALIAS_TO_ENTITY_MAP)
+            projections {
+                count("id", "count")
+                groupProperty("location", "location")
+            }
+        }
+        def data = locationService.depots.collect { Location location ->
+            def count = countByLocation.find { it.location == location }?.count ?: null
+            [
+                    locationId              : location.id,
+                    locationName            : location.name,
+                    productAvailabilityCount: count,
+            ]
+        }
+        render([data: data] as JSON)
+    }
+
+    def productAvailabilityCount() {
+        Location location = Location.get(params.locationId)
+        if (!location) {
+            response.status = HttpStatus.NOT_FOUND.value()
+            render([errorCode: HttpStatus.NOT_FOUND.value(),
+                    errorMessage: "No location found for id ${params.locationId}".toString()] as JSON)
+            return
+        }
+        def results = ProductAvailability.createCriteria().list {
+            resultTransformer(CriteriaSpecification.ALIAS_TO_ENTITY_MAP)
+            projections {
+                count("id", "count")
+            }
+            eq("location", location)
+        }
+        def count = results ? results[0].count : null
+        render([data: [locationId: location.id, count: count]] as JSON)
+    }
+
+    @Transactional
+    def calculateProductAvailability() {
+        Location location = Location.get(params.locationId)
+        if (!location) {
+            response.status = HttpStatus.NOT_FOUND.value()
+            render([errorCode: HttpStatus.NOT_FOUND.value(),
+                    errorMessage: "No location found for id ${params.locationId}".toString()] as JSON)
+            return
+        }
+        def binLocations = productAvailabilityService.calculateBinLocations(location)
+        render([data: [locationId: location.id, count: binLocations.size()]] as JSON)
+    }
+
+    // The service manages its own transactions (the all-locations refresh runs a
+    // GPars pool with per-thread persistence contexts), so no controller-level
+    // transaction should be held open around it.
+    @NotTransactional
+    def refreshProductAvailability() {
+        String locationId = params.locationId ?: request.JSON?.locationId
+        if (locationId) {
+            Location location = Location.get(locationId)
+            if (!location) {
+                response.status = HttpStatus.NOT_FOUND.value()
+                render([errorCode: HttpStatus.NOT_FOUND.value(),
+                        errorMessage: "No location found for id ${locationId}".toString()] as JSON)
+                return
+            }
+            productAvailabilityService.refreshProductAvailability(location, true)
+            render([data: "Refreshed product availability for location ${location.name}".toString()] as JSON)
+            return
+        }
+        productAvailabilityService.refreshProductAvailability(Boolean.TRUE)
+        render([data: "Refreshed product availability"] as JSON)
+    }
+
+    @Transactional
+    def refreshProductDemand() {
+        reportService.refreshProductDemandData()
+        render([data: "Refreshed product demand data"] as JSON)
     }
 }

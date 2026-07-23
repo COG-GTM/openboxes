@@ -19,6 +19,7 @@ import org.quartz.Scheduler
 import org.quartz.Trigger
 import org.quartz.TriggerBuilder
 import org.quartz.TriggerKey
+import org.quartz.impl.matchers.GroupMatcher
 import org.quartz.impl.triggers.CronTriggerImpl
 import org.springframework.http.HttpStatus
 
@@ -34,6 +35,70 @@ class JobsApiController {
 
     Scheduler getQuartzScheduler() {
         return jobManagerService.quartzScheduler
+    }
+
+    def list() {
+        List<Map> jobs = []
+        quartzScheduler.jobGroupNames.each { String groupName ->
+            quartzScheduler.getJobKeys(GroupMatcher.groupEquals(groupName)).each { JobKey jobKey ->
+                JobDetail jobDetail = quartzScheduler.getJobDetail(jobKey)
+                def triggers = quartzScheduler.getTriggersOfJob(jobKey)
+                Map json = toJson(jobDetail, triggers)
+                [json.triggers, triggers].transpose().each { Map triggerJson, Trigger trigger ->
+                    triggerJson.state = quartzScheduler.getTriggerState(trigger.key)?.name()
+                }
+                jobs << json
+            }
+        }
+        render([data: [
+                schedulerInStandbyMode: quartzScheduler.inStandbyMode,
+                jobs                  : jobs.sort { it.name },
+        ]] as JSON)
+    }
+
+    def pauseJob() {
+        withJob { JobKey jobKey, JobDetail jobDetail ->
+            quartzScheduler.pauseJob(jobKey)
+        }
+    }
+
+    def resumeJob() {
+        withJob { JobKey jobKey, JobDetail jobDetail ->
+            quartzScheduler.resumeJob(jobKey)
+        }
+    }
+
+    def runJobNow() {
+        withJob { JobKey jobKey, JobDetail jobDetail ->
+            quartzScheduler.triggerJob(jobKey)
+        }
+    }
+
+    def standbyScheduler() {
+        quartzScheduler.standby()
+        render([data: [schedulerInStandbyMode: quartzScheduler.inStandbyMode]] as JSON)
+    }
+
+    def startScheduler() {
+        quartzScheduler.start()
+        render([data: [schedulerInStandbyMode: quartzScheduler.inStandbyMode]] as JSON)
+    }
+
+    private void withJob(Closure action) {
+        def jsonObject = request.JSON
+        String jobName = jsonObject.jobName
+        String jobGroup = jsonObject.jobGroup ?: GrailsJobClassConstants.DEFAULT_GROUP
+        JobKey jobKey = new JobKey(jobName, jobGroup)
+        JobDetail jobDetail = jobName ? quartzScheduler.getJobDetail(jobKey) : null
+        if (!jobDetail) {
+            response.status = HttpStatus.NOT_FOUND.value()
+            render([errorCode: HttpStatus.NOT_FOUND.value(),
+                    errorMessage: "No Job Detail for key ${jobName}".toString()] as JSON)
+            return
+        }
+        action.call(jobKey, jobDetail)
+        def triggers = quartzScheduler.getTriggersOfJob(jobKey)
+        render([data: toJson(jobDetail, triggers)] as JSON)
     }
 
     def read() {

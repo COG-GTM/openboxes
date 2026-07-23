@@ -44,11 +44,10 @@ class UserControllerSpec extends Specification implements ControllerUnitTest<Use
         when:
         controller.params.username = "Test"
         controller.params.password = "Password123"
-        def model = controller.create()
+        controller.create()
 
         then:
-        model.userInstance.username == "Test"
-        model.userInstance.password == "Password123"
+        view == '/common/react'
     }
 
     void "test saving an invalid user"() {
@@ -57,9 +56,8 @@ class UserControllerSpec extends Specification implements ControllerUnitTest<Use
         controller.save()
 
         then:
-        view == '/user/create'
-        model.userInstance.username == null
-        model.userInstance.password == null
+        response.redirectedUrl == '/user/create'
+        flash.message != null
     }
 
     void "test saving a valid user"() {

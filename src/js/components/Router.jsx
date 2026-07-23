@@ -448,6 +448,36 @@ const AsyncJobShow = Loadable({
   loading: Loading,
 });
 
+const AsyncQuartzJobList = Loadable({
+  loader: () => import('components/quartz/QuartzJobList'),
+  loading: Loading,
+});
+
+const AsyncMaterializedViews = Loadable({
+  loader: () => import('components/migration/MaterializedViews'),
+  loading: Loading,
+});
+
+const AsyncMigrationProductAvailability = Loadable({
+  loader: () => import('components/migration/MigrationProductAvailability'),
+  loading: Loading,
+});
+
+const AsyncRoleShow = Loadable({
+  loader: () => import('components/role/RoleShow'),
+  loading: Loading,
+});
+
+const AsyncUserCreate = Loadable({
+  loader: () => import('components/user/UserCreate'),
+  loading: Loading,
+});
+
+const AsyncUserChangePhoto = Loadable({
+  loader: () => import('components/user/UserChangePhoto'),
+  loading: Loading,
+});
+
 const AsyncLocationTypeForm = Loadable({
   loader: () => import('components/locationType/LocationTypeForm'),
   loading: Loading,
@@ -1560,6 +1590,12 @@ const Router = () => {
             <MainLayoutRoute path="**/localization/create" component={AsyncLocalizationForm} />
             <MainLayoutRoute path="**/localization/edit/:localizationId" component={AsyncLocalizationForm} />
             <MainLayoutRoute path="**/jobs/show/:jobName" component={AsyncJobShow} />
+            <MainLayoutRoute path="**/quartz/list" component={AsyncQuartzJobList} />
+            <MainLayoutRoute path="**/migration/materializedViews" component={AsyncMaterializedViews} />
+            <MainLayoutRoute path="**/migration/productAvailability" component={AsyncMigrationProductAvailability} />
+            <MainLayoutRoute path="**/role/show/:roleId" component={AsyncRoleShow} />
+            <MainLayoutRoute path="**/user/create" component={AsyncUserCreate} />
+            <MainLayoutRoute path="**/user/changePhoto/:userId" component={AsyncUserChangePhoto} />
             <MainLayoutRoute path="**/locationType/list" component={AsyncLocationTypeList} />
             <MainLayoutRoute path="**/locationType/create" component={AsyncLocationTypeForm} />
             <MainLayoutRoute path="**/locationType/edit/:locationTypeId" component={AsyncLocationTypeForm} />

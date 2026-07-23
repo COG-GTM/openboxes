@@ -18,6 +18,76 @@ servers:
 security:
   - cookieAuth: []
 paths:
+  /api/jobs/list:
+    get:
+      operationId: listJobs
+      summary: List all Quartz jobs with their triggers and scheduler state
+      responses:
+        '200':
+          description: All registered Quartz jobs, sorted by name.
+          content:
+            application/json:
+              schema:
+                type: object
+                required: [data]
+                properties:
+                  data:
+                    type: object
+                    required: [schedulerInStandbyMode, jobs]
+                    properties:
+                      schedulerInStandbyMode:
+                        type: boolean
+                      jobs:
+                        type: array
+                        items:
+                          $ref: '#/components/schemas/JobDetail'
+  /api/jobs/pause:
+    post:
+      operationId: pauseJob
+      summary: Pause all triggers of a Quartz job
+      requestBody:
+        $ref: '#/components/requestBodies/JobActionRequest'
+      responses:
+        '200':
+          $ref: '#/components/responses/JobDetailResponse'
+        '404':
+          $ref: '#/components/responses/JobNotFound'
+  /api/jobs/resume:
+    post:
+      operationId: resumeJob
+      summary: Resume all triggers of a paused Quartz job
+      requestBody:
+        $ref: '#/components/requestBodies/JobActionRequest'
+      responses:
+        '200':
+          $ref: '#/components/responses/JobDetailResponse'
+        '404':
+          $ref: '#/components/responses/JobNotFound'
+  /api/jobs/run:
+    post:
+      operationId: runJobNow
+      summary: Trigger an immediate one-off execution of a Quartz job
+      requestBody:
+        $ref: '#/components/requestBodies/JobActionRequest'
+      responses:
+        '200':
+          $ref: '#/components/responses/JobDetailResponse'
+        '404':
+          $ref: '#/components/responses/JobNotFound'
+  /api/jobs/scheduler/standby:
+    post:
+      operationId: standbyScheduler
+      summary: Put the Quartz scheduler into standby mode
+      responses:
+        '200':
+          $ref: '#/components/responses/SchedulerStateResponse'
+  /api/jobs/scheduler/start:
+    post:
+      operationId: startScheduler
+      summary: Start the Quartz scheduler (leave standby mode)
+      responses:
+        '200':
+          $ref: '#/components/responses/SchedulerStateResponse'
   /api/jobs/details:
     get:
       operationId: readJobDetails
@@ -127,6 +197,51 @@ paths:
               schema:
                 $ref: '../components/common.yaml#/components/schemas/ErrorResponse'
 components:
+  requestBodies:
+    JobActionRequest:
+      required: true
+      content:
+        application/json:
+          schema:
+            type: object
+            required: [jobName]
+            properties:
+              jobName:
+                type: string
+              jobGroup:
+                type: string
+                description: Defaults to GRAILS_JOBS.
+  responses:
+    JobDetailResponse:
+      description: The refreshed job detail.
+      content:
+        application/json:
+          schema:
+            type: object
+            required: [data]
+            properties:
+              data:
+                $ref: '#/components/schemas/JobDetail'
+    JobNotFound:
+      description: No job detail for the given key.
+      content:
+        application/json:
+          schema:
+            $ref: '../components/common.yaml#/components/schemas/ErrorResponse'
+    SchedulerStateResponse:
+      description: The scheduler standby state after the operation.
+      content:
+        application/json:
+          schema:
+            type: object
+            required: [data]
+            properties:
+              data:
+                type: object
+                required: [schedulerInStandbyMode]
+                properties:
+                  schedulerInStandbyMode:
+                    type: boolean
   schemas:
     JobDetail:
       type: object
@@ -185,6 +300,10 @@ components:
         nextFireTime:
           type: string
           nullable: true
+        state:
+          type: string
+          nullable: true
+          description: Trigger state name (e.g. NORMAL, PAUSED); only in listJobs.
       additionalProperties: true
   securitySchemes:
     cookieAuth:

@@ -240,6 +240,29 @@ export const LOCALE_OPTIONS = `${API}/localeOptions`;
 // JOBS
 export const JOBS_DETAILS_API = `${API}/jobs/details`;
 export const JOBS_TRIGGERS_API = `${API}/jobs/triggers`;
+export const JOBS_LIST_API = `${API}/jobs/list`;
+export const JOBS_PAUSE_API = `${API}/jobs/pause`;
+export const JOBS_RESUME_API = `${API}/jobs/resume`;
+export const JOBS_RUN_API = `${API}/jobs/run`;
+export const JOBS_SCHEDULER_STANDBY_API = `${API}/jobs/scheduler/standby`;
+export const JOBS_SCHEDULER_START_API = `${API}/jobs/scheduler/start`;
+
+// MIGRATION (materialized views)
+export const MIGRATION_API = `${API}/migration`;
+export const MIGRATION_MATERIALIZED_VIEWS = `${MIGRATION_API}/materializedViews`;
+export const MIGRATION_PRODUCT_AVAILABILITY = `${MIGRATION_API}/productAvailability`;
+export const MIGRATION_PRODUCT_AVAILABILITY_COUNT = `${MIGRATION_API}/productAvailability/count`;
+export const MIGRATION_PRODUCT_AVAILABILITY_CALCULATE = `${MIGRATION_API}/productAvailability/calculate`;
+export const MIGRATION_PRODUCT_AVAILABILITY_REFRESH = `${MIGRATION_API}/productAvailability/refresh`;
+export const MIGRATION_PRODUCT_DEMAND_REFRESH = `${MIGRATION_API}/productDemand/refresh`;
+
+// ROLE
+export const ROLE_BY_ID = (id) => `${API}/roles/${id}`;
+
+// USER
+export const USER_CREATE_API = `${API}/users/create`;
+export const USER_DETAILS = (id) => `${API}/users/${id}/details`;
+export const USER_PHOTO = (id) => `${API}/users/${id}/photo`;
 
 // PUTAWAY
 export const PUTAWAY_GENERATE_PDF = (id) => `/putAway/generatePdf/${id}`;
@@ -603,7 +626,6 @@ export const LOCALIZATION_RECORD_BY_ID = (id) => `${LOCALIZATION_RECORD_API}/${i
 export const LOCALIZATION_RECORD_DETAILS = (id) => `${LOCALIZATION_RECORD_API}/${id}/details`;
 
 // MIGRATION ADMIN DASHBOARD
-export const MIGRATION_API = `${API}/migration`;
 export const MIGRATION_DATA_MIGRATION = `${MIGRATION_API}/dataMigration`;
 export const MIGRATION_DATA_QUALITY = `${MIGRATION_API}/dataQuality`;
 export const MIGRATION_RECEIPTS_WITHOUT_TRANSACTION = `${MIGRATION_API}/receiptsWithoutTransaction`;

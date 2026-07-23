@@ -493,6 +493,95 @@ class UrlMappings {
             action = [POST: "createTrigger", DELETE: "deleteTrigger"]
         }
 
+        // Quartz job list endpoints for the React quartz/list screen (Phase 2 Batch 45)
+        "/api/jobs/list"(parseRequest: true) {
+            controller = { "jobsApi" }
+            action = [GET: "list"]
+        }
+
+        "/api/jobs/pause"(parseRequest: true) {
+            controller = { "jobsApi" }
+            action = [POST: "pauseJob"]
+        }
+
+        "/api/jobs/resume"(parseRequest: true) {
+            controller = { "jobsApi" }
+            action = [POST: "resumeJob"]
+        }
+
+        "/api/jobs/run"(parseRequest: true) {
+            controller = { "jobsApi" }
+            action = [POST: "runJobNow"]
+        }
+
+        "/api/jobs/scheduler/standby"(parseRequest: true) {
+            controller = { "jobsApi" }
+            action = [POST: "standbyScheduler"]
+        }
+
+        "/api/jobs/scheduler/start"(parseRequest: true) {
+            controller = { "jobsApi" }
+            action = [POST: "startScheduler"]
+        }
+
+        // The quartz-monitor plugin screen from the legacy Grails 3 build;
+        // now served by the React quartz/list screen.
+        "/quartz/list"(controller: "jobs", action: "quartzList")
+
+        // Migration materialized-view endpoints for the React migration screens (Phase 2 Batch 45)
+        "/api/migration/materializedViews"(parseRequest: true) {
+            controller = { "migrationApi" }
+            action = [GET: "materializedViews"]
+        }
+
+        "/api/migration/productAvailability"(parseRequest: true) {
+            controller = { "migrationApi" }
+            action = [GET: "productAvailability"]
+        }
+
+        "/api/migration/productAvailability/count"(parseRequest: true) {
+            controller = { "migrationApi" }
+            action = [GET: "productAvailabilityCount"]
+        }
+
+        "/api/migration/productAvailability/calculate"(parseRequest: true) {
+            controller = { "migrationApi" }
+            action = [GET: "calculateProductAvailability"]
+        }
+
+        "/api/migration/productAvailability/refresh"(parseRequest: true) {
+            controller = { "migrationApi" }
+            action = [POST: "refreshProductAvailability"]
+        }
+
+        "/api/migration/productDemand/refresh"(parseRequest: true) {
+            controller = { "migrationApi" }
+            action = [POST: "refreshProductDemand"]
+        }
+
+        // Role endpoints for the React role/show screen (Phase 2 Batch 45)
+        "/api/roles/$id"(parseRequest: true) {
+            controller = { "roleApi" }
+            action = [GET: "read", DELETE: "delete"]
+        }
+
+        // User endpoints for the React user/create and user/changePhoto screens
+        // (Phase 2 Batch 45). GET /api/users (usersOptions) is mapped separately.
+        "/api/users/create"(parseRequest: true) {
+            controller = { "userApi" }
+            action = [POST: "create"]
+        }
+
+        "/api/users/$id/details"(parseRequest: true) {
+            controller = { "userApi" }
+            action = [GET: "read"]
+        }
+
+        "/api/users/$id/photo" {
+            controller = { "userApi" }
+            action = [POST: "uploadPhoto"]
+        }
+
         "/api/paymentTermOptions"(parseRequest: true) {
             controller = { "selectOptionsApi" }
             action = [GET: "paymentTermOptions"]

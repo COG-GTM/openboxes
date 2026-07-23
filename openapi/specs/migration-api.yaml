@@ -2,13 +2,15 @@ openapi: 3.0.3
 info:
   title: OpenBoxes - MigrationApiController
   description: >
-    Read-only endpoints for the migration admin dashboard handled by
+    Endpoints for the migration admin dashboard handled by
     org.pih.warehouse.api.MigrationApiController, explicitly mapped under
     /api/migration/*. Added in Phase 2 (Batch 44) for the migrated
     migration/dataMigration, migration/dataQuality, migration/dimensionTables
-    and migration/factTables screens. The counts mirror the models the legacy
-    GSP screens rendered; dataMigration reflects the session's current
-    location.
+    and migration/factTables screens, and extended in Batch 45 with the
+    materialized-view and product-availability endpoints backing the React
+    migration/materializedViews and migration/productAvailability screens.
+    The counts mirror the models the legacy GSP screens rendered;
+    dataMigration reflects the session's current location.
   version: 0.1.0
 servers:
   - url: http://localhost:8080/openboxes
@@ -276,7 +278,160 @@ paths:
                         type: integer
                       stockoutFactCount:
                         type: integer
+  /api/migration/materializedViews:
+    get:
+      operationId: readMaterializedViewCounts
+      summary: Read row counts of the materialized-view tables
+      responses:
+        '200':
+          description: Row counts for product demand and product availability.
+          content:
+            application/json:
+              schema:
+                type: object
+                required: [data]
+                properties:
+                  data:
+                    type: object
+                    required: [productDemandCount, productAvailabilityCount]
+                    properties:
+                      productDemandCount:
+                        type: integer
+                      productAvailabilityCount:
+                        type: integer
+  /api/migration/productAvailability:
+    get:
+      operationId: listProductAvailabilityByDepot
+      summary: List product availability row counts per depot location
+      responses:
+        '200':
+          description: >
+            One row per depot, in depot order (matching the legacy screen).
+            Count is null for depots with no product_availability rows.
+          content:
+            application/json:
+              schema:
+                type: object
+                required: [data]
+                properties:
+                  data:
+                    type: array
+                    items:
+                      type: object
+                      required: [locationId, locationName]
+                      properties:
+                        locationId:
+                          type: string
+                        locationName:
+                          type: string
+                        productAvailabilityCount:
+                          type: integer
+                          nullable: true
+  /api/migration/productAvailability/count:
+    get:
+      operationId: readProductAvailabilityCount
+      summary: Read the product availability row count for one location
+      parameters:
+        - $ref: '#/components/parameters/locationId'
+      responses:
+        '200':
+          description: The row count for the location (null when no rows).
+          content:
+            application/json:
+              schema:
+                type: object
+                required: [data]
+                properties:
+                  data:
+                    type: object
+                    required: [locationId]
+                    properties:
+                      locationId:
+                        type: string
+                      count:
+                        type: integer
+                        nullable: true
+        '404':
+          $ref: '#/components/responses/LocationNotFound'
+  /api/migration/productAvailability/calculate:
+    get:
+      operationId: calculateProductAvailability
+      summary: Calculate (without persisting) bin location rows for one location
+      description: >
+        Runs the expensive ProductAvailabilityService.calculateBinLocations
+        query and returns the number of rows that a refresh would produce.
+      parameters:
+        - $ref: '#/components/parameters/locationId'
+      responses:
+        '200':
+          description: The calculated bin location row count.
+          content:
+            application/json:
+              schema:
+                type: object
+                required: [data]
+                properties:
+                  data:
+                    type: object
+                    required: [locationId, count]
+                    properties:
+                      locationId:
+                        type: string
+                      count:
+                        type: integer
+        '404':
+          $ref: '#/components/responses/LocationNotFound'
+  /api/migration/productAvailability/refresh:
+    post:
+      operationId: refreshProductAvailability
+      summary: Refresh the product availability materialized view
+      parameters:
+        - name: locationId
+          in: query
+          required: false
+          schema:
+            type: string
+          description: >
+            When present, refreshes only this location; otherwise refreshes
+            all locations (like the legacy report/refreshProductAvailability).
+      responses:
+        '200':
+          $ref: '#/components/responses/RefreshMessage'
+        '404':
+          $ref: '#/components/responses/LocationNotFound'
+  /api/migration/productDemand/refresh:
+    post:
+      operationId: refreshProductDemand
+      summary: Refresh the product demand materialized view
+      responses:
+        '200':
+          $ref: '#/components/responses/RefreshMessage'
 components:
+  parameters:
+    locationId:
+      name: locationId
+      in: query
+      required: true
+      schema:
+        type: string
+      description: Location id.
+  responses:
+    LocationNotFound:
+      description: No location for the given id.
+      content:
+        application/json:
+          schema:
+            $ref: '../components/common.yaml#/components/schemas/ErrorResponse'
+    RefreshMessage:
+      description: Refresh completed; returns a human-readable message.
+      content:
+        application/json:
+          schema:
+            type: object
+            required: [data]
+            properties:
+              data:
+                type: string
   securitySchemes:
     cookieAuth:
       $ref: '../components/common.yaml#/components/securitySchemes/cookieAuth'

@@ -62,6 +62,12 @@ class MigrationController {
     }
 
     def materializedViews() {
+        // The migration/index tabs still fetch this action via AJAX to render
+        // the legacy tab fragment; direct navigation gets the React screen.
+        if (!request.xhr) {
+            render(view: "/common/react", params: params)
+            return
+        }
         def productDemandCount = dataService.executeQuery("select count(*) as count from product_demand_details")[0]?.count ?: 0
         def productAvailabilityCount = dataService.executeQuery("select count(*) as count from product_availability")[0]?.count ?: 0
 
@@ -118,6 +124,12 @@ class MigrationController {
     }
 
     def productAvailability() {
+        // The migration/index tabs still fetch this action via AJAX to render
+        // the legacy tab fragment; direct navigation gets the React screen.
+        if (!request.xhr) {
+            render(view: "/common/react", params: params)
+            return
+        }
 
         def countByLocation = ProductAvailability.createCriteria().list {
             resultTransformer(CriteriaSpecification.ALIAS_TO_ENTITY_MAP)

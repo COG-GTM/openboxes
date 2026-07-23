@@ -47,6 +47,12 @@ class JobsController {
         render(view: "/common/react", params: params)
     }
 
+    // Serves /quartz/list (mapped in UrlMappings), replacing the quartz-monitor
+    // plugin screen that shipped with the legacy Grails 3 build.
+    def quartzList() {
+        render(view: "/common/react", params: params)
+    }
+
 
     def unscheduleJob() {
         // find jobKey of job

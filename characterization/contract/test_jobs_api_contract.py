@@ -95,3 +95,65 @@ def test_delete_unknown_trigger(client):
     resp = check(client, spec, "DELETE", "/api/jobs/triggers",
                  params={"name": "doesnotexist0000"})
     assert resp.status_code == 404
+
+
+# --- Batch 45 quartz/list endpoints ---
+
+@pytest.fixture(scope="module")
+def batch45_jobs_api(client):
+    # These endpoints were added after the jobs/show batch; skip on builds
+    # that expose /api/jobs/details but not /api/jobs/list.
+    if client.request("GET", "/api/jobs/list").status_code != 200:
+        pytest.skip("app build does not expose /api/jobs/list")
+
+
+def test_list_jobs(client, batch45_jobs_api):
+    resp = check(client, spec, "GET", "/api/jobs/list")
+    data = resp.json()["data"]
+    assert isinstance(data["schedulerInStandbyMode"], bool)
+    names = [job["name"] for job in data["jobs"]]
+    assert names == sorted(names)
+    assert JOB_NAME in names
+
+
+def test_pause_and_resume_job(client, batch45_jobs_api):
+    job = next(j for j in client.get_json("/api/jobs/list")["data"]["jobs"]
+               if j["name"] == JOB_NAME)
+    if not job["triggers"]:
+        pytest.skip(f"{JOB_NAME} has no triggers to pause in this app build")
+    resp = check(client, spec, "POST", "/api/jobs/pause",
+                 json={"jobName": JOB_NAME})
+    assert resp.status_code == 200
+    job = next(j for j in client.get_json("/api/jobs/list")["data"]["jobs"]
+               if j["name"] == JOB_NAME)
+    assert all(t["state"] == "PAUSED" for t in job["triggers"])
+    resp = check(client, spec, "POST", "/api/jobs/resume",
+                 json={"jobName": JOB_NAME})
+    assert resp.status_code == 200
+    job = next(j for j in client.get_json("/api/jobs/list")["data"]["jobs"]
+               if j["name"] == JOB_NAME)
+    assert all(t["state"] != "PAUSED" for t in job["triggers"])
+
+
+def test_pause_unknown_job(client, batch45_jobs_api):
+    resp = check(client, spec, "POST", "/api/jobs/pause",
+                 json={"jobName": "org.example.DoesNotExistJob"})
+    assert resp.status_code == 404
+
+
+def test_run_unknown_job(client, batch45_jobs_api):
+    resp = check(client, spec, "POST", "/api/jobs/run",
+                 json={"jobName": "org.example.DoesNotExistJob"})
+    assert resp.status_code == 404
+
+
+def test_scheduler_standby_and_start(client, batch45_jobs_api):
+    initially_standby = client.get_json(
+        "/api/jobs/list")["data"]["schedulerInStandbyMode"]
+    resp = check(client, spec, "POST", "/api/jobs/scheduler/standby")
+    assert resp.json()["data"]["schedulerInStandbyMode"] is True
+    resp = check(client, spec, "POST", "/api/jobs/scheduler/start")
+    assert resp.json()["data"]["schedulerInStandbyMode"] is False
+    # Restore the original state
+    if initially_standby:
+        client.request("POST", "/api/jobs/scheduler/standby")

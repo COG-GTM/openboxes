@@ -112,11 +112,7 @@ class UserController {
      * Create a user
      */
     def create() {
-        log.info "create a new user based on request parameters"
-        def userInstance = new User()
-        userInstance.properties = params
-
-        return [userInstance: userInstance]
+        render(view: "/common/react", params: params)
     }
 
     /**
@@ -163,8 +159,8 @@ class UserController {
             flash.message = "${warehouse.message(code: 'default.created.message', args: [warehouse.message(code: 'user.label'), userInstance.id])}"
             redirect(action: "edit", id: userInstance.id)
         } catch (ValidationException e) {
-            userInstance.errors = e.errors
-            render(view: "create", model: [userInstance: userInstance])
+            flash.message = e.errors.allErrors.collect { g.message(error: it) }.join("; ")
+            redirect(action: "create")
         }
     }
 
@@ -186,14 +182,13 @@ class UserController {
      * Allow user to change their avatar/photo.
      */
     def changePhoto() {
-        log.info "change photo for given user"
         def userInstance = User.get(params.id)
         if (!userInstance) {
             flash.message = "${warehouse.message(code: 'default.not.found.message', args: [warehouse.message(code: 'user.label'), params.id])}"
             redirect(action: "list")
-        } else {
-            [userInstance: userInstance]
+            return
         }
+        render(view: "/common/react", params: params)
     }
 
     def cropPhoto() {
@@ -442,7 +437,7 @@ class UserController {
             if (!okcontents.contains(photo.getContentType())) {
                 log.info "Photo is not correct type"
                 flash.message = "Photo must be one of: ${okcontents}"
-                render(view: "changePhoto", model: [userInstance: userInstance])
+                redirect(action: "changePhoto", id: userInstance.id)
                 return
             }
 
@@ -453,7 +448,7 @@ class UserController {
                     sendUserPhotoChanged(userInstance)
                 } else {
                     flash.message = "${warehouse.message(code: 'default.not.updated.message', args: [warehouse.message(code: 'user.label'), userInstance.id])}"
-                    render(view: "uploadPhoto", model: [userInstance: userInstance])
+                    redirect(action: "changePhoto", id: userInstance.id)
                     return
                 }
             } else {

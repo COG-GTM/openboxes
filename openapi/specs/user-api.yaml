@@ -1,0 +1,173 @@
+openapi: 3.0.3
+info:
+  title: OpenBoxes - UserApiController
+  description: >
+    User endpoints handled by org.pih.warehouse.api.UserApiController,
+    routed via explicit "/api/users/create", "/api/users/{id}/details"
+    and "/api/users/{id}/photo" mappings (plain GET /api/users is the
+    pre-existing user select-options endpoint). Added in Phase 2
+    (Batch 45) to back the React user/create and user/changePhoto
+    screens. Role assignment is intentionally not exposed, matching the
+    legacy create form. New users are created inactive, matching the
+    legacy UserController.save behavior.
+  version: 0.1.0
+servers:
+  - url: http://localhost:8080/openboxes
+    description: Local Docker baseline (docs/migration/RUNNING_LOCALLY.md)
+security:
+  - cookieAuth: []
+paths:
+  /api/users/create:
+    post:
+      operationId: createUser
+      summary: Create a user (inactive by default)
+      requestBody:
+        required: true
+        content:
+          application/json:
+            schema:
+              type: object
+              required: [username, password]
+              properties:
+                username:
+                  type: string
+                firstName:
+                  type: string
+                lastName:
+                  type: string
+                password:
+                  type: string
+                email:
+                  type: string
+                locale:
+                  type: string
+                  nullable: true
+                  description: Locale language code, e.g. "en".
+      responses:
+        '201':
+          description: Created; returns the new user.
+          content:
+            application/json:
+              schema:
+                type: object
+                required: [data]
+                properties:
+                  data:
+                    $ref: '#/components/schemas/User'
+        '400':
+          description: Validation failed.
+          content:
+            application/json:
+              schema:
+                type: object
+                required: [errorCode, errorMessages]
+                properties:
+                  errorCode:
+                    type: integer
+                  errorMessages:
+                    type: array
+                    items:
+                      type: string
+  /api/users/{id}/details:
+    get:
+      operationId: readUser
+      summary: Read a user
+      parameters:
+        - $ref: '#/components/parameters/userId'
+      responses:
+        '200':
+          description: The user.
+          content:
+            application/json:
+              schema:
+                type: object
+                required: [data]
+                properties:
+                  data:
+                    $ref: '#/components/schemas/User'
+        '404':
+          $ref: '#/components/responses/UserNotFound'
+  /api/users/{id}/photo:
+    post:
+      operationId: uploadUserPhoto
+      summary: Upload a user's photo
+      description: >
+        Multipart upload; the "photo" part must be a PNG, JPEG or GIF
+        smaller than 1MB (same rules as the legacy
+        UserController.uploadPhoto action).
+      parameters:
+        - $ref: '#/components/parameters/userId'
+      requestBody:
+        required: true
+        content:
+          multipart/form-data:
+            schema:
+              type: object
+              required: [photo]
+              properties:
+                photo:
+                  type: string
+                  format: binary
+      responses:
+        '200':
+          description: Uploaded; returns the refreshed user.
+          content:
+            application/json:
+              schema:
+                type: object
+                required: [data]
+                properties:
+                  data:
+                    $ref: '#/components/schemas/User'
+        '400':
+          description: Missing, wrong-type or too-large photo.
+          content:
+            application/json:
+              schema:
+                $ref: '../components/common.yaml#/components/schemas/ErrorResponse'
+        '404':
+          $ref: '#/components/responses/UserNotFound'
+components:
+  parameters:
+    userId:
+      name: id
+      in: path
+      required: true
+      schema:
+        type: string
+      description: User id.
+  responses:
+    UserNotFound:
+      description: No user for the given id.
+      content:
+        application/json:
+          schema:
+            $ref: '../components/common.yaml#/components/schemas/ErrorResponse'
+  schemas:
+    User:
+      type: object
+      required: [id, username, active, hasPhoto]
+      properties:
+        id:
+          type: string
+        username:
+          type: string
+        firstName:
+          type: string
+          nullable: true
+        lastName:
+          type: string
+          nullable: true
+        email:
+          type: string
+          nullable: true
+        locale:
+          type: string
+          nullable: true
+        active:
+          type: boolean
+        hasPhoto:
+          type: boolean
+  securitySchemes:
+    cookieAuth:
+      $ref: '../components/common.yaml#/components/securitySchemes/cookieAuth'

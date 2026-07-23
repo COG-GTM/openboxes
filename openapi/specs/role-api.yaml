@@ -1,0 +1,86 @@
+openapi: 3.0.3
+info:
+  title: OpenBoxes - RoleApiController
+  description: >
+    Read/delete endpoints over the Role domain, handled by
+    org.pih.warehouse.api.RoleApiController and routed via the explicit
+    "/api/roles/{id}" mapping. Added in Phase 2 (Batch 45) to back the
+    React role/show screen (the legacy screen was Grails scaffolding).
+  version: 0.1.0
+servers:
+  - url: http://localhost:8080/openboxes
+    description: Local Docker baseline (docs/migration/RUNNING_LOCALLY.md)
+security:
+  - cookieAuth: []
+paths:
+  /api/roles/{id}:
+    get:
+      operationId: readRole
+      summary: Read a role
+      parameters:
+        - $ref: '#/components/parameters/roleId'
+      responses:
+        '200':
+          description: The role.
+          content:
+            application/json:
+              schema:
+                type: object
+                required: [data]
+                properties:
+                  data:
+                    $ref: '#/components/schemas/Role'
+        '404':
+          description: No role for the given id.
+          content:
+            application/json:
+              schema:
+                $ref: '../components/common.yaml#/components/schemas/ErrorResponse'
+    delete:
+      operationId: deleteRole
+      summary: Delete a role
+      parameters:
+        - $ref: '#/components/parameters/roleId'
+      responses:
+        '204':
+          description: Deleted; no content.
+        '404':
+          description: No role for the given id.
+          content:
+            application/json:
+              schema:
+                $ref: '../components/common.yaml#/components/schemas/ErrorResponse'
+        '409':
+          description: The role is referenced by users and cannot be deleted.
+          content:
+            application/json:
+              schema:
+                $ref: '../components/common.yaml#/components/schemas/ErrorResponse'
+components:
+  parameters:
+    roleId:
+      name: id
+      in: path
+      required: true
+      schema:
+        type: string
+      description: Role id.
+  schemas:
+    Role:
+      type: object
+      required: [id, name]
+      properties:
+        id:
+          type: string
+        name:
+          type: string
+        roleType:
+          type: string
+          nullable: true
+          description: RoleType enum name, e.g. ROLE_ADMIN.
+        description:
+          type: string
+          nullable: true
+  securitySchemes:
+    cookieAuth:
+      $ref: '../components/common.yaml#/components/securitySchemes/cookieAuth'
