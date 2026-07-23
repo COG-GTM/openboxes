@@ -2246,6 +2246,26 @@ class UrlMappings {
             action = [GET: "getInventoryTransactionsSummary"]
         }
 
+        "/api/reports/binLocationReport" {
+            controller = "reportApi"
+            action = [GET: "binLocationReport"]
+        }
+
+        "/api/reports/cycleCountReport" {
+            controller = "reportApi"
+            action = [GET: "cycleCountReport"]
+        }
+
+        "/api/reports/shippingReport/$id" {
+            controller = "reportApi"
+            action = [GET: "shippingReport"]
+        }
+
+        "/api/dataExports" {
+            controller = "dataExportApi"
+            action = [GET: "list"]
+        }
+
         "/api/reports/on-order-summary" {
             controller = "reportApi"
             action = [GET: "onOrderSummary"]

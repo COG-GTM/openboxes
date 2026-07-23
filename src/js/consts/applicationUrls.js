@@ -329,6 +329,14 @@ const REPORT_URL = {
   showInventoryByLocationReport: () => `${REPORT_URL.base}/showInventoryByLocationReport`,
   showPaginatedPackingListReport: () => `${REPORT_URL.base}/showPaginatedPackingListReport`,
   downloadShippingReport: () => `${REPORT_URL.base}/downloadShippingReport`,
+  showBinLocationReport: (params = {}) => stringifyUrl({
+    url: `${REPORT_URL.base}/showBinLocationReport`,
+    query: params,
+  }),
+  showCycleCountReport: (params = {}) => stringifyUrl({
+    url: `${REPORT_URL.base}/showCycleCountReport`,
+    query: params,
+  }),
 };
 
 const BUDGET_CODE_URL = {
@@ -615,6 +623,14 @@ const BARCODE_URL = {
   }),
 };
 
+const DATA_EXPORT_URL = {
+  base: `${CONTEXT_PATH}/dataExport`,
+  render: (id, format) => stringifyUrl({
+    url: `${DATA_EXPORT_URL.base}/render/${id}`,
+    query: { format },
+  }),
+};
+
 const CYCLE_COUNT = {
   base: `${CONTEXT_PATH}/inventory/cycleCount`,
   list: (tab) => `${CYCLE_COUNT.base}?tab=${tab}`,
@@ -632,6 +648,7 @@ export {
   CREATE_SHIPMENT_URL,
   CYCLE_COUNT,
   DASHBOARD_URL,
+  DATA_EXPORT_URL,
   DELIVERY_NOTE_URL,
   DOCUMENT_URL,
   EVENT_TYPE_URL,

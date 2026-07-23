@@ -576,3 +576,11 @@ export const CATEGORY_OPTIONS = `${API}/categoryOptions`;
 export const CATEGORY_DETAILS = (id) => `${CATEGORY_API}/${id}/details`;
 export const CATEGORY_ASSIGNING_PARENT_TO_PRODUCT = `${CATEGORY_API}/assigningParentToProduct`;
 export const UNIT_OF_MEASURE_CLASS_OPTIONS = `${GENERIC_API}/unitOfMeasureClass/`;
+
+// BATCH 37 REPORTS
+export const REPORT_BIN_LOCATION = `${API}/reports/binLocationReport`;
+export const REPORT_CYCLE_COUNT = `${API}/reports/cycleCountReport`;
+export const REPORT_SHIPPING = (id) => `${API}/reports/shippingReport/${id}`;
+
+// DATA EXPORT
+export const DATA_EXPORT_API = `${API}/dataExports`;

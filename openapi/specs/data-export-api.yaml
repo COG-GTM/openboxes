@@ -1,0 +1,48 @@
+openapi: 3.0.3
+info:
+  title: OpenBoxes - DataExportApiController
+  description: >
+    Data export listing endpoint handled by
+    org.pih.warehouse.api.DataExportApiController, added in Phase 2 Batch 37
+    to back the React dataExport/index screen. Routed via the explicit
+    "/api/dataExports" mapping. Downloads still go through the legacy
+    /dataExport/render/{id}?format=csv|json action.
+  version: 0.1.0
+servers:
+  - url: http://localhost:8080/openboxes
+    description: Local Docker baseline (docs/migration/RUNNING_LOCALLY.md)
+security:
+  - cookieAuth: []
+paths:
+  /api/dataExports:
+    get:
+      operationId: listDataExports
+      summary: List custom data export documents
+      description: >
+        Documents whose document type has the DATA_EXPORT document code,
+        mirroring the legacy DataExportController.index model.
+      responses:
+        '200':
+          description: Data export documents, in a "data" envelope.
+          content:
+            application/json:
+              schema:
+                type: object
+                required: [data]
+                properties:
+                  data:
+                    type: array
+                    items:
+                      type: object
+                      required: [id, name]
+                      properties:
+                        id:
+                          $ref: '../components/common.yaml#/components/schemas/Id'
+                        name:
+                          type: string
+                          nullable: true
+                      additionalProperties: false
+components:
+  securitySchemes:
+    cookieAuth:
+      $ref: '../components/common.yaml#/components/securitySchemes/cookieAuth'

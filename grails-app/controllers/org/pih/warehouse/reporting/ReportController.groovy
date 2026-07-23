@@ -325,35 +325,16 @@ class ReportController {
         render(view: "/common/react")
     }
 
-    def printShippingReport(ChecklistReportCommand command) {
-        command.rootCategory = productService.getRootCategory()
-        if (!command?.hasErrors()) {
-            reportService.generateShippingReport(command)
-        }
-        [command: command]
+    def printShippingReport() {
+        render(view: "/common/react")
     }
 
-    def printPickListReport(ChecklistReportCommand command) {
-
-        Map binLocations
-        if (!command?.hasErrors()) {
-            reportService.generateShippingReport(command)
-            binLocations = inventoryService.getBinLocations(command.shipment)
-        }
-        [command: command, binLocations: binLocations]
+    def printPickListReport() {
+        render(view: "/common/react")
     }
 
-    def printPaginatedPackingListReport(ChecklistReportCommand command) {
-        try {
-            command.rootCategory = productService.getRootCategory()
-            if (!command?.hasErrors()) {
-                reportService.generateShippingReport(command)
-            }
-        } catch (Exception e) {
-            log.error("error", e)
-            e.printStackTrace()
-        }
-        [command: command]
+    def printPaginatedPackingListReport() {
+        render(view: "/common/react")
     }
 
     def downloadShippingReport() {
@@ -477,12 +458,7 @@ class ReportController {
         }
 
         log.info("Show bin location report: " + (System.currentTimeMillis() - startTime) + " ms")
-        [
-                location   : location,
-                elapsedTime: (System.currentTimeMillis() - startTime),
-                statuses   : ["inStock", "outOfStock"]
-        ]
-
+        render(view: "/common/react")
     }
 
     def showOnOrderReport() {
@@ -651,6 +627,10 @@ class ReportController {
     }
 
     def showCycleCountReport() {
+        if (!params.print) {
+            render(view: "/common/react")
+            return
+        }
         Location location = Location.load(session.warehouse.id)
         List binLocations = inventoryService.getQuantityByBinLocation(location)
         log.info "Returned ${binLocations.size()} bin locations for location ${location}"
@@ -658,12 +638,12 @@ class ReportController {
         List rows = binLocations.collect { row ->
             // Required in order to avoid lazy initialization exception that occurs because all
             // of the querying / session work that was done above was executed in worker threads
-            Product product = Product.load(row?.product?.id)
+            Product product = Product.get(row?.product?.id)
 
             def latestInventoryDate = row?.product?.latestInventoryDate(location.id) ?: row?.product.earliestReceivingDate(location.id)
-            Map dataRow = params.print ? [
+            Map dataRow = [
                             "Product code"        : StringEscapeUtils.escapeCsv(row?.product?.productCode),
-                            "Product name"        : product.displayNameWithLocaleCode,
+                            "Product name"        : product?.displayNameWithLocaleCode,
                             "Lot number"          : StringEscapeUtils.escapeCsv(row?.inventoryItem.lotNumber ?: ""),
                             "Expiration date"     : row?.inventoryItem.expirationDate ? row?.inventoryItem.expirationDate.format(Constants.EXPIRATION_DATE_FORMAT) : "",
                             "Bin location"        : StringEscapeUtils.escapeCsv(row?.binLocation?.name ?: ""),
@@ -671,38 +651,20 @@ class ReportController {
                             "Physical QOH"        : "",
                             "Comment"             : "",
                             "Product family"      : product?.productFamily ?: "",
-                            "Category"            : StringEscapeUtils.escapeCsv(row?.category?.name ?: ""),
-                            "Formularies"         : product.productCatalogs.join(", ") ?: "",
+                            "Category"            : StringEscapeUtils.escapeCsv(product?.category?.name ?: ""),
+                            "Formularies"         : product?.productCatalogs?.join(", ") ?: "",
                             "ABC Classification"  : StringEscapeUtils.escapeCsv(row?.product.getAbcClassification(location.id) ?: ""),
                             "Status"              : g.message(code: "binLocationSummary.${row?.status}.label"),
                             "Last Inventory Date" : latestInventoryDate ? latestInventoryDate.format(Constants.EXPIRATION_DATE_FORMAT) : "",
-                    ] : [
-                            productCode       : StringEscapeUtils.escapeCsv(row?.product?.productCode),
-                            productName       : row?.product.name ?: "",
-                            productFamily     : product?.productFamily ?: "",
-                            category          : StringEscapeUtils.escapeCsv(row?.category?.name ?: ""),
-                            formularies       : product.productCatalogs.join(", ") ?: "",
-                            lotNumber         : StringEscapeUtils.escapeCsv(row?.inventoryItem.lotNumber ?: ""),
-                            expirationDate    : row?.inventoryItem.expirationDate ? row?.inventoryItem.expirationDate.format(Constants.EXPIRATION_DATE_FORMAT) : "",
-                            abcClassification : StringEscapeUtils.escapeCsv(row?.product.getAbcClassification(location.id) ?: ""),
-                            binLocation       : StringEscapeUtils.escapeCsv(row?.binLocation?.name ?: ""),
-                            status            : g.message(code: "binLocationSummary.${row?.status}.label"),
-                            lastInventoryDate : latestInventoryDate ? latestInventoryDate.format(Constants.EXPIRATION_DATE_FORMAT) : "",
-                            quantityOnHand    : row?.quantity ?: 0,
                     ]
 
             return dataRow
         }
 
-        if (params.print) {
-            def filename = "CycleCountReport-${location.name}-${new Date().format("dd MMM yyyy hhmmss")}"
-            response.contentType = "application/vnd.ms-excel"
-            response.setHeader("Content-disposition", "attachment; filename=\"${filename}.xls\"")
-            documentService.generateInventoryTemplate(response.outputStream, rows)
-            return
-        }
-
-        render(view: "showCycleCountReport", model: [rows: rows])
+        def filename = "CycleCountReport-${location.name}-${new Date().format("dd MMM yyyy hhmmss")}"
+        response.contentType = "application/vnd.ms-excel"
+        response.setHeader("Content-disposition", "attachment; filename=\"${filename}.xls\"")
+        documentService.generateInventoryTemplate(response.outputStream, rows)
     }
 
     def showForecastReport() {

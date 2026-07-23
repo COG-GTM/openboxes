@@ -604,6 +604,13 @@ a.disabled {
   .print-mt {
     margin-top: 40px;
   }
+
+  body.print-report {
+    .navbar,
+    .footer {
+      display: none !important;
+    }
+  }
 }
 
 .clickable-row:hover {

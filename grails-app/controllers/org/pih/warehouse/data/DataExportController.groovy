@@ -20,8 +20,7 @@ class DataExportController {
 
     def dataService
     def index() {
-        List<Document> documents = Document.findAllByDocumentCode(DocumentCode.DATA_EXPORT)
-        [documents: documents]
+        render(view: "/common/react")
     }
 
     def render() {

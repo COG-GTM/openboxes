@@ -325,11 +325,334 @@ paths:
                           type: string
         '500':
           $ref: '../components/common.yaml#/components/responses/ServerError'
+  /api/reports/binLocationReport:
+    get:
+      operationId: getBinLocationReport
+      summary: Bin location (inventory details) report rows
+      description: >
+        Quantity on hand by bin location for the requested location
+        (defaults to the session warehouse). unitCost and totalValue are null
+        unless the current user has the finance role; totalValue is a
+        formatted string. Unknown location ids respond 404 with
+        {"errorMessage"}.
+      parameters:
+        - name: location.id
+          in: query
+          required: false
+          description: Location id; defaults to the session warehouse.
+          schema:
+            $ref: '../components/common.yaml#/components/schemas/Id'
+        - name: status
+          in: query
+          required: false
+          description: Filter on row status (inStock or outOfStock).
+          schema:
+            type: string
+            enum: [inStock, outOfStock]
+      responses:
+        '200':
+          description: Bin location report rows, in a "data" envelope.
+          content:
+            application/json:
+              schema:
+                type: object
+                required: [data, location]
+                properties:
+                  data:
+                    type: array
+                    items:
+                      $ref: '#/components/schemas/BinLocationRow'
+                  location:
+                    $ref: '#/components/schemas/NamedReference'
+        '404':
+          $ref: '#/components/responses/NotFoundError'
+  /api/reports/cycleCountReport:
+    get:
+      operationId: getCycleCountReport
+      summary: Cycle count report rows for the session warehouse
+      description: >
+        Quantity by bin location for the session warehouse, one row per
+        product/lot/bin, with the legacy CSV-escaped string values and
+        "MM/dd/yyyy" date strings.
+      responses:
+        '200':
+          description: Cycle count report rows, in a "data" envelope.
+          content:
+            application/json:
+              schema:
+                type: object
+                required: [data, location]
+                properties:
+                  data:
+                    type: array
+                    items:
+                      $ref: '#/components/schemas/CycleCountRow'
+                  location:
+                    $ref: '#/components/schemas/NamedReference'
+  /api/reports/shippingReport/{id}:
+    get:
+      operationId: getShippingReport
+      summary: Shipment checklist data for the print report screens
+      description: >
+        Shipment header plus one entry per shipment item (sorted), backing
+        the React printShippingReport, printPickListReport and
+        printPaginatedPackingListReport screens. binLocations lists the
+        current availability by bin for the entry's inventory item (used by
+        the pick list). Unknown shipment ids respond 404 with
+        {"errorMessage"}.
+      parameters:
+        - name: id
+          in: path
+          required: true
+          description: Shipment id.
+          schema:
+            $ref: '../components/common.yaml#/components/schemas/Id'
+      responses:
+        '200':
+          description: The shipping report data, in a "data" envelope.
+          content:
+            application/json:
+              schema:
+                type: object
+                required: [data]
+                properties:
+                  data:
+                    $ref: '#/components/schemas/ShippingReport'
+        '404':
+          $ref: '#/components/responses/NotFoundError'
 components:
+  responses:
+    NotFoundError:
+      description: Unknown id.
+      content:
+        application/json:
+          schema:
+            type: object
+            required: [errorMessage]
+            properties:
+              errorMessage:
+                type: string
+            additionalProperties: false
   securitySchemes:
     cookieAuth:
       $ref: '../components/common.yaml#/components/securitySchemes/cookieAuth'
   schemas:
+    NamedReference:
+      type: object
+      nullable: true
+      properties:
+        id:
+          type: string
+          nullable: true
+        name:
+          type: string
+          nullable: true
+      additionalProperties: false
+    BinLocationRow:
+      type: object
+      required: [quantity, quantityAvailableToPromise]
+      properties:
+        id:
+          type: string
+          nullable: true
+          description: Product id.
+        status:
+          type: string
+          nullable: true
+          description: Localized binLocationSummary status label.
+        productCode:
+          type: string
+          nullable: true
+        productName:
+          type: string
+          nullable: true
+        displayName:
+          type: string
+          nullable: true
+        productGroup:
+          type: string
+          nullable: true
+        category:
+          type: string
+          nullable: true
+        lotNumber:
+          type: string
+          nullable: true
+        lotStatus:
+          type: string
+          nullable: true
+        expirationDate:
+          type: string
+          nullable: true
+          description: '"dd/MMM/yyyy" display format.'
+        unitOfMeasure:
+          type: string
+          nullable: true
+        zone:
+          type: string
+        binLocation:
+          type: string
+          description: Bin location name, or "Default".
+        isOnHold:
+          type: boolean
+          nullable: true
+        quantity:
+          type: number
+        quantityAvailableToPromise:
+          type: number
+        unitCost:
+          type: number
+          nullable: true
+          description: Null unless the current user has the finance role.
+        totalValue:
+          type: string
+          nullable: true
+          description: Formatted number; null unless finance role.
+        handlingIcons:
+          type: array
+          nullable: true
+          items:
+            type: object
+            additionalProperties: true
+      additionalProperties: false
+    CycleCountRow:
+      type: object
+      required: [quantityOnHand]
+      properties:
+        productCode:
+          type: string
+          nullable: true
+          description: CSV-escaped (legacy parity).
+        productName:
+          type: string
+        productFamily:
+          type: string
+        category:
+          type: string
+          description: CSV-escaped (legacy parity).
+        formularies:
+          type: string
+        lotNumber:
+          type: string
+          description: CSV-escaped (legacy parity).
+        expirationDate:
+          type: string
+          description: '"MM/dd/yyyy" display format, or empty.'
+        abcClassification:
+          type: string
+          description: CSV-escaped (legacy parity).
+        binLocation:
+          type: string
+          description: CSV-escaped (legacy parity).
+        status:
+          type: string
+          nullable: true
+          description: Localized binLocationSummary status label.
+        lastInventoryDate:
+          type: string
+          description: '"MM/dd/yyyy" display format, or empty.'
+        quantityOnHand:
+          type: number
+      additionalProperties: false
+    ShippingReport:
+      type: object
+      required: [shipment, entries]
+      properties:
+        shipment:
+          type: object
+          required: [id]
+          properties:
+            id:
+              $ref: '../components/common.yaml#/components/schemas/Id'
+            name:
+              type: string
+              nullable: true
+            shipmentNumber:
+              type: string
+              nullable: true
+            expectedShippingDate:
+              type: string
+              nullable: true
+              description: '"MMM dd, yyyy hh:mma z" display format.'
+            expectedDeliveryDate:
+              type: string
+              nullable: true
+              description: '"MMM dd, yyyy hh:mma z" display format.'
+            origin:
+              $ref: '#/components/schemas/NamedReference'
+            destination:
+              $ref: '#/components/schemas/NamedReference'
+            licensePlateNumber:
+              type: string
+              nullable: true
+              description: Identifier of the "License Plate Number" reference number, if any.
+          additionalProperties: false
+        printedBy:
+          type: string
+          nullable: true
+          description: Display name of the current session user.
+        entries:
+          type: array
+          items:
+            $ref: '#/components/schemas/ShippingReportEntry'
+      additionalProperties: false
+    ShippingReportEntry:
+      type: object
+      properties:
+        container:
+          type: object
+          nullable: true
+          properties:
+            id:
+              type: string
+              nullable: true
+            name:
+              type: string
+              nullable: true
+            parentContainerName:
+              type: string
+              nullable: true
+          additionalProperties: false
+        productCode:
+          type: string
+          nullable: true
+        productName:
+          type: string
+          nullable: true
+        coldChain:
+          type: boolean
+        unitOfMeasure:
+          type: string
+          nullable: true
+        lotNumber:
+          type: string
+          nullable: true
+        expirationDate:
+          type: string
+          nullable: true
+          description: '"dd/MMM/yyyy" display format.'
+        quantity:
+          type: number
+          nullable: true
+        recipient:
+          type: string
+          nullable: true
+        binLocationPicked:
+          type: string
+          nullable: true
+        binLocations:
+          type: array
+          items:
+            type: object
+            properties:
+              binLocation:
+                type: string
+                nullable: true
+              quantity:
+                type: number
+                nullable: true
+            additionalProperties: false
+      additionalProperties: false
     OnOrderSummaryRow:
       type: object
       required: [productCode, productName]
