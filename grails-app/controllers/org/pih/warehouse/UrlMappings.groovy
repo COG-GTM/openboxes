@@ -2518,6 +2518,21 @@ class UrlMappings {
             action = [GET: "requestReasonCodes"]
         }
 
+        "/api/reports/transaction-report" {
+            controller = "reportApi"
+            action = [GET: "transactionReport"]
+        }
+
+        "/api/reports/transaction-report-metadata" {
+            controller = "reportApi"
+            action = [GET: "transactionReportMetadata"]
+        }
+
+        "/api/reports/transaction-report-details" {
+            controller = "reportApi"
+            action = [GET: "transactionReportDetails"]
+        }
+
         "/api/reports/inventory-by-location" {
             controller = "reportApi"
             action = [GET: "inventoryByLocation"]

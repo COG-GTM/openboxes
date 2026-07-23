@@ -408,6 +408,11 @@ const AsyncRequestDetailReport = Loadable({
   loading: Loading,
 });
 
+const AsyncTransactionReport = Loadable({
+  loader: () => import('components/reporting/transactionReport/TransactionReport'),
+  loading: Loading,
+});
+
 const AsyncLocationGroupList = Loadable({
   loader: () => import('components/locationGroup/LocationGroupList'),
   loading: Loading,
@@ -1452,6 +1457,7 @@ const Router = () => {
             <MainLayoutRoute path="**/report/showOnOrderReport" component={AsyncOnOrderReport} />
             <MainLayoutRoute path="**/report/showPaginatedPackingListReport" component={AsyncPaginatedPackingListReport} />
             <MainLayoutRoute path="**/report/showRequestDetailReport" component={AsyncRequestDetailReport} />
+            <MainLayoutRoute path="**/report/showTransactionReport" component={AsyncTransactionReport} />
             <MainLayoutRoute path="**/inventory/reorderReport" component={AsyncReorderReport} />
             <MainLayoutRoute path="**/inventory/browse" component={AsyncInventoryBrowse} />
             <MainLayoutRoute path="**/inventory/createTransaction" component={AsyncCreateTransaction} />

@@ -10,16 +10,23 @@
 package org.pih.warehouse.api
 
 import grails.converters.JSON
+import grails.plugins.quartz.GrailsJobClassConstants
 import org.apache.commons.lang.StringEscapeUtils
 import org.pih.warehouse.auth.AuthService
 import org.pih.warehouse.core.Constants
 import org.pih.warehouse.core.Location
 import org.pih.warehouse.core.ReasonCode
+import org.pih.warehouse.core.Tag
 import org.pih.warehouse.order.OrderItem
 import org.pih.warehouse.product.Category
 import org.pih.warehouse.product.Product
+import org.pih.warehouse.product.ProductCatalog
 import org.pih.warehouse.report.ChecklistReportCommand
+import org.pih.warehouse.reporting.LocationDimension
+import org.pih.warehouse.reporting.TransactionFact
 import org.pih.warehouse.shipping.Shipment
+import org.quartz.JobKey
+import org.quartz.impl.StdScheduler
 
 import java.text.DateFormat
 import java.text.SimpleDateFormat
@@ -41,6 +48,8 @@ class ReportApiController {
     def productAvailabilityService
     def localizationService
     def messageSource
+    def productService
+    StdScheduler quartzScheduler
 
     /**
      * On-order summary rows (same data as /json/getSummaryOrderReport, which
@@ -186,6 +195,117 @@ class ReportApiController {
                             " (" + shipment.origin.name + " to " + shipment.destination.name + ")",
             ]
         }
+        render([data: data] as JSON)
+    }
+
+    /**
+     * Transaction report rows (same data as /json/getTransactionReport,
+     * which backs the legacy Transaction Report DataTable), serialized with
+     * camelCase keys. locationId, startDate and endDate (MM/dd/yyyy) are
+     * required; validation errors return 400 with an errorMessage.
+     */
+    def transactionReport() {
+        DateFormat dateFormat = new SimpleDateFormat("MM/dd/yyyy")
+        Date startDate = params.startDate ? dateFormat.parse(params.startDate) : null
+        Date endDate = params.endDate ? dateFormat.parse(params.endDate) + 1 : null
+        Location location = params.locationId ? Location.get(params.locationId) : AuthService.currentLocation
+
+        if (!startDate || !endDate || !location) {
+            response.status = 400
+            render([errorMessage: "All parameter fields are required"] as JSON)
+            return
+        }
+        if (!startDate.before(endDate)) {
+            response.status = 400
+            render([errorMessage: "Start date must occur before end date"] as JSON)
+            return
+        }
+        if (endDate.after(new Date() + 1)) {
+            response.status = 400
+            render([errorMessage: "End date must occur on or before today"] as JSON)
+            return
+        }
+
+        Category category = (params.category ? Category.get(params.category) : null) ?: productService.getRootCategory()
+        List<Category> categories = params.includeCategoryChildren
+                ? category.children + category
+                : [category]
+        List<Tag> tagList = params.tags ? Tag.findAllById(params.list('tags')) : []
+        List<ProductCatalog> catalogList = params.catalogs
+                ? ProductCatalog.findAllById(params.list('catalogs'))
+                : []
+        List<Product> productList = params.products
+                ? params.list('products').collect { Product.get(it) }.findAll { it != null }
+                : []
+
+        List<Object> rows = reportService.getTransactionReport(
+                location,
+                categories,
+                tagList,
+                catalogList,
+                productList,
+                startDate,
+                endDate,
+                false)
+
+        def data = rows.collect { row ->
+            [
+                    productCode: row["Code"],
+                    productName: row["Name"],
+                    displayName: row["Display Name"] ?: null,
+                    category   : row["Category"],
+                    opening    : row["Opening"],
+                    credits    : row["Credits"],
+                    debits     : row["Debits"],
+                    adjustments: row["Adjustments"],
+                    closing    : row["Closing"],
+            ]
+        }
+        render([data: data] as JSON)
+    }
+
+    /**
+     * Metadata about the transaction fact table for a location (the sidebar
+     * box the legacy report/showTransactionReport GSP rendered server-side).
+     */
+    def transactionReportMetadata() {
+        Location location = params.locationId ? Location.get(params.locationId) : AuthService.currentLocation
+        LocationDimension locationKey = LocationDimension.findByLocationId(location?.id)
+
+        def triggers = quartzScheduler.getTriggersOfJob(
+                new JobKey("org.pih.warehouse.jobs.RefreshTransactionFactJob", GrailsJobClassConstants.DEFAULT_GROUP))
+        Date previousFireTime = triggers*.previousFireTime.max()
+        Date nextFireTime = triggers*.nextFireTime.max()
+
+        render([
+                data: [
+                        productCount      : TransactionFact.countDistinctProducts(locationKey?.locationId).get() ?: 0,
+                        transactionCount  : locationKey ? TransactionFact.countByLocationKey(locationKey) : 0,
+                        minTransactionDate: TransactionFact.minTransactionDate(locationKey?.locationId).get()?.format(Constants.DEFAULT_DATE_TIME_FORMAT),
+                        maxTransactionDate: TransactionFact.maxTransactionDate(locationKey?.locationId).get()?.format(Constants.DEFAULT_DATE_TIME_FORMAT),
+                        previousRefresh   : previousFireTime?.format(Constants.DEFAULT_DATE_TIME_FORMAT),
+                        nextRefresh       : nextFireTime?.format(Constants.DEFAULT_DATE_TIME_FORMAT),
+                ],
+        ] as JSON)
+    }
+
+    /**
+     * Per-product transaction detail rows for the transaction report modal
+     * (same data as /json/getTransactionReportDetails).
+     */
+    def transactionReportDetails() {
+        if (!params.productCode || !params.startDate || !params.endDate) {
+            response.status = 400
+            render([errorMessage: "productCode, startDate and endDate parameters are required"] as JSON)
+            return
+        }
+        DateFormat dateFormat = new SimpleDateFormat("MM/dd/yyyy")
+        Location location = params.locationId ? Location.get(params.locationId) : AuthService.currentLocation
+        Product product = Product.findByProductCode(params.productCode)
+        Date startDate = dateFormat.parse(params.startDate)
+        Date endDate = dateFormat.parse(params.endDate) + 1
+
+        List<Object> data = reportService.getTransactionReportModalData(location, product, startDate, endDate)
         render([data: data] as JSON)
     }
 

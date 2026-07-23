@@ -7,7 +7,9 @@ info:
     "/api/reports/..." mappings in UrlMappings.groovy
     (on-order-summary, on-order-details, request-details,
     request-reason-codes, inventory-by-location, packing-list,
-    packing-list-shipments). Added in Phase 2 (Reports batch) to back the
+    packing-list-shipments, transaction-report,
+    transaction-report-metadata, transaction-report-details).
+    Added in Phase 2 (Reports batch) to back the
     React report screens; serializations mirror what the legacy GSP report
     screens rendered server-side.
   version: 0.1.0
@@ -295,6 +297,203 @@ paths:
                         type: array
                         items:
                           $ref: '#/components/schemas/PackingListContainer'
+        '500':
+          $ref: '../components/common.yaml#/components/responses/ServerError'
+  /api/reports/transaction-report:
+    get:
+      operationId: getTransactionReport
+      summary: Transaction report rows (opening/credits/debits/adjustments/closing) per product
+      description: >
+        Same data as the legacy /json/getTransactionReport DataTable source
+        used by report/showTransactionReport, with camelCase keys.
+        locationId, startDate and endDate (MM/dd/yyyy) are required;
+        validation errors return 400 with an errorMessage.
+      parameters:
+        - name: locationId
+          in: query
+          required: true
+          schema:
+            type: string
+        - name: startDate
+          in: query
+          required: true
+          schema:
+            type: string
+          description: Start of the transaction date range (MM/dd/yyyy).
+        - name: endDate
+          in: query
+          required: true
+          schema:
+            type: string
+          description: End of the transaction date range (MM/dd/yyyy).
+        - name: category
+          in: query
+          required: false
+          schema:
+            type: string
+          description: Category id (defaults to the root category).
+        - name: includeCategoryChildren
+          in: query
+          required: false
+          schema:
+            type: string
+          description: Any non-empty value includes subcategory products.
+        - name: products
+          in: query
+          required: false
+          schema:
+            type: array
+            items:
+              type: string
+          style: form
+          explode: true
+        - name: tags
+          in: query
+          required: false
+          schema:
+            type: array
+            items:
+              type: string
+          style: form
+          explode: true
+        - name: catalogs
+          in: query
+          required: false
+          schema:
+            type: array
+            items:
+              type: string
+          style: form
+          explode: true
+      responses:
+        '200':
+          description: One row per product with transactions in the date range.
+          content:
+            application/json:
+              schema:
+                type: object
+                required: [data]
+                properties:
+                  data:
+                    type: array
+                    items:
+                      $ref: '#/components/schemas/TransactionReportRow'
+        '400':
+          description: Missing or invalid locationId/startDate/endDate.
+          content:
+            application/json:
+              schema:
+                type: object
+                required: [errorMessage]
+                properties:
+                  errorMessage:
+                    type: string
+        '500':
+          $ref: '../components/common.yaml#/components/responses/ServerError'
+  /api/reports/transaction-report-metadata:
+    get:
+      operationId: getTransactionReportMetadata
+      summary: Transaction fact metadata for a location
+      description: >
+        The metadata box the legacy report/showTransactionReport GSP rendered
+        server-side (fact counts, min/max transaction dates and the
+        RefreshTransactionFactJob previous/next fire times).
+      parameters:
+        - name: locationId
+          in: query
+          required: false
+          schema:
+            type: string
+          description: Location id (defaults to the session location).
+      responses:
+        '200':
+          description: Transaction fact metadata.
+          content:
+            application/json:
+              schema:
+                type: object
+                required: [data]
+                properties:
+                  data:
+                    type: object
+                    required: [productCount, transactionCount]
+                    properties:
+                      productCount:
+                        type: number
+                      transactionCount:
+                        type: number
+                      minTransactionDate:
+                        type: string
+                        nullable: true
+                        description: dd/MMM/yyyy HH:mm:ss, or null when no facts.
+                      maxTransactionDate:
+                        type: string
+                        nullable: true
+                      previousRefresh:
+                        type: string
+                        nullable: true
+                      nextRefresh:
+                        type: string
+                        nullable: true
+        '500':
+          $ref: '../components/common.yaml#/components/responses/ServerError'
+  /api/reports/transaction-report-details:
+    get:
+      operationId: getTransactionReportDetails
+      summary: Per-product transaction detail rows for the transaction report modal
+      description: >
+        Same data as the legacy /json/getTransactionReportDetails DataTable
+        source used by the legacy row-click dialog. productCode, startDate
+        and endDate (MM/dd/yyyy) are required.
+      parameters:
+        - name: productCode
+          in: query
+          required: true
+          schema:
+            type: string
+        - name: locationId
+          in: query
+          required: false
+          schema:
+            type: string
+          description: Location id (defaults to the session location).
+        - name: startDate
+          in: query
+          required: true
+          schema:
+            type: string
+          description: Start of the transaction date range (MM/dd/yyyy).
+        - name: endDate
+          in: query
+          required: true
+          schema:
+            type: string
+          description: End of the transaction date range (MM/dd/yyyy).
+      responses:
+        '200':
+          description: >
+            Detail rows bracketed by BALANCE_OPENING and BALANCE_CLOSING
+            entries (unknown products yield just those two rows).
+          content:
+            application/json:
+              schema:
+                type: object
+                required: [data]
+                properties:
+                  data:
+                    type: array
+                    items:
+                      $ref: '#/components/schemas/TransactionReportDetailRow'
+        '400':
+          description: productCode, startDate or endDate missing.
+          content:
+            application/json:
+              schema:
+                type: object
+                required: [errorMessage]
+                properties:
+                  errorMessage:
+                    type: string
         '500':
           $ref: '../components/common.yaml#/components/responses/ServerError'
   /api/reports/packing-list-shipments:
@@ -824,6 +1023,52 @@ components:
         totalQuantityAvailableToPromise:
           type: number
           nullable: true
+    TransactionReportRow:
+      type: object
+      required: [productCode, productName, category, opening, credits, debits, adjustments, closing]
+      properties:
+        productCode:
+          type: string
+          nullable: true
+        productName:
+          type: string
+          nullable: true
+        displayName:
+          type: string
+          nullable: true
+        category:
+          type: string
+          nullable: true
+        opening:
+          type: number
+        credits:
+          type: number
+        debits:
+          type: number
+        adjustments:
+          type: number
+        closing:
+          type: number
+    TransactionReportDetailRow:
+      type: object
+      required: [transactionDate, transactionCode, transactionTypeName, balance]
+      properties:
+        transactionDate:
+          type: string
+        transactionTime:
+          type: string
+          nullable: true
+        transactionCode:
+          type: string
+          description: TransactionCode enum name, or BALANCE_OPENING/BALANCE_CLOSING.
+        transactionTypeName:
+          type: string
+        quantity:
+          type: number
+          nullable: true
+          description: Null for the opening/closing balance rows.
+        balance:
+          type: number
     PackingListContainer:
       type: object
       required: [entries]
