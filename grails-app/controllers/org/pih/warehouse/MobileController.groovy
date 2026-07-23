@@ -28,14 +28,6 @@ class MobileController {
         render(view: "/common/react")
     }
 
-    def menu() {
-        Map menuConfig = grailsApplication.config.openboxes.megamenu
-        //User user = User.get(session?.user?.id)
-        //Location location = Location.get(session.warehouse?.id)
-        //List translatedMenu = megamenuService.buildAndTranslateMenu(menuConfig, user, location)
-        [menuConfig:menuConfig]
-    }
-
     def chooseLocation() {
         render(view: "/common/react", params: params)
     }

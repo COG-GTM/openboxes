@@ -32,16 +32,6 @@ class ShipmentEventController {
         return [shipmentEventInstance: shipmentEventInstance]
     }
 
-    def save() {
-        def shipmentEventInstance = new Event(params)
-        if (shipmentEventInstance.save(flush: true)) {
-            flash.message = "${warehouse.message(code: 'default.created.message', args: [warehouse.message(code: 'shipmentEvent.label', default: 'ShipmentEvent'), shipmentEventInstance.id])}"
-            redirect(action: "show", id: shipmentEventInstance.id)
-        } else {
-            render(view: "create", model: [shipmentEventInstance: shipmentEventInstance])
-        }
-    }
-
     def show() {
         def shipmentEventInstance = Event.get(params.id)
         if (!shipmentEventInstance) {
@@ -59,31 +49,6 @@ class ShipmentEventController {
             redirect(action: "list")
         } else {
             return [shipmentEventInstance: shipmentEventInstance]
-        }
-    }
-
-    def update() {
-        def shipmentEventInstance = Event.get(params.id)
-        if (shipmentEventInstance) {
-            if (params.version) {
-                def version = params.version.toLong()
-                if (shipmentEventInstance.version > version) {
-
-                    shipmentEventInstance.errors.rejectValue("version", "default.optimistic.locking.failure", [warehouse.message(code: 'shipmentEvent.label', default: 'ShipmentEvent')] as Object[], "Another user has updated this ShipmentEvent while you were editing")
-                    render(view: "edit", model: [shipmentEventInstance: shipmentEventInstance])
-                    return
-                }
-            }
-            shipmentEventInstance.properties = params
-            if (!shipmentEventInstance.hasErrors() && shipmentEventInstance.save(flush: true)) {
-                flash.message = "${warehouse.message(code: 'default.updated.message', args: [warehouse.message(code: 'shipmentEvent.label', default: 'ShipmentEvent'), shipmentEventInstance.id])}"
-                redirect(action: "show", id: shipmentEventInstance.id)
-            } else {
-                render(view: "edit", model: [shipmentEventInstance: shipmentEventInstance])
-            }
-        } else {
-            flash.message = "${warehouse.message(code: 'default.not.found.message', args: [warehouse.message(code: 'shipmentEvent.label', default: 'ShipmentEvent'), params.id])}"
-            redirect(action: "list")
         }
     }
 

@@ -34,37 +34,10 @@ class RequisitionItemController {
         render(view: "/common/react")
     }
 
-    def listCanceled() {
-        params.max = Math.min(params.max ? params.int('max') : 10, 100)
-        params.offset = params.offset ?: 0
-        def location = Location.get(session.warehouse.id)
-        def requisitionItemInstanceList = requisitionService.getCanceledRequisitionItems(location, params.cancelReasonCode, null, null, params.max, params.offset)
-
-        render(view: "list", model: [requisitionItemInstanceList: requisitionItemInstanceList, requisitionItemInstanceTotal: requisitionItemInstanceList.totalCount])
-    }
-
-    def listPending() {
-        def location = Location.get(session.warehouse.id)
-        def requisitionItemInstanceList = requisitionService.getPendingRequisitionItems(location)
-
-        render(view: "list", model: [requisitionItemInstanceList: requisitionItemInstanceList, requisitionItemInstanceTotal: requisitionItemInstanceList.size()])
-    }
-
-
     def create() {
         def requisitionItemInstance = new RequisitionItem()
         requisitionItemInstance.properties = params
         return [requisitionItemInstance: requisitionItemInstance]
-    }
-
-    def save() {
-        def requisitionItemInstance = new RequisitionItem(params)
-        if (requisitionItemInstance.save(flush: true)) {
-            flash.message = "${warehouse.message(code: 'default.created.message', args: [warehouse.message(code: 'requisitionItem.label', default: 'RequisitionItem'), requisitionItemInstance.id])}"
-            redirect(action: "list", id: requisitionItemInstance.id)
-        } else {
-            render(view: "create", model: [requisitionItemInstance: requisitionItemInstance])
-        }
     }
 
     def show() {
@@ -94,31 +67,6 @@ class RequisitionItemController {
             redirect(action: "list")
         } else {
             render(view: "/common/react")
-        }
-    }
-
-    def update() {
-        def requisitionItemInstance = RequisitionItem.get(params.id)
-        if (requisitionItemInstance) {
-            if (params.version) {
-                def version = params.version.toLong()
-                if (requisitionItemInstance.version > version) {
-
-                    requisitionItemInstance.errors.rejectValue("version", "default.optimistic.locking.failure", [warehouse.message(code: 'requisitionItem.label', default: 'RequisitionItem')] as Object[], "Another user has updated this RequisitionItem while you were editing")
-                    render(view: "edit", model: [requisitionItemInstance: requisitionItemInstance])
-                    return
-                }
-            }
-            requisitionItemInstance.properties = params
-            if (!requisitionItemInstance.hasErrors() && requisitionItemInstance.save(flush: true)) {
-                flash.message = "${warehouse.message(code: 'default.updated.message', args: [warehouse.message(code: 'requisitionItem.label', default: 'RequisitionItem'), requisitionItemInstance.id])}"
-                redirect(controller: "requisition", action: "review", id: requisitionItemInstance?.requisition?.id)
-            } else {
-                render(view: "edit", model: [requisitionItemInstance: requisitionItemInstance])
-            }
-        } else {
-            flash.message = "${warehouse.message(code: 'default.not.found.message', args: [warehouse.message(code: 'requisitionItem.label', default: 'RequisitionItem'), params.id])}"
-            redirect(controller: "requisition", action: "review", id: requisitionItemInstance?.requisition?.id)
         }
     }
 

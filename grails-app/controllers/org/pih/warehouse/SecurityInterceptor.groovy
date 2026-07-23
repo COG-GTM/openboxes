@@ -48,11 +48,6 @@ class SecurityInterceptor {
             return true
         }
 
-        // This allows the menu to be g:include'd on mobile page (allowing for dynamic content to be added)
-        if (controllerName.equals("mobile") && actionName.equals("menu")) {
-            return true
-        }
-
         // Not sure when this happens
         if (params.controller == null) {
             redirect(controller: 'auth', action: 'login')

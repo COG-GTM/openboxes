@@ -71,18 +71,6 @@ class RequisitionTemplateController {
         }
     }
 
-    def save() {
-        def requisition = new Requisition(params)
-
-        if (!requisition.hasErrors() && requisition.save()) {
-            flash.message = "Requisition template has been created"
-        } else {
-            render(view: "create", model: [requisition: requisition])
-            return
-        }
-        redirect(action: "edit", id: requisition.id)
-    }
-
     def publish() {
         def requisition = Requisition.get(params.id)
         if (requisition) {
@@ -331,21 +319,6 @@ class RequisitionTemplateController {
 
     def batch() {
         render(view: "/common/react")
-    }
-
-    def importData() {
-        Integer skipLines = params.int('skipLines') ?: 0
-        String delimiter = params.delimiter ?: ","
-        InputStream file = params?.csv
-                ? new ByteArrayInputStream(params?.csv.getBytes("UTF-8"))
-                :  request.getFile('file').inputStream
-        Requisition requisition = Requisition.get(params.id)
-
-        List<Object> data = requisitionTemplateService.parseImportFile(file, requisition, delimiter, skipLines)
-        List<String> errors = requisitionTemplateService.validateImportData(data)
-
-        session.data = data
-        render(view: "batch", model: [requisition: requisition, data: data, errors: errors])
     }
 
     def doImport() {

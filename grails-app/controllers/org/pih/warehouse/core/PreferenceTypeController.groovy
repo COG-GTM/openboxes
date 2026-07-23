@@ -30,34 +30,6 @@ class PreferenceTypeController {
     }
 
     @Transactional
-    def save() {
-        def preferenceType = new PreferenceType(params)
-        if (preferenceType.save(flush: true)) {
-            flash.message = "${warehouse.message(code: 'default.created.message', args: [warehouse.message(code: 'preferenceType.label', default: 'Preference Type'), preferenceType.id])}"
-            redirect(controller: "preferenceType", action: "edit", id: preferenceType?.id)
-        } else {
-            render(view: "create", model: [preferenceType: preferenceType])
-        }
-    }
-
-    @Transactional
-    def update() {
-        def preferenceType = PreferenceType.get(params.id)
-        if (preferenceType) {
-            preferenceType.properties = params
-            if (!preferenceType.hasErrors() && preferenceType.save(flush: true)) {
-                flash.message = "${warehouse.message(code: 'default.updated.message', args: [warehouse.message(code: 'preferenceType.label', default: 'Preference Type'), preferenceType.id])}"
-                redirect(action: "list")
-            } else {
-                render(view: "edit", model: [preferenceType: preferenceType])
-            }
-        } else {
-            flash.message = "${warehouse.message(code: 'default.not.found.message', args: [warehouse.message(code: 'preferenceType.label', default: 'Preference Type'), params.id])}"
-            redirect(action: "list")
-        }
-    }
-
-    @Transactional
     def delete() {
         def preferenceType = PreferenceType.get(params.id)
         if (preferenceType) {

@@ -44,24 +44,6 @@ class CategoryController {
         redirect(action: "tree")
     }
 
-    //  @CacheFlush("selectCategoryCache")
-    def saveCategory() {
-        def categoryInstance = Category.get(params.id)
-        if (!categoryInstance) {
-            categoryInstance = new Category(params)
-        } else {
-            categoryInstance.properties = params
-        }
-
-        try {
-            categoryGormService.save(categoryInstance)
-            flash.message = "${warehouse.message(code: 'category.saved.message', arg: [format.category(category: categoryInstance).decodeHTML()])}"
-            redirect(action: "tree", model: [rootCategory: productService.getRootCategory()])
-        } catch (Exception e) {
-            render(view: "edit", model: [categoryInstance: categoryInstance])
-        }
-    }
-
     def deleteCategory() {
         Category categoryInstance = categoryGormService.get(params.id)
 
@@ -92,18 +74,6 @@ class CategoryController {
         render(view: "/common/react")
     }
 
-    //  @CacheFlush("selectCategoryCache")
-    def save() {
-        def categoryInstance = new Category(params)
-        try {
-            categoryGormService.save(categoryInstance)
-            flash.message = "${warehouse.message(code: 'default.created.message', args: [warehouse.message(code: 'category.label', default: 'Category'), categoryInstance.id])}"
-            redirect(action: "tree", id: categoryInstance.id)
-        } catch(Exception e) {
-            render(view: "create", model: [categoryInstance: categoryInstance])
-        }
-    }
-
     def show() {
         def categoryInstance = Category.get(params.id)
         if (!categoryInstance) {
@@ -116,33 +86,6 @@ class CategoryController {
 
     def edit() {
         render(view: "/common/react")
-    }
-
-    //  @CacheFlush("selectCategoryCache")
-    def update() {
-        Category categoryInstance = categoryGormService.get(params.id)
-        if (categoryInstance) {
-            if (params.version) {
-                def version = params.version.toLong()
-                if (categoryInstance.version > version) {
-
-                    categoryInstance.errors.rejectValue("version", "default.optimistic.locking.failure", [warehouse.message(code: 'category.label', default: 'Category')] as Object[], "Another user has updated this Category while you were editing")
-                    render(view: "edit", model: [categoryInstance: categoryInstance])
-                    return
-                }
-            }
-            categoryInstance.properties = params
-            if (!categoryInstance.hasErrors()) {
-                categoryGormService.save(categoryInstance)
-                flash.message = "${warehouse.message(code: 'default.updated.message', args: [warehouse.message(code: 'category.label', default: 'Category'), categoryInstance.id])}"
-                redirect(action: "tree", id: categoryInstance.id)
-            } else {
-                render(view: "edit", model: [categoryInstance: categoryInstance])
-            }
-        } else {
-            flash.message = "${warehouse.message(code: 'default.not.found.message', args: [warehouse.message(code: 'category.label', default: 'Category'), params.id])}"
-            redirect(action: "tree")
-        }
     }
 
     //  @CacheFlush("selectCategoryCache")

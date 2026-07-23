@@ -73,31 +73,6 @@ class LocalizationController {
         render(view: "/common/react", params: params)
     }
 
-    def update() {
-        def localizationInstance = Localization.get(params.id)
-        if (localizationInstance) {
-            if (params.version) {
-                def version = params.version.toLong()
-                if (localizationInstance.version > version) {
-
-                    localizationInstance.errors.rejectValue("version", "default.optimistic.locking.failure", [warehouse.message(code: 'localization.label', default: 'Localization')] as Object[], "Another user has updated this Localization while you were editing")
-                    render(view: "edit", model: [localizationInstance: localizationInstance])
-                    return
-                }
-            }
-            localizationInstance.properties = params
-            if (!localizationInstance.hasErrors() && localizationInstance.save(flush: true)) {
-                flash.message = "${warehouse.message(code: 'default.updated.message', args: [warehouse.message(code: 'localization.label', default: 'Localization'), localizationInstance.id])}"
-                redirect(action: "list", id: localizationInstance.id)
-            } else {
-                render(view: "edit", model: [localizationInstance: localizationInstance])
-            }
-        } else {
-            flash.message = "${warehouse.message(code: 'default.not.found.message', args: [warehouse.message(code: 'localization.label', default: 'Localization'), params.id])}"
-            redirect(action: "list")
-        }
-    }
-
     def delete() {
         def localizationInstance = Localization.get(params.id)
         if (localizationInstance) {

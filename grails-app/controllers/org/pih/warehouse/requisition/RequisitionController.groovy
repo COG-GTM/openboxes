@@ -69,65 +69,12 @@ class RequisitionController {
         render(view: "/common/react")
     }
 
-    def save() {
-        log.info "Save requisition " + params
-        withForm {
-            def requisition = new Requisition(params)
-            // Need to handle commodity class since it is an enum
-            if (params.commodityClass) {
-                requisition.commodityClass = params.commodityClass as CommodityClass
-            }
-            requisition.name = getName(requisition)
-            requisition.requestNumber = requisitionIdentifierService.generate(requisition)
-            requisition = requisitionService.saveRequisition(requisition)
-            if (!requisition.hasErrors()) {
-                redirect(controller: "requisition", action: "edit", id: requisition?.id)
-            } else {
-
-                if (requisition.type == RequisitionType.STOCK) {
-                    render(view: "createStock", model: [requisition: requisition])
-                } else {
-                    render(view: "createNonStock", model: [requisition: requisition])
-                }
-            }
-        }.invalidToken {
-            flash.message = "${g.message(code: 'requisition.invalid.duplicate.message')}"
-            def requisition = Requisition.findByRequestNumber(params.requestNumber)
-            if (requisition) {
-                redirect(action: "show", id: requisition?.id)
-            } else {
-                redirect(action: "list")
-            }
-        }
-    }
-
-
     def edit() {
         render(view: "/common/react")
     }
 
     def editHeader() {
         render(view: "/common/react")
-    }
-
-
-    def saveHeader() {
-        def requisition = Requisition.get(params.id)
-
-        if (requisition) {
-            requisition.properties = params
-            requisition.name = getName(requisition)
-            requisition = requisitionService.saveRequisition(requisition)
-
-            if (requisition.hasErrors()) {
-                render(view: "editHeader", model: [requisition: requisition])
-                return
-            }
-        }
-
-        redirect(action: "edit", id: requisition?.id)
-
-
     }
 
     def normalize() {
@@ -273,26 +220,6 @@ class RequisitionController {
 
     def transfer() {
         render(view: "/common/react")
-    }
-
-    def complete() {
-        def requisition = Requisition.get(params.id)
-        try {
-            User issuedBy = User.get(params?.issuedBy?.id)
-            Person deliveredBy = Person.get(params?.deliveredBy?.id)
-            String comments = params.comments
-
-            requisitionService.issueRequisition(requisition, issuedBy, deliveredBy, comments)
-        }
-        catch (ValidationException e) {
-            requisition = Requisition.read(params.id)
-            def picklist = Picklist.findByRequisition(requisition)
-            requisition.errors = e.errors
-            render(view: "transfer", model: [requisition: requisition, picklist: picklist])
-            return
-        }
-        flash.message = "Successfully issued requisition " + requisition?.requestNumber
-        redirect(action: "show", id: params.id)
     }
 
     def cancel() {

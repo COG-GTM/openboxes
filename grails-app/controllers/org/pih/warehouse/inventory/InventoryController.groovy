@@ -152,26 +152,6 @@ class InventoryController {
     /**
      *
      */
-    def save() {
-        def warehouseInstance = Location.get(params.warehouse?.id)
-        if (!warehouseInstance) {
-            flash.message = "${warehouse.message(code: 'default.not.found.message', args: [warehouse.message(code: 'warehouse.label', default: 'Location'), params.id])}"
-            redirect(action: "list")
-        } else {
-            warehouseInstance.inventory = new Inventory(params)
-            //inventoryInstance.warehouse = session.warehouse;
-            if (warehouseInstance.save(flush: true)) {
-                flash.message = "${warehouse.message(code: 'default.created.message', args: [warehouse.message(code: 'inventory.label', default: 'Inventory'), warehouseInstance.inventory.id])}"
-                redirect(action: "browse")
-            } else {
-                render(view: "create", model: [warehouseInstance: warehouseInstance])
-            }
-        }
-    }
-
-    /**
-     *
-     */
     def show() {
         def quantityMap = [:]
         def startTime = System.currentTimeMillis()
@@ -197,71 +177,6 @@ class InventoryController {
         ]
 
     }
-
-    def search(QuantityOnHandReportCommand command) {
-        def quantityMapByDate = [:]
-        def products = []
-        def startTime = System.currentTimeMillis()
-        def startDate = command.startDate
-        def endDate = command.endDate
-        if (command.validate()) {
-            if (!command?.locations) {
-                command.locations = [Location.get(session?.warehouse?.id)]
-            }
-            if (command.startDate && command.endDate) {
-                command.dates = getDatesBetween(startDate, endDate, command.frequency)
-            } else if (command.startDate) {
-                command?.dates << startDate
-            } else if (command.endDate) {
-                command?.dates << endDate
-            }
-
-            command.locations.each { location ->
-                for (date in command?.dates) {
-                    println "Get quantity map " + date + " location = " + location
-                    def revisedDate = date
-                    use(TimeCategory) {
-                        revisedDate = revisedDate.plus(1.day)
-                    }
-                    def quantityMap = inventorySnapshotService.getQuantityOnHandByProduct(location, revisedDate)
-                    def existingQuantityMap = quantityMapByDate[date]
-                    if (existingQuantityMap) {
-                        quantityMapByDate[date] = mergeQuantityMap(existingQuantityMap, quantityMap)
-                    } else {
-                        quantityMapByDate[date] = quantityMap
-                    }
-
-                    if (quantityMapByDate[date]?.size() > products.size()) {
-                        products = quantityMapByDate[date].keySet()
-                    }
-
-                    println "quantityMap = " + quantityMap?.keySet()?.size() + " results "
-                    println "Time " + (System.currentTimeMillis() - startTime) + " ms"
-                }
-            }
-
-            command.products = products?.sort()
-        }
-
-        if (params.button == 'download') {
-            if (command.products) {
-                def date = new Date()
-                response.setHeader("Content-disposition", "attachment; filename=\"Baseline-QoH-${date.format("yyyyMMdd-hhmmss")}.csv\"")
-                response.contentType = "text/csv"
-                def csv = inventoryService.exportBaselineQoH(command.products, quantityMapByDate)
-                println "export products: " + csv
-                render(contentType: "text/csv", text:  csv, encoding: "UTF-8")
-            } else {
-                render(text: 'No products found', status: 404)
-            }
-            return
-        }
-
-
-        render(view: "show", model: [quantityMapByDate: quantityMapByDate, command: command, elapsedTime: (System.currentTimeMillis() - startTime)])
-
-    }
-
 
     def download(QuantityOnHandReportCommand command) {
 
@@ -330,31 +245,6 @@ class InventoryController {
         }
     }
 
-    def update() {
-        def inventoryInstance = Inventory.get(params.id)
-        if (inventoryInstance) {
-            if (params.version) {
-                def version = params.version.toLong()
-                if (inventoryInstance.version > version) {
-                    inventoryInstance.errors.rejectValue("version", "default.optimistic.locking.failure", [warehouse.message(code: 'inventory.label', default: 'Inventory')] as Object[],
-                            "Another user has updated this Inventory while you were editing")
-                    render(view: "edit", model: [inventoryInstance: inventoryInstance])
-                    return
-                }
-            }
-            inventoryInstance.properties = params
-            if (!inventoryInstance.hasErrors() && inventoryInstance.save(flush: true)) {
-                flash.message = "${warehouse.message(code: 'default.updated.message', args: [warehouse.message(code: 'inventory.label', default: 'Inventory'), inventoryInstance.id])}"
-                redirect(action: "browse", id: inventoryInstance.id)
-            } else {
-                render(view: "edit", model: [inventoryInstance: inventoryInstance])
-            }
-        } else {
-            flash.message = "${warehouse.message(code: 'default.not.found.message', args: [warehouse.message(code: 'inventory.label', default: 'Inventory'), params.id])}"
-            redirect(action: "list")
-        }
-    }
-
     def delete() {
         def inventoryInstance = Inventory.get(params.id)
         if (inventoryInstance) {
@@ -370,26 +260,6 @@ class InventoryController {
         } else {
             flash.message = "${warehouse.message(code: 'default.not.found.message', args: [warehouse.message(code: 'inventory.label', default: 'Inventory'), params.id])}"
             redirect(action: "list")
-        }
-    }
-
-    def addItem() {
-        def inventoryInstance = Inventory.get(params?.inventory?.id)
-        def productInstance = Product.get(params?.product?.id)
-        def itemInstance = inventoryService.findByProductAndLotNumber(productInstance, params.lotNumber)
-        if (itemInstance) {
-            flash.message = "${warehouse.message(code: 'default.alreadyExists.message', args: [warehouse.message(code: 'inventory.label', default: 'Inventory item'), inventoryInstance.id])}"
-            redirect(action: "show", id: inventoryInstance.id)
-        } else {
-            itemInstance = new InventoryItem(params)
-            if (itemInstance.hasErrors() || !itemInstance.save(flush: true)) {
-                flash.message = "${warehouse.message(code: 'default.updated.message', args: [warehouse.message(code: 'inventory.label', default: 'Inventory item'), inventoryInstance.id])}"
-                redirect(action: "show", id: inventoryInstance.id)
-            } else {
-                itemInstance.errors.each { println it }
-                flash.message = "${warehouse.message(code: 'default.notUpdated.message', args: [warehouse.message(code: 'inventory.label', default: 'Inventory item'), inventoryInstance.id])}"
-                render(view: "show", model: [inventoryInstance: inventoryInstance, itemInstance: itemInstance])
-            }
         }
     }
 
@@ -496,22 +366,6 @@ class InventoryController {
         this.listStock(params, "getOverStock", "Overstock - ")
     }
 
-    def listOutOfStock() {
-        def location = Location.get(session.warehouse.id)
-        List<Category> categories = this.determineCategories(params)
-
-        def inventoryItems = dashboardService.getOutOfStock(location, params.abcClass, categories)
-
-        if (params.button == "download") {
-            def filename = "Out of stock - supported - " + location.name + ".csv"
-            response.setHeader("Content-disposition", "attachment; filename=\"${filename}\"")
-            render(contentType: "text/csv", text: getCsvForProductMap(inventoryItems))
-            return
-        }
-        render(view: "list", model: [availableItems: inventoryItems])
-    }
-
-
     def listExpiredStock(InventoryReportCommand command) {
         if (params.format == "csv") {
             command.location = Location.get(session.warehouse.id)
@@ -606,17 +460,6 @@ class InventoryController {
         redirect(action: "listTransactions")
     }
 
-    def listPendingTransactions() {
-        def transactions = Transaction.findAllByConfirmedOrConfirmedIsNull(Boolean.FALSE)
-        render(view: "listTransactions", model: [transactionInstanceList: transactions])
-    }
-
-    def listConfirmedTransactions() {
-        def transactions = Transaction.findAllByConfirmed(Boolean.TRUE)
-        render(view: "listTransactions", model: [transactionInstanceList: transactions])
-    }
-
-
     def deleteTransaction() {
         def transactionInstance = Transaction.get(params.id)
 
@@ -684,29 +527,6 @@ class InventoryController {
 
         render(view: "/common/react")
     }
-
-    /**
-     * Show the transaction.
-     */
-    def showTransactionDialog() {
-        def transactionInstance = Transaction.get(params.id)
-        if (!transactionInstance) {
-            flash.message = "${warehouse.message(code: 'inventory.noTransactionWithId.message', args: [params.id])}"
-            transactionInstance = new Transaction()
-        }
-
-        def model = [
-                transactionInstance : transactionInstance,
-                productInstanceMap  : Product.list().groupBy { it.category },
-                transactionTypeList : TransactionType.list(),
-                locationInstanceList: Location.list(),
-                warehouseInstance   : Location.get(session?.warehouse?.id)
-        ]
-
-        render(view: "showTransactionDialog", model: model)
-
-    }
-
 
     def confirmTransaction() {
         def transactionInstance = Transaction.get(params?.id)
@@ -789,260 +609,11 @@ class InventoryController {
         render(view: "/common/react", params: params)
     }
 
-    def saveAdjustmentTransaction(TransactionCommand command) {
-        log.info("Saving inventory adjustment " + params)
-        log.info "Command: " + command
-
-        def transaction = command?.transactionInstance
-        def warehouseInstance = Location.get(session?.warehouse?.id)
-
-        // Quantity cannot be changed to be less than 0
-        command.transactionEntries.each {
-            if (it.quantity < 0) {
-                transaction.errors.rejectValue("transactionEntries", "transactionEntry.quantity.invalid", [it?.inventoryItem?.lotNumber] as Object[], "")
-            }
-        }
-
-        // Check to see if there are errors, if not save the transaction
-        if (!transaction.hasErrors()) {
-            try {
-                // Add validated transaction entries to the transaction we want to persist
-                command.transactionEntries.each {
-                    if (it.quantity != 0) {
-                        def transactionEntry = new TransactionEntry()
-                        transactionEntry.product = it.inventoryItem.product
-                        transactionEntry.inventoryItem = it.inventoryItem
-                        transactionEntry.binLocation = it.binLocation
-                        transactionEntry.quantity = it.quantity
-                        transactionEntry.comments = it.comment
-                        transactionEntry.reasonCode = it.reasonCode
-                        transaction.addToTransactionEntries(transactionEntry)
-                    }
-                }
-                TransactionSource transactionSource =
-                        adjustInventoryService.createAdjustInventoryTransactionSource(warehouseInstance)
-                transaction.transactionSource = transactionSource
-
-                // Validate the transaction object
-                if (!transaction.hasErrors() && transaction.validate()) {
-                    transaction.save(failOnError: true)
-                    flash.message = "Successfully saved transaction"
-                    def productId = command.transactionEntries.first()?.inventoryItem?.product?.id
-                    redirect(controller: "inventoryItem", action: "showStockCard", id: productId)
-                }
-            } catch (ValidationException e) {
-                log.debug("caught validation exception " + e)
-            }
-        }
-
-        // After the attempt to save the transaction, there might be errors on the transaction
-        if (transaction.hasErrors()) {
-            log.debug("has errors" + transaction.errors)
-
-            // Get the list of products that the user selected from the inventory browser
-            if (params.product?.id) {
-                def productIds = params.list('product.id')
-                def products = Product.findAllByIdInList(productIds)
-                command.productInventoryItems = inventoryService.getInventoryItemsByProducts(warehouseInstance, productIds)
-                command.binLocations = inventoryService.getProductQuantityByBinLocation(warehouseInstance, products)
-            }
-            // If given a list of inventory items, we just return those inventory items
-            else if (params?.inventoryItem?.id) {
-                def inventoryItemIds = params.list('inventoryItem.id')
-                def inventoryItems = inventoryItemIds.collect {
-                    InventoryItem.get(String.valueOf(it))
-                }
-                command?.productInventoryItems = inventoryItems.groupBy { it.product }
-            }
-
-            // Populate the command object and render the form view.
-            command.transactionInstance = transaction
-            command.warehouseInstance = warehouseInstance
-
-            render(view: "createTransaction", model: [command: command])
-        }
-    }
-
     /**
      * Save a transaction that debits stock from the given inventory.
      *
      * TRANSFER_OUT, CONSUMED, DAMAGED, EXPIRED
      */
-
-    //@CacheFlush("inventoryBrowserCache")
-    def saveDebitTransaction(TransactionCommand command) {
-        log.info("Saving debit transactions " + params)
-        log.info("size: " + command?.transactionEntries?.size())
-
-        // Data binding not working properly for nested objects of command objects
-        command.transactionInstance = new Transaction(params.transactionInstance)
-
-        // Get the products involved
-        def productIds = params.list('product.id').collect { String.valueOf(it) }
-        List products = Product.getAll(productIds)
-
-        def transaction = command?.transactionInstance
-        transaction.transactionNumber = transactionIdentifierService.generate(transaction)
-        def warehouseInstance = Location.get(session?.warehouse?.id)
-        def quantityMap = inventoryService.getQuantityForInventory(warehouseInstance?.inventory, products)
-
-        // Quantity cannot be greater than on hand quantity
-        command.transactionEntries.each {
-            def onHandQuantity = quantityMap[it.inventoryItem]
-            if (it.quantity > onHandQuantity) {
-                transaction.errors.rejectValue("transactionEntries", "transactionEntry.quantity.invalid", [it?.inventoryItem?.lotNumber] as Object[], "")
-            }
-        }
-
-        // Check to see if there are errors, if not save the transaction
-        if (!transaction?.hasErrors()) {
-            try {
-                // Add validated transaction entries to the transaction we want to persist
-                command.transactionEntries.each {
-                    if (it.quantity) {
-                        def transactionEntry = new TransactionEntry()
-                        transactionEntry.inventoryItem = it.inventoryItem
-                        transactionEntry.product = it.product
-                        transactionEntry.quantity = it.quantity
-                        transactionEntry.binLocation = it.binLocation
-                        transaction.addToTransactionEntries(transactionEntry)
-                    }
-                }
-
-                // Validate the transaction object
-                if (!transaction?.hasErrors() && transaction?.validate()) {
-                    transaction.save(failOnError: true)
-                    flash.message = "Successfully saved transaction"
-                    redirect(controller: "inventoryItem", action: "showStockCard", id: productIds[0])
-                    return
-                }
-            } catch (ValidationException e) {
-                log.debug("caught validation exception " + e)
-            }
-        }
-
-        // After the attempt to save the transaction, there might be errors on the transaction
-        if (transaction?.hasErrors()) {
-            log.debug("has errors" + transaction.errors)
-
-            // Get the list of products that the user selected from the inventory browser
-            if (params.product?.id) {
-                command.productInventoryItems = inventoryService.getInventoryItemsByProducts(warehouseInstance, productIds)
-                command.binLocations = inventoryService.getProductQuantityByBinLocation(warehouseInstance, products)
-            }
-            // If given a list of inventory items, we just return those inventory items
-            else if (params?.inventoryItem?.id) {
-                def inventoryItemIds = params.list('inventoryItem.id')
-                def inventoryItems = inventoryItemIds.collect {
-                    InventoryItem.get(String.valueOf(it))
-                }
-                command?.productInventoryItems = inventoryItems.groupBy { it.product }
-            }
-
-            // Populate the command object and render the form view.
-            command.transactionInstance = transaction
-            command.warehouseInstance = warehouseInstance
-            command.quantityMap = quantityMap
-
-        }
-        render(view: "createTransaction", model: [command: command])
-    }
-
-
-    /**
-     * Save a transaction that debits stock from the given inventory.
-     *
-     * TRANSFER_IN
-     */
-    //@CacheFlush("inventoryBrowserCache")
-    def saveCreditTransaction(TransactionCommand command) {
-
-        log.debug("Saving credit transaction: " + params)
-        def transactionInstance = command?.transactionInstance
-        def warehouseInstance = Location.get(session?.warehouse?.id)
-
-        // Quantity cannot be less than 0 or else it would be in a debit transaction
-        command.transactionEntries.each {
-            if (it.quantity < 0) {
-                transactionInstance.errors.rejectValue("transactionEntries", "transactionEntry.quantity.invalid", [it?.inventoryItem?.lotNumber] as Object[], "")
-            }
-        }
-
-        // We need to process each transaction entry to make sure that it has a valid inventory item (or we will create one if not)
-        command.transactionEntries.each {
-            if (!it.inventoryItem) {
-                // Find an existing inventory item for the given lot number and product and description
-                def inventoryItem = inventoryService.findInventoryItemByProductAndLotNumber(it.product, it.lotNumber)
-
-                // If the inventory item doesn't exist, we create a new one
-                if (!inventoryItem) {
-                    inventoryItem = new InventoryItem()
-                    inventoryItem.lotNumber = it.lotNumber
-                    inventoryItem.expirationDate = (it.lotNumber) ? it.expirationDate : null
-                    inventoryItem.product = it.product
-                    if (inventoryItem.hasErrors() || !inventoryItem.save()) {
-                        inventoryItem.errors.allErrors.each { error ->
-                            command.errors.reject("inventoryItem.invalid",
-                                    [inventoryItem, error.getField(), error.getRejectedValue()] as Object[],
-                                    "[${error.getField()} ${error.getRejectedValue()}] - ${error.defaultMessage} ")
-
-                        }
-                    }
-                }
-                it.inventoryItem = inventoryItem
-            }
-        }
-
-        // Now that all transaction entries in the command have inventory items,
-        // we need to create a persistable transaction entry
-        command.transactionEntries.each {
-            def transactionEntry = new TransactionEntry(inventoryItem: it.inventoryItem,
-                    product: it.inventoryItem.product, binLocation: it.binLocation, quantity: it.quantity)
-            transactionInstance.addToTransactionEntries(transactionEntry)
-        }
-
-        // Check to see if there are errors, if not save the transaction
-        if (!transactionInstance.hasErrors()) {
-            try {
-                // Validate the transaction object
-                if (!transactionInstance.hasErrors() && transactionInstance.validate()) {
-                    transactionInstance.save(failOnError: true)
-                    flash.message = "Successfully saved transaction"
-
-                    // A transfer-in only operates on a single product so redirect to its stock card.
-                    String productId = transactionInstance.getAssociatedProducts().first()
-                    redirect(controller: "inventoryItem", action: "showStockCard", id: productId)
-                }
-            } catch (ValidationException e) {
-                log.debug("caught validation exception " + e)
-            }
-        }
-
-        // Should be true if a validation exception was thrown
-        if (transactionInstance.hasErrors()) {
-            log.debug("has errors" + transactionInstance.errors)
-
-            // Get the list of products that the user selected from the inventory browser
-            if (params.product?.id) {
-                def productIds = params.list('product.id')
-                def products = productIds.collect { String.valueOf(it) }
-                command.productInventoryItems = inventoryService.getInventoryItemsByProducts(warehouseInstance, products)
-            }
-            // If given a list of inventory items, we just return those inventory items
-            else if (params?.inventoryItem?.id) {
-                def inventoryItemIds = params.list('inventoryItem.id')
-                def inventoryItems = inventoryItemIds.collect {
-                    InventoryItem.get(String.valueOf(it))
-                }
-                command?.productInventoryItems = inventoryItems.groupBy { it.product }
-            }
-
-            // Populate the command object and render the form view.
-            command.warehouseInstance = warehouseInstance
-
-            render(view: "createTransaction", model: [command: command])
-        }
-    }
 
     def editTransaction() {
         def transactionInstance = Transaction.get(params?.id)

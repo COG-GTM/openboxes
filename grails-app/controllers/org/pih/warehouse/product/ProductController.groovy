@@ -79,52 +79,6 @@ class ProductController {
         render(view: "/common/react")
     }
 
-    @Transactional
-    def batchSave(BatchEditCommand cmd) {
-
-        println "Batch save " + cmd
-
-        // If there are no products (usually when returning to batchSave after login
-        if (!cmd.productInstanceList) {
-            redirect(action: 'batchEdit')
-        }
-        // We needed to hack the category binding in order to make this work.
-        // When changing the product.category directly, we received an error
-        // from Hibernate stating that we were trying to change the primary key
-        // of the category object.
-        cmd.categoryInstanceList.eachWithIndex { cat, i ->
-            log.info "categoryInstanceList[" + i + "]: " + cat
-            cmd.productInstanceList[i].category = Category.get(cat.id)
-        }
-
-        cmd.productInstanceList.eachWithIndex { product, i ->
-            log.info "productInstanceList[" + i + "]: " + product.category
-            if (!product.hasErrors() && product.save()) {
-                // saved with no errors
-            } else {
-                // copy the errors from this product on to the overall command object errors
-                product.errors.getAllErrors().each {
-                    cmd.errors.reject(it.getCode(), it.getDefaultMessage())
-                }
-            }
-        }
-
-        if (!cmd.hasErrors()) {
-            flash.message = "${warehouse.message(code: 'product.allSavedSuccessfully.message')}"
-            chain(controller: "product", action: "batchEdit", params: params)
-        } else {
-
-            def category = Category.get(params.categoryId)
-            def tagIds = params.list("tagId")
-            def products = productService.getProducts(category, tagIds, params)
-
-            render(view: "batchEdit", model: [commandInstance: cmd, products: products])
-        }
-
-        println "flash " + flash.message
-        println "params " + params
-    }
-
     def list() {
         render(view: "/common/react")
     }
@@ -141,42 +95,6 @@ class ProductController {
 	render(view: "edit", model: [productInstance : productInstance, rootCategory: rootCategory, locationInstance: location])
         println "After render create.gsp for product: " + (System.currentTimeMillis() - startTime) + " ms"
     }
-
-    def save() {
-        println "Save product: " + params
-        Product productInstance = new Product()
-        productInstance.properties = params
-        Location location = Location.get(session?.warehouse?.id)
-
-        updateTags(productInstance, params)
-
-        ProductType defaultProductType = ProductType.defaultProductType.list()?.first();
-        // Throw an error for product type with empty code and product identifier that is not a default product type
-        if (productInstance.productType?.id != defaultProductType?.id && !productInstance.productType?.code && !productInstance.productType?.productIdentifierFormat) {
-            productInstance.errors.reject("product.productType.emptyCodeAndIdentifier.error.message")
-            render(view: "edit", model: [productInstance: productInstance, locationInstance: location])
-            return
-        }
-
-        // Need to validate here FIRST otherwise we'll run into an uncaught transient property exception
-        // when the session is closed.
-        if (!productInstance?.id || productInstance.validate()) {
-            if (!productInstance.productCode) {
-                productInstance.productCode = productService.generateProductIdentifier(productInstance)
-            }
-        }
-
-        productInstance.validateRequiredFieldsInLocation(location)
-
-        if (!productInstance.hasErrors() && productService.saveProduct(productInstance)) {
-            log.info("saved product " + productInstance.errors)
-            flash.message = "${warehouse.message(code: 'default.created.message', args: [warehouse.message(code: 'product.label', default: 'Product').decodeHTML(), format.product(product: productInstance).decodeHTML()])}"
-            sendProductCreatedNotification(productInstance)
-        }
-
-        render(view: "edit", model: [productInstance: productInstance, rootCategory: productService.getRootCategory(), locationInstance: location])
-    }
-
 
     def show() {
         render(view: "/common/react")
@@ -199,75 +117,6 @@ class ProductController {
             }
             boolean assigningParentCategoryToProductEnabled = categoryService.isAssigningParentToProductEnabled()
             render(template: params.templateName, model: [productInstance: productInstance, assigningParentCategoryToProductEnabled: assigningParentCategoryToProductEnabled])
-        }
-    }
-
-    @Transactional
-    def update() {
-        log.info "Update called with params " + params
-        Product productInstance = Product.get(params.id)
-        Location location = Location.get(session?.warehouse?.id)
-
-        if (productInstance) {
-            if (params.version) {
-                def version = params.version.toLong()
-                if (productInstance.version > version) {
-                    productInstance.errors.rejectValue("version", "default.optimistic.locking.failure", [
-                            warehouse.message(code: 'product.label', default: 'Product')] as Object[], "Another user has updated this product while you were editing")
-                    render(view: "edit", model: [productInstance: productInstance])
-                    return
-                }
-            }
-            productInstance.properties = params
-
-            try {
-                updateTags(productInstance, params)
-                updateAttributes(productInstance, params)
-
-                log.info("Categories " + productInstance?.categories)
-
-                // find the categories that are marked for deletion
-                def _toBeDeleted = productInstance.categories.findAll {
-                    (it?.deleted || (it == null))
-                }
-
-                log.info("toBeDeleted: " + _toBeDeleted)
-
-                // if there are categories to be deleted remove them all
-                if (_toBeDeleted) {
-                    productInstance.categories.removeAll(_toBeDeleted)
-                }
-
-                // Need to validate here FIRST otherwise we'll run into an uncaught transient property exception
-                // when the session is closed.
-                if (productInstance.validate()) {
-                    if (!productInstance.productCode) {
-                        productInstance.productCode = productService.generateProductIdentifier(productInstance)
-                    }
-                }
-
-                productInstance.validateRequiredFieldsInLocation(location)
-
-                if (!productInstance.hasErrors() && productInstance.save(failOnError: true, flush: true)) {
-                    flash.message = "${warehouse.message(code: 'default.updated.message', args: [warehouse.message(code: 'product.label', default: 'Product').decodeHTML(), format.product(product: productInstance).decodeHTML()])}"
-                    //redirect(controller: "inventoryItem", action: "showStockCard", id: productInstance?.id)
-                    redirect(controller: "product", action: "edit", id: productInstance?.id)
-                } else {
-                    render(view: "edit", model: [productInstance: productInstance])
-                }
-
-            } catch (ValidationException e) {
-                log.error("Validation error: " + e.message, e)
-                // Clear attributes to prevent transient object exception
-                productInstance.attributes.clear()
-                productInstance = Product.read(params.id)
-                productInstance.errors = e.errors
-                render view: "edit", model: [productInstance: productInstance]
-                return
-            }
-        } else {
-            flash.message = "${warehouse.message(code: 'default.not.found.message', args: [warehouse.message(code: 'product.label', default: 'Product'), params.id])}"
-            redirect(controller: "inventoryItem", action: "browse")
         }
     }
 
@@ -323,63 +172,6 @@ class ProductController {
         flash.message = "Product package has been deleted"
         redirect(action: "edit", id: productInstance.id)
     }
-
-    @Transactional
-    def savePackage() {
-
-        println "savePackage: " + params
-        def productInstance = Product.get(params.product.id)
-        def packageInstance = ProductPackage.get(params.id)
-
-        BigDecimal parsedUnitPrice = null
-        if (params.price) {
-            try {
-                parsedUnitPrice = new BigDecimal(params.price).setScale(2, RoundingMode.FLOOR)
-            } catch (Exception e) {
-                log.error("Unable to parse unit price: " + e.message, e)
-                flash.message = "Could not parse unit price with value: ${params.price}."
-                redirect(action: "edit", id: productInstance?.id)
-                return
-            }
-            if (parsedUnitPrice < 0) {
-                log.error("Wrong unit price value: ${parsedUnitPrice}.")
-                flash.message = "Wrong unit price value: ${parsedUnitPrice}."
-                redirect(action: "edit", id: productInstance?.id)
-                return
-            }
-        }
-
-        if (!packageInstance) {
-            packageInstance = new ProductPackage(params)
-            ProductPrice productPrice = new ProductPrice()
-            productPrice.price = parsedUnitPrice?:0
-            packageInstance.productPrice = productPrice
-            productInstance.addToPackages(packageInstance)
-        } else {
-            packageInstance.properties = params
-            if (packageInstance.productPrice) {
-                packageInstance.productPrice.price = parsedUnitPrice?:0
-            } else if (parsedUnitPrice) {
-                ProductPrice productPrice = new ProductPrice()
-                productPrice.price = parsedUnitPrice
-                packageInstance.productPrice = productPrice
-            }
-        }
-
-        if (!productInstance.hasErrors() && packageInstance.validate() && productInstance.save(flush: true)) {
-            flash.message = "${warehouse.message(code: 'default.created.message', args: [warehouse.message(code: 'package.label', default: 'Product'), packageInstance.name])}"
-            redirect(action: "edit", id: productInstance?.id)
-        } else {
-            def location = Location.get(session.warehouse.id)
-            def inventoryLevelInstance = InventoryLevel.findByProductAndInventory(productInstance, location.inventory)
-            if (!inventoryLevelInstance) {
-                inventoryLevelInstance = new InventoryLevel()
-            }
-
-            render(view: "edit", model: [productInstance: productInstance, inventoryLevelInstance: inventoryLevelInstance, packageInstance: packageInstance, rootCategory: productService.getRootCategory()])
-        }
-    }
-
 
     /**
      *
@@ -540,103 +332,6 @@ class ProductController {
     def importAsCsv() {
         render(view: "/common/react")
     }
-
-    /**
-     * Upload CSV file
-     */
-    def uploadCsv(ImportDataCommand command) {
-
-        log.info "uploadCsv " + params
-
-        def columns
-        def localFile
-        def uploadFile = command?.importFile
-
-        def existingProductsMap = [:]
-        def tag = ""
-
-        if (request.method == "POST") {
-
-            // Step 1: Upload file
-            if (uploadFile && !uploadFile?.empty) {
-                try {
-
-                    // Upload file
-                    localFile = uploadService.createLocalFile(uploadFile.originalFilename)
-                    uploadFile?.transferTo(localFile)
-                    session.localFile = localFile
-                    //Detect CSV encoding
-                    String fileEncoding = CSVUtils.detectCsvCharset(localFile)
-                    // Get CSV content in UTF-8 encoding
-                    def csv = localFile.getText(fileEncoding)
-
-                    columns = productService.getColumns(csv)
-                    println "CSV " + csv
-
-                    // Create default tag based on base filename
-                    tag = FilenameUtils.getBaseName(command?.importFile?.originalFilename)
-
-                    command.products = productService.validateProducts(csv, createMissingCategories)
-
-                    flash.message = "Uploaded file ${uploadFile?.originalFilename} to ${localFile.absolutePath}"
-                } catch (RuntimeException e) {
-                    log.error("An error occurred while uploading product import CSV " + e.message, e)
-                    command.errors.reject(e.message)
-                }
-                catch (FileNotFoundException e) {
-                    log.error("File not found exception occurred while uploading product import CSV " + e.message, e)
-                    command.errors.reject("File '${localFile.absolutePath}' could not be uploaded.  This is most likely due to a file permission error.  Make sure that the 'uploads' directory exists and has the proper read/write permissions.")
-
-                }
-                catch (Exception e) {
-                    log.error("Exception occurred while uploading product import CSV " + e.message, e)
-                    command.errors.reject("Unknown error: " + e.message)
-
-                }
-            } else {
-                command.errors.reject("${warehouse.message(code: 'import.emptyFile.message', default: 'File is empty')}")
-            }
-        }
-
-        render(view: 'importAsCsv', model: [command: command, columns: columns, tag: tag])
-    }
-
-    /**
-     * Perform import of CSV
-     */
-    def importCsv(ImportDataCommand command) {
-
-        log.info "import " + params
-
-        // Step 2: Import data from file
-        def tags = []
-        def columns = []
-
-        if (params.importNow && session.localFile) {
-            try {
-                String fileEncoding = CSVUtils.detectCsvCharset(session.localFile)
-                def csv = session.localFile.getText(fileEncoding)
-
-                // Get columns
-                columns = productService.getColumns(csv)
-
-                // Split tags
-                tags = params?.tagsToBeAdded?.split(",") as List
-
-                // Import products
-                command.products = productService.validateProducts(csv, createMissingCategories)
-
-                productService.importProducts(command.products, tags)
-                flash.message = "All ${command?.products?.size()} product(s) were imported successfully."
-                redirect(controller: "product", action: "importAsCsv", params: [tag: tags[0]])
-            } catch (ValidationException e) {
-                command.errors = e.errors
-            }
-
-        }
-        render(view: 'importAsCsv', model: [command: command, tags: tags, columns: columns, productsHaveBeenImported: true])
-    }
-
 
     /**
      * Add a product group to existing product

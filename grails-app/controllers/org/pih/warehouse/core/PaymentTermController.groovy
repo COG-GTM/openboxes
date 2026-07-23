@@ -26,28 +26,6 @@ class PaymentTermController {
     }
 
     @Transactional
-    def save() {
-        def paymentTerm = PaymentTerm.get(params.id)
-        if (paymentTerm) {
-            paymentTerm.properties = params
-            if (!paymentTerm.hasErrors() && paymentTerm.save(flush: true)) {
-                flash.message = "${warehouse.message(code: 'default.updated.message', args: [warehouse.message(code: 'paymentTerm.label', default: 'Payment Term'), paymentTerm.id])}"
-                redirect(action: "list")
-            } else {
-                render(view: "edit", model: [paymentTerm: paymentTerm])
-            }
-        } else {
-            paymentTerm = new PaymentTerm(params)
-            if (paymentTerm.save(flush: true)) {
-                flash.message = "${warehouse.message(code: 'default.created.message', args: [warehouse.message(code: 'paymentTerm.label', default: 'Payment Term'), paymentTerm.id])}"
-                redirect(controller: "paymentTerm", action: "edit", id: paymentTerm?.id)
-            } else {
-                render(view: "create", model: [paymentTerm: paymentTerm])
-            }
-        }
-    }
-
-    @Transactional
     def delete() {
         def paymentTerm = PaymentTerm.get(params.id)
         if (paymentTerm) {

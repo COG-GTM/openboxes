@@ -62,17 +62,6 @@ class OrderController {
         redirect(controller: 'purchaseOrder', action: 'index')
     }
 
-    @Transactional
-    def save() {
-        def orderInstance = new Order(params)
-        if (orderInstance.save(flush: true)) {
-            flash.message = "${warehouse.message(code: 'default.created.message', args: [warehouse.message(code: 'order.label', default: 'Order'), orderInstance.id])}"
-            redirect(action: "list", id: orderInstance.id, params: [orderType: orderInstance.orderType])
-        } else {
-            render(view: "create", model: [orderInstance: orderInstance])
-        }
-    }
-
     def show() {
         render(view: "/common/react", params: params)
     }
@@ -102,33 +91,6 @@ class OrderController {
             redirect(action: "list")
         }
     }
-
-    @Transactional
-    def update() {
-        def orderInstance = Order.get(params.id)
-        if (orderInstance) {
-            if (params.version) {
-                def version = params.version.toLong()
-                if (orderInstance.version > version) {
-
-                    orderInstance.errors.rejectValue("version", "default.optimistic.locking.failure", [warehouse.message(code: 'order.label', default: 'Order')] as Object[], "Another user has updated this Order while you were editing")
-                    render(view: "edit", model: [orderInstance: orderInstance])
-                    return
-                }
-            }
-            orderInstance.properties = params
-            if (!orderInstance.hasErrors() && orderInstance.save(flush: true)) {
-                flash.message = "${warehouse.message(code: 'default.updated.message', args: [warehouse.message(code: 'order.label', default: 'Order'), orderInstance.id])}"
-                redirect(action: "list", id: orderInstance.id, params: [orderType: orderInstance.orderType])
-            } else {
-                render(view: "edit", model: [orderInstance: orderInstance])
-            }
-        } else {
-            flash.message = "${warehouse.message(code: 'default.not.found.message', args: [warehouse.message(code: 'order.label', default: 'Order'), params.id])}"
-            redirect(action: "list")
-        }
-    }
-
 
     def remove() {
         def orderInstance = Order.get(params.id)
@@ -277,38 +239,6 @@ class OrderController {
         }
     }
 
-    @Transactional
-    def saveComment() {
-        log.info("params " + params)
-
-        def orderInstance = Order.get(params?.order?.id)
-        if (orderInstance) {
-            def commentInstance = Comment.get(params?.id)
-            if (commentInstance) {
-                commentInstance.properties = params
-                if (!commentInstance.hasErrors() && commentInstance.save(flush: true)) {
-                    flash.message = "${warehouse.message(code: 'default.updated.message', args: [warehouse.message(code: 'comment.label', default: 'Comment'), commentInstance.id])}"
-                    redirect(action: "show", id: orderInstance.id)
-                } else {
-                    render(view: "addComment", model: [orderInstance: orderInstance, commentInstance: commentInstance])
-                }
-            } else {
-                commentInstance = new Comment(params)
-                orderInstance.addToComments(commentInstance)
-                if (!orderInstance.hasErrors() && orderInstance.save(flush: true)) {
-                    flash.message = "${warehouse.message(code: 'default.updated.message', args: [warehouse.message(code: 'order.label', default: 'Order'), orderInstance.id])}"
-                    redirect(action: "show", id: orderInstance.id)
-                } else {
-                    render(view: "addComment", model: [orderInstance: orderInstance, commentInstance: commentInstance])
-                }
-            }
-        } else {
-            flash.message = "${warehouse.message(code: 'default.not.found.message', args: [warehouse.message(code: 'order.label', default: 'Order'), params.id])}"
-            redirect(action: "list")
-        }
-
-    }
-
     def addDocument() {
         render(view: "/common/react", params: params)
     }
@@ -367,23 +297,6 @@ class OrderController {
         }
     }
 
-    def saveOrderShipment(OrderCommand command) {
-        bindData(command, params)
-        def orderInstance = Order.get(params?.order?.id)
-        command.order = orderInstance
-
-        orderService.saveOrderShipment(command)
-
-        // If the shipment was saved, let's redirect back to the order received page
-        if (!command?.shipment?.hasErrors() && command?.shipment?.id) {
-            redirect(controller: "order", action: "receive", id: params?.order?.id)
-        }
-
-        // Otherwise, we want to display the errors, so we need to render the page.
-        render(view: "receive", model: [orderCommand: command])
-    }
-
-
     def fulfill() {
         def orderInstance = Order.get(params.id)
         if (!orderInstance) {
@@ -392,29 +305,6 @@ class OrderController {
         } else {
             return [orderInstance: orderInstance]
         }
-    }
-
-    @Transactional
-    def addOrderItemToShipment() {
-
-        def orderInstance = Order.get(params?.id)
-        def orderItem = OrderItem.get(params?.orderItem?.id)
-        def shipmentInstance = Shipment.get(params?.shipment?.id)
-
-        if (orderItem) {
-            def shipmentItem = new ShipmentItem(orderItem.properties)
-            shipmentInstance.addToShipmentItems(shipmentItem)
-            if (!shipmentInstance.hasErrors() && shipmentInstance?.save(flush: true)) {
-                // TODO: Refactor this part
-            } else {
-                flash.message = "${warehouse.message(code: 'order.shipmentItemErrors.message')}"
-                render(view: "fulfill", model: [orderItemInstance: orderItem, shipmentInstance: shipmentInstance])
-                return
-            }
-        }
-
-        redirect(action: "fulfill", id: orderInstance?.id)
-
     }
 
     def download() {

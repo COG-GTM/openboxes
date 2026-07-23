@@ -31,36 +31,6 @@ class OrderAdjustmentTypeController {
     }
 
     @Transactional
-    def save() {
-        def orderAdjustmentType = new OrderAdjustmentType(params)
-        if (orderAdjustmentType.save(flush: true)) {
-            flash.message = "${warehouse.message(code: 'default.created.message', args: [warehouse.message(code: 'orderAdjustmentType.label', default: 'Order Adjustment Type'), orderAdjustmentType.id])}"
-            redirect(controller: "orderAdjustmentType", action: "edit", id: orderAdjustmentType?.id)
-        } else {
-            def location = Location.get(session?.warehouse?.id)
-            render(view: "create", model: [orderAdjustmentType: orderAdjustmentType, locationInstance: location])
-        }
-    }
-
-    @Transactional
-    def update() {
-        def orderAdjustmentType = OrderAdjustmentType.get(params.id)
-        if (orderAdjustmentType) {
-            orderAdjustmentType.properties = params
-            if (!orderAdjustmentType.hasErrors() && orderAdjustmentType.save(flush: true)) {
-                flash.message = "${warehouse.message(code: 'default.updated.message', args: [warehouse.message(code: 'orderAdjustmentType.label', default: 'Order Adjustment Type'), orderAdjustmentType.id])}"
-                redirect(action: "list")
-            } else {
-                def location = Location.get(session?.warehouse?.id)
-                render(view: "edit", model: [orderAdjustmentType: orderAdjustmentType, locationInstance: location])
-            }
-        } else {
-            flash.message = "${warehouse.message(code: 'default.not.found.message', args: [warehouse.message(code: 'orderAdjustmentType.label', default: 'Order Adjustment Type'), params.id])}"
-            redirect(action: "list")
-        }
-    }
-
-    @Transactional
     def delete() {
         def orderAdjustmentType = OrderAdjustmentType.get(params.id)
         if (orderAdjustmentType) {

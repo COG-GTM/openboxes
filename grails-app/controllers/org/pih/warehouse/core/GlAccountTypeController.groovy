@@ -30,34 +30,6 @@ class GlAccountTypeController {
     }
 
     @Transactional
-    def save() {
-        def glAccountType = new GlAccountType(params)
-        if (glAccountType.save(flush: true)) {
-            flash.message = "${warehouse.message(code: 'default.created.message', args: [warehouse.message(code: 'glAccountType.label', default: 'GL Account Type'), glAccountType.id])}"
-            redirect(controller: "glAccountType", action: "edit", id: glAccountType?.id)
-        } else {
-            render(view: "create", model: [glAccountType: glAccountType])
-        }
-    }
-
-    @Transactional
-    def update() {
-        def glAccountType = GlAccountType.get(params.id)
-        if (glAccountType) {
-            glAccountType.properties = params
-            if (!glAccountType.hasErrors() && glAccountType.save(flush: true)) {
-                flash.message = "${warehouse.message(code: 'default.updated.message', args: [warehouse.message(code: 'glAccountType.label', default: 'GL Account Type'), glAccountType.id])}"
-                redirect(action: "list")
-            } else {
-                render(view: "edit", model: [glAccountType: glAccountType])
-            }
-        } else {
-            flash.message = "${warehouse.message(code: 'default.not.found.message', args: [warehouse.message(code: 'glAccountType.label', default: 'GL Account Type'), params.id])}"
-            redirect(action: "list")
-        }
-    }
-
-    @Transactional
     def delete() {
         def glAccountType = GlAccountType.get(params.id)
         if (glAccountType) {

@@ -365,14 +365,6 @@ class StockMovementController {
         render(view: "/common/react", params: params)
     }
 
-    def reject() {
-        Requisition requisition = Requisition.get(params.id)
-        StockMovement stockMovement = StockMovement.createFromRequisition(requisition)
-        flash.message = g.message(code: "request.rejectReason.message") + ": ${stockMovement.identifier}"
-        Comment comment = new Comment(recipient: requisition.requestedBy)
-        render(view: "addComment", model: [stockMovement: stockMovement, comment: comment, approvalStatus: StockMovementStatusCode.REJECTED])
-    }
-
     def editComment() {
         def stockMovement = outboundStockMovementService.getStockMovement(params.stockMovementId)
         if (!stockMovement) {
@@ -409,37 +401,6 @@ class StockMovementController {
         flash.message = "${g.message(code: 'default.deleted.message', args: [g.message(code: 'comment.label', default: 'Comment'), comment.id])}"
         redirect(action: "show", id: stockMovement.id)
     }
-
-    def saveComment() {
-        StockMovement stockMovement = stockMovementService.getStockMovement(params.stockMovementId)
-
-        Comment comment = new Comment(params)
-        if (comment.validate()) {
-            stockMovementService.saveComment(comment, stockMovement)
-            flash.message = "${g.message(code: 'default.created.message', args: [g.message(code: 'comment.label', default: 'Comment'), comment.id])}"
-            redirect(action: "show", id: stockMovement.id)
-            return
-         }
-        render(view: "addComment", model: [stockMovement: stockMovement, comment: comment])
-    }
-
-    def updateComment() {
-        StockMovement stockMovement = stockMovementService.getStockMovement(params.stockMovementId)
-
-        Comment comment = Comment.get(params?.id)
-        if (comment.sender.id != session.user.id) {
-            throw new UnsupportedOperationException("${g.message(code: 'errors.noPermissions.label')}")
-        }
-        comment.properties = params
-        if (comment.validate()) {
-            stockMovementService.saveComment(comment, stockMovement)
-            flash.message = "${g.message(code: 'default.updated.message', args: [g.message(code: 'comment.label', default: 'Comment'), comment.id])}"
-            redirect(action: "show", id: stockMovement.id)
-            return
-        }
-        render(view: "addComment", model: [stockMovement: stockMovement, comment: comment])
-    }
-
 
     def packingList() {
         def stockMovement = getStockMovement(params.id)

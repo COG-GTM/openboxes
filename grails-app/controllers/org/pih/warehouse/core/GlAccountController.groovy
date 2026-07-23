@@ -30,42 +30,6 @@ class GlAccountController {
     }
 
     @Transactional
-    def save() {
-        def glAccount = new GlAccount(params)
-        if (glAccount.save(flush: true)) {
-            flash.message = "${warehouse.message(code: 'default.created.message', args: [warehouse.message(code: 'glAccount.label', default: 'GL Account'), glAccount.id])}"
-            redirect(controller: "glAccount", action: "edit", id: glAccount?.id)
-        } else {
-            render(view: "create", model: [glAccount: glAccount])
-        }
-    }
-
-    @Transactional
-    def update() {
-        def glAccount = GlAccount.get(params.id)
-        if (glAccount) {
-            // If the glAccount is associated with ANY product, do not allow to deactivate it
-            Product productAssociated = Product.findByGlAccount(glAccount)
-            if (productAssociated && !params.active) {
-                flash.message = g.message(code: 'glAccount.associatedProducts.error.label', default: 'This GL account is linked to an active product and cannot be deactivated.')
-                redirect(action: "list")
-                return
-            }
-            glAccount.properties = params
-            if (!glAccount.hasErrors() && glAccount.save(flush: true)) {
-                flash.message = "${warehouse.message(code: 'default.updated.message', args: [warehouse.message(code: 'glAccount.label', default: 'GL Account'), glAccount.id])}"
-                redirect(action: "list")
-            } else {
-                def glAccountType = glAccount?.glAccountType ? GlAccountType.get(glAccount?.glAccountType?.id) : null
-                render(view: "edit", id: glAccount.id, model: [glAccount: glAccount, glAccountTypeId: glAccountType?.id])
-            }
-        } else {
-            flash.message = "${warehouse.message(code: 'default.not.found.message', args: [warehouse.message(code: 'glAccount.label', default: 'GL Account'), params.id])}"
-            redirect(action: "list")
-        }
-    }
-
-    @Transactional
     def delete() {
         def glAccount = GlAccount.get(params.id)
         if (glAccount) {

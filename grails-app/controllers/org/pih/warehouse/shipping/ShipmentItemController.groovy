@@ -35,16 +35,6 @@ class ShipmentItemController {
         render(view: "/common/react")
     }
 
-    def save() {
-        def shipmentItemInstance = new ShipmentItem(params)
-        if (shipmentItemInstance.save(flush: true)) {
-            flash.message = "${warehouse.message(code: 'default.created.message', args: [warehouse.message(code: 'shipmentItem.label', default: 'ShipmentItem'), shipmentItemInstance.id])}"
-            redirect(action: "list", id: shipmentItemInstance.id)
-        } else {
-            render(view: "create", model: [shipmentItemInstance: shipmentItemInstance])
-        }
-    }
-
     def show() {
         render(view: "/common/react", params: params)
     }

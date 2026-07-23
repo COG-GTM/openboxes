@@ -123,37 +123,6 @@ class InventoryLevelController {
         render(view: "/common/react")
     }
 
-    def update() {
-        def inventoryLevelInstance = InventoryLevel.get(params.id)
-        if (inventoryLevelInstance) {
-            if (params.version) {
-                def version = params.version.toLong()
-                if (inventoryLevelInstance.version > version) {
-                    inventoryLevelInstance.errors.rejectValue("version", "default.optimistic.locking.failure", [warehouse.message(code: 'inventoryLevel.label', default: 'InventoryLevel')] as Object[], "Another user has updated this InventoryLevel while you were editing")
-                    render(view: "edit", model: [inventoryLevelInstance: inventoryLevelInstance])
-                    return
-                }
-            }
-            inventoryLevelInstance.properties = params
-            if (!inventoryLevelInstance.hasErrors() && inventoryLevelInstance.save(flush: true)) {
-                flash.message = "${warehouse.message(code: 'default.updated.message', args: [warehouse.message(code: 'inventoryLevel.label', default: 'InventoryLevel'), inventoryLevelInstance.id])}"
-
-                // FIXME Should do this in a filter
-                if (params.redirectUrl) {
-                    redirect(url: params.redirectUrl)
-                } else {
-                    redirect(controller: "product", action: "edit", id: inventoryLevelInstance?.product?.id)
-                }
-
-            } else {
-                render(view: "edit", model: [inventoryLevelInstance: inventoryLevelInstance])
-            }
-        } else {
-            flash.message = "${warehouse.message(code: 'default.not.found.message', args: [warehouse.message(code: 'inventoryLevel.label', default: 'InventoryLevel'), params.id])}"
-            redirect(action: "list")
-        }
-    }
-
     def delete() {
         def inventoryLevelInstance = InventoryLevel.get(params.id)
         if (inventoryLevelInstance) {

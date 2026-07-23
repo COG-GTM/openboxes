@@ -31,27 +31,6 @@ class ProductGroupController {
         render(view: "/common/react", params: params)
     }
 
-    // @CacheFlush("selectProductFamilyCache")
-    def save() {
-        println "Save " + params
-        ProductGroup productGroupInstance = productGroupDataService.get(params.id)
-        if (!productGroupInstance) {
-            productGroupInstance = new ProductGroup(params)
-        }
-        List<Product> products = productService.getProducts(params['product.id'])
-        products.each { product ->
-            productGroupInstance.addToProducts(product)
-        }
-
-        try {
-            productGroupDataService.save(productGroupInstance)
-            flash.message = "${warehouse.message(code: 'default.created.message', args: [warehouse.message(code: 'productGroup.label', default: 'ProductGroup'), productGroupInstance.id])}"
-            redirect(action: "edit", id: productGroupInstance.id)
-        } catch (ValidationException e) {
-            render(view: "create", model: [productGroupInstance: productGroupInstance])
-        }
-    }
-
     def show() {
         render(view: "/common/react", params: params)
     }
