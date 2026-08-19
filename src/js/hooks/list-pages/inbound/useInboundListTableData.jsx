@@ -6,7 +6,11 @@ import Alert from 'react-s-alert';
 
 import { hideSpinner, showSpinner } from 'actions';
 import stockMovementApi from 'api/services/StockMovementApi';
-import { STOCK_MOVEMENT_API, STOCK_MOVEMENT_INCOMING_ITEMS } from 'api/urls';
+import {
+  SHIPMENT_EXCEPTIONS_OVERDUE_API,
+  STOCK_MOVEMENT_API,
+  STOCK_MOVEMENT_INCOMING_ITEMS,
+} from 'api/urls';
 import useTableData from 'hooks/list-pages/useTableData';
 import exportFileFromAPI from 'utils/file-download-util';
 import { translateWithDefaultMessage } from 'utils/Translate';
@@ -22,6 +26,15 @@ const useInboundListTableData = (filterParams) => {
     const {
       receiptStatusCode, origin, destination, requestedBy, createdBy, updatedBy, shipmentType,
     } = filterParams;
+    if (filterParams.overdue) {
+      return _.omitBy({
+        origin: origin?.id,
+        destination: destination?.id,
+        offset: `${offset}`,
+        max: `${state.pageSize}`,
+        ...sortingParams,
+      }, (value) => !value);
+    }
     return _.omitBy({
       ...filterParams,
       offset: `${offset}`,
@@ -47,7 +60,7 @@ const useInboundListTableData = (filterParams) => {
     onFetchHandler,
   } = useTableData({
     filterParams,
-    url: STOCK_MOVEMENT_API,
+    url: filterParams.overdue ? SHIPMENT_EXCEPTIONS_OVERDUE_API : STOCK_MOVEMENT_API,
     errorMessageId,
     defaultErrorMessage,
     getParams,

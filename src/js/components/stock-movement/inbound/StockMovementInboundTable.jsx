@@ -31,6 +31,7 @@ const StockMovementInboundTable = ({
   shipmentStatuses,
   currentLocation,
   isUserAdmin,
+  overdue,
 }) => {
   const {
     tableData,
@@ -49,6 +50,7 @@ const StockMovementInboundTable = ({
 
   // List of all actions for inbound Stock Movement rows
   const getActions = useCallback((row) => {
+    if (overdue) return [];
     const {
       id, isPending, isReturn, order, origin, isReceived, isPartiallyReceived,
     } = row.original;
@@ -99,7 +101,7 @@ const StockMovementInboundTable = ({
       }
     }
     return actions;
-  }, []);
+  }, [overdue]);
 
   // Columns for react-table
   const columns = useMemo(() => [
@@ -110,17 +112,19 @@ const StockMovementInboundTable = ({
       style: { overflow: 'visible', zIndex: 1 },
       fixed: 'left',
       Cell: (row) => (
-        <ContextMenu
-          positions={['right']}
-          dropdownClasses="action-dropdown-offset"
-          actions={getActions(row)}
-          id={row.original.id}
-        />
+        overdue ? null : (
+          <ContextMenu
+            positions={['right']}
+            dropdownClasses="action-dropdown-offset"
+            actions={getActions(row)}
+            id={row.original.id}
+          />
+        )
       ),
     },
     {
       Header: <Translate id="react.stockMovement.column.itemsCount.label" defaultMessage="# items" />,
-      accessor: 'lineItemCount',
+      accessor: overdue ? 'shipmentItemCount' : 'lineItemCount',
       fixed: 'left',
       className: 'active-circle d-flex justify-content-center',
       headerClassName: 'header justify-content-center',
@@ -130,7 +134,7 @@ const StockMovementInboundTable = ({
     },
     {
       Header: <Translate id="react.stockMovement.column.status.label" defaultMessage="Status" />,
-      accessor: 'displayStatus',
+      accessor: overdue ? 'status' : 'displayStatus',
       fixed: 'left',
       width: 170,
       sortable: false,
@@ -138,22 +142,25 @@ const StockMovementInboundTable = ({
         <TableCell
           {...row}
           tooltip
-          tooltipLabel={getStatusTooltip(row.value?.name)}
+          tooltipLabel={getStatusTooltip(row.value?.name || row.value)}
         >
-          <StatusIndicator
-            variant={row?.value?.variant}
-            status={row?.value?.label}
-          />
+          {overdue ? row.value : (
+            <StatusIndicator
+              variant={row?.value?.variant}
+              status={row?.value?.label}
+            />
+          )}
         </TableCell>
       ),
     },
     {
       Header: <Translate id="react.stockMovement.column.identifier.label" defaultMessage="Identifier" />,
-      accessor: 'identifier',
+      accessor: overdue ? 'shipmentNumber' : 'identifier',
       headerClassName: 'header justify-content-center',
       fixed: 'left',
       minWidth: 130,
       Cell: (row) => {
+        if (overdue) return <TableCell {...row} />;
         const {
           isReturn, order, id, shipmentType,
         } = row.original;
@@ -236,7 +243,13 @@ const StockMovementInboundTable = ({
         />
       ),
     },
-  ], [shipmentStatuses, translate]);
+    ...(overdue ? [{
+      Header: <Translate id="react.stockMovement.column.daysLate.label" defaultMessage="Days Late" />,
+      accessor: 'daysLate',
+      width: 100,
+      Cell: (row) => (<TableCell {...row} />),
+    }] : []),
+  ], [overdue, shipmentStatuses, translate]);
 
   return (
     <div className="list-page-list-section">
@@ -299,6 +312,7 @@ export default connect(mapStateToProps)(StockMovementInboundTable);
 
 StockMovementInboundTable.propTypes = {
   filterParams: PropTypes.shape({}).isRequired,
+  overdue: PropTypes.bool.isRequired,
   translate: PropTypes.func.isRequired,
   isUserAdmin: PropTypes.bool.isRequired,
   currentLocation: PropTypes.shape({

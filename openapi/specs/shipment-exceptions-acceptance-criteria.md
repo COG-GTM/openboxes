@@ -37,8 +37,9 @@ session bound to a warehouse via `POST /api/chooseLocation/{locationId}`.
    `expectedDeliveryDate`.
 7. **Cancelled shipments are excluded.** A shipment with a past
    `expectedDeliveryDate` that carries a shipment event with
-   `EventCode.CANCELLED` does not appear. (There is no `CANCELLED`
-   `ShipmentStatusCode`; cancellation is event-based — see open question 1.)
+   `EventCode.CANCELLED` as its latest event does not appear. (There is no
+   `CANCELLED` `ShipmentStatusCode`; cancellation is event-based — see
+   decision 1.)
 8. **Only inbound shipments are included.** A shipment whose `origin` is the
    session warehouse and whose `destination` is another location does not
    appear; every row in `data` has `destination.id` equal to the session
@@ -51,7 +52,7 @@ session bound to a warehouse via `POST /api/chooseLocation/{locationId}`.
     `expectedDeliveryDate`, derived status `PARTIALLY_RECEIVED`, and neither a
     `RECEIVED` nor a `DELIVERED` event appears, because part of the goods is
     still outstanding. The received/delivered exclusion takes precedence when
-    either event exists (see open question 2).
+    either event exists (see decision 2).
 
 ## daysLate
 
@@ -115,25 +116,18 @@ session bound to a warehouse via `POST /api/chooseLocation/{locationId}`.
     no warehouse selected, the endpoint responds `400` with the shared
     validation error body (`errorCode` 400).
 
-## Open questions for the human
+## Decisions
 
-1. **Cancellation semantics.** `ShipmentStatusCode` has no `CANCELLED` value;
-   the only cancellation signal is a shipment event with
-   `EventCode.CANCELLED`. Criterion 7 assumes "cancelled" means "has a
-   CANCELLED event, and that event is the latest one". Confirm, or name the
-   signal you actually want.
-2. **Partially received shipments.** Criterion 10 reports them as still
-   overdue only when there is neither a `RECEIVED` nor a `DELIVERED` event;
-   `dateDelivered()` resolves those events and exclusion takes precedence.
-   Confirm — the alternative is to exclude anything with any receipt.
-3. **Inbound definition.** The contract defines inbound as
-   `destination` = session warehouse (or a child location of it). Confirm that
-   is the right notion of "relative to the requesting location", rather than,
-   say, any location the user has access to.
-4. **Time zone / clock.** `daysLate` is a calendar-day difference using the
-   server time zone. Confirm that time zone is acceptable, or specify whether
-   a client-supplied `asOfDate` is wanted.
-5. **Overdue vs. never shipped.** A shipment still in derived status `PENDING`
-   (not-yet-shipped) past its expected delivery date is reported (it is late).
-   Confirm you want those, or restrict to shipments that have actually
-   shipped.
+1. **Cancellation semantics — decided.** `ShipmentStatusCode` has no
+   `CANCELLED` value. A shipment is cancelled when its **latest** event has
+   `EventCode.CANCELLED`; those shipments are excluded.
+2. **Partially received shipments — decided.** Partially received shipments
+   stay in the list. They are excluded only when a `RECEIVED` or `DELIVERED`
+   event exists, meaning `dateDelivered()` is non-null.
+3. **Inbound definition — decided.** Inbound means the shipment destination
+   is the session warehouse or one of its child locations.
+4. **Time zone / clock — decided.** `daysLate` is floored whole calendar
+   days using the server clock and time zone; both dates are truncated to
+   midnight. There is no client-supplied `asOfDate`.
+5. **Overdue vs. never shipped — decided.** Shipments in derived status
+   `PENDING` that are past due are included.

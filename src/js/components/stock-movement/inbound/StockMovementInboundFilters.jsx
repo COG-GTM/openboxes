@@ -4,6 +4,7 @@ import PropTypes from 'prop-types';
 import { connect } from 'react-redux';
 
 import FilterForm from 'components/Filter/FilterForm';
+import Button from 'components/form-elements/Button';
 import { debounceLocationsFetch, debouncePeopleFetch, debounceUsersFetch } from 'utils/option-utils';
 
 const StockMovementInboundFilters = ({
@@ -13,6 +14,8 @@ const StockMovementInboundFilters = ({
   formProps,
   filterFields,
   defaultValues,
+  overdue,
+  setOverdue,
 }) => {
   const fetchUsers = useCallback(
     debounceUsersFetch(debounceTime, minSearchLength),
@@ -34,6 +37,14 @@ const StockMovementInboundFilters = ({
 
   return (
     <div className="d-flex flex-column list-page-filters">
+      <div className="mb-2">
+        <Button
+          defaultLabel="Overdue"
+          label="react.stockMovement.overdue.label"
+          variant={overdue ? 'primary' : 'secondary'}
+          onClick={() => setOverdue(!overdue)}
+        />
+      </div>
       <FilterForm
         searchFieldId="q"
         searchFieldPlaceholder="react.stockMovement.search.placeholder.label"
@@ -68,4 +79,6 @@ StockMovementInboundFilters.propTypes = {
   filterFields: PropTypes.shape({}).isRequired,
   defaultValues: PropTypes.shape({}).isRequired,
   formProps: PropTypes.shape({}).isRequired,
+  overdue: PropTypes.bool.isRequired,
+  setOverdue: PropTypes.func.isRequired,
 };

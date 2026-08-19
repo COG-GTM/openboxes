@@ -1,4 +1,4 @@
-import React from 'react';
+import React, { useState } from 'react';
 
 import PropTypes from 'prop-types';
 import { connect } from 'react-redux';
@@ -18,6 +18,7 @@ const StockMovementInboundList = (props) => {
     setFilterValues,
     filterParams,
   } = useInboundFilters();
+  const [overdue, setOverdue] = useState(false);
 
   useTranslation('stockMovement', 'reactTable');
 
@@ -32,8 +33,10 @@ const StockMovementInboundList = (props) => {
           shipmentStatuses: props.shipmentStatuses,
           shipmentTypes: props.shipmentTypes,
         }}
+        overdue={overdue}
+        setOverdue={setOverdue}
       />
-      <StockMovementInboundTable filterParams={filterParams} />
+      <StockMovementInboundTable filterParams={{ ...filterParams, overdue }} overdue={overdue} />
     </div>
   );
 };
