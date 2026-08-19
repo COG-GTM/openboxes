@@ -45,6 +45,8 @@ class ShipmentExceptionCommand implements Validateable {
     Integer offset = 0
 
     static constraints = {
+        origin(nullable: true, blank: true)
+        destination(nullable: true, blank: true)
         minDaysLate(min: 1)
         max(min: 0, max: 500)
         offset(min: 0)
