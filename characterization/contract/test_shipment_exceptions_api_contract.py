@@ -9,6 +9,7 @@ from oas import Spec, check
 
 spec = Spec("shipment-exceptions-api.yaml")
 TEST_PREFIX = "ZZ Contract Shipment Exception"
+pytestmark = pytest.mark.usefixtures("shipment_exception_endpoints")
 
 
 def _shipment_options(client):
