@@ -20,9 +20,11 @@ info:
     cannot be swallowed by the existing generic mappings, which are declared
     ahead of any new mapping would matter: "/api/${resource}s/$id" and the
     catch-all "/api/$action/$id?" (ApiController) both match at most two
-    segments after /api, and "/api/shipments/$id" would otherwise capture a
-    two-segment path such as /api/shipments/overdue with id="overdue". No
-    existing mapping matches /api/shipments/exceptions/overdue (all declared
+    segments after /api, while "/api/${resource}s/$id/status" has three
+    segments but requires the literal third segment "status". The
+    "/api/shipments/$id" mapping would otherwise capture a two-segment path
+    such as /api/shipments/overdue with id="overdue". No existing mapping
+    matches /api/shipments/exceptions/overdue (all declared
     "/api/shipments/$id/<literal>" mappings require a different literal third
     segment), so the new mapping is unambiguous wherever it is declared.
 
@@ -31,8 +33,10 @@ info:
     (grails-app/domain/org/pih/warehouse/shipping/Shipment.groovy):
     expectedShippingDate is required, expectedDeliveryDate is nullable,
     receipt/delivery is derived (actualDeliveryDate / dateDelivered()), and
-    currentStatus is a ShipmentStatusCode (CREATED, PENDING, SHIPPED,
-    PARTIALLY_RECEIVED, RECEIVED). There is no CANCELLED shipment status; a
+    currentStatus is a nullable ShipmentStatusCode (CREATED, PENDING, SHIPPED,
+    PARTIALLY_RECEIVED, RECEIVED). Row status is derived from getStatus(), which
+    can return PENDING, SHIPPED, PARTIALLY_RECEIVED or RECEIVED; CREATED is
+    unreachable via getStatus(). There is no CANCELLED shipment status; a
     cancellation is recorded as a shipment event with EventCode.CANCELLED.
   version: 0.1.0
 servers:
@@ -50,18 +54,29 @@ paths:
         warehouse selected on the session (POST /api/chooseLocation/{id}):
         expectedDeliveryDate is set, is in the past, the shipment has not been
         received or delivered, and it has not been cancelled. Inbound means
-        the shipment's destination is the session warehouse.
+        the shipment's destination is the session warehouse or one of its child
+        locations. Received/delivered exclusion is based on dateDelivered(),
+        which resolves a RECEIVED event and falls back to a DELIVERED event, so
+        either event excludes a shipment even when its derived status is
+        PARTIALLY_RECEIVED.
 
 
-        daysLate is whole days only (floor of the elapsed time between
-        expectedDeliveryDate and "now" in the server time zone), so a shipment
-        due yesterday reports daysLate = 1. Rows with daysLate below
-        minDaysLate (default 1) are excluded, which means a shipment that is
-        due today is never reported.
+        daysLate is the calendar-day difference in the server time zone:
+        expectedDeliveryDate and "now" are both truncated to midnight before
+        the difference is calculated. A shipment due yesterday always reports
+        daysLate = 1 regardless of the request time; a shipment due today
+        reports daysLate = 0 and is excluded by the default minDaysLate of 1.
+        Rows with daysLate below minDaysLate are excluded.
 
 
         The result set is paginated with the standard max/offset params and
-        sorted by daysLate descending (most overdue first) by default.
+        sorted by daysLate descending (most overdue first) by default. max
+        defaults to 50 when omitted; values above 500 are rejected with 400.
+        An authenticated session with no warehouse selected responds 400 with
+        the shared ValidationErrorResponse body. Invalid query parameter
+        values are validated through a Grails command object and surface
+        through ErrorsController.handleValidationErrors, rather than being
+        rendered by hand.
       parameters:
         - $ref: '#/components/parameters/origin'
         - $ref: '#/components/parameters/destination'
@@ -120,7 +135,9 @@ components:
       name: sort
       in: query
       required: false
-      description: Row property to sort by. Defaults to daysLate.
+      description: >
+        Row property to sort by. Defaults to daysLate. For origin and
+        destination, rows are sorted by the location name, case-insensitively.
       schema:
         type: string
         default: daysLate
@@ -162,7 +179,9 @@ components:
                 description: Number of rows in this page.
               max:
                 type: integer
-                description: Page size applied (the requested max, or the default).
+                description: >
+                  Page size applied (the requested max, or 50 when omitted).
+                  Values above 500 are rejected with 400.
               offset:
                 type: integer
                 description: Zero-based index of the first row in this page.
@@ -217,14 +236,18 @@ components:
           type: integer
           minimum: 1
           description: >
-            Whole days between expectedDeliveryDate and now, floored. Never
-            below the effective minDaysLate.
+            Calendar days between expectedDeliveryDate and now in the server
+            time zone, with both timestamps truncated to midnight. Never below
+            the effective minDaysLate.
         status:
           type: string
-          enum: [CREATED, PENDING, SHIPPED, PARTIALLY_RECEIVED]
+          enum: [PENDING, SHIPPED, PARTIALLY_RECEIVED]
           description: >
-            Current ShipmentStatusCode. RECEIVED never appears; a
-            PARTIALLY_RECEIVED shipment is still outstanding and is reported.
+            Derived status from Shipment.getStatus(); the nullable currentStatus
+            column is deliberately not used. RECEIVED never appears because
+            received or delivered shipments are excluded; a
+            PARTIALLY_RECEIVED shipment is reported only when it has neither a
+            RECEIVED nor a DELIVERED event.
         shipmentItemCount:
           type: integer
           description: Number of shipment items, for context on the exception list.
