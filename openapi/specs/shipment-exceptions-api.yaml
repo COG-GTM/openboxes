@@ -16,9 +16,10 @@ info:
     grails-app/controllers/org/pih/warehouse/UrlMappings.groovy.
 
 
-    PATH CHOICE: the path deliberately has three segments after /api so it
-    cannot be swallowed by the existing generic mappings, which are declared
-    ahead of any new mapping would matter: "/api/${resource}s/$id" and the
+    PATH CHOICE: the path deliberately has three segments after /api.
+    Declaration order in UrlMappings.groovy could matter for a two-segment
+    path because existing generic mappings might swallow it, but it does not
+    matter for this three-segment path: "/api/${resource}s/$id" and the
     catch-all "/api/$action/$id?" (ApiController) both match at most two
     segments after /api, while "/api/${resource}s/$id/status" has three
     segments but requires the literal third segment "status". The
@@ -58,7 +59,8 @@ paths:
         locations. Received/delivered exclusion is based on dateDelivered(),
         which resolves a RECEIVED event and falls back to a DELIVERED event, so
         either event excludes a shipment even when its derived status is
-        PARTIALLY_RECEIVED.
+        PARTIALLY_RECEIVED (actualDeliveryDate is transient and derives from
+        the RECEIVED event, so RECEIVED/DELIVERED events are the only signals).
 
 
         daysLate is the calendar-day difference in the server time zone:
@@ -196,8 +198,10 @@ components:
       required:
         - id
         - shipmentNumber
+        - name
         - origin
         - destination
+        - expectedShippingDate
         - expectedDeliveryDate
         - daysLate
         - status
@@ -209,8 +213,7 @@ components:
           description: Human-readable shipment number shown on the shipment screens.
         name:
           type: string
-          nullable: true
-          description: Shipment name (nullable in the domain).
+          description: Required shipment name.
         shipmentType:
           type: string
           nullable: true
@@ -250,7 +253,10 @@ components:
             RECEIVED nor a DELIVERED event.
         shipmentItemCount:
           type: integer
-          description: Number of shipment items, for context on the exception list.
+          description: >-
+            Number of shipment items, for context on the exception list.
+            Derived from the denormalized count, falling back to the item
+            collection size, so it is always present.
 
     LocationRef:
       type: object
