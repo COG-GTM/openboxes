@@ -210,6 +210,7 @@ const StockMovementInboundTable = ({
     {
       Header: <Translate id="react.stockMovement.stocklist.label" defaultMessage="Stocklist" />,
       accessor: 'stocklist.name',
+      sortable: !overdue,
       minWidth: 150,
       Cell: (row) => (<TableCell {...row} tooltip defaultValue="None" />),
     },
@@ -223,6 +224,7 @@ const StockMovementInboundTable = ({
     {
       Header: <Translate id="react.stockMovement.column.dateCreated.label" defaultMessage="Date Created" />,
       accessor: 'dateCreated',
+      sortable: !overdue,
       width: 150,
       Cell: (row) => (
         <DateCell
@@ -259,27 +261,31 @@ const StockMovementInboundTable = ({
           <Translate id="react.stockMovement.inbound.label" defaultMessage="Inbound" />
           <span className="ml-1">{`(${tableData.totalCount})`}</span>
         </div>
-        <Button
-          isDropdown
-          defaultLabel="Export"
-          label="react.default.button.export.label"
-          variant="secondary"
-          EndIcon={<RiDownload2Line />}
-        />
-        <div className="dropdown-menu dropdown-menu-right nav-item padding-8" aria-labelledby="dropdownMenuButton">
-          <a href="#" className="dropdown-item" onClick={exportStockMovements} role="button" tabIndex={0}>
-            <Translate
-              id="react.stockMovement.export.label"
-              defaultMessage="Export Stock Movements"
+        {!overdue && (
+          <>
+            <Button
+              isDropdown
+              defaultLabel="Export"
+              label="react.default.button.export.label"
+              variant="secondary"
+              EndIcon={<RiDownload2Line />}
             />
-          </a>
-          <a className="dropdown-item" onClick={exportAllIncomingItems} href="#">
-            <Translate
-              id="react.stockMovement.export.allIncomingItems.label"
-              defaultMessage="Export all incoming items"
-            />
-          </a>
-        </div>
+            <div className="dropdown-menu dropdown-menu-right nav-item padding-8" aria-labelledby="dropdownMenuButton">
+              <a href="#" className="dropdown-item" onClick={exportStockMovements} role="button" tabIndex={0}>
+                <Translate
+                  id="react.stockMovement.export.label"
+                  defaultMessage="Export Stock Movements"
+                />
+              </a>
+              <a className="dropdown-item" onClick={exportAllIncomingItems} href="#">
+                <Translate
+                  id="react.stockMovement.export.allIncomingItems.label"
+                  defaultMessage="Export all incoming items"
+                />
+              </a>
+            </div>
+          </>
+        )}
       </div>
       <DataTable
         manual

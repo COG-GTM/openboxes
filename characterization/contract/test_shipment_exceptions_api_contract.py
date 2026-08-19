@@ -187,7 +187,7 @@ def test_criterion_09_inbound_is_relative_to_session_warehouse(client, exception
     default_rows = {row["shipmentNumber"] for row in _rows(client)["data"]}
     assert number in default_rows
     other_client = type(client)()
-    other_client.login("Main Supplier")
+    other_client.login("Boston Warehouse")
     assert number not in {
         row["shipmentNumber"] for row in _rows(other_client)["data"]
     }
@@ -201,9 +201,13 @@ def test_criterion_10_partially_received_without_delivery_is_included(client, ex
 
 def test_criterion_11_days_late_is_calendar_days(client, exception_shipments):
     """Criterion 11: daysLate is a calendar-day difference."""
-    number = _shipment_number(client, exception_shipments["overdue"])
+    shipment_id = exception_shipments["overdue"]
+    number = _shipment_number(client, shipment_id)
     row = next(row for row in _rows(client)["data"] if row["shipmentNumber"] == number)
-    assert row["daysLate"] == 3
+    expected_delivery = date.fromisoformat(
+        client.get_json(f"/api/shipments/{shipment_id}")["data"]["expectedDeliveryDate"][:10]
+    )
+    assert row["daysLate"] == (date.today() - expected_delivery).days
 
 
 def test_criterion_12_days_late_meets_threshold(client):
