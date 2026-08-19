@@ -1,0 +1,266 @@
+openapi: 3.0.3
+info:
+  title: OpenBoxes - ShipmentExceptionApiController
+  description: >
+    Read-only shipment exception reporting for warehouse managers: inbound
+    shipments whose expected delivery date has passed and that have not been
+    received yet, with how many days late each one is.
+
+
+    NOTE ON INTENT: every other spec under openapi/specs/ is descriptive - it
+    pins the CURRENT behavior of an existing *ApiController (see
+    openapi/README.md). This one is different: it is a contract-first spec for
+    a NEW endpoint that does not exist yet, agreed before any implementation.
+    The controller (org.pih.warehouse.api.ShipmentExceptionApiController) and
+    its URL mapping are proposed, not present in
+    grails-app/controllers/org/pih/warehouse/UrlMappings.groovy.
+
+
+    PATH CHOICE: the path deliberately has three segments after /api so it
+    cannot be swallowed by the existing generic mappings, which are declared
+    ahead of any new mapping would matter: "/api/${resource}s/$id" and the
+    catch-all "/api/$action/$id?" (ApiController) both match at most two
+    segments after /api, while "/api/${resource}s/$id/status" has three
+    segments but requires the literal third segment "status". The
+    "/api/shipments/$id" mapping would otherwise capture a two-segment path
+    such as /api/shipments/overdue with id="overdue". No existing mapping
+    matches /api/shipments/exceptions/overdue (all declared
+    "/api/shipments/$id/<literal>" mappings require a different literal third
+    segment), so the new mapping is unambiguous wherever it is declared.
+
+
+    Shipment data model facts this contract relies on
+    (grails-app/domain/org/pih/warehouse/shipping/Shipment.groovy):
+    expectedShippingDate is required, expectedDeliveryDate is nullable,
+    receipt/delivery is derived (actualDeliveryDate / dateDelivered()), and
+    currentStatus is a nullable ShipmentStatusCode (CREATED, PENDING, SHIPPED,
+    PARTIALLY_RECEIVED, RECEIVED). Row status is derived from getStatus(), which
+    can return PENDING, SHIPPED, PARTIALLY_RECEIVED or RECEIVED; CREATED is
+    unreachable via getStatus(). There is no CANCELLED shipment status; a
+    cancellation is recorded as a shipment event with EventCode.CANCELLED.
+  version: 0.1.0
+servers:
+  - url: http://localhost:8080/openboxes
+    description: Local Docker baseline (docs/migration/RUNNING_LOCALLY.md)
+security:
+  - cookieAuth: []
+paths:
+  /api/shipments/exceptions/overdue:
+    get:
+      operationId: getOverdueInboundShipments
+      summary: Inbound shipments that are late and not yet received
+      description: >
+        Returns one row per inbound shipment that is overdue relative to the
+        warehouse selected on the session (POST /api/chooseLocation/{id}):
+        expectedDeliveryDate is set, is in the past, the shipment has not been
+        received or delivered, and it has not been cancelled. Inbound means
+        the shipment's destination is the session warehouse or one of its child
+        locations. Received/delivered exclusion is based on dateDelivered(),
+        which resolves a RECEIVED event and falls back to a DELIVERED event, so
+        either event excludes a shipment even when its derived status is
+        PARTIALLY_RECEIVED.
+
+
+        daysLate is the calendar-day difference in the server time zone:
+        expectedDeliveryDate and "now" are both truncated to midnight before
+        the difference is calculated. A shipment due yesterday always reports
+        daysLate = 1 regardless of the request time; a shipment due today
+        reports daysLate = 0 and is excluded by the default minDaysLate of 1.
+        Rows with daysLate below minDaysLate are excluded.
+
+
+        The result set is paginated with the standard max/offset params and
+        sorted by daysLate descending (most overdue first) by default. max
+        defaults to 50 when omitted; values above 500 are rejected with 400.
+        An authenticated session with no warehouse selected responds 400 with
+        the shared ValidationErrorResponse body. Invalid query parameter
+        values are validated through a Grails command object and surface
+        through ErrorsController.handleValidationErrors, rather than being
+        rendered by hand.
+      parameters:
+        - $ref: '#/components/parameters/origin'
+        - $ref: '#/components/parameters/destination'
+        - $ref: '#/components/parameters/minDaysLate'
+        - $ref: '#/components/parameters/sort'
+        - $ref: '#/components/parameters/order'
+        - $ref: '../components/common.yaml#/components/parameters/max'
+        - $ref: '../components/common.yaml#/components/parameters/offset'
+      responses:
+        '200':
+          $ref: '#/components/responses/OverdueInboundShipmentsOk'
+        '400':
+          $ref: '../components/common.yaml#/components/responses/ValidationError'
+        '401':
+          $ref: '../components/common.yaml#/components/responses/Unauthorized'
+        '500':
+          $ref: '../components/common.yaml#/components/responses/ServerError'
+
+components:
+  securitySchemes:
+    cookieAuth:
+      $ref: '../components/common.yaml#/components/securitySchemes/cookieAuth'
+
+  parameters:
+    origin:
+      name: origin
+      in: query
+      required: false
+      description: >
+        Restrict to shipments sent from this origin location id. Unknown ids
+        yield an empty page, not an error.
+      schema:
+        $ref: '../components/common.yaml#/components/schemas/Id'
+    destination:
+      name: destination
+      in: query
+      required: false
+      description: >
+        Restrict to shipments arriving at this destination location id. Must
+        be the session warehouse or one of its child locations; any other
+        value yields an empty page.
+      schema:
+        $ref: '../components/common.yaml#/components/schemas/Id'
+    minDaysLate:
+      name: minDaysLate
+      in: query
+      required: false
+      description: >
+        Minimum whole days late a shipment must be to appear. Defaults to 1.
+        Values below 1 are rejected with 400.
+      schema:
+        type: integer
+        minimum: 1
+        default: 1
+    sort:
+      name: sort
+      in: query
+      required: false
+      description: >
+        Row property to sort by. Defaults to daysLate. For origin and
+        destination, rows are sorted by the location name, case-insensitively.
+      schema:
+        type: string
+        default: daysLate
+        enum:
+          - daysLate
+          - expectedDeliveryDate
+          - shipmentNumber
+          - origin
+          - destination
+    order:
+      name: order
+      in: query
+      required: false
+      description: >
+        Sort direction. Defaults to desc, so the most overdue shipments come
+        first.
+      schema:
+        type: string
+        default: desc
+        enum: [asc, desc]
+
+  responses:
+    OverdueInboundShipmentsOk:
+      description: >
+        A page of overdue inbound shipments. totalCount reflects the full
+        filtered result set, count the number of rows in this page.
+      content:
+        application/json:
+          schema:
+            type: object
+            required: [data, count, max, offset, totalCount]
+            properties:
+              data:
+                type: array
+                items:
+                  $ref: '#/components/schemas/OverdueInboundShipment'
+              count:
+                type: integer
+                description: Number of rows in this page.
+              max:
+                type: integer
+                description: >
+                  Page size applied (the requested max, or 50 when omitted).
+                  Values above 500 are rejected with 400.
+              offset:
+                type: integer
+                description: Zero-based index of the first row in this page.
+              totalCount:
+                type: integer
+                description: Total number of matching shipments, ignoring pagination.
+
+  schemas:
+    OverdueInboundShipment:
+      type: object
+      description: One overdue inbound shipment.
+      required:
+        - id
+        - shipmentNumber
+        - origin
+        - destination
+        - expectedDeliveryDate
+        - daysLate
+        - status
+      properties:
+        id:
+          $ref: '../components/common.yaml#/components/schemas/Id'
+        shipmentNumber:
+          type: string
+          description: Human-readable shipment number shown on the shipment screens.
+        name:
+          type: string
+          nullable: true
+          description: Shipment name (nullable in the domain).
+        shipmentType:
+          type: string
+          nullable: true
+          description: ShipmentType name (e.g. Air, Sea, Land, Suitcase).
+        origin:
+          $ref: '#/components/schemas/LocationRef'
+        destination:
+          $ref: '#/components/schemas/LocationRef'
+        expectedShippingDate:
+          type: string
+          format: date-time
+          description: >
+            Date the origin expected to ship the goods (required in the
+            domain, so always present).
+        expectedDeliveryDate:
+          type: string
+          format: date-time
+          description: >
+            Date the shipment was expected to arrive. Always present on these
+            rows: shipments with a null expectedDeliveryDate cannot be
+            overdue and are excluded.
+        daysLate:
+          type: integer
+          minimum: 1
+          description: >
+            Calendar days between expectedDeliveryDate and now in the server
+            time zone, with both timestamps truncated to midnight. Never below
+            the effective minDaysLate.
+        status:
+          type: string
+          enum: [PENDING, SHIPPED, PARTIALLY_RECEIVED]
+          description: >
+            Derived status from Shipment.getStatus(); the nullable currentStatus
+            column is deliberately not used. RECEIVED never appears because
+            received or delivered shipments are excluded; a
+            PARTIALLY_RECEIVED shipment is reported only when it has neither a
+            RECEIVED nor a DELIVERED event.
+        shipmentItemCount:
+          type: integer
+          description: Number of shipment items, for context on the exception list.
+
+    LocationRef:
+      type: object
+      description: Minimal location reference (id + display name).
+      required: [id, name]
+      properties:
+        id:
+          $ref: '../components/common.yaml#/components/schemas/Id'
+        name:
+          type: string
+        locationNumber:
+          type: string
+          nullable: true
