@@ -203,6 +203,7 @@ const StockMovementInboundTable = ({
     {
       Header: <Translate id="react.stockMovement.origin.label" defaultMessage="Origin" />,
       accessor: 'origin.name',
+      id: overdue ? 'origin' : undefined,
       minWidth: 250,
       Cell: (row) => (<TableCell {...row} tooltip />),
     },
