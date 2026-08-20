@@ -376,14 +376,18 @@ def test_criterion_31_carrier_name_reports_the_shipment_carrier(client):
     )
     try:
         _set_carrier(client, with_carrier, person["id"])
-        rows = {row["shipmentNumber"]: row for row in _rows(client, max=500)["data"]}
-        missing = sorted(number for number, row in rows.items() if "carrierName" not in row)
+        rows = {row["id"]: row for row in _rows(client, max=500)["data"]}
+        missing = sorted(
+            rows[shipment_id]["shipmentNumber"]
+            for shipment_id in rows
+            if "carrierName" not in rows[shipment_id]
+        )
         assert not missing, f"rows without a carrierName key: {missing}"
-        carrier_row = rows[_shipment_number(client, with_carrier)]
+        carrier_row = rows[with_carrier]
         assert carrier_row["carrierName"] == person["name"], (
             f"expected carrierName {person['name']!r}, got {carrier_row['carrierName']!r}"
         )
-        no_carrier_row = rows[_shipment_number(client, without_carrier)]
+        no_carrier_row = rows[without_carrier]
         assert no_carrier_row["carrierName"] is None, (
             f"expected null carrierName, got {no_carrier_row['carrierName']!r}"
         )
