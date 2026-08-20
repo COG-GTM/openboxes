@@ -210,7 +210,11 @@ components:
           $ref: '../components/common.yaml#/components/schemas/Id'
         shipmentNumber:
           type: string
-          description: Human-readable shipment number shown on the shipment screens.
+          description: >
+            Human-readable shipment number shown on the shipment screens. The
+            underlying domain column is nullable, but ShipmentService.saveShipment
+            generates one via shipmentIdentifierService.generate for every
+            created shipment, so this field is required here.
         name:
           type: string
           description: Required shipment name.
@@ -254,9 +258,9 @@ components:
         shipmentItemCount:
           type: integer
           description: >-
-            Number of shipment items, for context on the exception list.
-            Derived from the denormalized count, falling back to the item
-            collection size, so it is always present.
+            Formula-derived item count for the exception list. The endpoint
+            always populates it, falling back to the item collection size and
+            then 0, so it is always present.
 
     LocationRef:
       type: object
