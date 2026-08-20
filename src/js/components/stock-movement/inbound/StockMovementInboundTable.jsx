@@ -31,6 +31,7 @@ const StockMovementInboundTable = ({
   shipmentStatuses,
   currentLocation,
   isUserAdmin,
+  overdue,
 }) => {
   const {
     tableData,
@@ -42,13 +43,18 @@ const StockMovementInboundTable = ({
     deleteConfirmAlert,
   } = useInboundListTableData(filterParams);
 
-  const getStatusTooltip = (status) => translate(
-    `react.stockMovement.status.${status.toLowerCase()}.description.label`,
-    status.toLowerCase(),
-  );
+  const getStatusTooltip = (status) => {
+    if (!status) return null;
+    const statusKey = status.toLowerCase();
+    return translate(
+      `react.stockMovement.status.${statusKey}.description.label`,
+      statusKey,
+    );
+  };
 
   // List of all actions for inbound Stock Movement rows
   const getActions = useCallback((row) => {
+    if (overdue) return [];
     const {
       id, isPending, isReturn, order, origin, isReceived, isPartiallyReceived,
     } = row.original;
@@ -99,7 +105,7 @@ const StockMovementInboundTable = ({
       }
     }
     return actions;
-  }, []);
+  }, [overdue]);
 
   // Columns for react-table
   const columns = useMemo(() => [
@@ -110,17 +116,19 @@ const StockMovementInboundTable = ({
       style: { overflow: 'visible', zIndex: 1 },
       fixed: 'left',
       Cell: (row) => (
-        <ContextMenu
-          positions={['right']}
-          dropdownClasses="action-dropdown-offset"
-          actions={getActions(row)}
-          id={row.original.id}
-        />
+        overdue ? null : (
+          <ContextMenu
+            positions={['right']}
+            dropdownClasses="action-dropdown-offset"
+            actions={getActions(row)}
+            id={row.original.id}
+          />
+        )
       ),
     },
     {
       Header: <Translate id="react.stockMovement.column.itemsCount.label" defaultMessage="# items" />,
-      accessor: 'lineItemCount',
+      accessor: overdue ? 'shipmentItemCount' : 'lineItemCount',
       fixed: 'left',
       className: 'active-circle d-flex justify-content-center',
       headerClassName: 'header justify-content-center',
@@ -130,30 +138,33 @@ const StockMovementInboundTable = ({
     },
     {
       Header: <Translate id="react.stockMovement.column.status.label" defaultMessage="Status" />,
-      accessor: 'displayStatus',
+      accessor: overdue ? 'status' : 'displayStatus',
       fixed: 'left',
       width: 170,
       sortable: false,
       Cell: (row) => (
         <TableCell
           {...row}
-          tooltip
-          tooltipLabel={getStatusTooltip(row.value?.name)}
+          tooltip={Boolean(row.value?.name || row.value)}
+          tooltipLabel={getStatusTooltip(row.value?.name || row.value)}
         >
-          <StatusIndicator
-            variant={row?.value?.variant}
-            status={row?.value?.label}
-          />
+          {overdue ? row.value : (
+            <StatusIndicator
+              variant={row?.value?.variant}
+              status={row?.value?.label}
+            />
+          )}
         </TableCell>
       ),
     },
     {
       Header: <Translate id="react.stockMovement.column.identifier.label" defaultMessage="Identifier" />,
-      accessor: 'identifier',
+      accessor: overdue ? 'shipmentNumber' : 'identifier',
       headerClassName: 'header justify-content-center',
       fixed: 'left',
       minWidth: 130,
       Cell: (row) => {
+        if (overdue) return <TableCell {...row} />;
         const {
           isReturn, order, id, shipmentType,
         } = row.original;
@@ -196,12 +207,14 @@ const StockMovementInboundTable = ({
     {
       Header: <Translate id="react.stockMovement.origin.label" defaultMessage="Origin" />,
       accessor: 'origin.name',
+      id: overdue ? 'origin' : undefined,
       minWidth: 250,
       Cell: (row) => (<TableCell {...row} tooltip />),
     },
     {
       Header: <Translate id="react.stockMovement.stocklist.label" defaultMessage="Stocklist" />,
       accessor: 'stocklist.name',
+      sortable: !overdue,
       minWidth: 150,
       Cell: (row) => (<TableCell {...row} tooltip defaultValue="None" />),
     },
@@ -215,6 +228,7 @@ const StockMovementInboundTable = ({
     {
       Header: <Translate id="react.stockMovement.column.dateCreated.label" defaultMessage="Date Created" />,
       accessor: 'dateCreated',
+      sortable: !overdue,
       width: 150,
       Cell: (row) => (
         <DateCell
@@ -236,7 +250,13 @@ const StockMovementInboundTable = ({
         />
       ),
     },
-  ], [shipmentStatuses, translate]);
+    ...(overdue ? [{
+      Header: <Translate id="react.stockMovement.column.daysLate.label" defaultMessage="Days Late" />,
+      accessor: 'daysLate',
+      width: 100,
+      Cell: (row) => (<TableCell {...row} />),
+    }] : []),
+  ], [overdue, shipmentStatuses, translate]);
 
   return (
     <div className="list-page-list-section">
@@ -245,29 +265,34 @@ const StockMovementInboundTable = ({
           <Translate id="react.stockMovement.inbound.label" defaultMessage="Inbound" />
           <span className="ml-1">{`(${tableData.totalCount})`}</span>
         </div>
-        <Button
-          isDropdown
-          defaultLabel="Export"
-          label="react.default.button.export.label"
-          variant="secondary"
-          EndIcon={<RiDownload2Line />}
-        />
-        <div className="dropdown-menu dropdown-menu-right nav-item padding-8" aria-labelledby="dropdownMenuButton">
-          <a href="#" className="dropdown-item" onClick={exportStockMovements} role="button" tabIndex={0}>
-            <Translate
-              id="react.stockMovement.export.label"
-              defaultMessage="Export Stock Movements"
+        {!overdue && (
+          <>
+            <Button
+              isDropdown
+              defaultLabel="Export"
+              label="react.default.button.export.label"
+              variant="secondary"
+              EndIcon={<RiDownload2Line />}
             />
-          </a>
-          <a className="dropdown-item" onClick={exportAllIncomingItems} href="#">
-            <Translate
-              id="react.stockMovement.export.allIncomingItems.label"
-              defaultMessage="Export all incoming items"
-            />
-          </a>
-        </div>
+            <div className="dropdown-menu dropdown-menu-right nav-item padding-8" aria-labelledby="dropdownMenuButton">
+              <a href="#" className="dropdown-item" onClick={exportStockMovements} role="button" tabIndex={0}>
+                <Translate
+                  id="react.stockMovement.export.label"
+                  defaultMessage="Export Stock Movements"
+                />
+              </a>
+              <a className="dropdown-item" onClick={exportAllIncomingItems} href="#">
+                <Translate
+                  id="react.stockMovement.export.allIncomingItems.label"
+                  defaultMessage="Export all incoming items"
+                />
+              </a>
+            </div>
+          </>
+        )}
       </div>
       <DataTable
+        key={overdue ? 'overdue' : 'inbound'}
         manual
         sortable
         ref={tableRef}
@@ -299,6 +324,7 @@ export default connect(mapStateToProps)(StockMovementInboundTable);
 
 StockMovementInboundTable.propTypes = {
   filterParams: PropTypes.shape({}).isRequired,
+  overdue: PropTypes.bool.isRequired,
   translate: PropTypes.func.isRequired,
   isUserAdmin: PropTypes.bool.isRequired,
   currentLocation: PropTypes.shape({

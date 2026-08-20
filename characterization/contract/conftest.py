@@ -75,6 +75,12 @@ def batch22_endpoints(client):
 
 
 @pytest.fixture(scope="session")
+def shipment_exception_endpoints(client):
+    if client.request("GET", "/api/shipments/exceptions/overdue").status_code == 404:
+        pytest.skip("shipment exception endpoint not present in target build")
+
+
+@pytest.fixture(scope="session")
 def batch41_endpoints(client):
     # Same rationale as batch14_endpoints for the Batch 41 admin/auth/batch/
     # document screen endpoints.

@@ -13,6 +13,7 @@ export const PURCHASE_ORDER_ROLLBACK_ORDER = (id) => `${PURCHASE_ORDER_API}/${id
 
 // STOCK MOVEMENT
 export const STOCK_MOVEMENT_API = `${API}/stockMovements`;
+export const SHIPMENT_EXCEPTIONS_OVERDUE_API = `${API}/shipments/exceptions/overdue`;
 export const STOCK_MOVEMENT_BY_ID = (id) => `${STOCK_MOVEMENT_API}/${id}`;
 export const STOCK_MOVEMENT_PENDING_SHIPMENT_ITEMS = `${STOCK_MOVEMENT_API}/pendingRequisitionItems`;
 export const STOCK_MOVEMENT_INCOMING_ITEMS = `${STOCK_MOVEMENT_API}/shippedItems`;

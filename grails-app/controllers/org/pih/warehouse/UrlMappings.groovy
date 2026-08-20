@@ -1259,6 +1259,11 @@ class UrlMappings {
             action = [GET: "listOptions"]
         }
 
+        "/api/shipments/exceptions/overdue" {
+            controller = "shipmentExceptionApi"
+            action = [GET: "overdue"]
+        }
+
         "/api/shipments/bulkAction"(parseRequest: true) {
             controller = "shipmentApi"
             action = [POST: "bulkAction"]
