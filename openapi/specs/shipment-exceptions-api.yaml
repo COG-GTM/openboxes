@@ -9,11 +9,9 @@ info:
 
     NOTE ON INTENT: every other spec under openapi/specs/ is descriptive - it
     pins the CURRENT behavior of an existing *ApiController (see
-    openapi/README.md). This one is different: it is a contract-first spec for
-    a NEW endpoint that does not exist yet, agreed before any implementation.
-    The controller (org.pih.warehouse.api.ShipmentExceptionApiController) and
-    its URL mapping are proposed, not present in
-    grails-app/controllers/org/pih/warehouse/UrlMappings.groovy.
+    openapi/README.md). This one was authored contract-first, and the endpoint
+    has since been implemented at org.pih.warehouse.api.ShipmentExceptionApiController
+    with a UrlMappings.groovy entry for "/api/shipments/exceptions/overdue".
 
 
     PATH CHOICE: the path deliberately has three segments after /api.
