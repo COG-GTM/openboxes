@@ -205,6 +205,7 @@ components:
         - expectedDeliveryDate
         - daysLate
         - status
+        - shipmentItemCount
       properties:
         id:
           $ref: '../components/common.yaml#/components/schemas/Id'
