@@ -212,6 +212,7 @@ components:
         - expectedDeliveryDate
         - daysLate
         - status
+        - carrierName
       properties:
         id:
           $ref: '../components/common.yaml#/components/schemas/Id'
