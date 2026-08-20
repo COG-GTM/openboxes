@@ -355,6 +355,43 @@ def test_criterion_28_unsupported_sort_is_rejected(client):
     assert response.json()["errorCode"] == 400
 
 
+def _set_carrier(client, shipment_id, person_id):
+    response = client.request(
+        "POST", f"/api/shipments/{shipment_id}/tracking",
+        json={"carrierId": person_id},
+    )
+    assert response.status_code == 200
+    return response
+
+
+def test_criterion_31_carrier_name_reports_the_shipment_carrier(client):
+    """Criterion 31: carrierName is the carrier display name, null when unset."""
+    person = client.get_json("/api/persons", params={"max": 1})["data"][0]
+    expected_delivery = (date.today() - timedelta(days=4)).isoformat()
+    with_carrier = _create_shipment(
+        client, f"{TEST_PREFIX} carrier", expected_delivery=expected_delivery,
+    )
+    without_carrier = _create_shipment(
+        client, f"{TEST_PREFIX} no carrier", expected_delivery=expected_delivery,
+    )
+    try:
+        _set_carrier(client, with_carrier, person["id"])
+        rows = {row["shipmentNumber"]: row for row in _rows(client, max=500)["data"]}
+        missing = sorted(number for number, row in rows.items() if "carrierName" not in row)
+        assert not missing, f"rows without a carrierName key: {missing}"
+        carrier_row = rows[_shipment_number(client, with_carrier)]
+        assert carrier_row["carrierName"] == person["name"], (
+            f"expected carrierName {person['name']!r}, got {carrier_row['carrierName']!r}"
+        )
+        no_carrier_row = rows[_shipment_number(client, without_carrier)]
+        assert no_carrier_row["carrierName"] is None, (
+            f"expected null carrierName, got {no_carrier_row['carrierName']!r}"
+        )
+    finally:
+        _delete_shipment(client, with_carrier)
+        _delete_shipment(client, without_carrier)
+
+
 def test_criterion_29_session_is_required():
     """Criterion 29: an unauthenticated session returns 401."""
     from obx import BASE_URL
