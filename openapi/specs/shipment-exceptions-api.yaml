@@ -9,16 +9,15 @@ info:
 
     NOTE ON INTENT: every other spec under openapi/specs/ is descriptive - it
     pins the CURRENT behavior of an existing *ApiController (see
-    openapi/README.md). This one is different: it is a contract-first spec for
-    a NEW endpoint that does not exist yet, agreed before any implementation.
-    The controller (org.pih.warehouse.api.ShipmentExceptionApiController) and
-    its URL mapping are proposed, not present in
-    grails-app/controllers/org/pih/warehouse/UrlMappings.groovy.
+    openapi/README.md). This one was authored contract-first, and the endpoint
+    has since been implemented at org.pih.warehouse.api.ShipmentExceptionApiController
+    with a UrlMappings.groovy entry for "/api/shipments/exceptions/overdue".
 
 
-    PATH CHOICE: the path deliberately has three segments after /api so it
-    cannot be swallowed by the existing generic mappings, which are declared
-    ahead of any new mapping would matter: "/api/${resource}s/$id" and the
+    PATH CHOICE: the path deliberately has three segments after /api.
+    Declaration order in UrlMappings.groovy could matter for a two-segment
+    path because existing generic mappings might swallow it, but it does not
+    matter for this three-segment path: "/api/${resource}s/$id" and the
     catch-all "/api/$action/$id?" (ApiController) both match at most two
     segments after /api, while "/api/${resource}s/$id/status" has three
     segments but requires the literal third segment "status". The
@@ -58,7 +57,8 @@ paths:
         locations. Received/delivered exclusion is based on dateDelivered(),
         which resolves a RECEIVED event and falls back to a DELIVERED event, so
         either event excludes a shipment even when its derived status is
-        PARTIALLY_RECEIVED.
+        PARTIALLY_RECEIVED (actualDeliveryDate is transient and derives from
+        the RECEIVED event, so RECEIVED/DELIVERED events are the only signals).
 
 
         daysLate is the calendar-day difference in the server time zone:
@@ -196,21 +196,27 @@ components:
       required:
         - id
         - shipmentNumber
+        - name
         - origin
         - destination
+        - expectedShippingDate
         - expectedDeliveryDate
         - daysLate
         - status
+        - shipmentItemCount
       properties:
         id:
           $ref: '../components/common.yaml#/components/schemas/Id'
         shipmentNumber:
           type: string
-          description: Human-readable shipment number shown on the shipment screens.
+          description: >
+            Human-readable shipment number shown on the shipment screens. The
+            underlying domain column is nullable, but ShipmentService.saveShipment
+            generates one via shipmentIdentifierService.generate for every
+            created shipment, so this field is required here.
         name:
           type: string
-          nullable: true
-          description: Shipment name (nullable in the domain).
+          description: Required shipment name.
         shipmentType:
           type: string
           nullable: true
@@ -250,7 +256,10 @@ components:
             RECEIVED nor a DELIVERED event.
         shipmentItemCount:
           type: integer
-          description: Number of shipment items, for context on the exception list.
+          description: >-
+            Formula-derived item count for the exception list. The endpoint
+            always populates it, falling back to the item collection size and
+            then 0, so it is always present.
 
     LocationRef:
       type: object

@@ -17,7 +17,7 @@ session bound to a warehouse via `POST /api/chooseLocation/{locationId}`.
 1. **Overdue, unreceived, inbound shipment is included.** A shipment with
    `destination` = the session warehouse or one of its child locations,
    `expectedDeliveryDate` 3 days in the past and derived status `SHIPPED`
-   appears in `data`, keyed by its `shipmentNumber`.
+   appears in `data`, identified by matching `shipmentNumber`.
 2. **Future expected delivery date is excluded.** A shipment with
    `expectedDeliveryDate` 3 days in the future does not appear in `data` for
    any page of the result set.
@@ -29,8 +29,10 @@ session bound to a warehouse via `POST /api/chooseLocation/{locationId}`.
    appear, and no row in `data` has `status` = `RECEIVED`.
 5. **Received-or-delivered shipments are excluded.** A shipment with a past
    `expectedDeliveryDate` that has either a `RECEIVED` or `DELIVERED` shipment
-   event (`dateDelivered()` non-null) does not appear, even when its derived
-   status is `PARTIALLY_RECEIVED`.
+   event (`dateDelivered()` non-null; its `actualDeliveryDate` fallback is
+   transient and derives from the `RECEIVED` event, so `RECEIVED`/`DELIVERED`
+   events are the only signals) does not appear, even when its derived status
+   is `PARTIALLY_RECEIVED`.
 6. **Null expected delivery date is excluded.** A shipment with
    `expectedDeliveryDate` null and an `expectedShippingDate` well in the past
    does not appear, and every row in `data` has a non-null
@@ -51,8 +53,10 @@ session bound to a warehouse via `POST /api/chooseLocation/{locationId}`.
 10. **Partially received shipments are included.** A shipment with a past
     `expectedDeliveryDate`, derived status `PARTIALLY_RECEIVED`, and neither a
     `RECEIVED` nor a `DELIVERED` event appears, because part of the goods is
-    still outstanding. The received/delivered exclusion takes precedence when
-    either event exists (see decision 2).
+    still outstanding (the `actualDeliveryDate` fallback is transient and
+    derives from `RECEIVED`, so `RECEIVED`/`DELIVERED` events are the only
+    signals). The received/delivered exclusion takes precedence when either
+    event exists (see decision 2).
 
 ## daysLate
 
