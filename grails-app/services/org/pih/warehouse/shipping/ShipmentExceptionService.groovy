@@ -65,6 +65,7 @@ class ShipmentExceptionService {
                     destination          : locationReference(shipment.destination),
                     expectedShippingDate : shipment.expectedShippingDate,
                     expectedDeliveryDate : shipment.expectedDeliveryDate,
+                    carrierName          : shipment.carrier?.name,
                     daysLate              : daysLate,
                     status               : shipment.status?.code?.name(),
                     shipmentItemCount    : shipment.shipmentItemCount ?: shipment.shipmentItems?.size() ?: 0,

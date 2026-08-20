@@ -255,6 +255,12 @@ const StockMovementInboundTable = ({
       accessor: 'daysLate',
       width: 100,
       Cell: (row) => (<TableCell {...row} />),
+    }, {
+      Header: <Translate id="react.stockMovement.column.carrier.label" defaultMessage="Carrier" />,
+      accessor: 'carrierName',
+      sortable: false,
+      minWidth: 180,
+      Cell: (row) => (<TableCell {...row} tooltip defaultValue="None" />),
     }] : []),
   ], [overdue, shipmentStatuses, translate]);
 
