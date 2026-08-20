@@ -2,6 +2,8 @@ import React from 'react';
 
 import PropTypes from 'prop-types';
 
+import Translate from 'utils/Translate';
+
 /* global _ */
 const TableCard = (props) => {
   const {
@@ -60,6 +62,16 @@ const TableCard = (props) => {
           </tr>
         </thead>
         <tbody>
+          {!data.body.length && data.emptyMessage ? (
+            <tr className="empty-table-row">
+              <td colSpan={3}>
+                <Translate
+                  id={data.emptyMessage.id}
+                  defaultMessage={data.emptyMessage.defaultMessage}
+                />
+              </td>
+            </tr>
+          ) : null}
           {data.body.map((item) => (
             <tr
               onClick={() => {
@@ -116,6 +128,10 @@ TableCard.propTypes = {
     nameLink: PropTypes.string,
     nameDataList: PropTypes.arrayOf(PropTypes.string),
     nameLinksList: PropTypes.arrayOf(PropTypes.string),
+    emptyMessage: PropTypes.shape({
+      id: PropTypes.string,
+      defaultMessage: PropTypes.string,
+    }),
   }).isRequired,
   columnsSize: PropTypes.shape({
     name: PropTypes.string,

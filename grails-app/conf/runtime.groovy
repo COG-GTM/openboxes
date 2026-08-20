@@ -630,6 +630,10 @@ openboxes {
                         [
                             widgetId: "discrepancy",
                             order   : 6
+                        ],
+                        [
+                            widgetId: "overdueInbound",
+                            order   : 7
                         ]
                     ]
                 }
@@ -676,6 +680,10 @@ openboxes {
                         [
                             widgetId: "discrepancy",
                             order   : 6
+                        ],
+                        [
+                            widgetId: "overdueInbound",
+                            order   : 7
                         ]
                     ]
                 }
@@ -1004,6 +1012,15 @@ openboxes {
                 type = 'graph'
                 endpoint = "/api/dashboard/discrepancy"
                 timeFilter = true
+            }
+            overdueInbound {
+                enabled = true
+                title = "react.dashboard.overdueInbound.title.label"
+                info = "react.dashboard.overdueInbound.info.label"
+                graphType = "table"
+                type = 'graph'
+                endpoint = "/api/shipments/exceptions/overdue?max=5"
+                responseAdapter = "overdueInboundShipments"
             }
             delayedShipments {
                 enabled = true

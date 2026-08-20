@@ -1,7 +1,7 @@
 /* eslint no-param-reassign: ["error", { "props": false }] */
 import _ from 'lodash';
 import queryString from 'query-string';
-import { addTranslationForLanguage } from 'react-localize-redux';
+import { addTranslationForLanguage, getTranslate } from 'react-localize-redux';
 
 import {
   ADD_EMPTY_ROW,
@@ -85,7 +85,9 @@ import RoleType from 'consts/roleType';
 import { UnitOfMeasureType } from 'consts/UnitOfMeasureType';
 import apiClient, { parseResponse } from 'utils/apiClient';
 import { removeBinLocationData } from 'utils/cycleCountUtils';
+import dashboardResponseAdapters from 'utils/dashboard-response-adapters';
 import { fetchBins, getLotNumbersByProductIds, mapShipmentTypes } from 'utils/option-utils';
+import { translateWithDefaultMessage } from 'utils/Translate';
 
 export function showSpinner() {
   return {
@@ -304,16 +306,27 @@ function getParameterList(params = '', locationId = '', userId = '') {
   return listParams;
 }
 
+function getTranslateFromState(getState) {
+  return translateWithDefaultMessage(getTranslate(getState().localize));
+}
+
+function adaptIndicatorResponse(indicatorConfig, responseData, translate) {
+  const adapter = dashboardResponseAdapters[indicatorConfig.responseAdapter];
+  return adapter ? adapter(responseData, translate) : responseData;
+}
+
 function fetchGraphIndicator(
   dispatch,
   indicatorConfig,
   locationId = '',
   params = '',
+  translate = (id, defaultMessage) => defaultMessage || id,
 ) {
   const id = indicatorConfig.order;
 
   const listParams = getParameterList(params, locationId);
-  const url = `${indicatorConfig.endpoint}?${listParams}`;
+  const separator = indicatorConfig.endpoint.includes('?') ? '&' : '?';
+  const url = `${indicatorConfig.endpoint}${separator}${listParams}`;
 
   dispatch({
     type: FETCH_GRAPHS,
@@ -328,7 +341,7 @@ function fetchGraphIndicator(
   });
 
   apiClient.get(url).then((res) => {
-    const indicatorData = res.data;
+    const indicatorData = adaptIndicatorResponse(indicatorConfig, res.data, translate);
     dispatch({
       type: FETCH_GRAPHS,
       payload: {
@@ -400,14 +413,27 @@ function fetchNumberIndicator(
 }
 
 export function reloadIndicator(indicatorConfig, params, locationId) {
-  return (dispatch) => {
+  return (dispatch, getState) => {
     // new reference so that the original config is not modified
     const indicatorConfigData = JSON.parse(JSON.stringify(indicatorConfig));
-    fetchGraphIndicator(dispatch, indicatorConfigData, locationId, params);
+    fetchGraphIndicator(
+      dispatch,
+      indicatorConfigData,
+      locationId,
+      params,
+      getTranslateFromState(getState),
+    );
   };
 }
 
-function getData(dispatch, dashboardConfig, locationId, config = 'personal', userId = '') {
+function getData(
+  dispatch,
+  dashboardConfig,
+  locationId,
+  config = 'personal',
+  userId = '',
+  translate,
+) {
   // new reference so that the original config is not modified
 
   const dashboard = dashboardConfig.dashboard[config] || {};
@@ -423,7 +449,7 @@ function getData(dispatch, dashboardConfig, locationId, config = 'personal', use
 
   _.forEach(visibleWidgets, (widgetConfig) => {
     if (widgetConfig.type === 'graph') {
-      fetchGraphIndicator(dispatch, widgetConfig, locationId, '');
+      fetchGraphIndicator(dispatch, widgetConfig, locationId, '', translate);
     } else if (widgetConfig.type === 'number') {
       fetchNumberIndicator(dispatch, widgetConfig, locationId, userId);
     }
@@ -436,7 +462,7 @@ export function fetchIndicators(
   locationId,
   userId,
 ) {
-  return (dispatch) => {
+  return (dispatch, getState) => {
     dispatch({
       type: SET_ACTIVE_CONFIG,
       payload: {
@@ -444,7 +470,7 @@ export function fetchIndicators(
       },
     });
 
-    getData(dispatch, configData, locationId, config, userId);
+    getData(dispatch, configData, locationId, config, userId, getTranslateFromState(getState));
   };
 }
 
@@ -455,9 +481,15 @@ export function resetIndicators() {
 }
 
 export function addToIndicators(widgetConfig, locationId, userId = '') {
-  return (dispatch) => {
+  return (dispatch, getState) => {
     if (widgetConfig.type === 'graph') {
-      fetchGraphIndicator(dispatch, widgetConfig, locationId, '');
+      fetchGraphIndicator(
+        dispatch,
+        widgetConfig,
+        locationId,
+        '',
+        getTranslateFromState(getState),
+      );
     } else if (widgetConfig.type === 'number') {
       fetchNumberIndicator(dispatch, widgetConfig, locationId, userId);
     }
@@ -478,8 +510,8 @@ export function reorderIndicators({ oldIndex, newIndex }, e, type) {
 }
 
 // eslint-disable-next-line default-param-last
-export function fetchConfigAndData(locationId, config = 'personal', userId, id, filterSelected) {
-  return (dispatch) => {
+export function fetchConfigAndData(locationId, config = 'personal', userId, id) {
+  return (dispatch, getState) => {
     apiClient.get(`/api/dashboard/${id}/config`).then((res) => {
       dispatch({
         type: FETCH_CONFIG_AND_SET_ACTIVE,
@@ -488,7 +520,7 @@ export function fetchConfigAndData(locationId, config = 'personal', userId, id, 
           activeConfig: config,
         },
       });
-      getData(dispatch, res.data, locationId, config, userId, filterSelected);
+      getData(dispatch, res.data, locationId, config, userId, getTranslateFromState(getState));
     });
   };
 }
