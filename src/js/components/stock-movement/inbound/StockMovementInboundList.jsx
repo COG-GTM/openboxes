@@ -1,8 +1,9 @@
 import React, { useMemo, useState } from 'react';
 
 import PropTypes from 'prop-types';
+import queryString from 'query-string';
 import { connect } from 'react-redux';
-import { withRouter } from 'react-router-dom';
+import { useLocation, withRouter } from 'react-router-dom';
 
 import filterFields from 'components/stock-movement/inbound/FilterFields';
 import StockMovementInboundFilters from 'components/stock-movement/inbound/StockMovementInboundFilters';
@@ -18,7 +19,10 @@ const StockMovementInboundList = (props) => {
     setFilterValues,
     filterParams,
   } = useInboundFilters();
-  const [overdue, setOverdue] = useState(false);
+  const { search } = useLocation();
+  const [overdue, setOverdue] = useState(
+    queryString.parse(search).overdue === 'true',
+  );
   const tableFilterParams = useMemo(() => {
     if (Object.keys(filterParams).length === 0 && !overdue) return filterParams;
     return { ...filterParams, overdue };
