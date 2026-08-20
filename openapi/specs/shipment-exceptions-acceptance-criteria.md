@@ -108,6 +108,19 @@ session bound to a warehouse via `POST /api/chooseLocation/{locationId}`.
 28. **Unsupported sort values are rejected.** `sort=carrier` responds `400`
     (the parameter is a closed enum in the contract).
 
+## Carrier
+
+(Numbered after the auth criteria so the existing criterion numbers, and the
+contract tests named after them, stay stable.)
+
+31. **carrierName reports the shipment carrier and is null when unset.** For a
+    qualifying overdue shipment whose `carrier` is set to a person, the row
+    carries `carrierName` equal to that person's display name
+    (`Person.getName()`, i.e. "firstName lastName"); for an otherwise
+    identical shipment with no carrier, the row carries `carrierName` = null.
+    Every row in `data` has the `carrierName` key. (`Shipment.carrier` is a
+    nullable `Person` association — see decision 6.)
+
 ## Auth
 
 29. **A session is required.** Called without the `JSESSIONID` cookie, the
@@ -131,3 +144,12 @@ session bound to a warehouse via `POST /api/chooseLocation/{locationId}`.
    midnight. There is no client-supplied `asOfDate`.
 5. **Overdue vs. never shipped — decided.** Shipments in derived status
    `PENDING` that are past due are included.
+6. **Carrier identity — decided.** The carrier is `Shipment.carrier`, the
+   nullable `Person` association documented in the domain as "the person or
+   organization that actually carries the goods from A to B", and already
+   serialized as `carrier: {id, name, email}` by `ShipmentApiController`. The
+   exception rows expose only its display name as `carrierName`; the
+   `shipmentMethod.shipper` (a `Shipper` reference used for tracking links)
+   and the free-text `driverName` are deliberately not used, and no new column
+   or migration is introduced. `carrierName` is not sortable or filterable in
+   this version.
