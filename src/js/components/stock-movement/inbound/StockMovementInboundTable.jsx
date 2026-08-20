@@ -292,6 +292,7 @@ const StockMovementInboundTable = ({
         )}
       </div>
       <DataTable
+        key={overdue ? 'overdue' : 'inbound'}
         manual
         sortable
         ref={tableRef}
