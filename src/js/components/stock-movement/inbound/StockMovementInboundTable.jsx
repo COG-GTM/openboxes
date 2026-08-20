@@ -43,10 +43,14 @@ const StockMovementInboundTable = ({
     deleteConfirmAlert,
   } = useInboundListTableData(filterParams);
 
-  const getStatusTooltip = (status) => translate(
-    `react.stockMovement.status.${status.toLowerCase()}.description.label`,
-    status.toLowerCase(),
-  );
+  const getStatusTooltip = (status) => {
+    if (!status) return null;
+    const statusKey = status.toLowerCase();
+    return translate(
+      `react.stockMovement.status.${statusKey}.description.label`,
+      statusKey,
+    );
+  };
 
   // List of all actions for inbound Stock Movement rows
   const getActions = useCallback((row) => {
@@ -141,7 +145,7 @@ const StockMovementInboundTable = ({
       Cell: (row) => (
         <TableCell
           {...row}
-          tooltip
+          tooltip={Boolean(row.value?.name || row.value)}
           tooltipLabel={getStatusTooltip(row.value?.name || row.value)}
         >
           {overdue ? row.value : (

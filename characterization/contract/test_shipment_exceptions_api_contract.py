@@ -21,8 +21,20 @@ def _event_type_id(client, event_code):
         "/api/eventTypes", params={"max": 100}
     )["data"]
     matches = [event for event in event_types if event.get("eventCode") == event_code]
-    assert matches, f"event type not found: {event_code}"
-    return matches[0]["id"]
+    if matches:
+        return matches[0]["id"]
+    response = client.request(
+        "POST",
+        "/api/eventTypes",
+        json={
+            "name": event_code,
+            "description": f"{TEST_PREFIX} {event_code}",
+            "sortOrder": 999,
+            "eventCode": event_code,
+        },
+    )
+    assert response.status_code == 201
+    return response.json()["data"]["id"]
 
 
 def _create_shipment(client, name, destination=None, expected_delivery=None,
