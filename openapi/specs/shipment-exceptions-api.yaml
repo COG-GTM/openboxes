@@ -37,8 +37,13 @@ info:
     PARTIALLY_RECEIVED, RECEIVED). Row status is derived from getStatus(), which
     can return PENDING, SHIPPED, PARTIALLY_RECEIVED or RECEIVED; CREATED is
     unreachable via getStatus(). There is no CANCELLED shipment status; a
-    cancellation is recorded as a shipment event with EventCode.CANCELLED.
-  version: 0.1.0
+    cancellation is recorded as a shipment event with EventCode.CANCELLED. The
+    party responsible for carrying the goods is Shipment.carrier, a nullable
+    association to core.Person ("the person or organization that actually
+    carries the goods from A to B"), whose display name is Person.getName()
+    ("firstName lastName"); ShipmentApiController already serializes it as
+    carrier: {id, name, email}.
+  version: 0.2.0
 servers:
   - url: http://localhost:8080/openboxes
     description: Local Docker baseline (docs/migration/RUNNING_LOCALLY.md)
@@ -67,6 +72,12 @@ paths:
         daysLate = 1 regardless of the request time; a shipment due today
         reports daysLate = 0 and is excluded by the default minDaysLate of 1.
         Rows with daysLate below minDaysLate are excluded.
+
+
+        Each row also carries carrierName, the display name of the party
+        responsible for carrying the shipment (Shipment.carrier, a nullable
+        Person association), so a manager can chase the right carrier straight
+        from the exception list. It is null when no carrier is recorded.
 
 
         The result set is paginated with the standard max/offset params and
@@ -248,6 +259,15 @@ components:
             received or delivered shipments are excluded; a
             PARTIALLY_RECEIVED shipment is reported only when it has neither a
             RECEIVED nor a DELIVERED event.
+        carrierName:
+          type: string
+          nullable: true
+          description: >
+            Display name of the carrier responsible for the shipment, from
+            Shipment.carrier.name (Person.getName(), i.e. "firstName
+            lastName"). Null when the shipment has no carrier: the carrier
+            association is nullable in the domain and is not required to send
+            a shipment. Not sortable or filterable in this version.
         shipmentItemCount:
           type: integer
           description: Number of shipment items, for context on the exception list.
