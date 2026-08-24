@@ -10,6 +10,10 @@ import org.pih.warehouse.core.User
 import org.pih.warehouse.dashboard.GraphData
 import org.pih.warehouse.dashboard.IndicatorDataService
 import org.pih.warehouse.dashboard.NumberData
+import org.pih.warehouse.dashboard.Table
+import org.pih.warehouse.dashboard.TableData
+import org.pih.warehouse.shipping.ShipmentExceptionService
+import util.ConfigHelper
 
 @Transactional
 class DashboardApiController {
@@ -20,6 +24,7 @@ class DashboardApiController {
     def messageService
     GrailsApplication grailsApplication
     AuthService authService
+    ShipmentExceptionService shipmentExceptionService
 
     def config() {
         User user = User.get(session.user.id)
@@ -163,6 +168,29 @@ class DashboardApiController {
         Location location = Location.get(params.locationId)
         def delayedShipments = indicatorDataService.getDelayedShipments(location)
         render(delayedShipments as JSON)
+    }
+
+    def getOverdueInbound() {
+        Location location = Location.get(params.locationId)
+        ShipmentExceptionCommand command = new ShipmentExceptionCommand(
+                minDaysLate: params.int('minDaysLate') ?: 1,
+                sort: params.sort ?: 'daysLate',
+                order: params.order ?: 'desc',
+                max: Math.min(params.int('max') ?: 10, 10)
+        )
+        Map overdueInbound = shipmentExceptionService.getOverdueInboundShipments(location, command)
+        String urlContextPath = ConfigHelper.contextPath
+        List<TableData> tableBody = overdueInbound.data.collect { row ->
+            new TableData(
+                    row.shipmentNumber,
+                    row.origin?.name,
+                    "${row.daysLate} days",
+                    "${urlContextPath}/stockMovement/show/${row.id}"
+            )
+        }
+        Table tableData = new Table("Shipment", "Origin", "Days late", tableBody)
+        GraphData graphData = new GraphData(tableData)
+        render(graphData as JSON)
     }
 
     def getProductWithNegativeInventory() {
