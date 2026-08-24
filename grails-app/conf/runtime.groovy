@@ -628,8 +628,12 @@ openboxes {
                             order   : 5
                         ],
                         [
-                            widgetId: "discrepancy",
+                            widgetId: "overdueInbound",
                             order   : 6
+                        ],
+                        [
+                            widgetId: "discrepancy",
+                            order   : 7
                         ]
                     ]
                 }
@@ -674,8 +678,12 @@ openboxes {
                             order   : 5
                         ],
                         [
-                            widgetId: "discrepancy",
+                            widgetId: "overdueInbound",
                             order   : 6
+                        ],
+                        [
+                            widgetId: "discrepancy",
+                            order   : 7
                         ]
                     ]
                 }
@@ -712,8 +720,12 @@ openboxes {
                             order   : 1
                         ],
                         [
-                            widgetId: "productsInventoried",
+                            widgetId: "overdueInbound",
                             order   : 2
+                        ],
+                        [
+                            widgetId: "productsInventoried",
+                            order   : 3
                         ]
                     ]
                 }
@@ -1019,6 +1031,14 @@ openboxes {
                         state3 = ["third"]
                     }
                 }
+            }
+            overdueInbound {
+                enabled = true
+                title = "react.dashboard.overdueInbound.title.label"
+                info = "react.dashboard.overdueInbound.info.label"
+                graphType = "table"
+                type = 'graph'
+                endpoint = "/api/dashboard/overdueInbound"
             }
             sentStockMovements {
                 enabled = true

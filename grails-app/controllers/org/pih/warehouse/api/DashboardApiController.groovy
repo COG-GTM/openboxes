@@ -2,6 +2,7 @@ package org.pih.warehouse.api
 
 import grails.converters.JSON
 import grails.core.GrailsApplication
+import grails.validation.ValidationException
 import grails.util.Holders
 import org.pih.warehouse.auth.AuthService
 import org.pih.warehouse.core.Location
@@ -163,6 +164,16 @@ class DashboardApiController {
         Location location = Location.get(params.locationId)
         def delayedShipments = indicatorDataService.getDelayedShipments(location)
         render(delayedShipments as JSON)
+    }
+
+    def getOverdueInbound() {
+        Location location = Location.get(params.locationId)
+        if (!location) {
+            ShipmentExceptionCommand command = new ShipmentExceptionCommand()
+            command.errors.reject("warehouse", "A warehouse must be selected")
+            throw new ValidationException("A warehouse must be selected", command.errors)
+        }
+        render(indicatorDataService.getOverdueInbound(location) as JSON)
     }
 
     def getProductWithNegativeInventory() {
