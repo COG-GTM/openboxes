@@ -10,6 +10,7 @@ import org.grails.plugins.web.taglib.ApplicationTagLib
 import org.hibernate.SessionFactory
 import org.joda.time.LocalDate
 import org.pih.warehouse.LocalizationUtil
+import org.pih.warehouse.api.ShipmentExceptionCommand
 import org.pih.warehouse.api.StockMovementDirection
 import org.pih.warehouse.core.ConfigService
 import org.pih.warehouse.core.Location
@@ -25,6 +26,7 @@ import org.pih.warehouse.inventory.OutboundStockMovementListItem
 import org.pih.warehouse.inventory.OutgoingStockMovementCounts
 import org.pih.warehouse.requisition.RequisitionSourceType
 import org.pih.warehouse.shipping.Shipment
+import org.pih.warehouse.shipping.ShipmentExceptionService
 import util.ConfigHelper
 
 @Transactional
@@ -38,6 +40,7 @@ class IndicatorDataService {
     def messageService
     ConfigService configService
     SessionFactory sessionFactory
+    ShipmentExceptionService shipmentExceptionService
 
     ApplicationTagLib getApplicationTagLib() {
         return Holders.grailsApplication.mainContext.getBean(ApplicationTagLib)
@@ -791,6 +794,24 @@ class IndicatorDataService {
         GraphData graphData = new GraphData(numberTableData)
 
         return graphData;
+    }
+
+    @Cacheable(value = "dashboardCache", key = { "getOverdueInbound-${location?.id}" })
+    GraphData getOverdueInbound(Location location) {
+        ShipmentExceptionCommand command = new ShipmentExceptionCommand(max: 10)
+        Map overdueInbound = shipmentExceptionService.getOverdueInboundShipments(location, command)
+        String urlContextPath = ConfigHelper.contextPath
+        List<TableData> tableBody = overdueInbound.data.collect { row ->
+            new TableData(
+                    row.shipmentNumber,
+                    row.origin?.name,
+                    row.daysLate == 1 ? "1 day" : "${row.daysLate} days",
+                    "${urlContextPath}/stockMovement/show/${row.id}"
+            )
+        }
+        Table table = new Table("Shipment", "Origin", "Days late", tableBody)
+        GraphData graphData = new GraphData(table)
+        return graphData
     }
 
     @Cacheable(value = "dashboardCache", key = { "getProductsInventoried-${location?.id}" })
