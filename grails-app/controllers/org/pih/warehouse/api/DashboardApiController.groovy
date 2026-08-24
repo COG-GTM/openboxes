@@ -2,6 +2,7 @@ package org.pih.warehouse.api
 
 import grails.converters.JSON
 import grails.core.GrailsApplication
+import grails.validation.ValidationException
 import grails.util.Holders
 import org.pih.warehouse.auth.AuthService
 import org.pih.warehouse.core.Location
@@ -178,13 +179,17 @@ class DashboardApiController {
                 order: params.order ?: 'desc',
                 max: Math.min(params.int('max') ?: 10, 10)
         )
+        if (!location) {
+            command.errors.reject("warehouse", "A warehouse must be selected")
+            throw new ValidationException("A warehouse must be selected", command.errors)
+        }
         Map overdueInbound = shipmentExceptionService.getOverdueInboundShipments(location, command)
         String urlContextPath = ConfigHelper.contextPath
         List<TableData> tableBody = overdueInbound.data.collect { row ->
             new TableData(
                     row.shipmentNumber,
                     row.origin?.name,
-                    "${row.daysLate} days",
+                    row.daysLate == 1 ? "1 day" : "${row.daysLate} days",
                     "${urlContextPath}/stockMovement/show/${row.id}"
             )
         }
