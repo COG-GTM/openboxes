@@ -43,12 +43,12 @@ class StockTransferWizard extends Component {
     }
   }
 
-  componentWillReceiveProps(nextProps) {
-    if (this.props.locale && this.props.locale !== nextProps.locale) {
-      this.props.fetchTranslations(nextProps.locale, 'stockTransfer');
+  componentDidUpdate(prevProps) {
+    if (prevProps.locale && prevProps.locale !== this.props.locale) {
+      this.props.fetchTranslations(this.props.locale, 'stockTransfer');
     }
 
-    if (nextProps.stockTransferTranslationsFetched && !this.dataFetched) {
+    if (this.props.stockTransferTranslationsFetched && !this.dataFetched) {
       this.dataFetched = true;
 
       this.fetchStockTransfer();

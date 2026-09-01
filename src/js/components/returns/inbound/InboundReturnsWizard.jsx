@@ -37,13 +37,13 @@ class InboundReturns extends Component {
     }
   }
 
-  componentWillReceiveProps(nextProps) {
-    if (this.props.locale && this.props.locale !== nextProps.locale) {
-      this.props.fetchTranslations(nextProps.locale, 'inboundReturns');
-      this.props.fetchTranslations(nextProps.locale, 'stockMovement');
+  componentDidUpdate(prevProps) {
+    if (prevProps.locale && prevProps.locale !== this.props.locale) {
+      this.props.fetchTranslations(this.props.locale, 'inboundReturns');
+      this.props.fetchTranslations(this.props.locale, 'stockMovement');
     }
 
-    if (nextProps.inboundReturnsTranslationsFetched && !this.dataFetched) {
+    if (this.props.inboundReturnsTranslationsFetched && !this.dataFetched) {
       this.dataFetched = true;
 
       this.fetchInitialValues();

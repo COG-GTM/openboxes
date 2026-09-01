@@ -38,13 +38,13 @@ class OutboundReturns extends Component {
     }
   }
 
-  componentWillReceiveProps(nextProps) {
-    if (this.props.locale && this.props.locale !== nextProps.locale) {
-      this.props.fetchTranslations(nextProps.locale, 'outboundReturns');
-      this.props.fetchTranslations(nextProps.locale, 'stockMovement');
+  componentDidUpdate(prevProps) {
+    if (prevProps.locale && prevProps.locale !== this.props.locale) {
+      this.props.fetchTranslations(this.props.locale, 'outboundReturns');
+      this.props.fetchTranslations(this.props.locale, 'stockMovement');
     }
 
-    if (nextProps.outboundReturnsTranslationsFetched && !this.dataFetched) {
+    if (this.props.outboundReturnsTranslationsFetched && !this.dataFetched) {
       this.dataFetched = true;
 
       this.fetchInitialValues();

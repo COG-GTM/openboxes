@@ -110,9 +110,9 @@ class StockRequestDashboard extends Component {
     this.props.fetchTranslations('', 'stockMovement');
   }
 
-  componentWillReceiveProps(nextProps) {
-    if (this.props.locale && this.props.locale !== nextProps.locale) {
-      this.props.fetchTranslations(nextProps.locale, 'stockMovement');
+  componentDidUpdate(prevProps) {
+    if (prevProps.locale && prevProps.locale !== this.props.locale) {
+      this.props.fetchTranslations(this.props.locale, 'stockMovement');
     }
   }
 

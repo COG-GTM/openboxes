@@ -205,8 +205,8 @@ class SendMovementPage extends Component {
     }
   }
 
-  componentWillReceiveProps(nextProps) {
-    if (nextProps.inboundReturnsTranslationsFetched && !this.dataFetched) {
+  componentDidUpdate() {
+    if (this.props.inboundReturnsTranslationsFetched && !this.dataFetched) {
       this.dataFetched = true;
       this.fetchInboundReturn();
     }

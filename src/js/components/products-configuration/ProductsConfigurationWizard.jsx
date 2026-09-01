@@ -31,9 +31,9 @@ class ProductsConfigurationWizard extends Component {
     this.props.fetchTranslations('', 'productsConfiguration');
   }
 
-  componentWillReceiveProps(nextProps) {
-    if (this.props.locale && this.props.locale !== nextProps.locale) {
-      this.props.fetchTranslations(nextProps.locale, 'productsConfiguration');
+  componentDidUpdate(prevProps) {
+    if (prevProps.locale && prevProps.locale !== this.props.locale) {
+      this.props.fetchTranslations(this.props.locale, 'productsConfiguration');
     }
   }
 

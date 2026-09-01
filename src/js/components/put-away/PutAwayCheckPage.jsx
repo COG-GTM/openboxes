@@ -80,21 +80,25 @@ class PutAwayCheckPage extends Component {
     this.save = this.save.bind(this);
   }
 
-  componentWillReceiveProps(nextProps) {
-    showLocationChangedAlert(
-      this.props.translate, this.state.location, nextProps.location,
-      () => { window.location = `${ORDER_URL.list()}?orderType=PUTAWAY_ORDER&status=PENDING`; },
-    );
+  componentDidUpdate(prevProps) {
+    if (!_.isEqual(prevProps.initialValues, this.props.initialValues)
+      || !_.isEqual(prevProps.location, this.props.location)) {
+      showLocationChangedAlert(
+        this.props.translate, this.state.location, this.props.location,
+        () => { window.location = `${ORDER_URL.list()}?orderType=PUTAWAY_ORDER&status=PENDING`; },
+      );
 
-    this.setState((prev) => ({
-      putAway: {
-        ...nextProps.initialValues.putAway,
-        putawayItems: PutAwayCheckPage
-          .processSplitLines(nextProps.initialValues.putAway.putawayItems),
-      },
-      completed: nextProps.initialValues.putAway.putawayStatus === 'COMPLETED',
-      location: prev.location.id ? prev.location : nextProps.location,
-    }));
+      // eslint-disable-next-line react/no-did-update-set-state
+      this.setState((prev) => ({
+        putAway: {
+          ...this.props.initialValues.putAway,
+          putawayItems: PutAwayCheckPage
+            .processSplitLines(this.props.initialValues.putAway.putawayItems),
+        },
+        completed: this.props.initialValues.putAway.putawayStatus === 'COMPLETED',
+        location: prev.location.id ? prev.location : this.props.location,
+      }));
+    }
   }
 
   /**

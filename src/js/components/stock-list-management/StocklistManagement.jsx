@@ -55,12 +55,12 @@ class StocklistManagement extends Component {
     }
   }
 
-  componentWillReceiveProps(nextProps) {
-    if (this.props.locale && this.props.locale !== nextProps.locale) {
-      this.props.fetchTranslations(nextProps.locale, 'stockListManagement');
+  componentDidUpdate(prevProps, prevState) {
+    if (prevProps.locale && prevProps.locale !== this.props.locale) {
+      this.props.fetchTranslations(this.props.locale, 'stockListManagement');
     }
 
-    if (nextProps.stockListManagementTranslationsFetched && !this.dataFetched) {
+    if (this.props.stockListManagementTranslationsFetched && !this.dataFetched) {
       this.dataFetched = true;
 
       this.fetchData();
@@ -68,9 +68,7 @@ class StocklistManagement extends Component {
       this.fetchProductInfo();
       this.fetchUsers();
     }
-  }
 
-  componentDidUpdate(prevProps, prevState) {
     if ((!prevState.usersFetched || !prevState.stocklistsFetched)
       && this.state.usersFetched && this.state.stocklistsFetched) {
       this.props.hideSpinner();

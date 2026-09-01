@@ -212,15 +212,15 @@ class CreateReplenishment extends Component {
     this.props.hideInfoBar(InfoBar.STOCK_REPLENISHMENT_DESCRIPTION);
   }
 
-  componentWillReceiveProps(nextProps) {
-    if (nextProps.replenishmentTranslationsFetched) {
+  componentDidUpdate(prevProps) {
+    if (this.props.replenishmentTranslationsFetched) {
       if (!this.dataFetched) {
         this.dataFetched = true;
 
         this.fetchStatusOptions();
+        this.fetchRequirements(prevProps.locationId);
+      } else if (prevProps.locationId !== this.props.locationId) {
         this.fetchRequirements(this.props.locationId);
-      } else if (this.props.locationId !== nextProps.locationId) {
-        this.fetchRequirements(nextProps.locationId);
       }
     }
   }

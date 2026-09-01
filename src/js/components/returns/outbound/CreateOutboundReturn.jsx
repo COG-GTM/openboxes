@@ -106,14 +106,14 @@ class CreateOutboundReturn extends Component {
     }
   }
 
-  componentWillReceiveProps(nextProps) {
-    if (nextProps.outboundReturnsTranslationsFetched && nextProps.location.id) {
+  componentDidUpdate(prevProps) {
+    if (this.props.outboundReturnsTranslationsFetched && this.props.location.id) {
       if (!this.dataFetched) {
         this.dataFetched = true;
 
-        this.fetchOutboundReturn(nextProps);
-      } else if (this.props.location.id !== nextProps.location.id) {
-        this.fetchOutboundReturn(nextProps);
+        this.fetchOutboundReturn(this.props);
+      } else if (prevProps.location.id !== this.props.location.id) {
+        this.fetchOutboundReturn(this.props);
       }
     }
   }

@@ -35,12 +35,12 @@ class InvoiceWizard extends Component {
     }
   }
 
-  componentWillReceiveProps(nextProps) {
-    if (this.props.locale && this.props.locale !== nextProps.locale) {
-      this.props.fetchTranslations(nextProps.locale, 'invoice');
+  componentDidUpdate(prevProps) {
+    if (prevProps.locale && prevProps.locale !== this.props.locale) {
+      this.props.fetchTranslations(this.props.locale, 'invoice');
     }
 
-    if (nextProps.invoiceTranslationsFetched && !this.dataFetched) {
+    if (this.props.invoiceTranslationsFetched && !this.dataFetched) {
       this.dataFetched = true;
       this.fetchInitialValues();
     }

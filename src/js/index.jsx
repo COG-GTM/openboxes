@@ -3,10 +3,10 @@ import React from 'react';
 import { library } from '@fortawesome/fontawesome-svg-core';
 import { fab } from '@fortawesome/free-brands-svg-icons';
 import { fas } from '@fortawesome/free-solid-svg-icons';
-import ReactDOM from 'react-dom';
+import { createRoot } from 'react-dom/client';
 import { LocalizeProvider } from 'react-localize-redux';
 import MetaTags from 'react-meta-tags';
-import Provider from 'react-redux/es/components/Provider';
+import { Provider } from 'react-redux';
 // eslint-disable-next-line import/extensions,import/no-unresolved
 import MainRouter from 'src/MainRouter';
 import store from 'store';
@@ -30,7 +30,8 @@ __webpack_public_path__ = `${window.CONTEXT_PATH}/static/webpack/`;
 // Initialize Sentry as early as possible so that it can capture startup errors as well.
 initializeSentry();
 
-ReactDOM.render(
+const root = createRoot(document.getElementById('root'));
+root.render(
   <Provider store={store}>
     <LocalizeProvider store={store}>
       <MetaTags>
@@ -39,5 +40,4 @@ ReactDOM.render(
       <MainRouter />
     </LocalizeProvider>
   </Provider>,
-  document.getElementById('root'),
 );

@@ -23,9 +23,9 @@ class Wizard extends Component {
     this.goToPage = this.goToPage.bind(this);
   }
 
-  componentWillReceiveProps(nextProps) {
-    if (nextProps.currentPage !== this.props.currentPage) {
-      this.goToPage(nextProps.currentPage, nextProps.initialValues);
+  componentDidUpdate(prevProps) {
+    if (prevProps.currentPage !== this.props.currentPage) {
+      this.goToPage(this.props.currentPage, this.props.initialValues);
     }
   }
 

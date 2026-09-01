@@ -298,7 +298,7 @@ class ReceivingCheckScreen extends Component {
         }
 
         this.setState({ values: {} }, () => {
-          this.setState({ values });
+          this.setState({ values }, () => this.props.hideSpinner());
         });
       })
       .catch(() => this.props.hideSpinner());

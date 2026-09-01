@@ -270,8 +270,8 @@ class PackingPage extends Component {
     }
   }
 
-  componentWillReceiveProps(nextProps) {
-    if (nextProps.stockMovementTranslationsFetched && !this.dataFetched) {
+  componentDidUpdate() {
+    if (this.props.stockMovementTranslationsFetched && !this.dataFetched) {
       this.dataFetched = true;
 
       this.fetchAllData();

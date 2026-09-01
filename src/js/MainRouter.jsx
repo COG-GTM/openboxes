@@ -3,7 +3,7 @@ import React from 'react';
 import PropTypes from 'prop-types';
 import { renderToStaticMarkup } from 'react-dom/server';
 import { withLocalize } from 'react-localize-redux';
-import connect from 'react-redux/es/connect/connect';
+import { connect } from 'react-redux';
 
 import { fetchMenuConfig, fetchSessionInfo, fetchTranslations } from 'actions';
 import Router from 'components/Router';
@@ -17,7 +17,7 @@ const TRANSLATION_PREFIXES = ['default', 'dashboard', 'combinedShipments', 'prod
 // TODO: Refactor fetching menu config
 // TODO: Refactor fetching localizations (react-localize-redux)
 
-class MainRouter extends React.Component {
+export class MainRouter extends React.Component {
   componentDidMount() {
     this.props.fetchSessionInfo().then(() => {
       this.props.initialize({
@@ -33,11 +33,11 @@ class MainRouter extends React.Component {
     });
   }
 
-  componentWillReceiveProps(nextProps) {
-    if (this.props.locale !== nextProps.locale) {
-      this.props.setActiveLanguage(nextProps.locale);
+  componentDidUpdate(prevProps) {
+    if (prevProps.locale !== this.props.locale) {
+      this.props.setActiveLanguage(this.props.locale);
 
-      if (this.props.locale) {
+      if (prevProps.locale) {
         TRANSLATION_PREFIXES.forEach((prefix) => this.props.fetchTranslations('', prefix));
       }
 

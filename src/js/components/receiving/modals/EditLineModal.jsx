@@ -86,7 +86,7 @@ const eraseReceivingQuantity = (items) => items.map((item) => {
  * Modal window where user can edit receiving's line. User can open it on the first page
  * of partial receiving if they want to change lot information.
 */
-class EditLineModal extends Component {
+export class EditLineModalComponent extends Component {
   constructor(props) {
     super(props);
     const {
@@ -126,14 +126,13 @@ class EditLineModal extends Component {
     this.validate = this.validate.bind(this);
   }
 
-  componentWillReceiveProps(nextProps) {
+  static getDerivedStateFromProps(props) {
     const {
       fieldConfig: { attributes, getDynamicAttr },
-    } = nextProps;
-    const dynamicAttr = getDynamicAttr ? getDynamicAttr(nextProps) : {};
-    const attr = { ...attributes, ...dynamicAttr };
+    } = props;
+    const dynamicAttr = getDynamicAttr ? getDynamicAttr(props) : {};
 
-    this.setState({ attr });
+    return { attr: { ...attributes, ...dynamicAttr } };
   }
 
   groupShipmentItems(values = this.props.values) {
@@ -355,9 +354,9 @@ const mapStateToProps = (state) => ({
   translate: translateWithDefaultMessage(getTranslate(state.localize)),
 });
 
-export default connect(mapStateToProps, { showSpinner, hideSpinner })(EditLineModal);
+export default connect(mapStateToProps, { showSpinner, hideSpinner })(EditLineModalComponent);
 
-EditLineModal.propTypes = {
+EditLineModalComponent.propTypes = {
   /** Name of the field */
   fieldName: PropTypes.string.isRequired,
   /** Configuration of the field */
@@ -384,6 +383,6 @@ EditLineModal.propTypes = {
   confirmExpirationDateSave: PropTypes.func.isRequired,
 };
 
-EditLineModal.defaultProps = {
+EditLineModalComponent.defaultProps = {
   wrapperClassName: null,
 };

@@ -13,9 +13,10 @@ class VerticalTabs extends Component {
     };
   }
 
-  componentWillReceiveProps(nextProps) {
-    if (Object.keys(this.props.tabs).length !== Object.keys(nextProps.tabs).length) {
-      this.setState({ activeTab: Object.keys(nextProps.tabs)[0] });
+  componentDidUpdate(prevProps) {
+    if (Object.keys(prevProps.tabs).length !== Object.keys(this.props.tabs).length) {
+      // eslint-disable-next-line react/no-did-update-set-state
+      this.setState({ activeTab: Object.keys(this.props.tabs)[0] });
     }
   }
 

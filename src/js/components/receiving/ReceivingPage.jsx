@@ -45,12 +45,12 @@ class ReceivingPage extends Component {
     }
   }
 
-  componentWillReceiveProps(nextProps) {
-    if (this.props.locale && this.props.locale !== nextProps.locale) {
-      this.props.fetchTranslations(nextProps.locale, 'partialReceiving');
+  componentDidUpdate(prevProps) {
+    if (prevProps.locale && prevProps.locale !== this.props.locale) {
+      this.props.fetchTranslations(this.props.locale, 'partialReceiving');
     }
 
-    if (nextProps.partialReceivingTranslationsFetched && !this.dataFetched) {
+    if (this.props.partialReceivingTranslationsFetched && !this.dataFetched) {
       this.dataFetched = true;
 
       this.fetchPartialReceiptCandidates();
