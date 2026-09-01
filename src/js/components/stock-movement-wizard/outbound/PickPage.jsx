@@ -271,15 +271,15 @@ class PickPage extends Component {
     }
   }
 
-  componentWillReceiveProps(nextProps) {
-    if (nextProps.stockMovementTranslationsFetched && !this.dataFetched) {
+  componentDidUpdate(prevProps) {
+    if (this.props.stockMovementTranslationsFetched && !this.dataFetched) {
       this.dataFetched = true;
 
       this.fetchAllData(false);
     }
 
     // If we change the language, refetch the reason codes
-    if (nextProps.currentLocale !== this.props.currentLocale) {
+    if (prevProps.currentLocale !== this.props.currentLocale) {
       this.props.fetchReasonCodes();
     }
   }

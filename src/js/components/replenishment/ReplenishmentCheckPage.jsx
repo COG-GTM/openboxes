@@ -148,8 +148,8 @@ class ReplenishmentSecondPage extends Component {
     }
   }
 
-  componentWillReceiveProps(nextProps) {
-    if (nextProps.replenishmentTranslationsFetched && !this.dataFetched) {
+  componentDidUpdate() {
+    if (this.props.replenishmentTranslationsFetched && !this.dataFetched) {
       this.dataFetched = true;
       this.fetchReplenishment();
     }

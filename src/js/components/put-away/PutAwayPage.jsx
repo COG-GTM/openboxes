@@ -66,14 +66,14 @@ class PutAwayPage extends Component {
     }
   }
 
-  componentWillReceiveProps(nextProps) {
-    if (nextProps.putAwayTranslationsFetched) {
+  componentDidUpdate(prevProps) {
+    if (this.props.putAwayTranslationsFetched) {
       if (!this.dataFetched) {
         this.dataFetched = true;
 
         this.fetchPutAwayCandidates(this.props.locationId);
-      } else if (this.props.locationId !== nextProps.locationId) {
-        this.fetchPutAwayCandidates(nextProps.locationId);
+      } else if (prevProps.locationId !== this.props.locationId) {
+        this.fetchPutAwayCandidates(this.props.locationId);
       }
     }
   }

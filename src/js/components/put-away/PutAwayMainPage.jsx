@@ -39,12 +39,12 @@ class PutAwayMainPage extends Component {
     }
   }
 
-  componentWillReceiveProps(nextProps) {
-    if (this.props.locale && this.props.locale !== nextProps.locale) {
-      this.props.fetchTranslations(nextProps.locale, 'putAway');
+  componentDidUpdate(prevProps) {
+    if (prevProps.locale && prevProps.locale !== this.props.locale) {
+      this.props.fetchTranslations(this.props.locale, 'putAway');
     }
 
-    if (nextProps.putAwayTranslationsFetched && !this.dataFetched) {
+    if (this.props.putAwayTranslationsFetched && !this.dataFetched) {
       this.dataFetched = true;
 
       this.fetchPutAway();

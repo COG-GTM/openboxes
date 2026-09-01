@@ -255,9 +255,7 @@ exports[`wizard component should match snapshot 1`] = `
                                     "whiteSpace": "pre",
                                   }
                                 }
-                              >
-                                
-                              </div>
+                              />
                             </div>
                           </div>
                         </div>
@@ -526,9 +524,7 @@ exports[`wizard component should match snapshot 1`] = `
                                     "whiteSpace": "pre",
                                   }
                                 }
-                              >
-                                
-                              </div>
+                              />
                             </div>
                           </div>
                         </div>
@@ -764,9 +760,7 @@ exports[`wizardPage component should match snapshot 1`] = `
                                 "whiteSpace": "pre",
                               }
                             }
-                          >
-                            
-                          </div>
+                          />
                         </div>
                       </div>
                     </div>
@@ -1035,9 +1029,7 @@ exports[`wizardPage component should match snapshot 1`] = `
                                 "whiteSpace": "pre",
                               }
                             }
-                          >
-                            
-                          </div>
+                          />
                         </div>
                       </div>
                     </div>

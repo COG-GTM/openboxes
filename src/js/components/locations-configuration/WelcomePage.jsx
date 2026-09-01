@@ -13,9 +13,9 @@ class WelcomePage extends Component {
     this.props.fetchTranslations('', 'locationsConfiguration');
   }
 
-  componentWillReceiveProps(nextProps) {
-    if (this.props.locale && this.props.locale !== nextProps.locale) {
-      this.props.fetchTranslations(nextProps.locale, 'locationsConfiguration');
+  componentDidUpdate(prevProps) {
+    if (prevProps.locale && prevProps.locale !== this.props.locale) {
+      this.props.fetchTranslations(this.props.locale, 'locationsConfiguration');
     }
   }
 

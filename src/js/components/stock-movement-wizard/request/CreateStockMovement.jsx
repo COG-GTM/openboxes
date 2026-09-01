@@ -255,10 +255,10 @@ class CreateStockMovement extends Component {
     this.fetchRequisitionTypes();
   }
 
-  componentWillReceiveProps(nextProps) {
-    if (!this.props.match.params.stockMovementId && this.state.setInitialValues
-      && nextProps.location.id) {
-      this.setInitialValues(nextProps.location, nextProps.user);
+  componentDidUpdate(prevProps) {
+    if (!prevProps.match.params.stockMovementId && this.state.setInitialValues
+      && this.props.location.id) {
+      this.setInitialValues(this.props.location, this.props.user);
     }
   }
 

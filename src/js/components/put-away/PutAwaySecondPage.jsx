@@ -71,17 +71,20 @@ class PutAwaySecondPage extends Component {
     this.fetchPutAway();
   }
 
-  componentWillReceiveProps(nextProps) {
-    showLocationChangedAlert(
-      this.props.translate, this.state.location, nextProps.location,
-      () => { window.location = `${ORDER_URL.list()}?orderType=PUTAWAY_ORDER&status=PENDING`; },
-    );
+  componentDidUpdate(prevProps) {
+    if (!_.isEqual(prevProps.location, this.props.location)) {
+      showLocationChangedAlert(
+        this.props.translate, this.state.location, this.props.location,
+        () => { window.location = `${ORDER_URL.list()}?orderType=PUTAWAY_ORDER&status=PENDING`; },
+      );
 
-    this.setState((prev) => ({
-      location: prev.location.id ? prev.location : nextProps.location,
-    }));
+      // eslint-disable-next-line react/no-did-update-set-state
+      this.setState((prev) => ({
+        location: prev.location.id ? prev.location : this.props.location,
+      }));
+    }
 
-    if (nextProps.putAwayTranslationsFetched && !this.dataFetched) {
+    if (this.props.putAwayTranslationsFetched && !this.dataFetched) {
       this.dataFetched = true;
       this.fetchBins();
     }

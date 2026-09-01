@@ -95,8 +95,8 @@ class StockTransferSecondPage extends Component {
     this.fetchStockTransfer();
   }
 
-  componentWillReceiveProps(nextProps) {
-    if (nextProps.stockTransferTranslationsFetched && !this.dataFetched) {
+  componentDidUpdate() {
+    if (this.props.stockTransferTranslationsFetched && !this.dataFetched) {
       this.dataFetched = true;
       this.fetchBins();
     }

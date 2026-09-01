@@ -75,14 +75,14 @@ class CreateStockTransfer extends Component {
     this.props.hideInfoBar(InfoBar.STOCK_TRANSFER_DESCRIPTION);
   }
 
-  componentWillReceiveProps(nextProps) {
-    if (nextProps.stockTransferTranslationsFetched) {
+  componentDidUpdate(prevProps) {
+    if (this.props.stockTransferTranslationsFetched) {
       if (!this.dataFetched) {
         this.dataFetched = true;
 
         this.fetchStockTransferCandidates(this.props.locationId);
-      } else if (this.props.locationId !== nextProps.locationId) {
-        this.fetchStockTransferCandidates(nextProps.locationId);
+      } else if (prevProps.locationId !== this.props.locationId) {
+        this.fetchStockTransferCandidates(this.props.locationId);
       }
     }
   }

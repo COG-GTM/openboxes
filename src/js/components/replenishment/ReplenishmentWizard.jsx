@@ -42,12 +42,12 @@ class ReplenishmentWizard extends Component {
     }
   }
 
-  componentWillReceiveProps(nextProps) {
-    if (this.props.locale && this.props.locale !== nextProps.locale) {
-      this.props.fetchTranslations(nextProps.locale, 'replenishment');
+  componentDidUpdate(prevProps) {
+    if (prevProps.locale && prevProps.locale !== this.props.locale) {
+      this.props.fetchTranslations(this.props.locale, 'replenishment');
     }
 
-    if (nextProps.replenishmentTranslationsFetched && !this.dataFetched) {
+    if (this.props.replenishmentTranslationsFetched && !this.dataFetched) {
       this.dataFetched = true;
 
       this.fetchReplenishment();

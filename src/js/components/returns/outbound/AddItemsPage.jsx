@@ -221,14 +221,14 @@ class AddItemsPage extends Component {
     }
   }
 
-  componentWillReceiveProps(nextProps) {
-    if (nextProps.outboundReturnsTranslationsFetched) {
+  componentDidUpdate(prevProps) {
+    if (this.props.outboundReturnsTranslationsFetched) {
       if (!this.dataFetched) {
         this.dataFetched = true;
 
         this.fetchBins();
         this.fetchOutboundReturn();
-      } else if (this.props.locationId !== nextProps.locationId) {
+      } else if (prevProps.locationId !== this.props.locationId) {
         this.fetchBins();
         this.fetchOutboundReturn();
       }

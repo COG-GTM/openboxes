@@ -130,10 +130,10 @@ class CreateStockMovement extends Component {
     }
   }
 
-  componentWillReceiveProps(nextProps) {
-    if (!this.props.match.params.stockMovementId && this.state.setInitialValues
-      && nextProps.location.id && !orderId && !this.props.hasCentralPurchasingEnabled) {
-      this.setInitialValues(null, nextProps.location);
+  componentDidUpdate(prevProps) {
+    if (!prevProps.match.params.stockMovementId && this.state.setInitialValues
+      && this.props.location.id && !orderId && !prevProps.hasCentralPurchasingEnabled) {
+      this.setInitialValues(null, this.props.location);
     }
   }
 

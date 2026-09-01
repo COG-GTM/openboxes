@@ -106,14 +106,13 @@ class DetailsModal extends Component {
     this.onOpen = this.onOpen.bind(this);
   }
 
-  componentWillReceiveProps(nextProps) {
+  static getDerivedStateFromProps(props) {
     const {
       fieldConfig: { attributes, getDynamicAttr },
-    } = nextProps;
-    const dynamicAttr = getDynamicAttr ? getDynamicAttr(nextProps) : {};
-    const attr = { ...attributes, ...dynamicAttr };
+    } = props;
+    const dynamicAttr = getDynamicAttr ? getDynamicAttr(props) : {};
 
-    this.setState({ attr });
+    return { attr: { ...attributes, ...dynamicAttr } };
   }
 
   onOpen() {

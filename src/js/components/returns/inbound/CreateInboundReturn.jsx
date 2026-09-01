@@ -116,14 +116,14 @@ class CreateInboundReturn extends Component {
     }
   }
 
-  componentWillReceiveProps(nextProps) {
-    if (nextProps.inboundReturnsTranslationsFetched && nextProps.location.id) {
+  componentDidUpdate(prevProps) {
+    if (this.props.inboundReturnsTranslationsFetched && this.props.location.id) {
       if (!this.dataFetched) {
         this.dataFetched = true;
 
-        this.fetchInboundReturn(nextProps);
-      } else if (this.props.location.id !== nextProps.location.id) {
-        this.fetchInboundReturn(nextProps);
+        this.fetchInboundReturn(this.props);
+      } else if (prevProps.location.id !== this.props.location.id) {
+        this.fetchInboundReturn(this.props);
       }
     }
   }

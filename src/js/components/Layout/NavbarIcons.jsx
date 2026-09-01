@@ -56,18 +56,16 @@ const NavbarIcons = ({
       tooltip: translate('react.default.navbar.search', 'Search'),
       component: (renderProps) => (
         <GlobalSearch
-          renderButton={({ showSearchbar, isVisible }) => {
-            renderProps.setIsTooltipDisabled(isVisible);
-            return (
-              <button
-                type="button"
-                onClick={showSearchbar}
-                className="menu-icon"
-              >
-                <RiSearchLine />
-              </button>
-            );
-          }}
+          onVisibilityChange={renderProps.setIsTooltipDisabled}
+          renderButton={({ showSearchbar }) => (
+            <button
+              type="button"
+              onClick={showSearchbar}
+              className="menu-icon"
+            >
+              <RiSearchLine />
+            </button>
+          )}
         />
       ),
     },
