@@ -400,6 +400,11 @@ class AvailableItem {
         return binLocation?.onHold
     }
 
+    Boolean isExpired() {
+        Date expirationDate = inventoryItem?.expirationDate
+        return expirationDate ? expirationDate.before(new Date().clearTime()) : false
+    }
+
     Boolean isRecalled() {
         return inventoryItem?.recalled
     }
