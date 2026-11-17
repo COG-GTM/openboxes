@@ -402,7 +402,7 @@ class AvailableItem {
 
     Boolean isExpired() {
         Date expirationDate = inventoryItem?.expirationDate
-        return expirationDate ? expirationDate.before(new Date().clearTime()) : false
+        return expirationDate ? expirationDate.before(new Date().clearTime() + 1) : false
     }
 
     Boolean isRecalled() {

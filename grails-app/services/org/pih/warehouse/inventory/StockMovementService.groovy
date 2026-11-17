@@ -1969,7 +1969,7 @@ class StockMovementService {
             // Retrieve all available items and then calculate suggested
             List<AvailableItem> availableItems = getAvailableItems(location, requisitionItem)
             log.info "Available items: ${availableItems}"
-            List<SuggestedItem> suggestedItems = getSuggestedItems(availableItems, quantityRequired)
+            List<SuggestedItem> suggestedItems = getSuggestedItems(availableItems, quantityRequired, true)
             log.info "Suggested items " + suggestedItems
             clearPicklist(requisitionItem)
             if (suggestedItems) {
@@ -2208,10 +2208,14 @@ class StockMovementService {
      * @return
      */
     List getSuggestedItems(List<AvailableItem> availableItems, Integer quantityRequested) {
+        return getSuggestedItems(availableItems, quantityRequested, false)
+    }
+
+    List getSuggestedItems(List<AvailableItem> availableItems, Integer quantityRequested, Boolean skipExpired) {
 
         List suggestedItems = []
         List<AvailableItem> autoPickableItems = availableItems?.findAll {
-            it.quantityAvailable > 0 && it.pickable && !it.expired
+            it.quantityAvailable > 0 && it.pickable && !(skipExpired && it.expired)
         }
 
         // As long as quantity requested is less than the total available we can iterate through available items
@@ -2351,7 +2355,7 @@ class StockMovementService {
 
         List<AvailableItem> availableItems = getAvailableItems(location, requisitionItem, showDetails)
         Integer quantityRequired = requisitionItem?.calculateQuantityRequired()
-        List<SuggestedItem> suggestedItems = getSuggestedItems(availableItems, quantityRequired)
+        List<SuggestedItem> suggestedItems = getSuggestedItems(availableItems, quantityRequired, true)
         pickPageItem.availableItems = availableItems
         pickPageItem.suggestedItems = suggestedItems
         pickPageItem.sortOrder = requisitionItem.orderIndex ?: sortOrder
