@@ -210,7 +210,9 @@ class PicklistService {
     List getSuggestedItems(List<AvailableItem> availableItems, Integer quantityRequested, Location warehouse) {
 
         List suggestedItems = []
-        List<AvailableItem> autoPickableItems = availableItems?.findAll { it.quantityAvailable > 0 && it.pickable }
+        List<AvailableItem> autoPickableItems = availableItems?.findAll {
+            it.quantityAvailable > 0 && it.pickable && !it.expired
+        }
 
         // As long as quantity requested is less than the total available we can iterate through available items
         // and pick until quantity requested is 0. Otherwise, we don't suggest anything because the user must
