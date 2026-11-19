@@ -877,16 +877,22 @@ class ProductAvailabilityService {
         }
         List results = ProductAvailability.createCriteria().list {
             projections {
-                resultTransformer(CriteriaSpecification.ALIAS_TO_ENTITY_MAP)
-                groupProperty("inventoryItem", "inventoryItem")
-                sum("quantityOnHand", "quantityOnHand")
+                groupProperty("inventoryItem.id")
+                sum("quantityOnHand")
             }
             eq("location", location)
             if (inventoryItems) {
                 'in'("inventoryItem.id", inventoryItems.id)
             }
         }
-        return results.inject([:]) { map, it -> map << [(it.inventoryItem): it.quantityOnHand] }
+        // Load the grouped inventory items (and their products) in batches instead of one select per row
+        Map<String, InventoryItem> inventoryItemsById = [:]
+        results.collect { it[0] }.collate(1000).each { List ids ->
+            InventoryItem.executeQuery("select ii from InventoryItem ii left join fetch ii.product where ii.id in (:ids)", [ids: ids]).each {
+                inventoryItemsById[it.id] = it
+            }
+        }
+        return results.inject([:]) { map, it -> map << [(inventoryItemsById[it[0]]): it[1]] }
     }
 
     List<AvailableItem> getAvailableBinLocations(Location location, String productId) {
